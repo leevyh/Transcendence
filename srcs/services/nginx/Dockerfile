@@ -12,11 +12,11 @@ RUN apt-get update && apt-get upgrade
 
 COPY /conf/nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY /frontend/index.html /var/www/html
-COPY /frontend/css/index.css /var/www/html
-COPY /frontend/js/index.js /var/www/html
+COPY /frontend/index.html /usr/share/nginx
+COPY /frontend/. /usr/share/nginx
+COPY /frontend/. /usr/share/nginx
 
-RUN chmod 777 /var/www/html && chown -R www-data:www-data /var/www/html
+RUN chmod 777 /usr/share/nginx && chown -R www-data:www-data /usr/share/nginx
 
 # CMD ["nginx", "-g", "daemon off;"]
 
