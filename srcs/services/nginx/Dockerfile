@@ -14,7 +14,6 @@ COPY /conf/nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY /frontend/index.html /usr/share/nginx
 COPY /frontend/. /usr/share/nginx
-COPY /frontend/. /usr/share/nginx
 
 RUN chmod 777 /usr/share/nginx && chown -R www-data:www-data /usr/share/nginx
 

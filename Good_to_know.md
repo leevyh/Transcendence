@@ -26,41 +26,42 @@ Automatic file-based routing can be achieved with tools like TanStack Router and
 
 
 # HTML
-<html lang=”fr”>  pour le français ;
-<html lang=”en”>  pour l’anglais ;
-<html lang=”es”>  pour l’espagnol…
+\<html lang=”fr”>  pour le français ; \
+\<html lang=”en”>  pour l’anglais ; \
+\<html lang=”es”>  pour l’espagnol…
 
-- La balise en paire <title> </title> affiche le titre de la page dans l'onglet du navigateur.
-- La balise en paire <head> </head> contient deux balises qui donnent des informations au navigateur : l’encodage et le titre de la page.
-- La balise en paire <body> </body> contient tout ce qui sera affiché à l'écran sur la page web.
-- Les balises <p> </p> permettent de délimiter des paragraphes en HTML.
-- Pour revenir à la ligne, on utilise la balise orpheline  <br> (pour break), on n'a donc pas besoin de la fermer.
+- La balise en paire \<title> \</title> affiche le titre de la page dans l'onglet du navigateur.
+- La balise en paire \<head> \</head> contient deux balises qui donnent des informations au navigateur : l’encodage et le titre de la page.
+- La balise en paire \<body> \</body> contient tout ce qui sera affiché à l'écran sur la page web.
+- Les balises \<p> \</p> permettent de délimiter des paragraphes en HTML.
+- Pour revenir à la ligne, on utilise la balise orpheline \<br> (pour break), on n'a donc pas besoin de la fermer.
 
-- Les balises de titres vont de <h1> </h1> jusqu'à <h6> </h6>, ce qui permet de hiérarchiser et structurer le texte dans différentes sections, du niveau le plus grand, au niveau le plus petit.
-/!\ Il faut toujours structurer sa page en commençant par un titre de niveau 1<h1>, puis structurer l'intérieur avec des titres de niveau 2<h2>, puis, si besoin de structurer l'intérieur, utiliser des titres de niveau 3, etc. Il ne devrait pas y avoir de sous-titre sans titre principal !
+- Les balises de titres vont de \<h1> \</h1> jusqu'à \<h6> \</h6>, ce qui permet de hiérarchiser et structurer le texte dans différentes sections, du niveau le plus grand, au niveau le plus petit. \
+/!\ Il faut toujours structurer sa page en commençant par un titre de niveau 1\<h1>, puis structurer l'intérieur avec des titres de niveau 2\<h2>, puis, si besoin de structurer l'intérieur, utiliser des titres de niveau 3, etc. \
+Il ne devrait pas y avoir de sous-titre sans titre principal !
 
-- Les balises <li> </li> (pour "listed item") permettent de baliser les éléments que l'on veut mettre dans une liste.
-- Les balises <ul> </ul> (pour "unordered list") permettent d'indiquer qu'on démarre une liste non ordonnée, c'est-à-dire, ce que l'on appelle en français une liste à puces.
-- Les balises <ol> </ol> (pour "ordered list") permettent d'indiquer qu'on démarre une liste ordonnée, autrement dit en français une liste numérotée.
+- Les balises \<li> \</li> (pour "listed item") permettent de baliser les éléments que l'on veut mettre dans une liste.
+- Les balises \<ul> \</ul> (pour "unordered list") permettent d'indiquer qu'on démarre une liste non ordonnée, c'est-à-dire, ce que l'on appelle en français une liste à puces.
+- Les balises \<ol> \</ol> (pour "ordered list") permettent d'indiquer qu'on démarre une liste ordonnée, autrement dit en français une liste numérotée.
 
 - Les balises de texte :
-<mark> </mark> : Surligner le texte.
-<em> </em> : Mettre le texte en italique.
-<strong> </strong> : Mettre le texte en gras.
+\<mark> \</mark> : Surligner le texte. \
+\<em> \</em> : Mettre le texte en italique. \
+\<strong> \</strong> : Mettre le texte en gras.
 
-- Ajouter un lien hypertexte avec la balise <a> et l'attribut href:
-<a href="https://openclassrooms.com/fr/">Accédez à OpenClassrooms</a>
-Ce type de lien hypertexte s'appelle un lien absolu : il indique une adresse complète.
-<a href="contenu/autredossier/page3.html">Page 3</a>
+- Ajouter un lien hypertexte avec la balise \<a> et l'attribut href: \
+\<a href="https://openclassrooms.com/fr/">Accédez à OpenClassrooms\</a> \
+Ce type de lien hypertexte s'appelle un lien absolu : il indique une adresse complète. \
+\<a href="contenu/autredossier/page3.html">Page 3\</a> \
 Ce type de lien hypertexte s'appelle un lien relatif : il indique où trouver notre fichier HTML.
 
-- Créer une ancre avec les attributs id et href
-<h2 id="mon_ancre">Titre</h2>
-<a href="index.html#jardin">Le jardin</a>
+- Créer une ancre avec les attributs id et href \
+\<h2 id="mon_ancre">Titre\</h2> \
+\<a href="index.html#jardin">Le jardin\</a> \
 /!\ Évitez de créer des id  avec des espaces ou des caractères spéciaux ; utilisez simplement, dans la mesure du possible, des lettres et des chiffres pour que la valeur soit reconnue par tous les navigateurs.
 
-- Insérez une image avec la balise orpheline  <img>
-<img src="images/paysage.jpg" alt="Photo de plage vue du dessus" />
+- Insérez une image avec la balise orpheline \<img> \
+\<img src="images/paysage.jpg" alt="Photo de plage vue du dessus" /> \
 Voici quel format adopter en fonction de l'image que vous avez :
 - Une photo : utilisez un JPEG.
 - Une image avec peu de couleurs (moins de 256) : utilisez un PNG 8 bits, ou éventuellement un GIF.

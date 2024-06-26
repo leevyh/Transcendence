@@ -1,6 +1,7 @@
 import Dashboard from "./views/Dashboard.js";
 import Posts from "./views/Posts.js";
 import Settings from "./views/Settings.js";
+import NotFound from "./views/404.js";
 
 const navigateTo = url => {
 	  history.pushState(null, null, url);
@@ -12,6 +13,7 @@ const router = async () => {
 	{ path: "/", view: Dashboard },
 	{ path: "/posts", view: Posts },
 	{ path: "/settings", view: Settings },
+	{ path: "/404", view: NotFound }
   ];
 
   // Test each route for potential match
@@ -24,9 +26,10 @@ const router = async () => {
 
   let match = potentialMatches.find(potentialMatch => potentialMatch.isMatch);
 
+  // If no route is found, default to the 404 page
   if (!match) {
 	match = {
-	  route: routes[0],
+	  route: routes.find(route => route.path === "/404"),
 	  isMatch: true
 	};
   }
