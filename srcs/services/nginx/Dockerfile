@@ -2,6 +2,7 @@ FROM nginx:latest
 
 RUN apt-get update && apt-get upgrade
 
+# Install SSL
 # RUN mkdir -p /etc/nginx/ssl \
 # 	&& apt install openssl --no-install-suggests --no-install-recommends -y
 
@@ -17,7 +18,7 @@ COPY /frontend/. /usr/share/nginx
 
 RUN chmod 777 /usr/share/nginx && chown -R www-data:www-data /usr/share/nginx
 
-# CMD ["nginx", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
 
 
 # docker build -t nginx .
