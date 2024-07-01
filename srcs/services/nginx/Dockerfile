@@ -1,6 +1,6 @@
 FROM nginx:latest
 
-RUN apt-get update && apt-get upgrade
+RUN apt-get update -y && apt-get upgrade -y 
 
 # Install SSL
 # RUN mkdir -p /etc/nginx/ssl \
