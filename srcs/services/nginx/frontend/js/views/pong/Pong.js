@@ -14,9 +14,11 @@ export default class extends AbstractView {
 			<div style="display: flex; justify-content: center; align-items: center;">
 				<canvas id="terrain" width="700" height="400" style="background: rgb(0, 0, 0);"></canvas>
 			</div>
-			
+
 		`;
 	}
 }
+
+
 
 
