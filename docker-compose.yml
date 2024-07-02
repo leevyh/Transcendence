@@ -1,24 +1,27 @@
-#le volume ne fonctionne pas tout le temps a l ecole (en fonction du home que l on a plus de detail en vrai pour expliquer lul)
-
-
-version: '3'
-
-volumes:
-  bleu:
-    name: bleu
-    driver: local
-    driver_opts:
-      type: none
-      device: ./srcs/services/nginx/frontend
-      o: bind
-
 services:
   nginx:
     container_name: nginx
-    build:
-      context: ./srcs/services/nginx/
-      dockerfile: Dockerfile
+    build:  ./srcs/services/nginx
     ports:
-      - "8001:80"
-    # volumes:
-    #   - bleu:/usr/share/nginx/
+      -  8001:80
+    volumes:
+      -  static_volume:/home/app/web/staticfiles
+      -  media_volume:/home/app/web/mediafiles
+    depends_on:
+      -  backend
+    restart: on-failure
+
+  backend:
+    container_name: backend
+    build:  ./srcs/services/backend
+    expose:
+      -  8000
+    volumes:
+      -  static_volume:/home/app/web/staticfiles
+      -  media_volume:/home/app/web/mediafiles
+    restart: on-failure
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
