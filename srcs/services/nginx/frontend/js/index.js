@@ -1,5 +1,5 @@
 import Dashboard from "./views/Dashboard.js";
-import Pong from "./views/Pong.js";
+import Pong from "./views/pong/Pong.js";
 import Settings from "./views/Settings.js";
 import NotFound from "./views/404.js";
 import SignIn from "./views/Sign-in.js";
@@ -38,6 +38,7 @@ const router = async () => {
 
   const view = new match.route.view();
 
+  // This line updates the page content without a full page reload
   document.querySelector("#app").innerHTML = await view.getHtml();
 };
 
@@ -128,7 +129,6 @@ function changeLanguage(lang) {
 	  }
 	});
 }
-
 
 var imagejavascript = document.createElement("img")
 

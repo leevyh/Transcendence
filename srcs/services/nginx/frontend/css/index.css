@@ -114,4 +114,8 @@ svg,
 #login {
 	display: flex;
 }
-  
+
+pong {
+	display: flex;
+	justify-content: center;
+}
