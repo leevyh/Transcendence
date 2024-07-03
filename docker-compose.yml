@@ -1,30 +1,30 @@
 services:
-  django_backend:
-    container_name: django_backend
-    build: ./srcs/services/django_backend
+  backend_django:
+    container_name: backend_django
+    build: ./srcs/services/backend_django
     expose:
       -  9001
     restart: on-failure
 
-  nginx_frontend:
-    container_name: nginx_frontend
-    build: ./srcs/services/nginx_frontend
+  frontend_nginx:
+    container_name: frontend_nginx
+    build: ./srcs/services/frontend_nginx
     expose:
       - 9000:80
     volumes:
       - ./srcs/data/frontend:/var/www/ft_transcendence
     depends_on:
-      - django_backend
+      - backend_django
     restart: on-failure
 
-  nginx_proxy:
-    container_name: nginx_proxy
-    build: ./srcs/services/nginx_proxy
+  proxy_nginx:
+    container_name: proxy_nginx
+    build: ./srcs/services/proxy_nginx
     ports:
       - 8888:80
     depends_on:
-      - nginx_frontend
-      - django_backend
+      - frontend_nginx
+      - backend_django
     restart: on-failure
 
 volumes:
