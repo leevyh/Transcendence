@@ -1,27 +1,36 @@
 services:
-  nginx:
-    container_name: nginx
-    build:  ./srcs/services/nginx
-    ports:
-      -  8001:80
-    volumes:
-      -  static_volume:/home/app/web/staticfiles
-      -  media_volume:/home/app/web/mediafiles
-    depends_on:
-      -  backend
+  django_backend:
+    container_name: django_backend
+    build: ./srcs/services/django_backend
+    expose:
+      -  9001
     restart: on-failure
 
-  backend:
-    container_name: backend
-    build:  ./srcs/services/backend
+  nginx_frontend:
+    container_name: nginx_frontend
+    build: ./srcs/services/nginx_frontend
     expose:
-      -  8000
+      - 9000:80
     volumes:
-      -  static_volume:/home/app/web/staticfiles
-      -  media_volume:/home/app/web/mediafiles
+      - data_frontend:/var/www/ft_transcendence
+    depends_on:
+      - django_backend
+    restart: on-failure
+
+  nginx_proxy:
+    container_name: nginx_proxy
+    build: ./srcs/services/nginx_proxy
+    ports:
+      - 8888:80
+    depends_on:
+      - nginx_frontend
+      - django_backend
     restart: on-failure
 
 volumes:
-  postgres_data:
-  static_volume:
-  media_volume:
+  data_frontend:
+    driver: local
+    driver_opts:
+        o: bind
+        type: none
+        device: './srcs/README.md'
