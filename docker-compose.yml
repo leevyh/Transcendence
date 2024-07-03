@@ -1,11 +1,36 @@
-#le volume ne fonctionne pas tout le temps a l ecole (en fonction du home que l on a plus de detail en vrai pour expliquer lul)
 services:
-  nginx:
-    container_name: nginx
-    build:
-      context: ./srcs/services/nginx/
-      dockerfile: Dockerfile
-    ports:
-      - "8001:80"
+  backend_django:
+    container_name: backend_django
+    build: ./srcs/services/backend_django
+    expose:
+      -  9001
+    restart: on-failure
+
+  frontend_nginx:
+    container_name: frontend_nginx
+    build: ./srcs/services/frontend_nginx
+    expose:
+      - 9000:80
     volumes:
-      - ./srcs/services/nginx/frontend:/usr/share/nginx/
+      - ./srcs/data/frontend:/var/www/ft_transcendence
+    depends_on:
+      - backend_django
+    restart: on-failure
+
+  proxy_nginx:
+    container_name: proxy_nginx
+    build: ./srcs/services/proxy_nginx
+    ports:
+      - 8888:80
+    depends_on:
+      - frontend_nginx
+      - backend_django
+    restart: on-failure
+
+volumes:
+  data_frontend:
+    driver: local
+    driver_opts:
+        o: bind
+        type: none
+        device: ./srcs/data/frontend
