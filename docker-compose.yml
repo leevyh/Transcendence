@@ -12,7 +12,7 @@ services:
     expose:
       - 9000:80
     volumes:
-      - data_frontend:/var/www/ft_transcendence
+      - ./srcs/data/frontend:/var/www/ft_transcendence
     depends_on:
       - django_backend
     restart: on-failure
@@ -33,4 +33,4 @@ volumes:
     driver_opts:
         o: bind
         type: none
-        device: './srcs/README.md'
+        device: ./srcs/data/frontend
