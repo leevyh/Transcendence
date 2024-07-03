@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /home/app/
 
 RUN apt update -y && apt upgrade -y
-RUN apt install -y python3 python3-pip
+RUN apt install -y python3 python3-pip --no-install-suggests --no-install-recommends
 
 COPY ./tools/requirements.txt /home/app/requirements.txt
 
