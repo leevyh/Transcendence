@@ -34,9 +34,9 @@ services:
     volumes:
       - backend_elk_certs:/usr/share/elasticsearch/config/certs
     user: "0"
-    command: bash /usr/share/elasticsearch/setup.sh ${ELASTIC_PASSWORD} ${KIBANA_PASSWORD}
+    command: /usr/share/elasticsearch/setup.sh ${ELASTIC_PASSWORD} ${KIBANA_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "[ -f config/certs/backend_elastic/backend_elastic.crt ]"]
+      test: ["CMD-SHELL", "[ -f /usr/share/elasticsearch/config/certs/backend_elastic/backend_elastic.crt ]"]
       interval: 1s
       timeout: 5s
       retries: 120
@@ -55,7 +55,7 @@ services:
       - 9200:9200
     healthcheck:
       test:
-        [ "CMD-SHELL", "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'" ]
+        [ "CMD-SHELL", "curl -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'" ]
       interval: 10s
       timeout: 10s
       retries: 120
@@ -102,6 +102,10 @@ volumes:
 
   backend_elk_certs:
     driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/certs
+      o: bind
   backend_elastic:
     driver: local
   backend_kibana:
