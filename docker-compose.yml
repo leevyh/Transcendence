@@ -1,56 +1,56 @@
 services:
-  backend_django:
-    container_name: backend_django
+  backend-django:
+    container_name: backend-django
     build: ./srcs/services/backend_django
     expose:
       - 9001
     restart: on-failure
 
-  frontend_nginx:
-    container_name: frontend_nginx
+  frontend-nginx:
+    container_name: frontend-nginx
     build: ./srcs/services/frontend_nginx
     expose:
       - 9000:80
     volumes:
       - ./srcs/data/frontend:/var/www/ft_transcendence
     depends_on:
-      - backend_django
+      - backend-django
     restart: on-failure
 
-  proxy_nginx:
-    container_name: proxy_nginx
+  proxy-nginx:
+    container_name: proxy-nginx
     build: ./srcs/services/proxy_nginx
     ports:
       - 8888:80
     depends_on:
-      - frontend_nginx
-      - backend_django
+      - frontend-nginx
+      - backend-django
     restart: on-failure
 
-  setup_elastic:
-    container_name: setup_elastic
+  setup-elastic:
+    container_name: setup-elastic
     build: ./srcs/services/setup_elastic/
     env_file: .env
     volumes:
-      - backend_elk_certs:/usr/share/elasticsearch/config/certs
+      - backend-elk-certs:/usr/share/elasticsearch/config/certs
     user: "0"
     command: /usr/share/elasticsearch/setup.sh ${ELASTIC_PASSWORD} ${KIBANA_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "[ -f /usr/share/elasticsearch/config/certs/backend_elastic/backend_elastic.crt ]"]
+      test: ["CMD-SHELL", "[ -f /usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt ]"]
       interval: 1s
       timeout: 5s
       retries: 120
 
-  backend_elastic:
-    container_name: backend_elastic
+  backend-elastic:
+    container_name: backend-elastic
     depends_on:
-      setup_elastic:
+      setup-elastic:
         condition: service_healthy
     build: ./srcs/services/backend_elastic
     env_file: .env
     volumes:
-      - backend_elk_certs:/usr/share/elasticsearch/config/certs
-      - backend_elastic:/usr/share/elasticsearch/data
+      - backend-elk-certs:/usr/share/elasticsearch/config/certs
+      - backend-elastic:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
     healthcheck:
@@ -60,16 +60,16 @@ services:
       timeout: 10s
       retries: 120
 
-  backend_kibana:
-    container_name: backend_kibana
+  backend-kibana:
+    container_name: backend-kibana
     depends_on:
-      backend_elastic:
+      backend-elastic:
         condition: service_healthy
     build: ./srcs/services/backend_kibana
     env_file: .env
     volumes:
-      - backend_elk_certs:/usr/share/kibana/config/certs
-      - backend_kibana:/usr/share/kibana/data
+      - backend-elk-certs:/usr/share/kibana/config/certs
+      - backend-kibana:/usr/share/kibana/data
     ports:
       - 5601:5601
     healthcheck:
@@ -79,15 +79,15 @@ services:
       timeout: 10s
       retries: 120
 
-  backend_logstash:
-    container_name: backend_logstash
+  backend-logstash:
+    container_name: backend-logstash
     depends_on:
-      backend_elastic:
+      backend-elastic:
         condition: service_healthy
     build: ./srcs/services/backend_logstash
     env_file: .env
     volumes:
-      - backend_elk_certs:/usr/share/logstash/config/certs
+      - backend-elk-certs:/usr/share/logstash/config/certs
     ports:
         - 5044:5044
         - 9600:9600
@@ -100,13 +100,9 @@ volumes:
       device: ./srcs/data/frontend
       o: bind
 
-  backend_elk_certs:
+  backend-elk-certs:
     driver: local
-    driver_opts:
-      type: none
-      device: ./srcs/data/certs
-      o: bind
-  backend_elastic:
+  backend-elastic:
     driver: local
-  backend_kibana:
+  backend-kibana:
     driver: local
