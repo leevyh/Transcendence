@@ -18,7 +18,6 @@ if [ ! -f config/certs/certs.zip ]; then
   "instances:\n"\
   "  - name: backend_elastic\n"\
   "    dns:\n"\
-  "      - elastic\n"\
   "      - localhost\n"\
   "      - backend_elastic\n"\
   "    ip:\n"\
