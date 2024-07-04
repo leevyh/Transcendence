@@ -35,9 +35,9 @@ find . -type d -exec chmod 750 \{\} \;;
 find . -type f -exec chmod 640 \{\} \;;
 
 echo "Waiting for Elasticsearch availability";
-until curl -s --cacert config/certs/ca/ca.crt https://backend-elastic:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
+until curl -s --cacert config/certs/ca/ca.crt https://backend-elastic:9200 | grep -q "missing authentication credentials"; do sleep 5; done;
 
 echo "Setting kibana_system password";
-until curl -s -X POST --cacert config/certs/ca/ca.crt -u "backend-elastic:$1" -H "Content-Type: application/json" https://backend-elastic:9200/_security/user/kibana_system/_password -d "{\"password\":\"$2}\"}" | grep -q "^{}"; do sleep 10; done;
+until curl -s -X POST --cacert config/certs/ca/ca.crt -u "backend-elastic:$1" -H "Content-Type: application/json" https://backend-elastic:9200/_security/user/kibana_system/_password -d "{\"password\":\"$2}\"}" | grep -q "^{}"; do sleep 5; done;
 
 echo "All done!";
