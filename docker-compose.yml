@@ -60,6 +60,18 @@ services:
       timeout: 10s
       retries: 120
 
+  backend-fleet:
+    container_name: backend-fleet
+    depends_on:
+      backend-elastic:
+        condition: service_healthy
+    build: ./srcs/services/backend_fleet
+    env_file: .env
+    volumes:
+      - backend-elk-certs:/usr/share/fleet/config/certs
+    ports:
+      - 8220:8220
+
   backend-kibana:
     container_name: backend-kibana
     depends_on:
@@ -82,7 +94,7 @@ services:
   backend-logstash:
     container_name: backend-logstash
     depends_on:
-      backend-elastic:
+      backend-kibana:
         condition: service_healthy
     build: ./srcs/services/backend_logstash
     env_file: .env
