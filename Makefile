@@ -19,25 +19,19 @@ all:
 debug:
 	docker compose -f ${COMPOSE} up --build
 
-build:
-	docker compose -f ${COMPOSE} build
-
-start:
-	docker compose -f ${COMPOSE} up -d
-
-stop:
-	docker compose -f ${COMPOSE} stop
-
-restart:
-	docker compose -f ${COMPOSE} restart
-
 clean:
 	docker compose -f ${COMPOSE} down --rmi all
+
+folder:
+	@mkdir -p ./srcs/data/certs
+	@mkdir -p ./srcs/data/elastic
+	@mkdir -p ./srcs/data/kibana
+	@mkdir -p ./srcs/data/logs
 
 prune:
 	docker system prune -af
 
 re: clean all
 
-.PHONY: all debug build start stop restart clean prune re
-.SILENT: all debug build start stop restart clean prune re
+.PHONY: all debug clean folder prune re
+.SILENT: all debug clean folder prune re
