@@ -30,9 +30,11 @@ services:
   setup-elastic:
     container_name: setup-elastic
     build: ./srcs/services/setup_elastic/
-    env_file: .env
     volumes:
+      - backend-elastic:/usr/share/elasticsearch/data
       - backend-elk-certs:/usr/share/elasticsearch/config/certs
+      - backend-elk-logs:/usr/share/elasticsearch/logs
+      - backend-kibana:/usr/share/kibana/data
     user: "0"
     command: /usr/share/elasticsearch/setup.sh ${ELASTIC_PASSWORD} ${KIBANA_PASSWORD}
     healthcheck:
@@ -47,30 +49,18 @@ services:
       setup-elastic:
         condition: service_healthy
     build: ./srcs/services/backend_elastic
-    env_file: .env
     volumes:
       - backend-elk-certs:/usr/share/elasticsearch/config/certs
+      - backend-elk-logs:/usr/share/elasticsearch/logs
       - backend-elastic:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
     healthcheck:
       test:
-        [ "CMD-SHELL", "curl -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'" ]
+        [ "CMD-SHELL", "curl -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://backend-elastic:9200 | grep -q 'missing authentication credentials'" ]
       interval: 10s
       timeout: 10s
       retries: 120
-
-  backend-fleet:
-    container_name: backend-fleet
-    depends_on:
-      backend-elastic:
-        condition: service_healthy
-    build: ./srcs/services/backend_fleet
-    env_file: .env
-    volumes:
-      - backend-elk-certs:/usr/share/fleet/config/certs
-    ports:
-      - 8220:8220
 
   backend-kibana:
     container_name: backend-kibana
@@ -78,9 +68,9 @@ services:
       backend-elastic:
         condition: service_healthy
     build: ./srcs/services/backend_kibana
-    env_file: .env
     volumes:
       - backend-elk-certs:/usr/share/kibana/config/certs
+      - backend-elk-logs:/usr/share/kibana/logs
       - backend-kibana:/usr/share/kibana/data
     ports:
       - 5601:5601
@@ -91,13 +81,24 @@ services:
       timeout: 10s
       retries: 120
 
+  #  backend-fleet:
+  #    container_name: backend-fleet
+  #    depends_on:
+  #      backend-elastic:
+  #        condition: service_healthy
+  #    build: ./srcs/services/backend_fleet
+  #    env_file: .env
+  #    volumes:
+  #      - backend-elk-certs:/usr/share/fleet/config/certs
+  #    expose:
+  #      - 8220:8220
+
   backend-logstash:
     container_name: backend-logstash
     depends_on:
       backend-kibana:
         condition: service_healthy
     build: ./srcs/services/backend_logstash
-    env_file: .env
     volumes:
       - backend-elk-certs:/usr/share/logstash/config/certs
     ports:
@@ -111,10 +112,27 @@ volumes:
       type: none
       device: ./srcs/data/frontend
       o: bind
-
   backend-elk-certs:
     driver: local
+    driver_opts:
+        type: none
+        device: ./srcs/data/certs
+        o: bind
+  backend-elk-logs:
+    driver: local
+    driver_opts:
+        type: none
+        device: ./srcs/data/logs
+        o: bind
   backend-elastic:
     driver: local
+    driver_opts:
+        type: none
+        device: ./srcs/data/elastic
+        o: bind
   backend-kibana:
     driver: local
+    driver_opts:
+        type: none
+        device: ./srcs/data/kibana
+        o: bind

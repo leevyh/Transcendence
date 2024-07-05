@@ -1,5 +1,6 @@
 FROM elasticsearch:8.14.1
 
+ENV ELASTIC_PASSWORD=acrespy
 ENV ES_SETTING_BOOTSTRAP_MEMORY__LOCK=false
 ENV ES_SETTING_CLUSTER_NAME=transcendence-elk-cluster
 ENV ES_SETTING_DISCOVERY_TYPE=single-node
