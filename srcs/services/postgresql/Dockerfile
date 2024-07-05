@@ -3,15 +3,19 @@ FROM postgres:latest
 
 RUN apt update -y && apt upgrade -y
 
-COPY ./tools/script.sh /tmp/script.sh
-RUN chmod +x /tmp/script.sh
+COPY ./tools/script.sh /docker-entrypoint-initdb.d/script.sh
 
-USER postgres
+RUN chmod +x /docker-entrypoint-initdb.d/script.sh
 
-RUN service postgresql start
+#USER postgres
+
+#RUN service postgresql start
 
 EXPOSE 5432
 
+ENTRYPOINT ["docker-entrypoint.sh"]
+
 #RUN CONTAINER POSTGRESQL
 
-CMD ["sh", "/tmp/script.sh"]
+#CMD ["sh", "/tmp/script.sh"]
+CMD ["postgres"]
