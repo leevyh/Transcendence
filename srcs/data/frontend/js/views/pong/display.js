@@ -1,3 +1,5 @@
+import { pong } from './game.js';
+
 pong.display = {
 	container : "",
 
@@ -15,6 +17,15 @@ pong.display = {
 		clear : function() {
 			this.context2D.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		}
+	},
+
+	sprite : {
+		width : 0,
+		height : 0,
+		posX : null,
+		posY : null,
+		imagePath : "",
+		img : null,
 	},
 
 	createLayer : function(name, width, height, htmlContainer , zIndex, backgroundColor, x, y) {
@@ -37,17 +48,17 @@ pong.display = {
 		layer.canvas.height = height;
 
 		if ( x != undefined )
-		  layer.posX = x;
+		  layer.posX = "auto";
 	 
 		if ( y != undefined )
-		  layer.posY = y;
+		  layer.posY = "auto";
 
 		layer.canvas.style.position = "absolute";
 		if ( x != undefined )
-		  layer.canvas.style.left = x;
+		  layer.canvas.style.left = "auto";
 
 		if ( y != undefined )
-		  layer.canvas.style.top = y;
+		  layer.canvas.style.top = "auto";
 
 		if ( htmlContainer != undefined ) {
 		  htmlContainer.appendChild(layer.canvas);
@@ -58,18 +69,39 @@ pong.display = {
 		layer.context2D = layer.canvas.getContext('2d');
 
 		return layer;
-	  },
+	},
 
-	  drawRectangleInLayer : function(targetLayer, width, heigth, color, x, y) {
+	drawRectangleInLayer : function(targetLayer, width, heigth, color, x, y) {
 		targetLayer.context2D.fillStyle = color;
-		targetLayer.context2D.fillRect (x, y, width, heigth);
-	  },
+		targetLayer.context2D.fillRect(x, y, width, heigth);
+	},
 
-	  drawTextInLayer : function(targetLayer, text, font, color, x, y) {
+	drawTextInLayer : function(targetLayer, text, font, color, x, y) {
 		targetLayer.context2D.font = font;
 		targetLayer.context2D.fillStyle = color;
 		targetLayer.context2D.fillText(text, x, y);
-	  },
+	},
+
+	// drawImageInLayer : function(targetLayer, image, x, y, width, height) {
+	// 	targetLayer.context2D.drawImage(image, x, y, width, height);
+	// },
+	drawImageInLayer : function(targetLayer, image, x, y) {
+		targetLayer.context2D.drawImage(image, x, y);
+	},
+
+	createSprite : function(width, height, posX, posY, imagePath) {
+		let sprite = Object.create(this.sprite);
+		sprite.width = width;
+		sprite.height = height;
+		sprite.posX = posX;
+		sprite.posY = posY;
+		sprite.imagePath = imagePath;
+		sprite.img = new Image(width, height);
+		sprite.img.src = imagePath;
+		sprite.img.width = width;
+		sprite.img.height = height;
+		return sprite;
+	}
 }
 
 
