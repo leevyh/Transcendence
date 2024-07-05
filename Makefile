@@ -1,6 +1,5 @@
 NAME = Transcendence
 
-
 all:
 	docker compose up --build -d
 #create volume maybe needed
@@ -11,5 +10,8 @@ down:
 
 logs:
 	docker compose logs -f
+
+status:
+	docker compose ps
 
 re: down all
