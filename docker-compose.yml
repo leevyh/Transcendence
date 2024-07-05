@@ -32,6 +32,8 @@ services:
     build: ./srcs/services/postgresql
     ports:
       - 5432:5432
+    env_file:
+      - ./env/postgresql.env
     restart: on-failure
 
 volumes:
