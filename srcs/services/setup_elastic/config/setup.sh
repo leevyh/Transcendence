@@ -1,7 +1,7 @@
-if [ x$1 == x ]; then
+if [ "x$1" == "x" ]; then
   echo "./setup.sh <ELASTIC_PASSWORD> <KIBANA_PASSWORD>";
   exit 1;
-elif [ x$2 == x ]; then
+elif [ "x$2" == "x" ]; then
   echo "./setup.sh <ELASTIC_PASSWORD> <KIBANA_PASSWORD>";
   exit 1;
 fi;
@@ -19,6 +19,21 @@ if [ ! -f config/certs/certs.zip ]; then
   "  - name: backend-elastic\n"\
   "    dns:\n"\
   "      - backend-elastic\n"\
+  "    ip:\n"\
+  "      - 127.0.0.1\n"\
+  "  - name: backend-kibana\n"\
+  "    dns:\n"\
+  "      - backend-kibana\n"\
+  "    ip:\n"\
+  "      - 127.0.0.1\n"\
+  "  - name: backend-fleet\n"\
+  "    dns:\n"\
+  "      - backend-fleet\n"\
+  "    ip:\n"\
+  "      - 127.0.0.1\n"\
+  "  - name: backend-logstash\n"\
+  "    dns:\n"\
+  "      - backend-logstash\n"\
   "    ip:\n"\
   "      - 127.0.0.1\n"\
   > config/certs/instances.yml;

@@ -20,6 +20,7 @@ services:
   proxy-nginx:
     container_name: proxy-nginx
     build: ./srcs/services/proxy_nginx
+    command: /esa.sh ${ENROLLMENT_TOKEN}
     ports:
       - 8888:80
     depends_on:
@@ -81,17 +82,19 @@ services:
       timeout: 10s
       retries: 120
 
-  #  backend-fleet:
-  #    container_name: backend-fleet
-  #    depends_on:
-  #      backend-elastic:
-  #        condition: service_healthy
-  #    build: ./srcs/services/backend_fleet
-  #    env_file: .env
-  #    volumes:
-  #      - backend-elk-certs:/usr/share/fleet/config/certs
-  #    expose:
-  #      - 8220:8220
+  backend-fleet:
+    container_name: backend-fleet
+    depends_on:
+      backend-kibana:
+        condition: service_healthy
+    build: ./srcs/services/backend_fleet
+    env_file: .env
+    volumes:
+      - backend-elk-certs:/usr/share/fleet/config/certs
+    ports:
+      - 8220:8220
+    expose:
+      - 9243:9243
 
   backend-logstash:
     container_name: backend-logstash
