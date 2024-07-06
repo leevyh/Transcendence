@@ -1,7 +1,9 @@
-if [ "x$1" == "x" ]; then
+#!/bin/sh
+
+if [ "x$1" = "x" ]; then
   echo "./setup.sh <ELASTIC_PASSWORD> <KIBANA_PASSWORD>";
   exit 1;
-elif [ "x$2" == "x" ]; then
+elif [ "x$2" = "x" ]; then
   echo "./setup.sh <ELASTIC_PASSWORD> <KIBANA_PASSWORD>";
   exit 1;
 fi;
