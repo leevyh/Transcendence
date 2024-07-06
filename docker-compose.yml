@@ -2,6 +2,8 @@ services:
   backend-django:
     container_name: backend-django
     build: ./srcs/services/backend_django
+    volumes:
+      - backend-elk-certs:/usr/share/elasticsearch/config/certs
     expose:
       - 9001
     restart: on-failure
@@ -12,15 +14,22 @@ services:
     expose:
       - 9000:80
     volumes:
-      - ./srcs/data/frontend:/var/www/ft_transcendence
+      - frontend:/var/www/ft_transcendence
+      - backend-elk-certs:/usr/share/elasticsearch/config/certs
     depends_on:
       - backend-django
     restart: on-failure
 
   proxy-nginx:
     container_name: proxy-nginx
-    build: ./srcs/services/proxy_nginx
-    command: /esa.sh ${ENROLLMENT_TOKEN}
+    env_file: .env
+    build:
+        context: ./srcs/services/proxy_nginx
+        args:
+            - ENROLLMENT_TOKEN=${ENROLLMENT_TOKEN}
+    volumes:
+      - ea-proxy-nginx:/elastic-agent-8.14.1-linux-x86_64
+      - backend-elk-certs:/usr/share/elasticsearch/config/certs
     ports:
       - 8888:80
     depends_on:
@@ -37,7 +46,7 @@ services:
       - backend-elk-logs:/usr/share/elasticsearch/logs
       - backend-kibana:/usr/share/kibana/data
     user: "0"
-    command: /usr/share/elasticsearch/setup.sh ${ELASTIC_PASSWORD} ${KIBANA_PASSWORD}
+    command: /usr/share/elasticsearch/setup.sh "${ELASTIC_PASSWORD}" "${KIBANA_PASSWORD}"
     healthcheck:
       test: ["CMD-SHELL", "[ -f /usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt ]"]
       interval: 1s
@@ -106,7 +115,6 @@ services:
       - backend-elk-certs:/usr/share/logstash/config/certs
     ports:
         - 5044:5044
-        - 9600:9600
 
 volumes:
   frontend:
@@ -139,3 +147,9 @@ volumes:
         type: none
         device: ./srcs/data/kibana
         o: bind
+  ea-proxy-nginx:
+      driver: local
+      driver_opts:
+          type: none
+          device: ./srcs/data/ea/proxy-nginx
+          o: bind
