@@ -23,13 +23,10 @@ services:
   proxy-nginx:
     container_name: proxy-nginx
     env_file: .env
-    build:
-        context: ./srcs/services/proxy_nginx
-        args:
-            - ENROLLMENT_TOKEN=${ENROLLMENT_TOKEN}
+    build: ./srcs/services/proxy_nginx
     volumes:
-      - ea-proxy-nginx:/elastic-agent-8.14.1-linux-x86_64
-      - backend-elk-certs:/usr/share/elasticsearch/config/certs
+      - ea-proxy-nginx:/usr/share/elastic-agent/data
+      - backend-elk-certs:/usr/share/elastic-agent/config/certs
     ports:
       - 8888:80
     depends_on:

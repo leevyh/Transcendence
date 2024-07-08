@@ -1,7 +1,14 @@
-FROM nginx:latest
+FROM elastic/elastic-agent:8.14.1
+
+ENV FLEET_ENROLL=1
+ENV FLEET_URL=https://backend-fleet:8220
+ENV FLEET_ENROLLMENT_TOKEN="UVlLZWg1QUJNQXJVLUFPTmxqeTM6aHIzeVBlV0dTRmlNYmk5NWgtUkhwZw=="
+ENV FLEET_CA=/usr/share/elastic-agent/config/certs/ca/ca.crt
+
+USER root
 
 RUN apt update -y && apt upgrade -y
-RUN apt install -y curl apt-utils
+RUN apt install -y nginx openssl
 
 # RUN mkdir -p /etc/nginx/ssl
 # RUN apt install -y openssl --no-install-suggests --no-install-recommends
@@ -10,12 +17,7 @@ RUN apt install -y curl apt-utils
 # 	-keyout /etc/nginx/ssl.key \
 # 	-subj "/C=FR/ST=Paris/L=Paris/O=42/OU=42/CN=localhost"
 
-RUN curl -fsSL https://get.docker.com -o docker-setup.sh && sh ./docker-setup.sh
-RUN dockerd &
-
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
-COPY ./conf/setup.sh /setup.sh
-RUN chmod +x /setup.sh
 
-ARG ENROLLMENT_TOKEN
-CMD ["/setup.sh", "${ENROLLMENT_TOKEN}"]
+USER elastic-agent
+
