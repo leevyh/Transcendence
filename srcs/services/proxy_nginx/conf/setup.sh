@@ -19,5 +19,3 @@ else
   cd elastic-agent-8.14.1-linux-x86_64;
   ./elastic-agent run;
 fi;
-
-nginx -g "daemon off;"

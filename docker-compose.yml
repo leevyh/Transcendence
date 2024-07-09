@@ -30,8 +30,8 @@ services:
     ports:
       - 8888:80
     depends_on:
-      - frontend-nginx
-      - backend-django
+      backend-fleet:
+        condition: service_started
     restart: on-failure
 
   setup-elastic:
