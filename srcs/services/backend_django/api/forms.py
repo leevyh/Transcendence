@@ -1,14 +1,17 @@
-# from django import forms
-# from django.contrib.auth.models import User
-# from .models import User
-# import pbkdf2
-#
-# class UserForm(User):
-# 	email = forms.CharField(max_length=100)
-# 	password = forms.CharField(widget=forms.PasswordInput)
-# 	nickname = forms.CharField(max_length=100)
-# 	create_at = forms.DateTimeField()
-#
-# 	class Meta:
-# 		model = User
-# 		fields = ['email', 'password', 'nickname', 'create_at']
+from django import forms
+from .models import User_site
+
+class UserRegistrationForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
+
+    class Meta:
+        model = User_site
+        fields = ['email',
+                  'login',
+                  'password',
+                  'nickname']
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        # Ajouter des validations supplémentaires ici si nécessaire
+        return password

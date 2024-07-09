@@ -128,8 +128,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.postgresql',
-		# 'NAME': os.getenv('POSTGRES_DB'),
-        'NAME': 'transcendence',
+		'NAME': 'transcendence',
 		'USER': 'postgres',
 		'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
 		'HOST': 'postgresql',
