@@ -27,10 +27,11 @@ SECRET_KEY = 'django-insecure-a4=7pox#i*0jn++(jt$dj+wrjp6+xucis%dy&pukjdj7qxan+4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 
 # Application definition
+AUTH_USER_MODEL = 'api.User_site'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -39,8 +40,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api'
+    'corsheaders',
+    'api',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -50,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -70,7 +80,21 @@ TEMPLATES = [
     },
 ]
 
+LOGIN_URL = '/api/login'
+
 WSGI_APPLICATION = 'backend.wsgi.application'
+
+# Backend de session par défaut
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Utilisation de la base de données pour stocker les sessions
+SESSION_COOKIE_NAME = 'sessionid'  # Nom du cookie de session
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = False  # True si HTTPS
+
+# Autres backends possibles
+# SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+# SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+# SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+# SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 
 # Database

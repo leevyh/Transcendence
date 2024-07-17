@@ -1,6 +1,8 @@
 from django import forms
 from .models import User_site, Settings_user
 
+
+
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
 
@@ -9,12 +11,13 @@ class UserRegistrationForm(forms.ModelForm):
         fields = ['email',
                   'login',
                   'password',
-                  'nickname']
+                  'username']
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
         # Ajouter des validations supplémentaires ici si nécessaire
         return password
+
 
 class SettingsUpdateForm(forms.ModelForm):
     class Meta:
