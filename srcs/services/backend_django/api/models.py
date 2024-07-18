@@ -8,9 +8,10 @@ class User_site(AbstractUser):
         OFFLINE = "offline"
         INGAME = "ingame"
 
-    login = models.CharField(max_length=255, unique=True)
+    nickname = models.CharField(max_length=255, unique=True)
     created_at = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=255, default=Status.OFFLINE, choices=Status.choices)
+    avatar = models.ImageField(upload_to='../img/', default='default.jpg')
 
     def __str__(self):
         return self.login
