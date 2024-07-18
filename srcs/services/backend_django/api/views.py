@@ -10,7 +10,6 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 import json
 
-
 @csrf_exempt
 def register(request):
     if request.method == 'POST':
@@ -32,13 +31,11 @@ def register(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-
 @csrf_exempt
 def loginView(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            # user = User_site.objects.get(login=data['login'])
             user = authenticate(request, username=data['login'], password=data['password'])
             if user is not None:
                 login(request, user)
@@ -70,23 +67,4 @@ def	updateSettings(request, user_id):
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#
-# @login_required(login_url='/api/login')
-# @csrf_exempt
 
