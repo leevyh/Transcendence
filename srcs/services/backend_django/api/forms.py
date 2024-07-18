@@ -1,8 +1,6 @@
 from django import forms
 from .models import User_site, Settings_user
 
-
-
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
 
