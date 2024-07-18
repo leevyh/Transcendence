@@ -26,6 +26,14 @@ class Settings_user(models.Model):
     dark_mode = models.BooleanField(default=False)
 
 
+class Stats_user(models.Model):
+    user = models.OneToOneField(User_site, on_delete=models.CASCADE, primary_key=True)
+    nb_games = models.IntegerField(default=0)
+    nb_wins = models.IntegerField(default=0)
+    nb_losses = models.IntegerField(default=0)
+    nb_point_taken = models.IntegerField(default=0)
+    nb_point_given = models.IntegerField(default=0)
+    win_rate = models.FloatField(default=0.0)
 
 
 
