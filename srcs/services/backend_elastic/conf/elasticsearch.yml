@@ -1,0 +1,35 @@
+elastic:
+  password: "changeme"
+
+es:
+  setting:
+    cluster:
+      name: "transcendence-cluster"
+    node:
+        name: "backend-elastic"
+    discovery:
+      type: "single-node"
+    xpack:
+      security:
+        enabled: true
+        transport:
+          ssl:
+            verification_mode: certificate
+            certificate_authorities: ["/usr/share/elasticsearch/config/certs/ca/ca.crt"]
+            certificate: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt"
+            key: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.key"
+        http:
+          ssl:
+            enabled: true
+            verification_mode: certificate
+            certificate_authorities: ["/usr/share/elasticsearch/config/certs/ca/ca.crt"]
+            certificate: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt"
+            key: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.key"
+      monitoring:
+        collection:
+          enabled: true
+      license:
+        self_generated:
+          type: basic
+    bootstrap:
+      memory_lock: false
