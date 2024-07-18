@@ -1,0 +1,19 @@
+server:
+  name: "kibana"
+  host: "0.0.0.0"
+  port: 5601
+
+  ssl:
+    enabled: true
+    certificate: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt
+    key: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.key
+    certificateAuthorities: /usr/share/kibana/config/certs/ca/ca.crt
+
+elsaticsearch:
+  hosts: ["https://backend-elastic:9200"]
+  username: "elastic"
+  password: "changeme"
+  ssl:
+    certificate: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt
+    key: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.key
+    certificateAuthorities: /usr/share/kibana/config/certs/ca/ca.crt
