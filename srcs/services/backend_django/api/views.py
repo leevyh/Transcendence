@@ -70,6 +70,30 @@ def	updateSettings(request, user_id):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+
+def get_profile(request, nickname):
+    if request.method == 'GET':
+        try:
+            user = User_site.objects.get(nickname=nickname)
+            try:
+                stats = Stats_user.objects.get(user=user)
+                data = {'nickname': user.nickname,
+                        'created_at': user.created_at,
+                        'status': user.status,
+                        'nb_games': stats.nb_games,
+                        'nb_wins': stats.nb_wins,
+                        'nb_losses': stats.nb_losses,
+                        'win_rate': stats.win_rate,
+                        'nb_point_taken' :stats.nb_point_taken,
+                        'nb_point_given' :stats.nb_point_given}
+                return JsonResponse(data, status=200)
+            except Stats_user.DoesNotExist:
+                return JsonResponse({'error': 'Stats not found'}, status=404)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 @csrf_exempt
 def get_Stats(request, user_id):
     if request.method == 'GET':

@@ -7,7 +7,7 @@ class UserRegistrationForm(forms.ModelForm):
     class Meta:
         model = User_site
         fields = ['email',
-                  'login',
+                  'nickname',
                   'password',
                   'username']
 
