@@ -110,7 +110,7 @@ def get_Stats(request, user_id):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-@login_required(login_url='/api/login')
+@login_required(login_url='/api/login') # TODO CHANGE THIS ROUTE TO GO
 @csrf_exempt
 def update_Stats(request, user_id): #TODO without form and with json.loads. Need to changed if we use a view in python or views in js
     if request.method == 'POST':
