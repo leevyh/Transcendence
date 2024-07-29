@@ -3,6 +3,8 @@ import Pong from "./views/pong/Pong.js";
 import Settings from "./views/Settings.js";
 import NotFound from "./views/404.js";
 import SignIn from "./views/Sign-in.js";
+import Chat from "./views/Chat.js";
+import Room from "./views/Room.js";
 
 const navigateTo = url => {
 	  history.pushState(null, null, url);
@@ -16,6 +18,8 @@ const router = async () => {
 	{ path: "/settings", view: Settings },
 	{ path: "/404", view: NotFound },
 	{ path: "/sign-in", view: SignIn },
+	{ path: "/chat", view: Chat },
+	{ path: "/room", view: Room },
   ];
 
   // Test each route for potential match
