@@ -42,9 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'api',
-    'chat.apps.ChatConfig', #
-    'channels', #
-    'rest_framework', #
 ]
 
 REST_FRAMEWORK = {
@@ -86,17 +83,6 @@ TEMPLATES = [
 LOGIN_URL = '/api/login'
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-ASGI_APPLICATION = 'core.asgi.application' # New for chat
-
-# New for chat
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],
-        },
-    }
-}
 
 # Backend de session par défaut
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Utilisation de la base de données pour stocker les sessions
