@@ -1,4 +1,3 @@
-// views/login.js
 export function loginView(container) {
     // Clear previous content
     container.innerHTML = '';
@@ -59,15 +58,14 @@ export function loginView(container) {
         .then(data => {
             if (data.message === 'User logged in successfully') {
                 localStorage.setItem('username', username);
-                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('isLoggedIn', 'true');  // A supprimer plus tard pour eviter conflic avec le backend
                 // Redirect to profile page
-                window.location.hash = '#profile';
-                // window.location.hash = '#profile/' + username;
+                window.location.href = '/settings';
                 
             } else if (data.error) {
                 alert(data.error);
-                // Redirect to register page or any other page
-                window.location.hash = '#register';
+                // Redirect to register page
+                window.location.href = '/register';
                 
             }
         })
@@ -100,85 +98,3 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
-
-// export function loginView(container) {
-//     // Clear previous content
-//     container.innerHTML = '';
-
-//     // Create and append the form element
-//     const form = document.createElement('form');
-//     form.className = 'form-register';
-
-//     // Create and append the h1 element
-//     const h1 = document.createElement('h1');
-//     h1.className = 'h3 mb-3 font-weight-normal';
-//     h1.setAttribute('data-i18n', 'register');
-//     h1.textContent = 'Please register';
-//     form.appendChild(h1);
-
-//     // Create and append the email input element
-//     const inputEmail = document.createElement('input');
-//     inputEmail.type = 'email';
-//     inputEmail.id = 'inputEmail';
-//     inputEmail.className = 'form-control';
-//     inputEmail.placeholder = 'Email address';
-//     inputEmail.required = true;
-//     inputEmail.autofocus = true;
-//     form.appendChild(inputEmail);
-
-//     // Create and append the password input element
-//     const inputPassword = document.createElement('input');
-//     inputPassword.type = 'password';
-//     inputPassword.id = 'inputPassword';
-//     inputPassword.className = 'form-control';
-//     inputPassword.placeholder = 'Password';
-//     inputPassword.required = true;
-//     form.appendChild(inputPassword);
-
-//     // Confirm password input element
-//     const inputConfirmPassword = document.createElement('input');
-//     inputConfirmPassword.type = 'password';
-//     inputConfirmPassword.id = 'inputConfirmPassword';
-//     inputConfirmPassword.className = 'form-control';
-//     inputConfirmPassword.placeholder = 'Confirm Password';
-//     inputConfirmPassword.required = true;
-//     form.appendChild(inputConfirmPassword);
-    
-//     // Create and append the checkbox div
-//     const checkboxDiv = document.createElement('div');
-//     checkboxDiv.className = 'checkbox mb-3';
-//     const checkboxLabel = document.createElement('label');
-//     const checkboxInput = document.createElement('input');
-//     checkboxInput.type = 'checkbox';
-//     checkboxInput.value = 'remember-me';
-//     checkboxLabel.appendChild(checkboxInput);
-//     checkboxLabel.appendChild(document.createTextNode(' Remember me'));
-//     checkboxDiv.appendChild(checkboxLabel);
-//     form.appendChild(checkboxDiv);
-
-//     // Create and append the login div
-//     const loginDiv = document.createElement('div');
-//     loginDiv.id = 'login';
-
-//     // Create and append the "Sign in" button
-//     const signInButton = document.createElement('button');
-//     signInButton.type = 'button';
-//     signInButton.className = 'btn btn-outline-primary';
-//     signInButton.setAttribute('data-i18n', 'sign');
-//     signInButton.textContent = 'Sign in';
-//     loginDiv.appendChild(signInButton);
-
-//     // Create and append the "Sign in with 42" button
-//     const signIn42Button = document.createElement('button');
-//     signIn42Button.type = 'button';
-//     signIn42Button.className = 'btn btn-dark';
-//     signIn42Button.setAttribute('data-i18n', 'sign42');
-//     signIn42Button.innerHTML = 'Sign in with <img class="logo42" src="./js/img/42_logo_white.svg">';
-//     loginDiv.appendChild(signIn42Button);
-
-//     form.appendChild(loginDiv);
-
-//     // Append the form to the container
-//     container.appendChild(form);
-// }

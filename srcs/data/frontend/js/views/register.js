@@ -1,4 +1,3 @@
-// views/register.js
 export function registerView(container) {
     // Clear previous content
     container.innerHTML = '';
@@ -44,7 +43,7 @@ export function registerView(container) {
     input5.setAttribute('name', 'email');
     div5.appendChild(label5);
     div5.appendChild(input5);
-    
+
     // Password input
     const div2 = document.createElement('div');
     const label2 = document.createElement('label');
@@ -95,32 +94,32 @@ export function registerView(container) {
                 'X-CSRFToken': getCookie('csrftoken') // Include CSRF token if needed
             },
             body: JSON.stringify(
-                { 
-                    username: username, 
+                {
+                    username: username,
                     password: password,
                     nickname: nickname,
                     email: email
                 }
             )
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.message === 'User registered successfully') {
-                alert('Registration successful!');
-                window.location.hash = '#login'; // Redirect to login page or any other page
-            } else if (data.errors) {
-                alert('Registration failed: ' + JSON.stringify(data.errors));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.message === 'User registered successfully') {
+                    alert('Registration successful!');
+                    window.location.href = '/login'; // Redirect to login page
+                } else if (data.errors) {
+                    alert('Registration failed: ' + JSON.stringify(data.errors));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
     });
 
     form.appendChild(div1);

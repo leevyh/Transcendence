@@ -6,9 +6,10 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.hashers import make_password, check_password
 from .forms import UserRegistrationForm, SettingsUpdateForm
 from .models import User_site, Settings_user, Stats_user
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import json
+import base64
 
 @csrf_exempt
 def register(request):
@@ -150,3 +151,43 @@ def update_Stats(request, user_id): #TODO without form and with json.loads. Need
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
+@login_required(login_url='/api/login')
+@csrf_exempt
+def get_settings(request, nickname):
+    if request.method == 'GET':
+        try:
+            user = User_site.objects.get(nickname=nickname)
+            user_id = user.id
+            settings = Settings_user.objects.get(user=user_id)
+            # avatar_image = user.avatar
+            # avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
+            data = {'nickname': user.nickname,
+                    'email': user.email,
+                    # 'avatar': avatar,
+                    'language': settings.language,
+                    'accessibility': settings.accessibility,
+                    'dark_mode': settings.dark_mode}
+            return JsonResponse(data, status=200)
+        except Settings_user.DoesNotExist:
+            return JsonResponse({'error': 'Settings not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def get_status_all_users(request):
+    if request.method == 'GET':
+        users = User_site.objects.all()
+        data = []
+        for user in users:
+            data.append({'nickname': user.nickname,
+                         'status': user.status})
+            print(data)
+        return JsonResponse(data, status=200, safe=False)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+# def logout_view(request):
+#     request.user.status = User_site.Status.OFFLINE
+#     request.user.save()
+#     logout(request)
+#     return JsonResponse({'message': 'User logged out successfully'}, status=200)

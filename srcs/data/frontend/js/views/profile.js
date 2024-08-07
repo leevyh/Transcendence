@@ -9,11 +9,11 @@ export function profileView(container) {
         // Get user data
 
                // // Recuperer les infos de l'utilisateur dans le backend
-        fetch(`api/profile/${user}`, {
+        fetch(`api/settings/${user}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
+                'X-CSRFToken': getCookie('csrftoken'),
             },
         })
         .then(response => response.json())
@@ -24,30 +24,42 @@ export function profileView(container) {
             const userData = {
                 nickname: data.nickname,
                 email: data.email,
+                language: data.language,
+                accessibility: data.accessibility,
+                theme: data.dark_mode,
+                avatar: data.avatar,
                 // avatar: data.avatar,
             };
 
             // Create and append profile elements
-
             const h1 = document.createElement('h1');
             h1.textContent = 'Profile';
-    
             const pUsername = document.createElement('p');
             pUsername.textContent = `Username: ${userData.nickname}`;
-    
             const pEmail = document.createElement('p');
             pEmail.textContent = `Email: ${userData.email}`;
-    
+            const pLanguage = document.createElement('p');
+            pLanguage.textContent = `Language: ${userData.language}`;
+            const pAccessibility = document.createElement('p');
+            pAccessibility.textContent = `Accessibility: ${userData.accessibility}`;
+            const pTheme = document.createElement('p');
+            pTheme.textContent = `Theme: ${userData.theme}`;
+            const imgAvatar = document.createElement('img');
+            imgAvatar.src = userData.avatar;
+
             // const imgAvatar = document.createElement('img');
             // imgAvatar.src = userData.avatar;
 
-    
+
             // Append elements to container
             container.appendChild(h1);
             container.appendChild(pUsername);
             container.appendChild(pEmail);
-            // container.appendChild(imgAvatar);
-            
+            container.appendChild(pLanguage);
+            container.appendChild(pAccessibility);
+            container.appendChild(pTheme);
+            container.appendChild(imgAvatar);
+
             const logoutButton = document.createElement('button');
             logoutButton.textContent = 'Logout';
             logoutButton.className = 'btn btn-danger';
@@ -56,7 +68,7 @@ export function profileView(container) {
                 localStorage.removeItem('username');
                 window.location.hash = '#login';
             });
-    
+
             container.appendChild(logoutButton);
 
         });
@@ -106,7 +118,7 @@ export function profileView(container) {
         loginButton.addEventListener('click', () => {
             window.location.hash = '#login';
         });
-        
+
         container.appendChild(p1);
         container.appendChild(loginButton);
     }
