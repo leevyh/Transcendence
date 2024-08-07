@@ -11,4 +11,5 @@ urlpatterns = [
 	path('api/stats/<int:user_id>', views.get_Stats, name='stats'),
 	path('api/updateStats/<int:user_id>', views.update_Stats, name='updateStats'),
 	path('api/status_user/', views.get_status_all_users, name='status_user'),
+	path('api/logout/', views.logoutView, name='logout'),
 ]
