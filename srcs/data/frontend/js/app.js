@@ -3,6 +3,7 @@ import { registerView } from './views/register.js';
 import { loginView } from './views/login.js';
 import { profileView } from './views/profile.js';
 import { notFoundView } from './views/404.js';
+import { chatView } from './views/chat.js';
 
 const appDiv = document.getElementById('app');
 
@@ -12,6 +13,7 @@ const routes = {
     '/login': loginView,
     '/profile': profileView,
     '/404': notFoundView,
+    '/chat': chatView,
 };
 
 function navigateTo(view) {

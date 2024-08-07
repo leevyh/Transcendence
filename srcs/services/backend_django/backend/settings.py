@@ -34,6 +34,9 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 AUTH_USER_MODEL = 'api.User_site'
 
 INSTALLED_APPS = [
+    'daphne',
+    'channels',
+    # 'chat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
