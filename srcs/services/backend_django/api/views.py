@@ -18,7 +18,8 @@ def register(request):
             form = UserRegistrationForm(data)
             if form.is_valid():
                 user = form.save(commit=False)
-                user.password = make_password(form.cleaned_data['password'])
+                user.set_password(form.cleaned_data['password'])  # Utilisez set_password pour le mot de passe
+                # user.password = make_password(form.cleaned_data['password'])
                 user.username = form.cleaned_data.get('username', None)
                 user.save()
                 settings = Settings_user(user=user)
@@ -41,6 +42,8 @@ def loginView(request):
             user = authenticate(request, username=data['login'], password=data['password'])
             if user is not None:
                 login(request, user)
+                user.status = User_site.Status.ONLINE
+                user.save()
                 return JsonResponse({'message': 'User logged in successfully'}, status=200)
             else:
                 return JsonResponse({'error': 'Invalid credentials'}, status=401)
@@ -78,6 +81,8 @@ def get_profile(request, nickname):
             try:
                 stats = Stats_user.objects.get(user=user)
                 data = {'nickname': user.nickname,
+                        'email': user.email,
+                        # 'avatar': user.avatar,
                         'created_at': user.created_at,
                         'status': user.status,
                         'nb_games': stats.nb_games,
