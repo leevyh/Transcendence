@@ -1,228 +1,5 @@
-// export function chatView(container) {
-//     // Clear previous content
-//     container.innerHTML = '';
+import { getCookie } from './utils.js';
 
-//     // Create elements
-//     const chatContainer = document.createElement('div');
-//     chatContainer.classList.add('chat-container');
-
-//     // channels container
-//     const channelsContainer = document.createElement('div');
-//     channelsContainer.classList.add('channels-container');
-//     const channelsTitle = document.createElement('h2');
-//     channelsTitle.textContent = 'Channels';
-//     const channelsList = document.createElement('ul');
-//     channelsContainer.appendChild(channelsTitle);
-//     channelsContainer.appendChild(channelsList);
-
-//     // users container
-//     const usersContainer = document.createElement('div');
-//     usersContainer.classList.add('users-container');
-//     const usersTitle = document.createElement('h2');
-//     usersTitle.textContent = 'Online Users';
-//     const usersList = document.createElement('ul');
-//     usersContainer.appendChild(usersTitle);
-//     usersContainer.appendChild(usersList);
-
-//     const chatArea = document.createElement('div');
-//     chatArea.classList.add('chat-area');
-
-//     // channel creation container
-//     const createChannelContainer = document.createElement('div');
-//     createChannelContainer.classList.add('create-channel-container');
-//     const channelInput = document.createElement('input');
-//     channelInput.setAttribute('type', 'text');
-//     channelInput.setAttribute('placeholder', 'New channel name');
-//     const createChannelButton = document.createElement('button');
-//     createChannelButton.textContent = 'Create Channel';
-//     createChannelContainer.appendChild(channelInput);
-//     createChannelContainer.appendChild(createChannelButton);
-
-//     // chatContainer.appendChild(channelsContainer);
-//     chatContainer.appendChild(usersContainer);
-//     chatContainer.appendChild(chatArea);
-//     // chatContainer.appendChild(createChannelContainer);
-
-//     // Append chat container to main container
-//     container.appendChild(chatContainer);
-
-//     // Load initial data
-//     // loadChannels();
-//     loadUsers();
-
-//     // Event listener for creating a channel
-//     createChannelButton.addEventListener('click', async () => {
-//         const channelName = channelInput.value.trim();
-//         if (channelName) {
-//             try {
-//                 const response = await fetch('/api/channels/', {
-//                     method: 'POST',
-//                     headers: {
-//                         'Content-Type': 'application/json',
-//                     },
-//                     body: JSON.stringify({ name: channelName }),
-//                 });
-//                 if (response.ok) {
-//                     channelInput.value = '';
-//                     loadChannels();
-//                 } else {
-//                     console.error('Failed to create channel');
-//                 }
-//             } catch (error) {
-//                 console.error('Error:', error);
-//             }
-//         }
-//     });
-
-//     // Function to load channels
-//     async function loadChannels() {
-//         try {
-//             const response = await fetch('/api/channels/');
-//             if (response.ok) {
-//                 const channels = await response.json();
-//                 channelsList.innerHTML = '';
-//                 channels.forEach(channel => {
-//                     const channelItem = document.createElement('li');
-//                     channelItem.textContent = channel.name;
-//                     channelItem.addEventListener('click', () => joinChannel(channel.name));
-//                     channelsList.appendChild(channelItem);
-//                 });
-//             } else {
-//                 console.error('Failed to load channels');
-//             }
-//         } catch (error) {
-//             console.error('Error:', error);
-//         }
-//     }
-
-//     // Function to load users
-//     async function loadUsers() {
-//         try {
-//             const response = await fetch('/api/users/'); // api/profile/<str:nickname>' ?? Comment recuperer TOUS les users en ligne ?
-//             if (response.ok) {
-//                 const users = await response.json();
-//                 usersList.innerHTML = '';
-//                 users.forEach(user => {
-//                     const userItem = document.createElement('li');
-//                     userItem.textContent = user.username;
-//                     usersList.appendChild(userItem);
-//                 });
-//             } else {
-//                 console.error('Failed to load users');
-//             }
-//         } catch (error) {
-//             console.error('Error:', error);
-//         }
-//     }
-
-//     // Function to join a channel
-//     function joinChannel(channelName) {
-//         chatArea.innerHTML = '';
-//         const channelTitle = document.createElement('h3');
-//         channelTitle.textContent = `Channel: ${channelName}`;
-//         chatArea.appendChild(channelTitle);
-
-//         const messagesContainer = document.createElement('div');
-//         messagesContainer.classList.add('messages-container');
-//         chatArea.appendChild(messagesContainer);
-
-//         const inputContainer = document.createElement('div');
-//         inputContainer.classList.add('input-container');
-//         const messageInput = document.createElement('input');
-//         messageInput.setAttribute('type', 'text');
-//         messageInput.setAttribute('placeholder', 'Type your message...');
-//         const sendButton = document.createElement('button');
-//         sendButton.textContent = 'Send';
-//         inputContainer.appendChild(messageInput);
-//         inputContainer.appendChild(sendButton);
-//         chatArea.appendChild(inputContainer);
-
-//         // Load messages for the channel
-//         loadMessages(channelName, messagesContainer);
-
-//         // Event listener for sending messages
-//         sendButton.addEventListener('click', async () => {
-//             const message = messageInput.value;
-//             if (message.trim()) {
-//                 try {
-//                     const response = await fetch(`/api/channels/${channelName}/messages/`, {
-//                         method: 'POST',
-//                         headers: {
-//                             'Content-Type': 'application/json',
-//                         },
-//                         body: JSON.stringify({ content: message }),
-//                     });
-//                     if (response.ok) {
-//                         messageInput.value = '';
-//                         loadMessages(channelName, messagesContainer);
-//                     } else {
-//                         console.error('Failed to send message');
-//                     }
-//                 } catch (error) {
-//                     console.error('Error:', error);
-//                 }
-//             }
-//         });
-//     }
-
-//     // Function to load messages
-//     async function loadMessages(channelName, messagesContainer) {
-//         try {
-//             const response = await fetch(`/api/channels/${channelName}/messages/`);
-//             if (response.ok) {
-//                 const messages = await response.json();
-//                 messagesContainer.innerHTML = '';
-//                 messages.forEach(msg => {
-//                     const messageDiv = document.createElement('div');
-//                     messageDiv.textContent = msg.content;
-//                     messagesContainer.appendChild(messageDiv);
-//                 });
-//             } else {
-//                 console.error('Failed to load messages');
-//             }
-//         } catch (error) {
-//             console.error('Error:', error);
-//         }
-//     }
-// }
-
-
-{/* <head>
-    <title>django-channel-chat</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js "></script>
-    <style>
-        #roomSelect {
-            height: 300px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container mt-3 p-5">
-        <h2>django-channel-chat</h2>
-        <div class="row">
-            <div class="col-12 col-md-8">
-                <div class="mb-2">
-                    <label for="roomInput">Enter a room name to connect to it:</label>
-                    <input type="text" id="roomInput" class="form-control" placeholder="Room name">
-                    <small id="roomInputHelp" class="form-text text-muted">If the room doesn't exist yet, it will be created for you.</small>
-                </div>
-                <button type="button" id="roomConnect" class="btn btn-success">Connect</button>
-            </div>
-            <div class="col-12 col-md-4">
-                <label for="roomSelect">Active rooms:</label>
-                <select multiple class="form-control" id="roomSelect">
-                    {% for room in rooms %}
-                    <option>{{ room }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-    </div>
-</body> */}
-
-
-// views/chat.js
 export function chatView(container) {
     // Clear previous content
     container.innerHTML = '';
@@ -249,16 +26,77 @@ export function chatView(container) {
     const onlineUsersList = document.createElement('ul');
     onlineUsersList.setAttribute('id', 'onlineUsersList');
     onlineUsersList.classList.add('list-group');
-
+    
+    // Append online users section to the row
     onlineUsersSection.appendChild(onlineUsersLabel);
     onlineUsersSection.appendChild(onlineUsersList);
 
-    // Append online users section to the row
-    row.appendChild(onlineUsersSection);
+    // Create chat container
+    const chatContainer = document.createElement('div');
+    chatContainer.setAttribute('id', 'chat-container');
+    chatContainer.style.display = 'none'; // Hide by default
 
-    // Append title and row to the main container
+    const chatHeader = document.createElement('div');
+    chatHeader.setAttribute('id', 'chat-header');
+    chatHeader.innerHTML = '<h3>Chat avec <span id="chat-user">Utilisateur</span></h3>';
+    
+    const chatBox = document.createElement('div');
+    chatBox.setAttribute('id', 'chat-box');
+    
+    const chatFooter = document.createElement('div');
+    chatFooter.setAttribute('id', 'chat-footer');
+
+    // Create input group in chat footer
+    const colDiv = document.createElement('div');
+    colDiv.classList.add('col-md-6');
+
+    const inputGroupDiv = document.createElement('div');
+    inputGroupDiv.classList.add('input-group');
+
+    const span = document.createElement('span');
+    span.classList.add('input-group-text');
+    span.setAttribute('id', 'basic-addon1');
+
+    const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svgIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svgIcon.setAttribute('width', '16');
+    svgIcon.setAttribute('height', '16');
+    svgIcon.setAttribute('fill', 'currentColor');
+    svgIcon.classList.add('bi', 'bi-chat-dots');
+    svgIcon.setAttribute('viewBox', '0 0 16 16');
+
+    const path1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path1.setAttribute('d', 'M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2');
+
+    const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path2.setAttribute('d', 'm2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9 9 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.4 10.4 0 0 1-.524 2.318l-.003.011a11 11 0 0 1-.244.637c-.079.186.074.394.273.362a22 22 0 0 0 .693-.125m.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6-3.004 6-7 6a8 8 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a11 11 0 0 0 .398-2');
+
+    svgIcon.appendChild(path1);
+    svgIcon.appendChild(path2);
+    span.appendChild(svgIcon);
+
+    const messageInput = document.createElement('input');
+    messageInput.setAttribute('type', 'text');
+    messageInput.classList.add('form-control');
+    messageInput.setAttribute('placeholder', 'Tapez un message...');
+    messageInput.setAttribute('aria-label', 'Tapez un message...');
+    messageInput.setAttribute('aria-describedby', 'basic-addon1');
+
+    inputGroupDiv.appendChild(span);
+    inputGroupDiv.appendChild(messageInput);
+    colDiv.appendChild(inputGroupDiv);
+
+    chatFooter.appendChild(colDiv);
+
+    chatContainer.appendChild(chatHeader);
+    chatContainer.appendChild(chatBox);
+    chatContainer.appendChild(chatFooter);
+
+    // Append title, row, and chat container to the main container
     mainContainer.appendChild(title);
     mainContainer.appendChild(row);
+    row.appendChild(onlineUsersSection);
+    mainContainer.appendChild(chatContainer);
 
     // Append the main container to the provided container
     container.appendChild(mainContainer);
@@ -272,19 +110,73 @@ export function chatView(container) {
                 users.forEach(user => {
                     const listItem = document.createElement('li');
                     listItem.classList.add('list-group-item');
-                    listItem.textContent = user.nickname + ' - ' + user.status;
+                    listItem.textContent = `${user.nickname} - ${user.status}`;
+                    listItem.setAttribute('data-nickname', user.nickname); // Use data attribute for nickname
+                    listItem.style.cursor = 'pointer'; // Show pointer cursor on hover
                     onlineUsersList.appendChild(listItem);
                 });
-
-
             })
             .catch(error => console.error('Error fetching online users:', error));
     }
 
+    // Event delegation for clicking on user
+    onlineUsersList.addEventListener('click', (event) => {
+        const target = event.target;
+        if (target.tagName === 'LI') {
+            const nickname = target.getAttribute('data-nickname');
+            const chatHeaderUser = document.getElementById('chat-user');
+            const chatContainer = document.getElementById('chat-container');
+            chatHeaderUser.textContent = nickname;
+            chatContainer.style.display = 'block';
+
+            // Handle sending messages
+            function sendMessage() {
+                const messageText = messageInput.value.trim();
+                if (messageText) {
+                    addMessage(messageText, true); // true indicates the message is from the user
+                    messageInput.value = '';
+
+                    // Simulate receiving a reply from the server
+                    setTimeout(() => {
+                        addMessage('Réponse automatique: ' + messageText, false); // false indicates the message is from the system
+                    }, 500);
+                }
+            }
+
+            // Add a message to the chat box
+            function addMessage(text, fromUser) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                if (fromUser) {
+                    messageElement.classList.add('from-user');
+                }
+                messageElement.textContent = text;
+                chatBox.appendChild(messageElement);
+                chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+            }
+
+            // Event listeners for send button and input field
+            const user = localStorage.getItem('username');
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    fetch(`/api/chat/history/${user}/`, {
+                        method: 'PUT',                                                          // L'erreur vient d'ici !
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({ message: messageInput.value, recipient: nickname })
+                    })
+                    sendMessage();
+                }
+            });
+        }
+    });
+
     // Initial fetch of online users
     fetchOnlineUsers();
 
-    // Refresh the list of online users every 10 seconds
-    setInterval(fetchOnlineUsers, 10000);
+    // Refresh the list of online users every 30 seconds
+    setInterval(fetchOnlineUsers, 30000);
 }
-

@@ -190,11 +190,11 @@ def get_status_all_users(request):
 @csrf_exempt
 def logoutView(request):
     if request.method == 'POST':
-        logout(request)
         status = User_site.Status.OFFLINE
         user = User_site.objects.get(id=request.user.id)
         user.status = status
         user.save()
+        logout(request)
         return JsonResponse({'message': 'User logged out successfully'}, status=200)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)

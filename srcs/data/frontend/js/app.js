@@ -1,7 +1,7 @@
 import { homeView } from './views/home.js';
 import { registerView } from './views/register.js';
 import { loginView } from './views/login.js';
-import { profileView } from './views/profile.js';
+import { settingsView } from './views/settings.js';
 import { notFoundView } from './views/404.js';
 import { chatView } from './views/chat.js';
 
@@ -11,7 +11,8 @@ const routes = {
     '/': homeView,
     '/register': registerView,
     '/login': loginView,
-    '/profile': profileView,
+    '/settings': settingsView,
+    // '/profile': profileView,
     '/404': notFoundView,
     '/chat': chatView,
 };

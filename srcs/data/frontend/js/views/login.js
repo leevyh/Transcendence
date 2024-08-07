@@ -8,6 +8,11 @@ export function loginView(container) {
     const h1 = document.createElement('h1');
     h1.textContent = 'Login';
 
+    //if already logged in, redirect to setting page
+    if (localStorage.getItem('isLoggedIn') === 'true') {
+        window.location.href = '/settings';
+    }
+
     const form = document.createElement('form');
 
     const div1 = document.createElement('div');
