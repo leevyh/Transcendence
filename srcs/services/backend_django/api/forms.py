@@ -3,13 +3,15 @@ from .models import User_site, Settings_user, Stats_user
 
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
+    # confirm_password = forms.CharField(widget=forms.PasswordInput, label='Confirm Password')
 
     class Meta:
         model = User_site
         fields = ['email',
                   'nickname',
                   'password',
-                  'username']
+                #   'confirm_password',
+                  'username',]
 
     def clean_password(self):
         password = self.cleaned_data.get('password')

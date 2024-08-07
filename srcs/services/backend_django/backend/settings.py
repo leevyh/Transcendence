@@ -80,9 +80,29 @@ TEMPLATES = [
     },
 ]
 
+# Ajouter ces paramètres pour autoriser les requêtes depuis votre SPA
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8888",
+]
+
+# Autoriser les requêtes API
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8888",
+]
+
 LOGIN_URL = '/api/login'
 
 WSGI_APPLICATION = 'backend.wsgi.application'
+
+ASGI_APPLICATION = 'backend.wsgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 # Backend de session par défaut
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Utilisation de la base de données pour stocker les sessions
@@ -143,7 +163,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # New for chat
+STATIC_ROOT = os.path.join(BASE_DIR, 'static') #
+
+MEDIA_URL = '/media/' #
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') #
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
