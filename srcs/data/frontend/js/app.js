@@ -1,4 +1,3 @@
-// app.js
 import { homeView } from './views/home.js';
 import { registerView } from './views/register.js';
 import { loginView } from './views/login.js';
@@ -8,11 +7,11 @@ import { notFoundView } from './views/404.js';
 const appDiv = document.getElementById('app');
 
 const routes = {
-    home: homeView,
-    register: registerView,
-    login: loginView,
-    profile: profileView,
-    404: notFoundView,
+    '/': homeView,
+    '/register': registerView,
+    '/login': loginView,
+    '/profile': profileView,
+    '/404': notFoundView,
 };
 
 function navigateTo(view) {
@@ -24,17 +23,15 @@ function navigateTo(view) {
 document.querySelectorAll('nav a').forEach(link => {
     link.addEventListener('click', (event) => {
         event.preventDefault();
-        const view = event.target.getAttribute('data-link');
-        history.pushState(null, '', `#${view}`);
-        navigateTo(view);
+        const path = `/${event.target.getAttribute('data-link')}`;
+        history.pushState(null, '', path);
+        navigateTo(path);
     });
 });
 
 window.addEventListener('popstate', () => {
-    const view = location.hash.replace('#', '') || 'home';
-    navigateTo(view);
+    navigateTo(location.pathname);
 });
 
-// Initial load
-const initialView = location.hash.replace('#', '') || 'home';
-navigateTo(initialView);
+// Initial load test
+navigateTo(location.pathname || '/home');
