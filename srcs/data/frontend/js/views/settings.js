@@ -1,6 +1,6 @@
 import { getCookie } from './utils.js';
 
-export function profileView(container) {
+export function settingsView(container) {
     // Clear previous content
     container.innerHTML = '';
 
@@ -56,18 +56,27 @@ export function profileView(container) {
             container.appendChild(pTheme);
             container.appendChild(imgAvatar);
 
-            // Fetch to disconnect  
-            fetch('/api/logout/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-            });
+            // Create and append logout button
+            const logoutButton = document.createElement('button');
+            logoutButton.textContent = 'Logout';
+            logoutButton.className = 'btn btn-danger';
+            logoutButton.addEventListener('click', () => {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('username');
+                window.location.href = '/login';
+
+                // Fetch to disconnect  
+                fetch('/api/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                });
 
             // Create and append logout button
             const logoutButton = document.createElement('button');
@@ -77,6 +86,7 @@ export function profileView(container) {
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('username');
                 window.location.href = '/login';
+            });
             });
 
             container.appendChild(logoutButton);
