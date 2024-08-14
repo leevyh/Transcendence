@@ -33,6 +33,5 @@ RUN apt install -y nginx openssl
 # 	-subj "/C=FR/ST=Paris/L=Paris/O=42/OU=42/CN=localhost"
 
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
-COPY ./conf/elastic-agent.sh /elastic-agent.sh
-
-CMD ["nginx", "&&", "bash", "/elastic-agent.sh"]
+COPY ./conf/elastic-agent.sh /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
