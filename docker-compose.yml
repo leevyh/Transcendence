@@ -99,8 +99,6 @@ services:
       - backend-elk-certs:/usr/share/fleet/config/certs
     ports:
       - 8220:8220
-    expose:
-      - 9243:9243
 
   backend-logstash:
     container_name: backend-logstash
