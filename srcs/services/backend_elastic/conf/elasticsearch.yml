@@ -1,35 +1,21 @@
-elastic:
-  password: "changeme"
+cluster.name: transcendence-cluster
+node.name: backend-elastic
+discovery.type: single-node
 
-es:
-  setting:
-    cluster:
-      name: "transcendence-cluster"
-    node:
-        name: "backend-elastic"
-    discovery:
-      type: "single-node"
-    xpack:
-      security:
-        enabled: true
-        transport:
-          ssl:
-            verification_mode: certificate
-            certificate_authorities: ["/usr/share/elasticsearch/config/certs/ca/ca.crt"]
-            certificate: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt"
-            key: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.key"
-        http:
-          ssl:
-            enabled: true
-            verification_mode: certificate
-            certificate_authorities: ["/usr/share/elasticsearch/config/certs/ca/ca.crt"]
-            certificate: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt"
-            key: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.key"
-      monitoring:
-        collection:
-          enabled: true
-      license:
-        self_generated:
-          type: basic
-    bootstrap:
-      memory_lock: false
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.certificate_authorities: ["/usr/share/elasticsearch/config/certs/ca/ca.crt"]
+xpack.security.transport.ssl.certificate: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt"
+xpack.security.transport.ssl.key: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.key"
+
+xpack.security.http.ssl.enabled: true
+xpack.security.http.ssl.verification_mode: certificate
+xpack.security.http.ssl.certificate_authorities: ["/usr/share/elasticsearch/config/certs/ca/ca.crt"]
+xpack.security.http.ssl.certificate: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt"
+xpack.security.http.ssl.key: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.key"
+
+xpack.monitoring.collection.enabled: true
+
+xpack.license.self_generated.type: basic
+
+bootstrap.memory_lock: true
