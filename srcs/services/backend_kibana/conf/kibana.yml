@@ -1,19 +1,36 @@
-server:
-  name: "kibana"
-  host: "0.0.0.0"
-  port: 5601
+#server:
+#  name: "backend-kibana"
+#  host: "0.0.0.0"
+#  port: 5601
+#
+#  ssl:
+#    enabled: true
+#    certificate: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt
+#    key: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.key
+#    certificateAuthorities: /usr/share/kibana/config/certs/ca/ca.crt
+#
+#elsaticsearch:
+#  hosts: ["https://backend-elastic:9200"]
+#  username: "elastic"
+#  password: "changeme"
+#  ssl:
+#    certificate: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt
+#    key: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.key
+#    certificateAuthorities: /usr/share/kibana/config/certs/ca/ca.crt
 
-  ssl:
-    enabled: true
-    certificate: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt
-    key: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.key
-    certificateAuthorities: /usr/share/kibana/config/certs/ca/ca.crt
 
-elsaticsearch:
-  hosts: ["https://backend-elastic:9200"]
-  username: "elastic"
-  password: "changeme"
-  ssl:
-    certificate: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt
-    key: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.key
-    certificateAuthorities: /usr/share/kibana/config/certs/ca/ca.crt
+server.name: kibana
+server.host: 0.0.0.0
+
+server.ssl.certificate: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt
+server.ssl.key: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt
+server.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca/ca.crt
+
+elasticsearch.hosts: [ https://backend-elastic:9200 ]
+
+elasticsearch.ssl.certificate: /usr/share/kibana/config/certs/backend-elastic/backend-elastic.key
+elasticsearch.ssl.key: /usr/share/kibana/config/certs/backend-elastic/backend-elastic.key
+elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca/ca.crt
+
+elasticsearch.username: kibana-system
+elasticsearch.password: changeme
