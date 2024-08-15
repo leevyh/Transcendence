@@ -23,14 +23,14 @@ server.name: kibana
 server.host: 0.0.0.0
 
 server.ssl.certificate: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt
-server.ssl.key: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt
+server.ssl.key: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.key
 server.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca/ca.crt
 
 elasticsearch.hosts: [ https://backend-elastic:9200 ]
 
-elasticsearch.ssl.certificate: /usr/share/kibana/config/certs/backend-elastic/backend-elastic.key
-elasticsearch.ssl.key: /usr/share/kibana/config/certs/backend-elastic/backend-elastic.key
+elasticsearch.ssl.certificate: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt
+elasticsearch.ssl.key: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.key
 elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/config/certs/ca/ca.crt
 
-elasticsearch.username: kibana-system
+elasticsearch.username: kibana_system
 elasticsearch.password: changeme
