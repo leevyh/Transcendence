@@ -1,4 +1,5 @@
 import { getCookie } from './utils.js';
+import { navigateTo } from './utils.js';
 
 export function registerView(container) {
     // Clear previous content
@@ -116,7 +117,8 @@ export function registerView(container) {
             .then(data => {
                 if (data.message === 'User registered successfully') {
                     alert('Registration successful!');
-                    window.location.href = '/login'; // Redirect to login page
+                    event.preventDefault();
+                    navigateTo('/login'); // Redirect to login page
                 } else if (data.errors) {
                     alert('Registration failed: ' + JSON.stringify(data.errors));
                 }
@@ -132,8 +134,14 @@ export function registerView(container) {
     // Créer le pied de page de la carte
     const cardFooter = document.createElement('div');
     cardFooter.className = 'card-footer text-center';
-    cardFooter.innerHTML = '<small>Déjà un compte ? <a href="/login">Connectez-vous</a></small>';
-  
+    cardFooter.innerHTML = '<small>Déjà un compte ? <a href="#" id="loginLink">Connectez-vous</a></small>';
+
+    // Ajouter un gestionnaire d'événements au lien
+    cardFooter.querySelector('#loginLink').addEventListener('click', function(event) {
+        event.preventDefault();
+        navigateTo('/login');
+    });
+
     // Assembler les éléments
     card.appendChild(cardHeader);
     card.appendChild(cardBody);
