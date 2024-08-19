@@ -1,4 +1,5 @@
 import { getCookie } from './utils.js';
+import { navigateTo } from './utils.js';
 
 export function settingsView(container) {
     // Clear previous content
@@ -73,7 +74,7 @@ export function settingsView(container) {
               title: 'Modification des informations personnelles',
             // Possibilité de modifier les informations personnelles
               fields: [
-                { label: 'Nickname', type: 'text', id: 'nickname', placeholder: 'Entrez votre nickname' },
+                { label: 'Nickname - Affiché durant les tournois', type: 'text', id: 'nickname', placeholder: 'Entrez votre nickname' },
                 { label: 'Adresse email', type: 'email', id: 'email', placeholder: 'Entrez votre email' },
                 { label: 'Avatar', type: 'file', id: 'avatar', placeholder: 'Choisissez un avatar' },
               ]
@@ -178,7 +179,7 @@ export function settingsView(container) {
                 //         data[key] = value;
                 //     });
                 //     console.log(data);
-                //     fetch(`/api/settings/${user}`, {
+                //     fetch(`/api/updateSettings/${user}`, {
                 //         method: 'PUT',
                 //         headers: {
                 //             'Content-Type': 'application/json',
@@ -205,10 +206,11 @@ export function settingsView(container) {
             const logoutButton = document.createElement('button');
             logoutButton.textContent = 'Logout';
             logoutButton.className = 'btn btn-danger';
-            logoutButton.addEventListener('click', () => {
+            logoutButton.addEventListener('click', (event) => {
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('username');
-                window.location.href = '/login';
+                event.preventDefault();
+                navigateTo('/login'); // Redirect to login page
 
                 // Fetch to disconnect  
                 fetch('/api/logout/', {
@@ -233,8 +235,9 @@ export function settingsView(container) {
         const loginButton = document.createElement('button');
         loginButton.textContent = 'Go to Login';
         loginButton.className = 'btn btn-primary';
-        loginButton.addEventListener('click', () => {
-            window.location.href = '/login';
+        loginButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            navigateTo('/login'); // Redirect to login page
         });
 
         container.appendChild(p1);

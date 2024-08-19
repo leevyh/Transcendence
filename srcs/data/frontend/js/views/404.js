@@ -1,3 +1,5 @@
+import { navigateTo } from './utils.js';
+
 export function notFoundView(container) {
     // Clear previous content
     container.innerHTML = '';
@@ -12,8 +14,9 @@ export function notFoundView(container) {
     const homeButton = document.createElement('button');
     homeButton.textContent = 'Go to Home';
     homeButton.className = 'btn btn-primary';
-    homeButton.addEventListener('click', () => {
-        window.location.href = '/';
+    homeButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        navigateTo('/');
     });
 
     container.appendChild(h1);

@@ -1,4 +1,5 @@
 import { getCookie } from './utils.js';
+import { navigateTo } from './utils.js';
 
 export function loginView(container) {
     // Clear previous content
@@ -10,7 +11,8 @@ export function loginView(container) {
     
     //if already logged in, redirect to setting page
     if (localStorage.getItem('isLoggedIn') === 'true') {
-        window.location.href = '/settings';
+        preventDefault();
+        navigateTo('/settings');
     }
 
     // Créer le conteneur principal
@@ -93,14 +95,12 @@ export function loginView(container) {
             if (data.message === 'User logged in successfully') {
                 localStorage.setItem('username', username);
                 localStorage.setItem('isLoggedIn', 'true');  // A supprimer plus tard pour eviter conflic avec le backend
-                // Redirect to profile page
-                window.location.href = '/settings';
-                
+                event.preventDefault();
+                navigateTo('/settings'); // Redirect to profile page
             } else if (data.error) {
-                alert(data.error);
-                // Redirect to register page
-                window.location.href = '/register';
-                
+                // Afficher un message d'erreur "Bad password or username, please try again"
+                alert('Bad password or username, please try again');
+                // alert(data.error);
             }
         })
         .catch(error => {
@@ -114,8 +114,14 @@ export function loginView(container) {
     // Créer le pied de page de la carte
     const cardFooter = document.createElement('div');
     cardFooter.className = 'card-footer text-center';
-    cardFooter.innerHTML = '<small>Pas encore de compte ? <a href="/register">Inscrivez-vous</a></small>';
-  
+    cardFooter.innerHTML = '<small>Pas encore de compte ? <a href="#" id="registerLink">Inscrivez-vous</a></small>';
+
+    // Ajouter un gestionnaire d'événements au lien
+    cardFooter.querySelector('#registerLink').addEventListener('click', function(event) {
+        event.preventDefault();
+        navigateTo('/register');
+    });
+
     // Assembler les éléments
     card.appendChild(cardHeader);
     card.appendChild(cardBody);

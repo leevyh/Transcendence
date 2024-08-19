@@ -1,3 +1,5 @@
+import { navigateTo } from './utils.js';
+
 export function homeView(container) {
     // Clear previous content
     container.innerHTML = '';
@@ -9,7 +11,15 @@ export function homeView(container) {
     const p = document.createElement('p');
     p.textContent = 'Welcome to the Home page!';
 
+    // Create button to go to login page
+    // const button = document.createElement('button');
+    // button.textContent = 'Go to Login';
+    // button.addEventListener('click', function() {
+    //     navigateTo('/login');
+    // });
+
     // Append elements to container
     container.appendChild(h1);
     container.appendChild(p);
+    // container.appendChild(button);
 }
