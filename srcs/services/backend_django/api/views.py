@@ -81,9 +81,10 @@ def get_profile(request, nickname):
             user = User_site.objects.get(nickname=nickname)
             try:
                 stats = Stats_user.objects.get(user=user)
+                avatar_image = user.avatar
+                avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
                 data = {'nickname': user.nickname,
                         'email': user.email,
-                        # 'avatar': user.avatar,
                         'created_at': user.created_at,
                         'status': user.status,
                         'nb_games': stats.nb_games,
@@ -91,7 +92,9 @@ def get_profile(request, nickname):
                         'nb_losses': stats.nb_losses,
                         'win_rate': stats.win_rate,
                         'nb_point_taken' :stats.nb_point_taken,
-                        'nb_point_given' :stats.nb_point_given}
+                        'nb_point_given' :stats.nb_point_given,
+                        'avatar': avatar,
+                        }
                 return JsonResponse(data, status=200)
             except Stats_user.DoesNotExist:
                 return JsonResponse({'error': 'Stats not found'}, status=404)
@@ -159,14 +162,14 @@ def get_settings(request, nickname):
             user = User_site.objects.get(nickname=nickname)
             user_id = user.id
             settings = Settings_user.objects.get(user=user_id)
-            # avatar_image = user.avatar
-            # avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
+            avatar_image = user.avatar
+            avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
             data = {'nickname': user.nickname,
                     'email': user.email,
-                    # 'avatar': avatar,
                     'language': settings.language,
                     'accessibility': settings.accessibility,
-                    'dark_mode': settings.dark_mode}
+                    'dark_mode': settings.dark_mode,
+                    'avatar': avatar,}
             return JsonResponse(data, status=200)
         except Settings_user.DoesNotExist:
             return JsonResponse({'error': 'Settings not found'}, status=404)
@@ -186,6 +189,9 @@ def get_status_all_users(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+
+
+
 @login_required(login_url='/api/login')
 @csrf_exempt
 def logoutView(request):
@@ -196,5 +202,16 @@ def logoutView(request):
         user.save()
         logout(request)
         return JsonResponse({'message': 'User logged out successfully'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@login_required(login_url='/api/login')
+@csrf_exempt
+def test_get_avatar(request):
+    if request.method == 'GET':
+        user = User_site.objects.get(id=request.user.id)
+        avatar_image = user.avatar
+        avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
+        return JsonResponse({'avatar': avatar}, status=200)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
