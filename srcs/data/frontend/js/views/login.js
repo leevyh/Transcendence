@@ -7,52 +7,79 @@ export function loginView(container) {
     // Create elements
     const h1 = document.createElement('h1');
     h1.textContent = 'Login';
-
+    
     //if already logged in, redirect to setting page
     if (localStorage.getItem('isLoggedIn') === 'true') {
         window.location.href = '/settings';
     }
 
+    // Créer le conteneur principal
+    container.className = 'container';
+  
+    // Créer la ligne pour centrer le formulaire
+    const row = document.createElement('div');
+    row.className = 'row justify-content-center';
+  
+    // Créer la colonne qui contiendra la carte
+    const col = document.createElement('div');
+    col.className = 'col-md-4';
+  
+    // Créer la carte
+    const card = document.createElement('div');
+    card.className = 'card mt-5';
+  
+    // Créer l'en-tête de la carte
+    const cardHeader = document.createElement('div');
+    cardHeader.className = 'card-header text-center';
+    cardHeader.innerHTML = '<h2>Connexion</h2>';
+  
+    // Créer le corps de la carte
+    const cardBody = document.createElement('div');
+    cardBody.className = 'card-body';
+  
+    // Créer le formulaire
     const form = document.createElement('form');
-
-    const div1 = document.createElement('div');
-    const label1 = document.createElement('label');
-    label1.setAttribute('for', 'username');
-    label1.textContent = 'Username:';
-    const input1 = document.createElement('input');
-    input1.setAttribute('type', 'text');
-    input1.setAttribute('id', 'username');
-    input1.setAttribute('name', 'username');
-
-    const storedUsername = localStorage.getItem('username');
-    if (storedUsername) {
-        input1.value = storedUsername;
-    }
-
-    div1.appendChild(label1);
-    div1.appendChild(input1);
-
-    const div2 = document.createElement('div');
-    const label2 = document.createElement('label');
-    label2.setAttribute('for', 'password');
-    label2.textContent = 'Password:';
-    const input2 = document.createElement('input');
-    input2.setAttribute('type', 'password');
-    input2.setAttribute('id', 'password');
-    input2.setAttribute('name', 'password');
-    div2.appendChild(label2);
-    div2.appendChild(input2);
-
-    const button = document.createElement('button');
-    button.setAttribute('type', 'submit');
-    button.textContent = 'Login';
+  
+    // Champs du formulaire
+    const fields = [
+      { label: 'Username', type: 'username', id: 'username', placeholder: 'Entrez votre username' },
+      { label: 'Mot de passe', type: 'password', id: 'password', placeholder: 'Entrez votre mot de passe' },
+    ];
+  
+    fields.forEach(field => {
+      const formGroup = document.createElement('div');
+      formGroup.className = 'mb-3';
+  
+      const label = document.createElement('label');
+      label.className = 'form-label';
+      label.htmlFor = field.id;
+      label.textContent = field.label;
+  
+      const input = document.createElement('input');
+      input.type = field.type;
+      input.className = 'form-control';
+      input.id = field.id;
+      input.placeholder = field.placeholder;
+  
+      formGroup.appendChild(label);
+      formGroup.appendChild(input);
+      form.appendChild(formGroup);
+    });
+  
+    // Bouton de soumission
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.className = 'btn btn-primary w-100';
+    submitButton.textContent = 'Se connecter';
+  
+    form.appendChild(submitButton);
 
     form.addEventListener('submit', (event) => {
         event.preventDefault();
-
-        const username = input1.value;
-        const password = input2.value;
-
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
         fetch('/api/login/', {
             method: 'POST',
             headers: {
@@ -82,10 +109,19 @@ export function loginView(container) {
         });
     });
 
-    form.appendChild(div1);
-    form.appendChild(div2);
-    form.appendChild(button);
-
-    container.appendChild(h1);
-    container.appendChild(form);
+    cardBody.appendChild(form);
+  
+    // Créer le pied de page de la carte
+    const cardFooter = document.createElement('div');
+    cardFooter.className = 'card-footer text-center';
+    cardFooter.innerHTML = '<small>Pas encore de compte ? <a href="/register">Inscrivez-vous</a></small>';
+  
+    // Assembler les éléments
+    card.appendChild(cardHeader);
+    card.appendChild(cardBody);
+    card.appendChild(cardFooter);
+    col.appendChild(card);
+    row.appendChild(col);
+    container.appendChild(row);
+    document.body.appendChild(container);
 }
