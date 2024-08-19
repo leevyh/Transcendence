@@ -43,7 +43,7 @@ export function settingsView(container) {
             const pTheme = document.createElement('p');
             pTheme.textContent = `Theme: ${userData.theme}`;
             const imgAvatar = document.createElement('img');
-            imgAvatar.src = userData.avatar;
+            imgAvatar.src = `data:image/png;base64,${userData.avatar}`;
             // const imgAvatar = document.createElement('img');
             // imgAvatar.src = userData.avatar;
 
