@@ -8,83 +8,86 @@ export function registerView(container) {
     const h1 = document.createElement('h1');
     h1.textContent = 'Register';
 
+    // Créer le conteneur principal
+    container.className = 'container';
+  
+    // Créer la ligne pour centrer le formulaire
+    const row = document.createElement('div');
+    row.className = 'row justify-content-center';
+  
+    // Créer la colonne qui contiendra la carte
+    const col = document.createElement('div');
+    col.className = 'col-md-6';
+  
+    // Créer la carte
+    const card = document.createElement('div');
+    card.className = 'card mt-5';
+  
+    // Créer l'en-tête de la carte
+    const cardHeader = document.createElement('div');
+    cardHeader.className = 'card-header text-center';
+    cardHeader.innerHTML = '<h2>Inscription</h2>';
+  
+    // Créer le corps de la carte
+    const cardBody = document.createElement('div');
+    cardBody.className = 'card-body';
+  
+    // Créer le formulaire
     const form = document.createElement('form');
-
-    // Username input
-    const div1 = document.createElement('div');
-    const label1 = document.createElement('label');
-    label1.setAttribute('for', 'username');
-    label1.textContent = 'Username:';
-    const input1 = document.createElement('input');
-    input1.setAttribute('type', 'text');
-    input1.setAttribute('id', 'username');
-    input1.setAttribute('name', 'username');
-    div1.appendChild(label1);
-    div1.appendChild(input1);
-
-    // Nickname input
-    const div4 = document.createElement('div');
-    const label4 = document.createElement('label');
-    label4.setAttribute('for', 'nickname');
-    label4.textContent = 'Nickname:';
-    const input4 = document.createElement('input');
-    input4.setAttribute('type', 'text');
-    input4.setAttribute('id', 'nickname');
-    input4.setAttribute('name', 'nickname');
-    div4.appendChild(label4);
-    div4.appendChild(input4);
-
-    // Email input
-    const div5 = document.createElement('div');
-    const label5 = document.createElement('label');
-    label5.setAttribute('for', 'email');
-    label5.textContent = 'Email:';
-    const input5 = document.createElement('input');
-    input5.setAttribute('type', 'email');
-    input5.setAttribute('id', 'email');
-    input5.setAttribute('name', 'email');
-    div5.appendChild(label5);
-    div5.appendChild(input5);
-
-    // Password input
-    const div2 = document.createElement('div');
-    const label2 = document.createElement('label');
-    label2.setAttribute('for', 'password');
-    label2.textContent = 'Password:';
-    const input2 = document.createElement('input');
-    input2.setAttribute('type', 'password');
-    input2.setAttribute('id', 'password');
-    input2.setAttribute('name', 'password');
-    div2.appendChild(label2);
-    div2.appendChild(input2);
-
-    // Confirm Password input
-    const div3 = document.createElement('div');
-    const label3 = document.createElement('label');
-    label3.setAttribute('for', 'confirm_password');
-    label3.textContent = 'Confirm Password:';
-    const input3 = document.createElement('input');
-    input3.setAttribute('type', 'password');
-    input3.setAttribute('id', 'confirm_password');
-    input3.setAttribute('name', 'confirm_password');
-    div3.appendChild(label3);
-    div3.appendChild(input3);
-
-    // Submit button
-    const button = document.createElement('button');
-    button.setAttribute('type', 'submit');
-    button.textContent = 'Register';
-
+  
+    // Champs du formulaire
+    const fields = [
+      { label: 'Username', type: 'text', id: 'username', placeholder: 'Entrez votre username' },
+      { label: 'Nickname', type: 'text', id: 'nickname', placeholder: 'Entrez votre nickname' },
+      { label: 'Adresse email', type: 'email', id: 'email', placeholder: 'Entrez votre email' },
+      { label: 'Mot de passe', type: 'password', id: 'password', placeholder: 'Entrez un mot de passe' },
+      { label: 'Confirmer le mot de passe', type: 'password', id: 'confirmpassword', placeholder: 'Confirmez votre mot de passe' },
+    ];
+  
+    fields.forEach(field => {
+      const formGroup = document.createElement('div');
+      formGroup.className = 'mb-3';
+  
+      const label = document.createElement('label');
+      label.className = 'form-label';
+      label.htmlFor = field.id;
+      label.textContent = field.label;
+  
+      const input = document.createElement('input');
+      input.type = field.type;
+      input.className = 'form-control';
+      input.id = field.id;
+      input.placeholder = field.placeholder;
+  
+      formGroup.appendChild(label);
+      formGroup.appendChild(input);
+      form.appendChild(formGroup);
+    });
+  
+    // Bouton de soumission
+    const submitButton = document.createElement('button');
+    submitButton.setAttribute('type', 'submit');
+    submitButton.className = 'btn btn-primary w-100';
+    submitButton.textContent = "S'inscrire";
+    form.appendChild(submitButton);
+  
     form.addEventListener('submit', (event) => {
         event.preventDefault();
 
-        const username = input1.value;
-        const password = input2.value;
-        const confirmPassword = input3.value;
-        const nickname = input4.value;
-        const email = input5.value;
+        // Récupérer les valeurs des champs ajoutés dans le formulaire
+        const username = document.getElementById('username').value;
+        const nickname = document.getElementById('nickname').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmpassword').value;
 
-        if (password !== confirmPassword) {
+        // console.log('Username:', username);
+        // console.log('Nickname:', nickname);
+        // console.log('Email:', email);
+        // console.log('Password:', password);
+        // console.log('Confirm Password:', confirmPassword);
+
+        if (password.value !== confirmPassword.value) {
             alert('Passwords do not match!');
             return;
         }
@@ -124,13 +127,20 @@ export function registerView(container) {
             });
     });
 
-    form.appendChild(div1);
-    form.appendChild(div4);
-    form.appendChild(div5);
-    form.appendChild(div2);
-    form.appendChild(div3);
-    form.appendChild(button);
-
-    container.appendChild(h1);
-    container.appendChild(form);
+    cardBody.appendChild(form);
+  
+    // Créer le pied de page de la carte
+    const cardFooter = document.createElement('div');
+    cardFooter.className = 'card-footer text-center';
+    cardFooter.innerHTML = '<small>Déjà un compte ? <a href="/login">Connectez-vous</a></small>';
+  
+    // Assembler les éléments
+    card.appendChild(cardHeader);
+    card.appendChild(cardBody);
+    card.appendChild(cardFooter);
+    col.appendChild(card);
+    row.appendChild(col);
+    container.appendChild(row);
+    document.body.appendChild(container);
 }
+  
