@@ -11,8 +11,8 @@ export function loginView(container) {
     
     //if already logged in, redirect to setting page
     if (localStorage.getItem('isLoggedIn') === 'true') {
-        preventDefault();
         navigateTo('/settings');
+        return ;
     }
 
     // Créer le conteneur principal
