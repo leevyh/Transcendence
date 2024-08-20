@@ -14,8 +14,6 @@ xpack.security.http.ssl.certificate_authorities: ["/usr/share/elasticsearch/conf
 xpack.security.http.ssl.certificate: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt"
 xpack.security.http.ssl.key: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.key"
 
-xpack.monitoring.collection.enabled: true
-
 xpack.license.self_generated.type: basic
 
-bootstrap.memory_lock: true
+bootstrap.memory_lock: false
