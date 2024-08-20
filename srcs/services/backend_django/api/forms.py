@@ -1,5 +1,5 @@
 from django import forms
-from .models import User_site, Settings_user, Stats_user
+from .models import User_site, Accessibility, Stats_user
 
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
@@ -21,7 +21,7 @@ class UserRegistrationForm(forms.ModelForm):
 
 class SettingsUpdateForm(forms.ModelForm):
     class Meta:
-        model = Settings_user
+        model = Accessibility
         fields = ['language',
                   'accessibility',
                   'dark_mode']

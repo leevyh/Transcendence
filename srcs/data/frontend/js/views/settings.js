@@ -171,27 +171,28 @@ export function settingsView(container) {
             
                 form.appendChild(submitButton);
                 // fetch pour modifier les informations
-                // form.addEventListener('submit', (event) => {
-                //     event.preventDefault();
-                //     const formData = new FormData(form);
-                //     const data = {};
-                //     formData.forEach((value, key) => {
-                //         data[key] = value;
-                //     });
-                //     console.log(data);
-                //     fetch(`/api/updateSettings/${user}`, {
-                //         method: 'PUT',
-                //         headers: {
-                //             'Content-Type': 'application/json',
-                //             'X-CSRFToken': getCookie('csrftoken'),
-                //         },
-                //         body: JSON.stringify(data),
-                //     })
-                //     .then(response => response.json())
-                //     .then(data => {
-                //         console.log(data);
-                //     });
-                // });
+                form.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(form);
+                    const data = {};
+                    formData.forEach((value, key) => {
+                        data[key] = value;
+                        console.log(value);
+                    });
+                    console.log(data);
+                    fetch(`/api/updateSettings/${user}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken'),
+                        },
+                        body: JSON.stringify(data),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                    });
+                });
 
                 sectionBody.appendChild(form);
             
