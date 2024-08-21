@@ -1,4 +1,4 @@
-import { navigateTo } from './utils.js';
+// import { navigateTo } from './utils.js';
 
 export function homeView(container) {
     // Clear previous content
