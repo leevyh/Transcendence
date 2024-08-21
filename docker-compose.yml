@@ -6,6 +6,7 @@ services:
       -  8000
     env_file:
         - ./env/postgresql.env
+        - ./env/42app.env
 #    volumes:
 #      - ./srcs/data/backend:/home/app
     restart: on-failure
