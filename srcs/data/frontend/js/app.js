@@ -10,6 +10,7 @@ import { loginView } from './views/fr/login.js';
 import { settingsView } from './views/fr/settings.js';
 import { passwordView } from './views/fr/password.js';
 import { chatView } from './views/fr/chat.js';
+import { pongView } from './views/pong.js';
 
 const appDiv = document.getElementById('app');
 
@@ -37,6 +38,7 @@ const routes = {
     },
     '/': homeView, // A modifier plus tard
     '/404': notFoundView,
+    '/pong': pongView,
 };
 
 
