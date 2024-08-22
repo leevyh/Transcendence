@@ -12,7 +12,7 @@ export function loginView(container) {
     //if already logged in, redirect to setting page
     if (localStorage.getItem('isLoggedIn') === 'true') {
         navigateTo('/settings');
-        return ;
+        return;
     }
 
     // Créer le conteneur principal
@@ -96,7 +96,8 @@ export function loginView(container) {
                 localStorage.setItem('username', username);
                 localStorage.setItem('isLoggedIn', 'true');  // A supprimer plus tard pour eviter conflic avec le backend
                 event.preventDefault();
-                navigateTo('/settings'); // Redirect to profile page
+                navigateTo('/'); // Redirect to home page
+                // navigateTo('/settings'); // Redirect to profile page
             } else if (data.error) {
                 // Afficher un message d'erreur "Bad password or username, please try again"
                 alert('Bad password or username, please try again');
