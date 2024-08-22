@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth.hashers import make_password, check_password
 from .forms import UserRegistrationForm, SettingsUpdateForm
-from .models import User_site, Settings_user, Stats_user
+from .models import User_site, Accessibility, Stats_user
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import json
@@ -23,7 +23,7 @@ def register(request):
                 # user.password = make_password(form.cleaned_data['password'])
                 user.username = form.cleaned_data.get('username', None)
                 user.save()
-                settings = Settings_user(user=user)
+                settings = Accessibility(user=user)
                 settings.save()
                 stats = Stats_user(user=user)
                 stats.save()
@@ -54,26 +54,6 @@ def loginView(request):
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-@login_required(login_url='/api/login')
-@csrf_exempt
-def	updateSettings(request, user_id):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            settings_id = Settings_user.objects.get(user=user_id)
-            form = SettingsUpdateForm(data, instance=settings_id)
-            if form.is_valid():
-                update_settings = form.save(commit=False)
-                update_settings.save()
-                return JsonResponse({'message': 'Settings updated successfully'}, status=200)
-            else:
-                return JsonResponse({'errors': form.errors}, status=400)
-        except:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
-
 
 def get_profile(request, nickname):
     if request.method == 'GET':
@@ -119,6 +99,76 @@ def get_Stats(request, user_id):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+@login_required(login_url='/api/login')
+@csrf_exempt
+def get_settings(request, nickname):
+    if request.method == 'GET':
+        try:
+            user = User_site.objects.get(nickname=nickname)
+            user_id = user.id
+            settings = Accessibility.objects.get(user=user_id)
+            avatar_image = user.avatar
+            avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
+            data = {'nickname': user.nickname,
+                    'email': user.email,
+                    'language': settings.language,
+                    'accessibility': settings.accessibility,
+                    'dark_mode': settings.dark_mode,
+                    'avatar': avatar,}
+            return JsonResponse(data, status=200)
+        except Accessibility.DoesNotExist:
+            return JsonResponse({'error': 'Settings not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def get_status_all_users(request):
+    if request.method == 'GET':
+        users = User_site.objects.all()
+        data = []
+        for user in users:
+            data.append({'nickname': user.nickname,
+                         'status': user.status})
+            print(data)
+        return JsonResponse(data, status=200, safe=False)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@login_required(login_url='/api/login')
+@csrf_exempt
+def updateSettings(request, nickname):
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            print(data)
+
+            return JsonResponse({'message': 'Settings updated successfully'}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@login_required(login_url='/api/login')
+@csrf_exempt
+def updatePassword(request, nickname):
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            user = User_site.objects.get(nickname=nickname)
+            if check_password(data['old_password'], user.password):
+                user.set_password(data['new_password'])
+                user.save()
+                return JsonResponse({'message': 'Password updated successfully'}, status=200)
+            else:
+                return JsonResponse({'error': 'Invalid password'}, status=401)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
 @login_required(login_url='/api/login') # TODO CHANGE THIS ROUTE TO GO
 @csrf_exempt
 def update_Stats(request, user_id): #TODO without form and with json.loads. Need to changed if we use a view in python or views in js
@@ -153,45 +203,6 @@ def update_Stats(request, user_id): #TODO without form and with json.loads. Need
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-
-@login_required(login_url='/api/login')
-@csrf_exempt
-def get_settings(request, nickname):
-    if request.method == 'GET':
-        try:
-            user = User_site.objects.get(nickname=nickname)
-            user_id = user.id
-            settings = Settings_user.objects.get(user=user_id)
-            avatar_image = user.avatar
-            avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
-            data = {'nickname': user.nickname,
-                    'email': user.email,
-                    'language': settings.language,
-                    'accessibility': settings.accessibility,
-                    'dark_mode': settings.dark_mode,
-                    'avatar': avatar,}
-            return JsonResponse(data, status=200)
-        except Settings_user.DoesNotExist:
-            return JsonResponse({'error': 'Settings not found'}, status=404)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-@csrf_exempt
-def get_status_all_users(request):
-    if request.method == 'GET':
-        users = User_site.objects.all()
-        data = []
-        for user in users:
-            data.append({'nickname': user.nickname,
-                         'status': user.status})
-            print(data)
-        return JsonResponse(data, status=200, safe=False)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-
-
-
 @login_required(login_url='/api/login')
 @csrf_exempt
 def logoutView(request):
@@ -202,16 +213,5 @@ def logoutView(request):
         user.save()
         logout(request)
         return JsonResponse({'message': 'User logged out successfully'}, status=200)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-@login_required(login_url='/api/login')
-@csrf_exempt
-def test_get_avatar(request):
-    if request.method == 'GET':
-        user = User_site.objects.get(id=request.user.id)
-        avatar_image = user.avatar
-        avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
-        return JsonResponse({'avatar': avatar}, status=200)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)

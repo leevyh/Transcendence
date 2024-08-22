@@ -184,7 +184,6 @@ export function settingsView(container) {
                         data[key] = value;
                     });
                     console.log(data);
-
                     fetch(`/api/updateSettings/${user}`, {
                         method: 'PUT',
                         headers: {

@@ -16,7 +16,7 @@ class User_site(AbstractUser):
     def __str__(self):
         return self.login
 
-class Settings_user(models.Model):
+class Accessibility(models.Model):
     class Language(models.TextChoices):
         FRENCH = "fr"
         ENGLISH = "en"
