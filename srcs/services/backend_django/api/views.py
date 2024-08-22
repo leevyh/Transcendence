@@ -15,6 +15,7 @@ import requests
 import time
 from typing import Optional
 from typing import Union
+from django.http import HttpResponse as HTTPResponse
 
 
 @csrf_exempt
@@ -268,97 +269,112 @@ def logoutView(request):
 
 class Api:
     intra: str = "https://api.intra.42.fr"
-    key: str = ""
-    secret: str = ""
-    token: str = ""
-    expires_in: int = 0
+    client_id: str = ""
+    client_secret: str = ""
+    code_authorize: str = ""
+    redirect_uri: str = ""
 
-    def __init__(self, key: str, secret: str):
-        self.key = key
-        self.secret = secret
-        self.rate_limit_last_time = time.time()
-        self.rate_limit_last_time_hours = time.time()
-        if not self.get_token():
-            print("Failed to get token")
 
-    def get_token(self) -> bool:
-        self.add_rate()
-        try:
-            r = requests.post(f"{self.intra}/oauth/token", data={
-                "grant_type": "client_credentials",
-                "client_id": self.key,
-                "client_secret": self.secret
-            })
-        except Exception as e:
-            return False
-        if r.status_code == 200:
-            self.token = r.json()["access_token"]
-            self.expire_at = r.json()["expires_in"] + r.json()["created_at"]
-            return True
-        else:
-            return False
+    def __init__(self, client_id: str, client_secret: str, redirect_uri: str):
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.redirect_uri = redirect_uri
 
-    def get_access_token(self, token: str, state: str, domain: str) -> str:
-        self.add_rate()
-        r = None
-        try:
-            r = requests.post(f"{self.intra}/oauth/token", data={
-                "grant_type": "authorization_code",
-                "client_id": self.key,
-                "client_secret": self.secret,
-                "code": token,
-                "state": state,
-                "redirect_uri": domain
-            })
-        except Exception as e:
-            print("DEBUG: ", e)
-            return ""
-        if r.status_code != 200:
-            print("DEBUG: ", r.json())
-            return ""
-        print("Dbg: ", r.json())
-        return r.json()["access_token"]
-
-    def add_rate(self):
-        if self.rate_limit_last_time == time.time() and self.rate_limit_sec == 2:
-            time.sleep(1)
-            self.rate_limit_sec = 0
-        if self.rate_limit_last_time != time.time():
-            self.rate_limit_sec = 0
-            self.rate_limit_last_time = time.time()
-        self.rate_limit_sec += 1
-
-    def get(self, url: str, params: Optional[list] = None) -> tuple[dict, int, dict]:
-        if params is None:
-            params = []
-        if self.expire_at < time.time():
-            if not self.get_token():
-                return {"error": "Rate limit"}, 429, {}
-        self.add_rate()
-        req_url = self.intra
-        if "v2/" != url[:3]:
-            req_url += '/v2'
-        req_url += f"{url}?{'&'.join([item for item in params])}"
-        r = None
-        try:
-            r = requests.get(req_url, headers={
-                "Authorization": f"Bearer {self.token}"
-            })
-        except Exception as e:
-            return {"error": e.__str__()}, 0, {}
-        if r and r.status_code == 200:
-            return r.json(), r.status_code, dict(r.headers)
-        else:
-            return {"error": r.text}, r.status_code, dict(r.headers)
+    def get_code_authorize(self):
+        url = f"{self.intra}/oauth/authorize?client_id={self.client_id}&redirect_uri={self.redirect_uri}&response_type=code"
+        return url
 
 
 def auth_42(request):
-    Api_42 = Api(os.getenv('CLIENT_ID'), os.getenv('SECRET_KEY'))
-    code = request.GET.get('code')
-    state = request.GET.get('state')
-    print("Code: ", code)
-    final_token = Api_42.get_access_token(code, state, os.getenv('REDIRECT_URI'))
-    print(final_token)
-    if final_token:
-        return JsonResponse({"access_token": final_token}, status=200)
-    return JsonResponse({"error": "Invalid request"}, status=400)
+    if request.method == 'GET':
+        client_id = os.getenv('CLIENT_ID')
+        client_secret = os.getenv('CLIENT_SECRET')
+        redirect_uri = os.getenv('REDIRECT_URI')
+        api = Api(client_id, client_secret, redirect_uri)
+        url = api.get_code_authorize()
+        return JsonResponse({'url': url}, status=200)
+
+def check_user42(login):
+    try:
+        user = User_site.objects.get(nickname=login)
+        return True
+    except User_site.DoesNotExist:
+        return False
+
+def create_user42(response):
+    data = response.json()
+    access_token = data['access_token']
+    expires_in = data['expires_in'] + data['created_at']
+    url = "https://api.intra.42.fr/v2/me"
+    headers = {
+        'Authorization': f"Bearer {access_token}"
+    }
+    r = requests.get(url, headers=headers)
+    if r.status_code == 200:
+        data = r.json()
+        #save data json in media directory
+        with open('data.json', 'w') as f:
+            json.dump(data, f, indent=4)
+        username = data['login']
+        email = data['email']
+        nickname = data['login']
+        # {
+        #     "id": 116104,
+        #     "email": "amugnier@student.42.fr",
+        #     "login": "amugnier",
+        #     "first_name": "Antoine",
+        #     "last_name": "Mugnier",
+        #     "usual_full_name": "Antoine Mugnier",
+        #     "usual_first_name": null,
+        #     "url": "https://api.intra.42.fr/v2/users/amugnier",
+        #     "phone": "hidden",
+        #     "displayname": "Antoine Mugnier",
+        #     "kind": "student",
+        #     "image": {
+        #         "link": "https://cdn.intra.42.fr/users/aa2b6da5486c306e3ee6aa7dfb36c9b5/amugnier.jpg",
+        #         "versions": {
+        #             "large": "https://cdn.intra.42.fr/users/e37fda39ed56b223d59fe33a8ff16731/large_amugnier.jpg",
+        #             "medium": "https://cdn.intra.42.fr/users/21a9dd75b2389c6df367b2bafea71eef/medium_amugnier.jpg",
+        #             "small": "https://cdn.intra.42.fr/users/6194af12c14394528629684e5f1e823f/small_amugnier.jpg",
+        #             "micro": "https://cdn.intra.42.fr/users/e755da2d51ab74a770e91a84dcaaf689/micro_amugnier.jpg"
+        #         }
+        #     }
+        # }
+        url = data['image']['versions']['medium']
+        #download image in media directory
+        r = requests.get(url)
+        with open(f'media/{username}.jpg', 'wb') as f:
+            f.write(r.content)
+        avatar = f'media/{username}.jpg' #TODO change this to the path of the image
+        if not check_user42(username):
+            user = User_site(username=username, email=email, nickname=nickname, avatar=avatar)
+            user.save()
+            settings = Accessibility(user=user)
+            settings.save()
+            stats = Stats_user(user=user)
+            stats.save()
+        user = User_site.objects.get(nickname=nickname)
+        user.status = User_site.Status.ONLINE
+        user.save()
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+@csrf_exempt
+def token_42(request):
+    if request.method == 'POST':
+        client_id = os.getenv('CLIENT_ID')
+        client_secret = os.getenv('CLIENT_SECRET')
+        redirect_uri = os.getenv('REDIRECT_URI')
+        data = json.loads(request.body)
+        code = data['code']
+        print(f"code: {code}")
+        print(f"client_id: {client_id}")
+        print(f"client_secret: {client_secret}")
+        url = f"https://api.intra.42.fr/oauth/token?client_id={client_id}&client_secret={client_secret}&code={code}&redirect_uri={redirect_uri}&grant_type=authorization_code"
+        r = requests.post(url)
+        if r.status_code == 200:
+            create_user42(r)
+            return JsonResponse({'message': 'Token created successfully'}, status=200)
+        else:
+            return JsonResponse({'error': 'Invalid request'}, status=400)

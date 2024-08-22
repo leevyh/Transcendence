@@ -123,6 +123,35 @@ export function loginView(container) {
         navigateTo('/register');
     });
 
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        if (code) {
+            fetch('/api/token/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // 'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ code: code })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    console.log(data);
+                    navigateTo('/');
+                }
+                else {
+                    console.log('No data');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+            }
+        });
+
     // Connexion with 42 button with redirection to 42 to get autorization link
     const cardLogin42 = document.createElement('div');
     cardLogin42.className = 'card-footer text-center';
@@ -138,16 +167,15 @@ export function loginView(container) {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
+                // 'X-CSRFToken': getCookie('csrftoken')
             }
         })
         .then(response => response.json())
         .then(data => {
-            if (data.message === 'Redirecting to 42 login page' || data.code === 200) {
+            console.log(data);
+            if (data.url) {
+                console.log(data.url);
                 window.location.href = data.url;
-                //Get code from 42 and send it to backend to get token
-                const code = data.code;
-                console.log(code);
             } else if (data.error) {
                 alert(data.error);
             }
@@ -158,11 +186,17 @@ export function loginView(container) {
         });
     });
 
+
+
+
+
+
+
+
+
+
+
     card.appendChild(cardLogin42);
-
-
-
-
     // Assembler les éléments
     card.appendChild(cardHeader);
     card.appendChild(cardBody);

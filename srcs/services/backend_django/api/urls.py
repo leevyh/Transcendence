@@ -13,5 +13,6 @@ urlpatterns = [
 	path('updateStats/<int:user_id>', views.update_Stats, name='updateStats'),
 	path('status_user/', views.get_status_all_users, name='status_user'),
 	path('logout/', views.logoutView, name='logout'),
-	path('test_get_avatar/', views.test_get_avatar, name='test_get_avatar'),
+	path('auth/', views.auth_42, name='auth'),
+	path('token/', views.token_42, name='token'),
 ]
