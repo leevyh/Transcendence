@@ -4,6 +4,7 @@ import { loginView } from './views/login.js';
 import { settingsView } from './views/settings.js';
 import { notFoundView } from './views/404.js';
 import { chatView } from './views/chat3.js';
+import { passwordView } from './views/password.js';
 
 const appDiv = document.getElementById('app');
 
@@ -15,6 +16,7 @@ const routes = {
     // '/profile': profileView,
     '/404': notFoundView,
     '/chat': chatView,
+    '/password': passwordView,
 };
 
 function navigateTo(view) {

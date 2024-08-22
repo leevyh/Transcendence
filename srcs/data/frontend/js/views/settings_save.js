@@ -12,9 +12,9 @@ export function settingsView(container) {
     container.appendChild(pageTitle);
   
     // Check if the user is logged in
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    // const isLoggedIn = localStorage.getItem('isLoggedIn');
     const user = localStorage.getItem('username');
-    if (isLoggedIn) {
+    // if (isLoggedIn) {
         // Recuperer les infos de l'utilisateur dans le backend
         fetch(`/api/settings/${user}`, {
             method: 'GET',
@@ -24,6 +24,7 @@ export function settingsView(container) {
             },
         })
         .then(response => response.json())
+        // Recuperer les données de l'utilisateur
         .then(data => {
             console.log(data);
             const userData = {
@@ -34,9 +35,28 @@ export function settingsView(container) {
                 theme: data.dark_mode,
                 avatar: data.avatar,
             };  
+        // Si je recois une erreur, je n'affiche pas les informations et je mets un message d'erreur indiquant que l'utilisateur n'est pas connecté
+        // et je redirige vers la page de connexion
+            if (data.error) {
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'Vous n\'êtes pas connecté. Veuillez vous connecter pour voir votre profil.';
+                container.appendChild(errorMessage);
 
+                const loginButton = document.createElement('button');
+                loginButton.textContent = 'Aller à la page de connexion';
+                loginButton.className = 'btn btn-primary';
+                loginButton.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    navigateTo('/login');
+                });
+                container.appendChild(loginButton);
+
+                return;
+            }
+
+            // Si je reçois des données, je dois les afficher
 // *************** Affichage des informations personnelles ***************
-            // Affichage des informations personnelles
             const personalInfo = document.createElement('div');
             personalInfo.className = 'card mb-4';
             const personalInfoHeader = document.createElement('div');
@@ -128,7 +148,6 @@ export function settingsView(container) {
                 // Création de l'élément d'entrée pour chaque champ
                 let input;
                 if (field.type === 'select') {
-                    // Select input type
                     input = document.createElement('select');
                     input.className = 'form-select';
                     input.id = field.id;
@@ -139,7 +158,6 @@ export function settingsView(container) {
                     input.appendChild(optionElement);
                     });
                 } else if (field.type === 'checkbox') {
-                    // Checkbox input type
                     input = document.createElement('input');
                     input.type = 'checkbox';
                     input.className = 'form-check-input';
@@ -153,9 +171,8 @@ export function settingsView(container) {
                     formGroup.appendChild(input);
                     formGroup.appendChild(checkboxLabel);
                     form.appendChild(formGroup);
-                    return; // Skip the usual input append
+                    return;
                 } else {
-                    // Default input type is text
                     input = document.createElement('input');
                     input.type = field.type;
                     input.className = 'form-control';
@@ -178,6 +195,11 @@ export function settingsView(container) {
                 // Envoi des données du formulaire
                 form.addEventListener('submit', (event) => {
                     event.preventDefault();
+
+                    // Suppression des messages d'erreur précédents
+                    const errorMessages = form.querySelectorAll('.text-danger');
+                    errorMessages.forEach(message => message.remove());
+
                     const formData = new FormData(form);
                     const data = {};
                     formData.forEach((value, key) => {
@@ -197,7 +219,6 @@ export function settingsView(container) {
                         console.log(data);
                     });
                 });
-
                 sectionBody.appendChild(form);
             
                 // Ajout du corps et de l'en-tête à la carte
@@ -228,25 +249,24 @@ export function settingsView(container) {
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
-                    localStorage.setItem('isLoggedIn', 'false'); 
                 });
             });
             container.appendChild(logoutButton);
         });
-    } else {
-        // If not logged in, redirect to login or show a message
-        const p1 = document.createElement('p');
-        p1.textContent = 'You are not logged in. Please log in to view your profile.';
+    // } else {
+    //     // If not logged in, redirect to login or show a message
+    //     const p1 = document.createElement('p');
+    //     p1.textContent = 'You are not logged in. Please log in to view your profile.';
 
-        const loginButton = document.createElement('button');
-        loginButton.textContent = 'Go to Login';
-        loginButton.className = 'btn btn-primary';
-        loginButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            navigateTo('/login'); // Redirect to login page
-        });
+    //     const loginButton = document.createElement('button');
+    //     loginButton.textContent = 'Go to Login';
+    //     loginButton.className = 'btn btn-primary';
+    //     loginButton.addEventListener('click', (event) => {
+    //         event.preventDefault();
+    //         navigateTo('/login'); // Redirect to login page
+    //     });
 
-        container.appendChild(p1);
-        container.appendChild(loginButton);
+    //     container.appendChild(p1);
+    //     container.appendChild(loginButton);
     }
 }

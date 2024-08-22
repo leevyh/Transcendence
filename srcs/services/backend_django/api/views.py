@@ -114,7 +114,7 @@ def get_settings(request, nickname):
                     'language': settings.language,
                     'accessibility': settings.accessibility,
                     'dark_mode': settings.dark_mode,
-                    'avatar': avatar,}
+                    'avatar': avatar}
             return JsonResponse(data, status=200)
         except Accessibility.DoesNotExist:
             return JsonResponse({'error': 'Settings not found'}, status=404)
@@ -152,6 +152,7 @@ def updateSettings(request, nickname):
 @csrf_exempt
 def updatePassword(request, nickname):
     if request.method == 'PUT':
+        print(nickname)
         try:
             data = json.loads(request.body)
             user = User_site.objects.get(nickname=nickname)
@@ -215,3 +216,12 @@ def logoutView(request):
         return JsonResponse({'message': 'User logged out successfully'}, status=200)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+# @csrf_exempt
+# def is_logged_in(request):
+#     if request.method == 'GET':
+#         user = User_site.objects.get()
+#         data = {
+#             'status': user.status
+#         }
+#         return JsonResponse(data, status=200)

@@ -9,11 +9,16 @@ export function loginView(container) {
     const h1 = document.createElement('h1');
     h1.textContent = 'Login';
     
-    //if already logged in, redirect to setting page
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-        navigateTo('/settings');
-        return;
-    }
+    // Verifier si l'utilisateur est déjà connecté en demandant au backend
+    // fetch(`/api/is_logged_in/`)
+    // .then(response => response.json())
+    // .then(data => {
+    //     if (data.status === 'online') {
+    //         navigateTo('/settings');
+    //         return;
+    //     }
+    // })
+
 
     // Créer le conteneur principal
     container.className = 'container';
@@ -78,6 +83,10 @@ export function loginView(container) {
 
     form.addEventListener('submit', (event) => {
         event.preventDefault();
+
+        // Suppression des messages d'erreur précédents
+        const errorMessages = form.querySelectorAll('.text-danger');
+        errorMessages.forEach(message => message.remove());
         
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
@@ -94,24 +103,26 @@ export function loginView(container) {
         .then(data => {
             if (data.message === 'User logged in successfully') {
                 localStorage.setItem('username', username);
-                localStorage.setItem('isLoggedIn', 'true');  // A supprimer plus tard pour eviter conflic avec le backend
+                // localStorage.setItem('isLoggedIn', 'true');  // A supprimer plus tard pour eviter conflic avec le backend
                 const loggindiv = document.getElementById('loginLink')
                 loggindiv.setAttribute("hidden", true);
                 const settingsdiv = document.getElementById('settingsLink')
                 settingsdiv.removeAttribute("hidden");
                 event.preventDefault();
-                event.preventDefault();
                 navigateTo('/'); // Redirect to home page
                 // navigateTo('/settings'); // Redirect to profile page
             } else if (data.error) {
-                // Afficher un message d'erreur "Bad password or username, please try again"
-                alert('Bad password or username, please try again');
-                // alert(data.error);
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'Bad password or username, please try again';
+                form.insertBefore(errorMessage, submitButton);
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = error;
+            form.insertBefore(errorMessage, submitButton);
         });
     });
 
