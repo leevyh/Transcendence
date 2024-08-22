@@ -16,7 +16,7 @@ export function settingsView(container) {
     const user = localStorage.getItem('username');
     if (isLoggedIn) {
         // Recuperer les infos de l'utilisateur dans le backend
-        fetch(`api/settings/${user}`, {
+        fetch(`/api/settings/${user}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -119,13 +119,16 @@ export function settingsView(container) {
                 const formGroup = document.createElement('div');
                 formGroup.className = 'mb-3';
             
+                // Création de l'étiquette pour chaque champ
                 const label = document.createElement('label');
                 label.className = 'form-label';
                 label.htmlFor = field.id;
                 label.textContent = field.label;
             
+                // Création de l'élément d'entrée pour chaque champ
                 let input;
                 if (field.type === 'select') {
+                    // Select input type
                     input = document.createElement('select');
                     input.className = 'form-select';
                     input.id = field.id;
@@ -136,6 +139,7 @@ export function settingsView(container) {
                     input.appendChild(optionElement);
                     });
                 } else if (field.type === 'checkbox') {
+                    // Checkbox input type
                     input = document.createElement('input');
                     input.type = 'checkbox';
                     input.className = 'form-check-input';
@@ -151,6 +155,7 @@ export function settingsView(container) {
                     form.appendChild(formGroup);
                     return; // Skip the usual input append
                 } else {
+                    // Default input type is text
                     input = document.createElement('input');
                     input.type = field.type;
                     input.className = 'form-control';
@@ -168,16 +173,15 @@ export function settingsView(container) {
                 submitButton.type = 'submit';
                 submitButton.className = 'btn btn-primary w-100';
                 submitButton.textContent = 'Enregistrer les modifications';
-            
                 form.appendChild(submitButton);
-                // fetch pour modifier les informations
+    
+                // Envoi des données du formulaire
                 form.addEventListener('submit', (event) => {
                     event.preventDefault();
                     const formData = new FormData(form);
                     const data = {};
                     formData.forEach((value, key) => {
                         data[key] = value;
-                        console.log(value);
                     });
                     console.log(data);
                     fetch(`/api/updateSettings/${user}`, {
