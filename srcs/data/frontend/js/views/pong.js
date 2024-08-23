@@ -72,6 +72,7 @@ export function pongView(container) {
 
     canvas = document.getElementById('canvas');
 
+
 	reset(); // Init game
     draw();
     console.log("coucou");
