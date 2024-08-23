@@ -1,19 +1,46 @@
-server.name: "backend-kibana"
-server.host: "0.0.0.0"
-server.port: "5601"
+# Server configuration
+server:
+  name: "backend-kibana"
+  host: 0.0.0.0
+  port: 5601
 
-server.ssl.certificate: "/usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt"
-server.ssl.key: "/usr/share/kibana/config/certs/backend-kibana/backend-kibana.key"
-server.ssl.certificateAuthorities: "/usr/share/kibana/config/certs/ca/ca.crt"
+  ssl:
+    enabled: true
+    certificate: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt
+    key: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.key
+    certificateAuthorities: "/usr/share/kibana/config/certs/ca/ca.crt"
 
-elasticsearch.hosts: ["https://backend-elastic:9200"]
+# Elasticsearch connection configuration
+elasticsearch:
+  hosts: ["https://backend-elastic:9200"]
+  username: "kibana_system"
+  password: "changeme"
 
-elasticsearch.ssl.verificationMode: certificate
-elasticsearch.ssl.certificate: "/usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt"
-elasticsearch.ssl.key: "/usr/share/kibana/config/certs/backend-kibana/backend-kibana.key"
-elasticsearch.ssl.certificateAuthorities: "/usr/share/kibana/config/certs/ca/ca.crt"
+  ssl:
+      verificationMode: certificate
+      certificate: "/usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt"
+      key: "/usr/share/kibana/config/certs/backend-kibana/backend-kibana.key"
+      certificateAuthorities: "/usr/share/kibana/config/certs/ca/ca.crt"
 
-elasticsearch.username: "kibana_system"
-elasticsearch.password: "changeme"
+# Kibana configuration
+xpack:
+  security.encryptionKey: "du$?IN8$LVAnAV9F9Rthkm#wPIrLC2@Z"
+  encryptedSavedObjects.encryptionKey: "du$?IN8$LVAnAV9F9Rthkm#wPIrLC2@Z"
+  reporting.encryptionKey: "du$?IN8$LVAnAV9F9Rthkm#wPIrLC2@Z"
 
-xpack.reporting.encryptionKey: "IzbUrCE4ljKUSlErtQ1Zh1QoL+e8MSVc"
+  fleet:
+    packages:
+        - name: fleet_server
+          version: latest
+    agentPolicies:
+        - name: Fleet Server Policy
+          id: fleet-server-policy
+          namespace: default
+          package_policies:
+              - name: Fleet Server Integration
+                package:
+                  name: fleet_server
+    fleetServerHosts:
+      - id: "fleet-server"
+        name: "Fleet Server"
+        host_urls: ["https://backend-fleet:8220"]
