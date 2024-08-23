@@ -40,7 +40,7 @@ if [ ! -f config/certs/certs.zip ]; then
   "      - 127.0.0.1\n"\
   "  - name: proxy-nginx\n"\
   "    dns:\n"\
-  "      - localhost\n"\
+  "      - proxy-nginx\n"\
   "    ip:\n"\
   "      - 127.0.0.1\n"\
   > config/certs/instances.yml;
