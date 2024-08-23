@@ -128,9 +128,84 @@ export function loginView(container) {
         navigateTo('/register');
     });
 
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        if (code) {
+            fetch('/api/token/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // 'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ code: code })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    console.log(data);
+                    navigateTo('/');
+                }
+                else {
+                    console.log('No data');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+            }
+        });
+
+    // Connexion with 42 button with redirection to 42 to get autorization link
+    const cardLogin42 = document.createElement('div');
+    cardLogin42.className = 'card-footer text-center';
+    cardLogin42.innerHTML = '<small>Connexion avec 42</small>';
+    const login42Button = document.createElement('button');
+    login42Button.type = 'button';
+    login42Button.className = 'btn btn-primary w-100';
+    login42Button.textContent = 'Se connecter avec 42';
+    cardLogin42.appendChild(login42Button);
+    cardLogin42.addEventListener('click', (event) => {
+        event.preventDefault();
+        fetch('/api/auth/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.url) {
+                console.log(data.url);
+                window.location.href = data.url;
+            } else if (data.error) {
+                alert(data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    });
+
+
+
+
+
+
+
+
+
+
+
+    card.appendChild(cardLogin42);
     // Assembler les éléments
     card.appendChild(cardHeader);
     card.appendChild(cardBody);
+    // card.appendChild(cardLogin42);
     card.appendChild(cardFooter);
     col.appendChild(card);
     row.appendChild(col);

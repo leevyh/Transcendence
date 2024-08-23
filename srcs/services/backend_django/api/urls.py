@@ -14,5 +14,6 @@ urlpatterns = [
 	path('status_user/', views.get_status_all_users, name='status_user'),
 	path('logout/', views.logoutView, name='logout'),
 	path('check_auth/', views.check_auth, name='check_auth'),
-    # path('is_logged_in/', views.is_logged_in, name='is_logged_in'),
+	path('auth/', views.auth_42, name='auth'),
+	path('token/', views.token_42, name='token'),
 ]
