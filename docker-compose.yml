@@ -7,6 +7,8 @@ services:
     expose:
       - 9001
     restart: on-failure
+    networks:
+        - default
 
   frontend-nginx:
     container_name: frontend-nginx
@@ -19,6 +21,8 @@ services:
     depends_on:
       - backend-django
     restart: on-failure
+    networks:
+        - default
 
   proxy-nginx:
     container_name: proxy-nginx
@@ -33,6 +37,8 @@ services:
       backend-fleet:
         condition: service_started
     restart: on-failure
+    networks:
+        - default
 
   setup-elastic:
     container_name: setup-elastic
@@ -49,6 +55,8 @@ services:
       interval: 1s
       timeout: 5s
       retries: 120
+    networks:
+        - default
 
   backend-elastic:
     container_name: backend-elastic
@@ -64,10 +72,17 @@ services:
       - 9200:9200
     healthcheck:
       test:
-        [ "CMD-SHELL", "curl -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://127.0.0.1:9200 | grep -q 'missing authentication credentials'" ]
+        [ "CMD-SHELL", "curl -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://backend-elastic:9200 | grep -q 'missing authentication credentials'" ]
       interval: 10s
       timeout: 10s
       retries: 120
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1g
+    networks:
+        - default
 
   backend-kibana:
     container_name: backend-kibana
@@ -87,6 +102,8 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
+    networks:
+        - default
 
   backend-fleet:
     container_name: backend-fleet
@@ -99,6 +116,8 @@ services:
       - backend-elk-certs:/usr/share/fleet/config/certs
     ports:
       - 8220:8220
+    networks:
+        - default
 
   backend-logstash:
     container_name: backend-logstash
@@ -148,3 +167,7 @@ volumes:
           type: none
           device: ./srcs/data/ea/proxy-nginx
           o: bind
+
+networks:
+    default:
+        driver: bridge
