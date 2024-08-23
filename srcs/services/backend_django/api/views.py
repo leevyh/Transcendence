@@ -10,6 +10,15 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import json
 import base64
+import
+
+def check_auth(request):
+    if request.user.is_authenticated:
+        value = True
+        return JsonResponse({'value': value}, status=200)
+    else:
+        value = False
+        return JsonResponse({'value': value}, status=200)
 
 @csrf_exempt
 def register(request):
@@ -83,7 +92,7 @@ def get_profile(request, nickname):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-@csrf_exempt
+
 def get_Stats(request, user_id):
     if request.method == 'GET':
         try:
@@ -100,7 +109,6 @@ def get_Stats(request, user_id):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
-@csrf_exempt
 def get_settings(request, nickname):
     if request.method == 'GET':
         try:
@@ -121,7 +129,7 @@ def get_settings(request, nickname):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-@csrf_exempt
+
 def get_status_all_users(request):
     if request.method == 'GET':
         users = User_site.objects.all()
@@ -135,7 +143,7 @@ def get_status_all_users(request):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
-@csrf_exempt
+
 def updateSettings(request, nickname):
     if request.method == 'PUT':
         try:
@@ -149,7 +157,7 @@ def updateSettings(request, nickname):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
-@csrf_exempt
+
 def updatePassword(request, nickname):
     if request.method == 'PUT':
         print(nickname)
@@ -171,7 +179,7 @@ def updatePassword(request, nickname):
 
 
 @login_required(login_url='/api/login') # TODO CHANGE THIS ROUTE TO GO
-@csrf_exempt
+
 def update_Stats(request, user_id): #TODO without form and with json.loads. Need to changed if we use a view in python or views in js
     if request.method == 'POST':
         try:
@@ -205,7 +213,7 @@ def update_Stats(request, user_id): #TODO without form and with json.loads. Need
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
-@csrf_exempt
+
 def logoutView(request):
     if request.method == 'POST':
         status = User_site.Status.OFFLINE
@@ -217,7 +225,7 @@ def logoutView(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-# @csrf_exempt
+# 
 # def is_logged_in(request):
 #     if request.method == 'GET':
 #         user = User_site.objects.get()

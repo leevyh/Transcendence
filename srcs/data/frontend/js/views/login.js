@@ -93,7 +93,7 @@ export function loginView(container) {
         .then(response => response.json())
         .then(data => {
             if (data.message === 'User logged in successfully') {
-                localStorage.setItem('username', username);
+                localStorage.setItem('username', username); // TODO : A supprimer plus tard pour mettre un systeme de session/cookie car localStorage n'est pas sécurisé
                 localStorage.setItem('isLoggedIn', 'true');  // A supprimer plus tard pour eviter conflic avec le backend
                 const loggindiv = document.getElementById('loginLink')
                 loggindiv.setAttribute("hidden", true);

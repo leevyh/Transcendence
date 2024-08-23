@@ -13,8 +13,8 @@ export function settingsView(container) {
   
     // Check if the user is logged in
     const isLoggedIn = localStorage.getItem('isLoggedIn');
-    const user = localStorage.getItem('username');
-    if (isLoggedIn) {
+    const user = localStorage.getItem('username'); //TODO : Create JWT token and use ID instead of username
+//    if (isLoggedIn) {
         // Recuperer les infos de l'utilisateur dans le backend
         fetch(`/api/settings/${user}`, {
             method: 'GET',
@@ -233,20 +233,20 @@ export function settingsView(container) {
             });
             container.appendChild(logoutButton);
         });
-    } else {
+//    } else {
         // If not logged in, redirect to login or show a message
-        const p1 = document.createElement('p');
-        p1.textContent = 'You are not logged in. Please log in to view your profile.';
+//        const p1 = document.createElement('p');
+//        p1.textContent = 'You are not logged in. Please log in to view your profile.';
 
-        const loginButton = document.createElement('button');
-        loginButton.textContent = 'Go to Login';
-        loginButton.className = 'btn btn-primary';
-        loginButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            navigateTo('/login'); // Redirect to login page
-        });
+//        const loginButton = document.createElement('button');
+//       loginButton.textContent = 'Go to Login';
+//        loginButton.className = 'btn btn-primary';
+//        loginButton.addEventListener('click', (event) => {
+//            event.preventDefault();
+//            navigateTo('/login'); // Redirect to login page
+//       });
 
-        container.appendChild(p1);
-        container.appendChild(loginButton);
-    }
+//        container.appendChild(p1);
+//        container.appendChild(loginButton);
+    //}
 }
