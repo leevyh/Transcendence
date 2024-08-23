@@ -23,6 +23,7 @@ const PLAYER_SPEED = 8;
 
 var playerMovingUp = false;
 var playerMovingDown = false;
+var escapeDown = false;
 
 export function draw() {
     var context = canvas.getContext('2d');
@@ -161,6 +162,11 @@ export function handleKeyDown(event) {
 		playerMovingUp = true;
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
 		playerMovingDown = true;
+    if (event.key === "Escape")
+    {
+        escapeDown = true;
+        stop();
+    }
 }
 
 // Key Up
@@ -170,4 +176,6 @@ export function handleKeyUp(event) {
 		playerMovingUp = false;
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
 		playerMovingDown = false;
+    if (event.key === "Escape")
+        escapeDown = false;
 }

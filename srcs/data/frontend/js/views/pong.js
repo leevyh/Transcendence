@@ -69,9 +69,9 @@ export function pongView(container) {
 
     canvas = document.getElementById('canvas');
 
-	reset(); // Init game
 
-	// Event
+	reset(); // Init game
+    // Event
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
 
