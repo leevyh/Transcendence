@@ -18,12 +18,13 @@ var game = {
 
 const PLAYER_HEIGHT = 100;
 const PLAYER_WIDTH = 5;
-const MAX_SPEED = 12;
-const PLAYER_SPEED = 8;
+const MAX_SPEED = 10;
+const PLAYER_SPEED = 9;
 
 var playerMovingUp = false;
 var playerMovingDown = false;
 var escapeDown = false;
+var GameOn = false;
 
 export function draw() {
     var context = canvas.getContext('2d');
@@ -122,6 +123,8 @@ export function ballMove() {
 
 export function play() {
 
+    if (!GameOn)
+        GameOn = true;
 	draw();
 	movePlayerWithKeyboard();
 	computerMove();
@@ -153,6 +156,7 @@ export function stop() {
     document.querySelector('#player-score').textContent = game.player.score;
 
     draw();
+    GameOn = false;
 }
 
 // Key Down
@@ -166,6 +170,10 @@ export function handleKeyDown(event) {
     {
         escapeDown = true;
         stop();
+    }
+    if (event.key === ' ' && !GameOn) {
+        play();
+        GameOn = true;
     }
 }
 
