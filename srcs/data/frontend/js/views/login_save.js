@@ -9,11 +9,16 @@ export function loginView(container) {
     const h1 = document.createElement('h1');
     h1.textContent = 'Login';
     
-    //if already logged in, redirect to setting page
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-        navigateTo('/settings');
-        return;
-    }
+    // Verifier si l'utilisateur est déjà connecté en demandant au backend
+    // fetch(`/api/is_logged_in/`)
+    // .then(response => response.json())
+    // .then(data => {
+    //     if (data.status === 'online') {
+    //         navigateTo('/settings');
+    //         return;
+    //     }
+    // })
+
 
     // Créer le conteneur principal
     container.className = 'container';
@@ -78,6 +83,10 @@ export function loginView(container) {
 
     form.addEventListener('submit', (event) => {
         event.preventDefault();
+
+        // Suppression des messages d'erreur précédents
+        const errorMessages = form.querySelectorAll('.text-danger');
+        errorMessages.forEach(message => message.remove());
         
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
@@ -93,25 +102,27 @@ export function loginView(container) {
         .then(response => response.json())
         .then(data => {
             if (data.message === 'User logged in successfully') {
-                localStorage.setItem('username', username); // TODO : A supprimer plus tard pour mettre un systeme de session/cookie car localStorage n'est pas sécurisé
-                localStorage.setItem('isLoggedIn', 'true');  // A supprimer plus tard pour eviter conflic avec le backend
+                localStorage.setItem('username', username);
+                // localStorage.setItem('isLoggedIn', 'true');  // A supprimer plus tard pour eviter conflic avec le backend
                 const loggindiv = document.getElementById('loginLink')
                 loggindiv.setAttribute("hidden", true);
                 const settingsdiv = document.getElementById('settingsLink')
                 settingsdiv.removeAttribute("hidden");
                 event.preventDefault();
-                event.preventDefault();
                 navigateTo('/'); // Redirect to home page
                 // navigateTo('/settings'); // Redirect to profile page
             } else if (data.error) {
-                // Afficher un message d'erreur "Bad password or username, please try again"
-                alert('Bad password or username, please try again');
-                // alert(data.error);
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'Bad password or username, please try again';
+                form.insertBefore(errorMessage, submitButton);
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = error;
+            form.insertBefore(errorMessage, submitButton);
         });
     });
 
@@ -128,84 +139,9 @@ export function loginView(container) {
         navigateTo('/register');
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        if (code) {
-            fetch('/api/token/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // 'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({ code: code })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data) {
-                    console.log(data);
-                    navigateTo('/');
-                }
-                else {
-                    console.log('No data');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-            });
-            }
-        });
-
-    // Connexion with 42 button with redirection to 42 to get autorization link
-    const cardLogin42 = document.createElement('div');
-    cardLogin42.className = 'card-footer text-center';
-    cardLogin42.innerHTML = '<small>Connexion avec 42</small>';
-    const login42Button = document.createElement('button');
-    login42Button.type = 'button';
-    login42Button.className = 'btn btn-primary w-100';
-    login42Button.textContent = 'Se connecter avec 42';
-    cardLogin42.appendChild(login42Button);
-    cardLogin42.addEventListener('click', (event) => {
-        event.preventDefault();
-        fetch('/api/auth/', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                // 'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            if (data.url) {
-                console.log(data.url);
-                window.location.href = data.url;
-            } else if (data.error) {
-                alert(data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-        });
-    });
-
-
-
-
-
-
-
-
-
-
-
-    card.appendChild(cardLogin42);
     // Assembler les éléments
     card.appendChild(cardHeader);
     card.appendChild(cardBody);
-    // card.appendChild(cardLogin42);
     card.appendChild(cardFooter);
     col.appendChild(card);
     row.appendChild(col);

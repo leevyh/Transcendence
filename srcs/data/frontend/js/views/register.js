@@ -1,7 +1,7 @@
 import { getCookie } from './utils.js';
 import { navigateTo } from './utils.js';
 
-export function registerView(container) {
+export async function registerView(container) {
     // Clear previous content
     container.innerHTML = '';
 

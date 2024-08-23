@@ -4,6 +4,8 @@ import { loginView } from './views/login.js';
 import { settingsView } from './views/settings.js';
 import { notFoundView } from './views/404.js';
 import { chatView } from './views/chat3.js';
+import { passwordView } from './views/password.js';
+import { getCookie } from './views/utils.js';
 
 const appDiv = document.getElementById('app');
 
@@ -15,12 +17,47 @@ const routes = {
     // '/profile': profileView,
     '/404': notFoundView,
     '/chat': chatView,
+    '/password': passwordView,
 };
 
-function navigateTo(view) {
-    appDiv.innerHTML = '';
-    const viewFunction = routes[view] || notFoundView;
-    viewFunction(appDiv);
+async function isAuthenticated() {
+    try {
+        const response = await fetch('/api/check_auth/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+        });
+        if (response.ok) {
+            const data = await response.json();
+            console.log('data:', data);
+            return data.value;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.error('Error checking authentication:', error);
+        return false;
+    }
+}
+
+
+async function navigateTo(view) {
+    const isAuth = await isAuthenticated();
+    const publicRoutes = ['/login', '/register', '/404'];
+
+    if (!isAuth && !publicRoutes.includes(view)) {
+        console.log(isAuth);
+        history.pushState(null, '', '/');
+        homeView(appDiv);
+    } else {
+        console.log(isAuth);
+        appDiv.innerHTML = '';
+        const viewFunction = routes[view] || notFoundView;
+        viewFunction(appDiv);
+        history.pushState(null, '', view);
+    }
 }
 
 document.querySelectorAll('nav a').forEach(link => {

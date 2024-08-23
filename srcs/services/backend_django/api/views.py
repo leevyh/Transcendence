@@ -8,15 +8,22 @@ from .forms import UserRegistrationForm, SettingsUpdateForm
 from .models import User_site, Accessibility, Stats_user
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from typing import Optional
+from typing import Union
+from django.http import HttpResponse as HTTPResponse
 import json
 import base64
 import os
 import requests
 import time
-from typing import Optional
-from typing import Union
-from django.http import HttpResponse as HTTPResponse
 
+def check_auth(request):
+    if request.user.is_authenticated:
+        value = True
+        return JsonResponse({'value': value}, status=200)
+    else:
+        value = False
+        return JsonResponse({'value': value}, status=200)
 
 @csrf_exempt
 def register(request):
@@ -90,7 +97,7 @@ def get_profile(request, nickname):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-@csrf_exempt
+
 def get_Stats(request, user_id):
     if request.method == 'GET':
         try:
@@ -107,7 +114,6 @@ def get_Stats(request, user_id):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
-@csrf_exempt
 def get_settings(request, nickname):
     if request.method == 'GET':
         try:
@@ -121,14 +127,14 @@ def get_settings(request, nickname):
                     'language': settings.language,
                     'accessibility': settings.accessibility,
                     'dark_mode': settings.dark_mode,
-                    'avatar': avatar,}
+                    'avatar': avatar}
             return JsonResponse(data, status=200)
         except Accessibility.DoesNotExist:
             return JsonResponse({'error': 'Settings not found'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-@csrf_exempt
+
 def get_status_all_users(request):
     if request.method == 'GET':
         users = User_site.objects.all()
@@ -142,7 +148,7 @@ def get_status_all_users(request):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
-@csrf_exempt
+
 def updateSettings(request, nickname):
     if request.method == 'PUT':
         try:
@@ -156,9 +162,10 @@ def updateSettings(request, nickname):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
-@csrf_exempt
+
 def updatePassword(request, nickname):
     if request.method == 'PUT':
+        print(nickname)
         try:
             data = json.loads(request.body)
             user = User_site.objects.get(nickname=nickname)
@@ -177,7 +184,7 @@ def updatePassword(request, nickname):
 
 
 @login_required(login_url='/api/login') # TODO CHANGE THIS ROUTE TO GO
-@csrf_exempt
+
 def update_Stats(request, user_id): #TODO without form and with json.loads. Need to changed if we use a view in python or views in js
     if request.method == 'POST':
         try:
@@ -211,7 +218,7 @@ def update_Stats(request, user_id): #TODO without form and with json.loads. Need
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
-@csrf_exempt
+
 def logoutView(request):
     if request.method == 'POST':
         status = User_site.Status.OFFLINE
@@ -222,7 +229,6 @@ def logoutView(request):
         return JsonResponse({'message': 'User logged out successfully'}, status=200)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
-
 
 # @csrf_exempt
 # def auth_42(request):
@@ -258,14 +264,6 @@ def logoutView(request):
 #         return JsonResponse(response_data, status=200)
 #     else:
 #         return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-
-
-
-
-
-
-
 
 class Api:
     intra: str = "https://api.intra.42.fr"
