@@ -193,6 +193,10 @@ export function handleKeyDown(event, startButton, stopButton) {
         startButton.disabled = false;
         stopButton.disabled = true;
     }
+    if (event.key === ' ' && !GameOn) {
+        play();
+        GameOn = true;
+    }
 }
 
 // Key Up
