@@ -8,12 +8,6 @@ export function loginView(container) {
     // Create elements
     const h1 = document.createElement('h1');
     h1.textContent = 'Login';
-    
-    //if already logged in, redirect to setting page
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-        navigateTo('/settings');
-        return;
-    }
 
     // Créer le conteneur principal
     container.className = 'container';
@@ -93,8 +87,7 @@ export function loginView(container) {
         .then(response => response.json())
         .then(data => {
             if (data.message === 'User logged in successfully') {
-                localStorage.setItem('username', username); // TODO : A supprimer plus tard pour mettre un systeme de session/cookie car localStorage n'est pas sécurisé
-                localStorage.setItem('isLoggedIn', 'true');  // A supprimer plus tard pour eviter conflic avec le backend
+                localStorage.setItem('token', data.token);
                 const loggindiv = document.getElementById('loginLink')
                 loggindiv.setAttribute("hidden", true);
                 const settingsdiv = document.getElementById('settingsLink')
@@ -102,7 +95,6 @@ export function loginView(container) {
                 event.preventDefault();
                 event.preventDefault();
                 navigateTo('/'); // Redirect to home page
-                // navigateTo('/settings'); // Redirect to profile page
             } else if (data.error) {
                 // Afficher un message d'erreur "Bad password or username, please try again"
                 alert('Bad password or username, please try again');
@@ -190,15 +182,6 @@ export function loginView(container) {
             alert('An error occurred. Please try again.');
         });
     });
-
-
-
-
-
-
-
-
-
 
 
     card.appendChild(cardLogin42);

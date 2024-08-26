@@ -233,7 +233,6 @@ export function settingsView(container) {
             logoutButton.textContent = 'Logout';
             logoutButton.className = 'btn btn-danger';
             logoutButton.addEventListener('click', (event) => {
-                localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('username');
                 event.preventDefault();
                 navigateTo('/login'); // Redirect to login page
@@ -268,5 +267,5 @@ export function settingsView(container) {
 
     //     container.appendChild(p1);
     //     container.appendChild(loginButton);
-    }
+    // }
 }

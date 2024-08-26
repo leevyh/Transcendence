@@ -53,6 +53,12 @@ async function navigateTo(view) {
         homeView(appDiv);
     } else {
         console.log(isAuth);
+        //don't go in login or register if already logged in
+        if (isAuth && (view === '/login' || view === '/register')) {
+            history.pushState(null, '', '/');
+            homeView(appDiv);
+            return;
+        }
         appDiv.innerHTML = '';
         const viewFunction = routes[view] || notFoundView;
         viewFunction(appDiv);

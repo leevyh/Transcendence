@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from typing import Optional
 from typing import Union
 from django.http import HttpResponse as HTTPResponse
+import jwt
 import json
 import base64
 import os
@@ -59,7 +60,9 @@ def loginView(request):
                 login(request, user)
                 user.status = User_site.Status.ONLINE
                 user.save()
-                return JsonResponse({'message': 'User logged in successfully'}, status=200)
+                encoded_jwt = jwt.encode({'username': user.username, 'exp': time.time() + 3600}, 'secret', algorithm='HS256') #TODO redirect to the home page when the exp time is over
+                print(f"encoded_jwt: {encoded_jwt}")
+                return JsonResponse({'message': 'User logged in successfully', 'token': encoded_jwt}, status=200)
             else:
                 return JsonResponse({'error': 'Invalid credentials'}, status=401)
         except User_site.DoesNotExist:
@@ -72,6 +75,7 @@ def loginView(request):
 def get_profile(request, nickname):
     if request.method == 'GET':
         try:
+            # token = request.headers.get('Authorization').split(' ')[1]
             user = User_site.objects.get(nickname=nickname)
             try:
                 stats = Stats_user.objects.get(user=user)
@@ -98,7 +102,7 @@ def get_profile(request, nickname):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
-def get_Stats(request, user_id):
+def get_Stats(request):
     if request.method == 'GET':
         try:
             stats = Stats_user.objects.get(user=user_id)
@@ -114,9 +118,12 @@ def get_Stats(request, user_id):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
-def get_settings(request, nickname):
+def get_settings(request):
     if request.method == 'GET':
         try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            nickname = payload['username']
             user = User_site.objects.get(nickname=nickname)
             user_id = user.id
             settings = Accessibility.objects.get(user=user_id)
@@ -148,13 +155,15 @@ def get_status_all_users(request):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
-
-def updateSettings(request, nickname):
+def updateSettings(request):
     if request.method == 'PUT':
         try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            nickname = payload['username']
+            print(f"nickname: {nickname}")
             data = json.loads(request.body)
             print(data)
-
             return JsonResponse({'message': 'Settings updated successfully'}, status=200)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
@@ -162,11 +171,12 @@ def updateSettings(request, nickname):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
-
-def updatePassword(request, nickname):
+def updatePassword(request):
     if request.method == 'PUT':
-        print(nickname)
         try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            nickname = payload['username']
             data = json.loads(request.body)
             user = User_site.objects.get(nickname=nickname)
             if check_password(data['old_password'], user.password):
@@ -185,9 +195,13 @@ def updatePassword(request, nickname):
 
 @login_required(login_url='/api/login') # TODO CHANGE THIS ROUTE TO GO
 
-def update_Stats(request, user_id): #TODO without form and with json.loads. Need to changed if we use a view in python or views in js
+def update_Stats(request): #TODO without form and with json.loads. Need to changed if we use a view in python or views in js
     if request.method == 'POST':
         try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            nickname = payload['username']
+            user_id = User_site.objects.get(nickname=nickname).id
             data = json.loads(request.body)
             stats_id = Stats_user.objects.get(user=user_id)
             nb_wins = stats_id.nb_wins
@@ -218,7 +232,6 @@ def update_Stats(request, user_id): #TODO without form and with json.loads. Need
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
-
 def logoutView(request):
     if request.method == 'POST':
         status = User_site.Status.OFFLINE
@@ -229,41 +242,6 @@ def logoutView(request):
         return JsonResponse({'message': 'User logged out successfully'}, status=200)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-# @csrf_exempt
-# def auth_42(request):
-#     #Authorization code flow
-#     if request.method == 'GET':
-#         client_id = os.getenv('CLIENT_ID')
-#         client_secret = os.getenv('CLIENT_SECRET')
-#         redirect_uri = os.getenv('REDIRECT_URI')
-#         url = "https://api.intra.42.fr/oauth/authorize"
-#         request = request.post(url, data={"grant_type": "client_credentials",
-#                                             "client_id": client_id,
-#                                             "client_secret": client_secret})
-#         if request.status_code == 200:
-#             token = request.json()['access_token']
-#             expires_in = request.json()['expires_in'] + request.json()['created_at']
-#             print(token)
-#             print(expires_in)
-#         else:
-#             return JsonResponse({'error': 'Invalid request'}, status=400)
-#
-#         return JsonResponse({'message': 'Authorization successful'}, status=200)
-#
-#         #print all attributes of response
-#         print(dir(response))
-#         print(response.url)
-#         print(response.status_code)
-#         print(response.text)
-#         print(response.headers)
-#         print(response.json)
-#         #Send Url to front and redirect front to this url
-#         response_data = {'url': response.url,
-#                          'code': response.status_code}
-#         return JsonResponse(response_data, status=200)
-#     else:
-#         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 class Api:
     intra: str = "https://api.intra.42.fr"
@@ -316,30 +294,7 @@ def create_user42(response):
         username = data['login']
         email = data['email']
         nickname = data['login']
-        # {
-        #     "id": 116104,
-        #     "email": "amugnier@student.42.fr",
-        #     "login": "amugnier",
-        #     "first_name": "Antoine",
-        #     "last_name": "Mugnier",
-        #     "usual_full_name": "Antoine Mugnier",
-        #     "usual_first_name": null,
-        #     "url": "https://api.intra.42.fr/v2/users/amugnier",
-        #     "phone": "hidden",
-        #     "displayname": "Antoine Mugnier",
-        #     "kind": "student",
-        #     "image": {
-        #         "link": "https://cdn.intra.42.fr/users/aa2b6da5486c306e3ee6aa7dfb36c9b5/amugnier.jpg",
-        #         "versions": {
-        #             "large": "https://cdn.intra.42.fr/users/e37fda39ed56b223d59fe33a8ff16731/large_amugnier.jpg",
-        #             "medium": "https://cdn.intra.42.fr/users/21a9dd75b2389c6df367b2bafea71eef/medium_amugnier.jpg",
-        #             "small": "https://cdn.intra.42.fr/users/6194af12c14394528629684e5f1e823f/small_amugnier.jpg",
-        #             "micro": "https://cdn.intra.42.fr/users/e755da2d51ab74a770e91a84dcaaf689/micro_amugnier.jpg"
-        #         }
-        #     }
-        # }
         url = data['image']['versions']['medium']
-        #download image in media directory
         r = requests.get(url)
         with open(f'media/{username}.jpg', 'wb') as f:
             f.write(r.content)
@@ -357,8 +312,6 @@ def create_user42(response):
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
-
-@csrf_exempt
 def token_42(request):
     if request.method == 'POST':
         client_id = os.getenv('CLIENT_ID')
@@ -372,7 +325,9 @@ def token_42(request):
         url = f"https://api.intra.42.fr/oauth/token?client_id={client_id}&client_secret={client_secret}&code={code}&redirect_uri={redirect_uri}&grant_type=authorization_code"
         r = requests.post(url)
         if r.status_code == 200:
+            print('OKI MA GUEULE')
             create_user42(r)
-            return JsonResponse({'message': 'Token created successfully'}, status=200)
+            encoded_jwt = jwt.encode({'username': data['login'], 'exp': time.time + 3600}, 'secret', algorithm='HS256')
+            return JsonResponse({'message': 'Token created successfully', 'token': encoded_jwt}, status=200)
         else:
             return JsonResponse({'error': 'Invalid request'}, status=400)
