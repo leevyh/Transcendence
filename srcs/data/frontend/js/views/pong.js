@@ -7,6 +7,7 @@ import {
     draw,
 } from './pong_game.js'; // Importation des fonctions et variables du jeu Pong
 
+
 import { GameOn } from './pong_game.js';
 export let canvas = 'null'
 // const canvas = document.getElementById('canvas');

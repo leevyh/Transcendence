@@ -160,6 +160,7 @@ export function stop() {
 
     draw();
     GameOn = false;
+    return ;
 }
 
 // Key Down
