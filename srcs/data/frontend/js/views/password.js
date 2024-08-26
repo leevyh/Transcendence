@@ -95,40 +95,36 @@ export function passwordView(container) {
         }
 
         // Verifier si l'utilisateur est connecté
-        const isLoggedIn = localStorage.getItem('isLoggedIn');
-        const user = localStorage.getItem('username');
-        if (isLoggedIn) {
-            const response = await fetch(`/api/updatePassword/${user}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${getCookie('token')}`
-                },
-                body: JSON.stringify({ old_password, new_password })
-            });
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/updatePassword/`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ old_password, new_password })
+        });
 
-            if (response.ok) {
-                form.innerHTML = '';
-                const successMessage = document.createElement('p');
-                successMessage.className = 'text-success';
-                successMessage.textContent = 'Mot de passe modifié avec succès';
-                form.appendChild(successMessage);
+        if (response.ok) {
+            form.innerHTML = '';
+            const successMessage = document.createElement('p');
+            successMessage.className = 'text-success';
+            successMessage.textContent = 'Mot de passe modifié avec succès';
+            form.appendChild(successMessage);
 
-                const loginButton = document.createElement('button');
-                loginButton.type = 'button';
-                loginButton.className = 'btn btn-primary w-100';
-                loginButton.textContent = 'Retour à la page de connexion';
-                loginButton.addEventListener('click', () => navigateTo('/login'));
-                form.appendChild(loginButton);
+            const loginButton = document.createElement('button');
+            loginButton.type = 'button';
+            loginButton.className = 'btn btn-primary w-100';
+            loginButton.textContent = 'Retour à la page de connexion';
+            loginButton.addEventListener('click', () => navigateTo('/login'));
+            form.appendChild(loginButton);
 
-            } else {
-                const errorMessage = document.createElement('p');
-                errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'Erreur lors de la modification du mot de passe';
-                form.insertBefore(errorMessage, submitButton);
-            }
         } else {
-            alert('Vous devez être connecté pour modifier votre mot de passe');
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Erreur lors de la modification du mot de passe';
+            form.insertBefore(errorMessage, submitButton);
         }
     });
 }
