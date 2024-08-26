@@ -177,7 +177,7 @@ export function handleKeyDown(event, startButton, stopButton) {
         stopButton.disabled = false;
         GameOn = true;
     }
-    else if (event.key === ' ' && GameOn == true)
+    else if (event.key === ' ' && GameOn == true )
     {
         spaceDown = true;
         stop();
