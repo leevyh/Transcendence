@@ -15,4 +15,4 @@ status:
 	docker compose ps
 
 re: down
-    $(all)
+	$(MAKE) all
