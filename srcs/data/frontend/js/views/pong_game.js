@@ -25,6 +25,7 @@ var playerMovingUp = false;
 var playerMovingDown = false;
 var escapeDown = false;
 var GameOn = false;
+var spaceDown = false;
 
 export function draw() {
     var context = canvas.getContext('2d');
@@ -123,13 +124,15 @@ export function ballMove() {
 
 export function play() {
 
-    if (!GameOn)
+    console.log("start play");
+    if (GameOn == false)
         GameOn = true;
-	draw();
-	movePlayerWithKeyboard();
-	computerMove();
-	ballMove();
-	anim = requestAnimationFrame(play);
+    draw();
+    movePlayerWithKeyboard();
+    computerMove();
+    ballMove();
+    anim = requestAnimationFrame(play);
+    console.log("gameon = ", GameOn);
 }
 
 export function reset() {
@@ -145,6 +148,8 @@ export function reset() {
 }
 
 export function stop() {
+
+    console.log("start of stop");
     cancelAnimationFrame(anim);
     reset();
 
@@ -157,6 +162,7 @@ export function stop() {
 
     draw();
     GameOn = false;
+    return ;
 }
 
 // Key Down
@@ -166,14 +172,23 @@ export function handleKeyDown(event) {
 		playerMovingUp = true;
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
 		playerMovingDown = true;
+    if (event.key === ' ' && GameOn == false) {
+        console.log("key down gamone = ", GameOn);
+        play();
+        GameOn = true;
+        spaceDown = true;
+    }
+    if (event.key === ' ' && GameOn == true )
+    {
+        spaceDown = true;
+        stop();
+        console.log("ESCAPE key down gamone = ", GameOn);
+    }
     if (event.key === "Escape")
     {
         escapeDown = true;
         stop();
-    }
-    if (event.key === ' ' && !GameOn) {
-        play();
-        GameOn = true;
+        console.log("ESCAPE key down gamone = ", GameOn);
     }
 }
 
@@ -186,4 +201,6 @@ export function handleKeyUp(event) {
 		playerMovingDown = false;
     if (event.key === "Escape")
         escapeDown = false;
+    if (event.key === ' ')
+        spaceDown = false;
 }

@@ -4,8 +4,9 @@ import {
     reset,
     handleKeyDown,
     handleKeyUp,
-    draw
+    draw,
 } from './pong_game.js'; // Importation des fonctions et variables du jeu Pong
+
 
 export let canvas = 'null'
 // const canvas = document.getElementById('canvas');
@@ -22,6 +23,7 @@ export let canvas = 'null'
 // 		speed: {}
 // 	}
 // };
+
 
 export function pongView(container) {
 
@@ -72,6 +74,7 @@ export function pongView(container) {
 
 	reset(); // Init game
     draw();
+    console.log("coucou");
     // Event
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
