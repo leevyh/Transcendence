@@ -7,7 +7,7 @@ import {
     draw,
 } from './pong_game.js'; // Importation des fonctions et variables du jeu Pong
 
-
+import { GameOn } from './pong_game.js';
 export let canvas = 'null'
 // const canvas = document.getElementById('canvas');
 // var game = {
@@ -76,13 +76,32 @@ export function pongView(container) {
     draw();
     console.log("coucou");
     // Event
-    document.addEventListener('keydown', handleKeyDown);
+
+    document.addEventListener('keydown', (event) => handleKeyDown(event, startButton, stopButton));
     document.addEventListener('keyup', handleKeyUp);
 
-    document.querySelector('#start-game').addEventListener('click', play);
-    document.querySelector('#stop-game').addEventListener('click', stop);
+    const startGameButton = document.querySelector('#start-game');
+    const stopGameButton = document.querySelector('#stop-game');
 
+    startGameButton.addEventListener('click', () => {
+        if (!GameOn) {
+            play();
+            startGameButton.disabled = true; // Désactiver le bouton Start
+            stopGameButton.disabled = false; // Activer le bouton Stop
+        }
+    });
+
+    stopGameButton.addEventListener('click', () => {
+        if (GameOn) {
+            stop();
+            startGameButton.disabled = false; // Réactiver le bouton Start
+            stopGameButton.disabled = true; // Désactiver le bouton Stop
+        }
+    });
+
+    stopGameButton.disabled = true; // Le bouton Stop est désactivé au début
 }
+
 
 // CSS Pong
 function loadPongCSS() {

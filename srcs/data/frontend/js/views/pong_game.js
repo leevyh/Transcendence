@@ -24,7 +24,7 @@ const PLAYER_SPEED = 9;
 var playerMovingUp = false;
 var playerMovingDown = false;
 var escapeDown = false;
-var GameOn = false;
+export let GameOn = false;
 var spaceDown = false;
 
 export function draw() {
@@ -124,7 +124,6 @@ export function ballMove() {
 
 export function play() {
 
-    console.log("start play");
     if (GameOn == false)
         GameOn = true;
     draw();
@@ -132,7 +131,6 @@ export function play() {
     computerMove();
     ballMove();
     anim = requestAnimationFrame(play);
-    console.log("gameon = ", GameOn);
 }
 
 export function reset() {
@@ -162,11 +160,10 @@ export function stop() {
 
     draw();
     GameOn = false;
-    return ;
 }
 
 // Key Down
-export function handleKeyDown(event) {
+export function handleKeyDown(event, startButton, stopButton) {
 
 	if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W')
 		playerMovingUp = true;
@@ -175,20 +172,26 @@ export function handleKeyDown(event) {
     if (event.key === ' ' && GameOn == false) {
         console.log("key down gamone = ", GameOn);
         play();
-        GameOn = true;
         spaceDown = true;
+        startButton.disabled = true;
+        stopButton.disabled = false;
+        GameOn = true;
     }
-    if (event.key === ' ' && GameOn == true )
+    else if (event.key === ' ' && GameOn == true)
     {
         spaceDown = true;
         stop();
-        console.log("ESCAPE key down gamone = ", GameOn);
+        console.log("ESPACE key down gamone = ", GameOn);
+        startButton.disabled = false;
+        stopButton.disabled = true;
     }
     if (event.key === "Escape")
     {
         escapeDown = true;
         stop();
-        console.log("ESCAPE key down gamone = ", GameOn);
+        console.log("ECHAP key down gamone = ", GameOn);
+        startButton.disabled = false;
+        stopButton.disabled = true;
     }
 }
 
