@@ -14,4 +14,5 @@ logs:
 status:
 	docker compose ps
 
-re: down all
+re: down
+    $(all)

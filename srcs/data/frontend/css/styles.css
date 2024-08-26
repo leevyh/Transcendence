@@ -115,7 +115,6 @@ svg,
 	display: flex;
 }
 
-pong {
-	display: flex;
-	justify-content: center;
+#roomSelect {
+	height: 300px;
 }

@@ -11,12 +11,12 @@ class User_site(AbstractUser):
     nickname = models.CharField(max_length=255, unique=True)
     created_at = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=255, default=Status.OFFLINE, choices=Status.choices)
-    avatar = models.ImageField(upload_to='../img/', default='default.jpg')
+    avatar = models.ImageField(upload_to='avatar/', default='default.jpg')
 
     def __str__(self):
         return self.login
 
-class Settings_user(models.Model):
+class Accessibility(models.Model):
     class Language(models.TextChoices):
         FRENCH = "fr"
         ENGLISH = "en"

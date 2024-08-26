@@ -16,9 +16,11 @@ RUN pip3 install --no-cache-dir -r /home/app/requirements.txt
 COPY ./tools/script.sh /home/app/init.sh
 #COPY ./tools/script.sql /home/app/init.sql
 RUN chmod +x /home/app/init.sh
-RUN	#chmod +x /home/app/init.sql
+#RUN chmod +x /home/app/init.sql
 
 COPY . .
 
+# CMD ["sh", "-c", "/home/app/init.sh && gunicorn backend.wsgi:application --bind 0.0.0.0:8888"] 
+# Anciennement :
 CMD ["sh", "-c", "/home/app/init.sh && gunicorn backend.wsgi:application --bind 0.0.0.0:8000"]
 
