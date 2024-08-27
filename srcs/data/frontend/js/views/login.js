@@ -2,14 +2,11 @@ import { getCookie } from './utils.js';
 import { navigateTo } from './utils.js';
 
 export function loginView(container) {
-    // Clear previous content
     container.innerHTML = '';
 
-    // Create elements
     const h1 = document.createElement('h1');
     h1.textContent = 'Login';
 
-    // Créer le conteneur principal
     container.className = 'container';
   
     // Créer la ligne pour centrer le formulaire
@@ -93,20 +90,22 @@ export function loginView(container) {
                 const settingsdiv = document.getElementById('settingsLink')
                 settingsdiv.removeAttribute("hidden");
                 event.preventDefault();
-                event.preventDefault();
-                navigateTo('/'); // Redirect to home page
+                navigateTo('/');
             } else if (data.error) {
-                // Afficher un message d'erreur "Bad password or username, please try again"
-                alert('Bad password or username, please try again');
-                // alert(data.error);
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'Bad password or username, please try again';
+                form.insertBefore(errorMessage, submitButton);
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'An error occurred. Please try again.';
+            form.insertBefore(errorMessage, submitButton);
+            console.error('Error:', error); // A supprimer plus tard, debug
         });
     });
-
     cardBody.appendChild(form);
   
     // Créer le pied de page de la carte
@@ -143,8 +142,11 @@ export function loginView(container) {
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                form.insertBefore(errorMessage, submitButton);
+                console.error('Error:', error); // A supprimer plus tard, debug
             });
             }
         });
@@ -160,6 +162,11 @@ export function loginView(container) {
     cardLogin42.appendChild(login42Button);
     cardLogin42.addEventListener('click', (event) => {
         event.preventDefault();
+
+        // Suppression des messages d'erreur précédents
+        const errorMessages = form.querySelectorAll('.text-danger');
+        errorMessages.forEach(message => message.remove());
+    
         fetch('/api/auth/', {
             method: 'GET',
             headers: {
@@ -174,21 +181,26 @@ export function loginView(container) {
                 console.log(data.url);
                 window.location.href = data.url;
             } else if (data.error) {
-                alert(data.error);
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                form.insertBefore(errorMessage, submitButton);
+                console.error('Error:', error); // A supprimer plus tard, debug
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'An error occurred. Please try again.';
+            form.insertBefore(errorMessage, submitButton);
+            console.error('Error:', error); // A supprimer plus tard, debug
         });
     });
 
-
-    card.appendChild(cardLogin42);
     // Assembler les éléments
+    card.appendChild(cardLogin42);
     card.appendChild(cardHeader);
     card.appendChild(cardBody);
-    // card.appendChild(cardLogin42);
     card.appendChild(cardFooter);
     col.appendChild(card);
     row.appendChild(col);

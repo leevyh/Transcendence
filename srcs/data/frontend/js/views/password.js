@@ -2,7 +2,7 @@ import { navigateTo } from './utils.js';
 import { getCookie } from './utils.js';
 
 export function passwordView(container) {
-    // Clear previous content
+    // Suppression du contenu précédent
     container.innerHTML = '';
 
     // Titre de la page
@@ -50,6 +50,7 @@ export function passwordView(container) {
     // Gestion de la soumission du formulaire
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
+
         // Suppression des messages d'erreur précédents
         const errorMessages = form.querySelectorAll('.text-danger');
         errorMessages.forEach(message => message.remove());
@@ -94,8 +95,7 @@ export function passwordView(container) {
             return;
         }
 
-        // Verifier si l'utilisateur est connecté
-        const token = localStorage.getItem('token');
+        // const token = localStorage.getItem('token');
         const response = await fetch(`/api/updatePassword/`, {
             method: 'PUT',
             headers: {
