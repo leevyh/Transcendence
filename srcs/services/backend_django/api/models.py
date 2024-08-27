@@ -37,20 +37,6 @@ class Stats_user(models.Model):
     win_rate = models.FloatField(default=0.0)
 
 
-class FriendRequest(models.Model):
-    from_user = models.ForeignKey(User_site, related_name='from_user', on_delete=models.CASCADE)
-    to_user = models.ForeignKey(User_site, related_name='to_user', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=timezone.now)
-
-class FriendShip(models.Model):
-    user1 = models.ForeignKey(User_site, related_name='user1', on_delete=models.CASCADE)
-    user2 = models.ForeignKey(User_site, related_name='user2', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return f'{self.user1} and {self.user2}'
-
-
 
 
 
