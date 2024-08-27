@@ -13,6 +13,26 @@ export function settingsView(container) {
   
     const token = localStorage.getItem('token');
     // Recuperer les infos de l'utilisateur dans le backend
+    // fetch(`/api/settings/`, {
+    //     method: 'GET',
+    //     headers: {
+    //         'Authorization': `Bearer ${token}`,
+    //         'Content-Type': 'application/json',
+    //         'X-CSRFToken': getCookie('csrftoken'),
+    //     },
+    // })
+    // .then(response => response.json())
+    // .then(data => {
+    //     console.log(data);
+    //     const userData = {
+    //         nickname: data.nickname,
+    //         email: data.email,
+    //         language: data.language,
+    //         accessibility: data.accessibility,
+    //         theme: data.dark_mode,
+    //         avatar: data.avatar,
+    //     };
+
     fetch(`/api/settings/`, {
         method: 'GET',
         headers: {
@@ -20,18 +40,41 @@ export function settingsView(container) {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken'),
         },
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        const userData = {
-            nickname: data.nickname,
-            email: data.email,
-            language: data.language,
-            accessibility: data.accessibility,
-            theme: data.dark_mode,
-            avatar: data.avatar,
-        };
+        })
+        //If the status response is 200, we get the data else throw an error or redirect to login if status is 307 without passing in the data block
+        .then(response => {
+            if (response.status === 200) {
+                return response.json();
+            }
+            else if (response.status === 307) {
+                //Call the logout function
+                localStorage.removeItem('token');
+                fetch('/api/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                }).then(r => r.json())
+                navigateTo('/login');
+                return null;
+            }
+            else {
+                throw new Error('Something went wrong');
+            }
+        })
+        .then(data => {
+            if (!data) {
+                return;
+            }
+            const userData = {
+                nickname: data.nickname,
+                email: data.email,
+                language: data.language,
+                accessibility: data.accessibility,
+                theme: data.dark_mode,
+                avatar: data.avatar,
+            };
 
 // *************** Affichage des informations personnelles ***************
         // Affichage des informations personnelles
