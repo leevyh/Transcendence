@@ -86,14 +86,33 @@ export async function registerView(container) {
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmpassword').value;
 
-        if (password.value !== confirmPassword.value) {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,12}$/;
+        // Si un champ est vide
+        if (!username || !nickname || !email || !password || !confirmPassword) {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
-            errorMessage.textContent = 'Les mots de passe ne correspondent pas!';
+            errorMessage.textContent = 'Tous les champs sont obligatoires';
             form.insertBefore(errorMessage, submitButton);
             return;
         }
+        // Si les mots de passe ne correspondent pas
+        else if (password !== confirmPassword) {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Les mots de passe ne correspondent pas';
+            form.insertBefore(errorMessage, submitButton);
+            return;
+        }
+        // Si le nouveau mot de passe a la bonne forme
+        // else if (!passwordRegex.test(password)) {
+        //     const errorMessage = document.createElement('p');
+        //     errorMessage.className = 'text-danger';
+        //     errorMessage.textContent = 'Le mot de passe doit contenir entre 8 et 12 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre';
+        //     form.insertBefore(errorMessage, submitButton);
+        //     return;
+        // }
 
+        // Envoi des données du formulaire
         fetch('/api/register/', {
             method: 'POST',
             headers: {
@@ -111,7 +130,10 @@ export async function registerView(container) {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
+                    const errorMessage = document.createElement('p');
+                    errorMessage.className = 'text-danger';
+                    errorMessage.textContent = 'Erreur lors de l\'inscription, veuillez réessayer';
+                    form.insertBefore(errorMessage, submitButton);
                 }
                 return response.json();
             })

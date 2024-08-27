@@ -42,7 +42,6 @@ async function isAuthenticated() {
     }
 }
 
-
 async function navigateTo(view) {
     const isAuth = await isAuthenticated();
     const publicRoutes = ['/login', '/register', '/404'];

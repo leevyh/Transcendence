@@ -16,6 +16,13 @@ export function passwordView(container) {
     form.className = 'w-100';
     container.appendChild(form);
 
+    // Creation du label
+    const label = document.createElement('label');
+    label.className = 'form-label';
+    label.htmlFor = 'oldPassword';
+    label.textContent = 'Ancien mot de passe';
+    form.appendChild(label);
+
     // Champ de l'ancien mot de passe
     const oldPassword = document.createElement('input');
     oldPassword.type = 'password';
@@ -23,6 +30,13 @@ export function passwordView(container) {
     oldPassword.className = 'form-control mb-4';
     oldPassword.placeholder = 'Ancien mot de passe';
     form.appendChild(oldPassword);
+
+    // Creation du label
+    const label2 = document.createElement('label');
+    label2.className = 'form-label';
+    label2.htmlFor = 'newPassword';
+    label2.textContent = 'Nouveau mot de passe';
+    form.appendChild(label2);
 
     // Champ du nouveau mot de passe
     const newPassword = document.createElement('input');
@@ -32,6 +46,13 @@ export function passwordView(container) {
     newPassword.placeholder = 'Nouveau mot de passe';
     form.appendChild(newPassword);
 
+    // Creation du label
+    const label3 = document.createElement('label');
+    label3.className = 'form-label';
+    label3.htmlFor = 'confirmPassword';
+    label3.textContent = 'Confirmer le nouveau mot de passe';
+    form.appendChild(label3);
+    
     // Champ de confirmation du nouveau mot de passe
     const confirmPassword = document.createElement('input');
     confirmPassword.type = 'password';
@@ -40,7 +61,7 @@ export function passwordView(container) {
     confirmPassword.placeholder = 'Confirmer le nouveau mot de passe';
     form.appendChild(confirmPassword);
 
-    // Bouton de validation
+    // Bouton de soumission
     const submitButton = document.createElement('button');
     submitButton.type = 'submit';
     submitButton.className = 'btn btn-primary w-100';
@@ -61,6 +82,7 @@ export function passwordView(container) {
         const new_password = data.get('newPassword');
         const confirmPassword = data.get('confirmPassword');
 
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,12}$/;
         // Si un champ est vide
         if (!old_password || !new_password || !confirmPassword) {
             const errorMessage = document.createElement('p');
@@ -70,7 +92,7 @@ export function passwordView(container) {
             return;
         }
         // Si les mots de passe ne correspondent pas
-        if (new_password !== confirmPassword) {
+        else if (new_password !== confirmPassword) {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Les mots de passe ne correspondent pas';
@@ -78,7 +100,7 @@ export function passwordView(container) {
             return;
         }
         // Si l'ancien mot de passe est le même que le nouveau mot de passe
-        if (new_password === old_password) {
+        else if (new_password === old_password) {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Le nouveau mot de passe doit être différent de l\'ancien';
@@ -86,16 +108,14 @@ export function passwordView(container) {
             return;
         }
         // Si le nouveau mot de passe a la bonne forme
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,12}$/;
-        if (!passwordRegex.test(new_password)) {
-            const errorMessage = document.createElement('p');
-            errorMessage.className = 'text-danger';
-            errorMessage.textContent = 'Le mot de passe doit contenir entre 8 et 12 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre';
-            form.insertBefore(errorMessage, submitButton);
-            return;
-        }
+        // else if (!passwordRegex.test(new_password)) {
+        //     const errorMessage = document.createElement('p');
+        //     errorMessage.className = 'text-danger';
+        //     errorMessage.textContent = 'Le mot de passe doit contenir entre 8 et 12 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre';
+        //     form.insertBefore(errorMessage, submitButton);
+        //     return;
+        // }
 
-        // const token = localStorage.getItem('token');
         const response = await fetch(`/api/updatePassword/`, {
             method: 'PUT',
             headers: {
