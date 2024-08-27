@@ -71,9 +71,6 @@ class Stats_user(models.Model):
 
 
 
-
-
-
 # class User_site(models.Model):
 #     ONLINE = "green"
 #     OFFLINE = "gray"

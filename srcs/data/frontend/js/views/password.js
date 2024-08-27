@@ -140,6 +140,16 @@ export function passwordView(container) {
             loginButton.addEventListener('click', () => navigateTo('/login'));
             form.appendChild(loginButton);
 
+        } else if (response.status === 307) {
+            await fetch('/api/logout/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            });
+            navigateTo('/login');
+            return null;
         } else {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';

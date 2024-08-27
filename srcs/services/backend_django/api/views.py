@@ -60,8 +60,7 @@ def loginView(request):
                 login(request, user)
                 user.status = User_site.Status.ONLINE
                 user.save()
-                encoded_jwt = jwt.encode({'username': user.username, 'exp': time.time() + 3600}, 'secret', algorithm='HS256') #TODO redirect to the home page when the exp time is over
-                print(f"encoded_jwt: {encoded_jwt}")
+                encoded_jwt = jwt.encode({'username': user.username, 'exp': time.time() + 3600}, 'secret', algorithm='HS256')
                 return JsonResponse({'message': 'User logged in successfully', 'token': encoded_jwt}, status=200)
             else:
                 return JsonResponse({'error': 'Invalid credentials'}, status=401)
@@ -75,7 +74,6 @@ def loginView(request):
 def get_profile(request, nickname):
     if request.method == 'GET':
         try:
-            # token = request.headers.get('Authorization').split(' ')[1]
             user = User_site.objects.get(nickname=nickname)
             try:
                 stats = Stats_user.objects.get(user=user)
@@ -101,7 +99,6 @@ def get_profile(request, nickname):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-
 def get_Stats(request):
     if request.method == 'GET':
         try:
@@ -122,7 +119,10 @@ def get_settings(request):
     if request.method == 'GET':
         try:
             token_user = request.headers.get('Authorization').split(' ')[1]
-            payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307) #307 Temporary Redirect
             username = payload['username']
             user = User_site.objects.get(username=username)
             user_id = user.id
@@ -213,7 +213,10 @@ def updatePassword(request):
     if request.method == 'PUT':
         try:
             token_user = request.headers.get('Authorization').split(' ')[1]
-            payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
             nickname = payload['username']
             data = json.loads(request.body)
             print('password_data:', data)
@@ -233,12 +236,14 @@ def updatePassword(request):
 
 
 @login_required(login_url='/api/login') # TODO CHANGE THIS ROUTE TO GO
-
 def update_Stats(request): #TODO without form and with json.loads. Need to changed if we use a view in python or views in js
     if request.method == 'POST':
         try:
             token_user = request.headers.get('Authorization').split(' ')[1]
-            payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
             username = payload['username']
             user_id = User_site.objects.get(username=username).id
             data = json.loads(request.body)
