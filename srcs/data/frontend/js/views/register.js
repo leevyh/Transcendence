@@ -75,6 +75,10 @@ export async function registerView(container) {
     form.addEventListener('submit', (event) => {
         event.preventDefault();
 
+        // Suppression des messages d'erreur précédents
+        const errorMessages = form.querySelectorAll('.text-danger');
+        errorMessages.forEach(message => message.remove());
+
         // Récupérer les valeurs des champs ajoutés dans le formulaire
         const username = document.getElementById('username').value;
         const nickname = document.getElementById('nickname').value;
@@ -82,14 +86,11 @@ export async function registerView(container) {
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmpassword').value;
 
-        // console.log('Username:', username);
-        // console.log('Nickname:', nickname);
-        // console.log('Email:', email);
-        // console.log('Password:', password);
-        // console.log('Confirm Password:', confirmPassword);
-
         if (password.value !== confirmPassword.value) {
-            alert('Passwords do not match!');
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Les mots de passe ne correspondent pas!';
+            form.insertBefore(errorMessage, submitButton);
             return;
         }
 
@@ -116,16 +117,21 @@ export async function registerView(container) {
             })
             .then(data => {
                 if (data.message === 'User registered successfully') {
-                    alert('Registration successful!');
+                    // alert('Registration successful!');
                     event.preventDefault();
-                    navigateTo('/login'); // Redirect to login page
+                    navigateTo('/login');
                 } else if (data.errors) {
-                    alert('Registration failed: ' + JSON.stringify(data.errors));
+                    const errorMessage = document.createElement('p');
+                    errorMessage.className = 'text-danger';
+                    errorMessage.textContent = 'Erreur lors de l\'inscription: ' + JSON.stringify(data.errors);
+                    form.insertBefore(errorMessage, submitButton);
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'Erreur: ' + error.message;
+                form.insertBefore(errorMessage, submitButton);
             });
     });
 
@@ -151,4 +157,3 @@ export async function registerView(container) {
     container.appendChild(row);
     document.body.appendChild(container);
 }
-  

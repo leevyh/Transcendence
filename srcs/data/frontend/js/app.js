@@ -3,7 +3,7 @@ import { registerView } from './views/register.js';
 import { loginView } from './views/login.js';
 import { settingsView } from './views/settings.js';
 import { notFoundView } from './views/404.js';
-import { chatView } from './views/chat3.js';
+import { chatView } from './views/chat.js';
 import { passwordView } from './views/password.js';
 import { getCookie } from './views/utils.js';
 
