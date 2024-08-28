@@ -42,6 +42,29 @@ async function isAuthenticated() {
     }
 }
 
+// async function navigateTo(view) {
+//     const isAuth = await isAuthenticated();
+//     const publicRoutes = ['/login', '/register', '/404'];
+
+//     if (!isAuth && !publicRoutes.includes(view)) {
+//         console.log(isAuth);
+//         history.pushState(null, '', '/');
+//         homeView(appDiv);
+//     } else {
+//         console.log(isAuth);
+//         //don't go in login or register if already logged in
+//         if (isAuth && (view === '/login' || view === '/register')) {
+//             history.pushState(null, '', '/');
+//             homeView(appDiv);
+//             return;
+//         }
+//         appDiv.innerHTML = '';
+//         const viewFunction = routes[view] || notFoundView;
+//         viewFunction(appDiv);
+//         history.pushState(null, '', view);
+//     }
+// }
+
 async function navigateTo(view) {
     const isAuth = await isAuthenticated();
     const publicRoutes = ['/login', '/register', '/404'];
@@ -49,21 +72,22 @@ async function navigateTo(view) {
     if (!isAuth && !publicRoutes.includes(view)) {
         console.log(isAuth);
         history.pushState(null, '', '/');
-        homeView(appDiv);
+        appDiv.innerHTML = homeView(); // Insert HTML into appDiv
     } else {
         console.log(isAuth);
-        //don't go in login or register if already logged in
+        // Don't go to login or register if already logged in
         if (isAuth && (view === '/login' || view === '/register')) {
             history.pushState(null, '', '/');
-            homeView(appDiv);
+            appDiv.innerHTML = homeView(); // Insert HTML into appDiv
             return;
         }
         appDiv.innerHTML = '';
         const viewFunction = routes[view] || notFoundView;
-        viewFunction(appDiv);
+        appDiv.innerHTML = viewFunction(); // Insert HTML into appDiv
         history.pushState(null, '', view);
     }
 }
+
 
 document.querySelectorAll('nav a').forEach(link => {
     link.addEventListener('click', (event) => {
