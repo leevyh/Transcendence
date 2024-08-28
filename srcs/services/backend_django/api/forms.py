@@ -19,11 +19,11 @@ class UserRegistrationForm(forms.ModelForm):
         return password
 
 
-class SettingsUpdateForm(forms.ModelForm):
+class AccessibilityUpdateForm(forms.ModelForm):
     class Meta:
         model = Accessibility
         fields = ['language',
-                  'accessibility',
+                  'font_size',
                   'dark_mode']
 
 # class NewGameForm(forms.ModelForm):

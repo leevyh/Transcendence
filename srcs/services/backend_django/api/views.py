@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth.hashers import make_password, check_password
-from .forms import UserRegistrationForm, SettingsUpdateForm
+from .forms import UserRegistrationForm, AccessibilityUpdateForm
 from .models import User_site, Accessibility, Stats_user
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -123,8 +123,8 @@ def get_settings(request):
                 payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
             except jwt.ExpiredSignatureError:
                 return JsonResponse({'error': 'Token expired'}, status=307) #307 Temporary Redirect
-            nickname = payload['username']
-            user = User_site.objects.get(nickname=nickname)
+            username = payload['username']
+            user = User_site.objects.get(username=username)
             user_id = user.id
             settings = Accessibility.objects.get(user=user_id)
             avatar_image = user.avatar
@@ -132,7 +132,7 @@ def get_settings(request):
             data = {'nickname': user.nickname,
                     'email': user.email,
                     'language': settings.language,
-                    'accessibility': settings.accessibility,
+                    'font_size': settings.font_size,
                     'dark_mode': settings.dark_mode,
                     'avatar': avatar}
             return JsonResponse(data, status=200)
@@ -159,11 +159,50 @@ def updateSettings(request):
         try:
             token_user = request.headers.get('Authorization').split(' ')[1]
             payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
-            nickname = payload['username']
-            print(f"nickname: {nickname}")
+            username = payload['username']
             data = json.loads(request.body)
-            print(data)
+            print('settings_data:', data)
+
+            #  Mise à jour des paramètres
+            user = User_site.objects.get(username=username)
+            if 'new_nickname' in data:
+                user.nickname = data['new_nickname']
+                print('nickname:', data['new_nickname'])
+            if 'new_email' in data:
+                user.email = data['new_email']
+                print('email:', data['new_email'])
+            if 'avatar' in data:
+                user.avatar = data['avatar']
+
+            user.save()
+
             return JsonResponse({'message': 'Settings updated successfully'}, status=200)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@login_required(login_url='/api/login')
+def updateAccessibility(request):
+    if request.method == 'PUT':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            data = json.loads(request.body)
+            print(f'data: {data}')
+            username = payload['username']
+            user_id = User_site.objects.get(username=username).id
+            accessibility_id = Accessibility.objects.get(user=user_id)
+            form_accessibility = AccessibilityUpdateForm(data, instance=accessibility_id)
+            if form_accessibility.is_valid():
+                form_accessibility.save()
+                return JsonResponse({'message': 'Accessibility updated successfully'}, status=200)
+            else:
+                return JsonResponse({'errors': form_accessibility.errors}, status=400)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     else:
@@ -180,6 +219,7 @@ def updatePassword(request):
                 return JsonResponse({'error': 'Token expired'}, status=307)
             nickname = payload['username']
             data = json.loads(request.body)
+            print('password_data:', data)
             user = User_site.objects.get(nickname=nickname)
             if check_password(data['old_password'], user.password):
                 user.set_password(data['new_password'])
@@ -204,8 +244,8 @@ def update_Stats(request): #TODO without form and with json.loads. Need to chang
                 payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
             except jwt.ExpiredSignatureError:
                 return JsonResponse({'error': 'Token expired'}, status=307)
-            nickname = payload['username']
-            user_id = User_site.objects.get(nickname=nickname).id
+            username = payload['username']
+            user_id = User_site.objects.get(username=username).id
             data = json.loads(request.body)
             stats_id = Stats_user.objects.get(user=user_id)
             nb_wins = stats_id.nb_wins
