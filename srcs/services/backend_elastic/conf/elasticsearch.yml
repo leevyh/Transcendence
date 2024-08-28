@@ -6,6 +6,8 @@ discovery.type: single-node
 # Elasticsearch configuration
 xpack:
   security:
+    enabled: true
+
     transport.ssl:
       enabled: true
       verification_mode: certificate
