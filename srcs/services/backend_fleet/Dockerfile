@@ -7,7 +7,7 @@ ENV ELASTICSEARCH_USERNAME=elastic
 ENV ELASTICSEARCH_PASSWORD=changeme
 ENV ELASTICSEARCH_CA=/usr/share/fleet/config/certs/ca/ca.crt
 
-ENV KIBANA_HOST=http://backend-kibana:5601
+ENV KIBANA_HOST=https://backend-kibana:5601
 ENV KIBANA_USERNAME=elastic
 ENV KIBANA_PASSWORD=changeme
 ENV KIBANA_CA=/usr/share/fleet/config/certs/ca/ca.crt
