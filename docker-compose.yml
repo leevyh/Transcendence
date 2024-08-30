@@ -14,7 +14,7 @@ services:
     container_name: frontend-nginx
     build: ./srcs/services/frontend_nginx
     expose:
-      - 9000
+      - 9000:80
     volumes:
       - frontend:/var/www/ft_transcendence
       - backend-elk-certs:/usr/share/elasticsearch/config/certs
@@ -32,7 +32,7 @@ services:
       - ea-proxy-nginx:/usr/share/elastic-agent/data
       - backend-elk-certs:/usr/share/elastic-agent/config/certs
     ports:
-      - 8888
+      - 8888:80
     depends_on:
       backend-fleet:
         condition: service_started
@@ -69,7 +69,7 @@ services:
       - backend-elk-logs:/usr/share/elasticsearch/logs
       - backend-elastic:/usr/share/elasticsearch/data
     ports:
-      - 9200
+      - 9200:9200
     healthcheck:
       test:
         [ "CMD-SHELL", "curl -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://backend-elastic:9200 | grep -q 'missing authentication credentials'" ]
@@ -95,7 +95,7 @@ services:
       - backend-elk-logs:/usr/share/kibana/logs
       - backend-kibana:/usr/share/kibana/data
     ports:
-      - 5601
+      - 5601:5601
     healthcheck:
       test:
         [ "CMD-SHELL", "curl -s --cacert /usr/share/kibana/config/certs/ca/ca.crt -I https://backend-kibana:5601 | grep -q 'HTTP/1.1 302 Found'" ]
@@ -115,7 +115,7 @@ services:
     volumes:
       - backend-elk-certs:/usr/share/fleet/config/certs
     ports:
-      - 8220
+      - 8220:8220
     networks:
         - default
 
@@ -128,7 +128,7 @@ services:
     volumes:
       - backend-elk-certs:/usr/share/logstash/config/certs
     ports:
-        - 5044
+        - 5044:5044
 
 volumes:
   frontend:
