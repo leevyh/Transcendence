@@ -158,24 +158,20 @@ def updateSettings(request):
     if request.method == 'PUT':
         try:
             token_user = request.headers.get('Authorization').split(' ')[1]
-            payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
             username = payload['username']
             data = json.loads(request.body)
             print('settings_data:', data)
-
-            #  Mise à jour des paramètres
             user = User_site.objects.get(username=username)
-            if 'new_nickname' in data:
-                user.nickname = data['new_nickname']
-                print('nickname:', data['new_nickname'])
-            if 'new_email' in data:
-                user.email = data['new_email']
-                print('email:', data['new_email'])
-            if 'avatar' in data:
-                user.avatar = data['avatar']
-
+            #update user settings. If data[nickname] is not empty, update the nickname else let the nickname as it is
+            if data['nickname']:
+                user.nickname = data['nickname']
+            if data['email']:
+                user.email = data['email']
             user.save()
-
             return JsonResponse({'message': 'Settings updated successfully'}, status=200)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
@@ -183,6 +179,32 @@ def updateSettings(request):
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def updateAvatar(request):
+    if request.method == 'PUT':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            user = User_site.objects.get(username=username)
+            data = request.body
+            # avatar = base64.b64encode(data).decode('utf-8')
+            #save file in media directory
+            with open(f'media/{username}.jpg', 'wb') as f:
+                f.write(data)
+            user.avatar = f'{username}.jpg'
+            user.save()
+            return JsonResponse({'message': 'Avatar updated successfully'}, status=200)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 @login_required(login_url='/api/login')
 def updateAccessibility(request):
