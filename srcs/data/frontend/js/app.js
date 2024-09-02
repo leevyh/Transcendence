@@ -1,23 +1,55 @@
-import { homeView } from './views/home.js';
-import { registerView } from './views/register.js';
-import { loginView } from './views/login.js';
-import { settingsView } from './views/settings.js';
-import { notFoundView } from './views/404.js';
-import { chatView } from './views/chat.js';
-import { passwordView } from './views/password.js';
 import { getCookie } from './views/utils.js';
 
-const appDiv = document.getElementById('app');
+// FR
+import { notFoundView } from './views/fr/404.js';
+import { homeView } from './views/fr/home.js';
+import { registerView } from './views/fr/register.js';
+import { loginView } from './views/fr/login.js';
+import { settingsView } from './views/fr/settings.js';
+import { passwordView } from './views/fr/password.js';
+import { chatView } from './views/chat.js'; // FR
 
-const routes = {
-    '/': homeView,
-    '/register': registerView,
-    '/login': loginView,
-    '/settings': settingsView,
-    // '/profile': profileView,
-    '/404': notFoundView,
-    '/chat': chatView,
-    '/password': passwordView,
+// EN
+import { notFoundViewEN } from './views/en/404.js';
+import { homeViewEN } from './views/en/home.js';
+
+// SP
+import { notFoundViewSP } from './views/sp/404.js';
+import { homeViewSP } from './views/sp/home.js';
+
+const appDiv = document.getElementById('app');
+const defaultLang = 'fr'; // ou 'en' selon votre choix
+const initialPath = location.pathname !== '/' ? location.pathname : `/${defaultLang}/home`;
+navigateTo(initialPath);
+
+export const routes = {
+    'fr': {
+        '/404': notFoundView,
+        '/': homeView,
+        '/register': registerView,
+        '/login': loginView,
+        '/settings': settingsView,
+        '/password': passwordView,
+        // '/profile': profileView,
+        '/chat': chatView,
+    },
+    'en': {
+        '/404': notFoundViewEN,
+        '/': homeViewEN,
+    },
+    'sp': {
+        '/404': notFoundViewSP,
+        '/': homeViewSP,
+    },
+
+    // '/': homeView,
+    // '/register': registerView,
+    // '/login': loginView,
+    // '/settings': settingsView,
+    // // '/profile': profileView,
+    // '/404': notFoundView,
+    // '/chat': chatView,
+    // '/password': passwordView,
 };
 
 async function isAuthenticated() {
@@ -42,34 +74,99 @@ async function isAuthenticated() {
     }
 }
 
-async function navigateTo(view) {
+// async function navigateTo(view) {
+//     const isAuth = await isAuthenticated();
+//     const publicRoutes = ['/login', '/register', '/404'];
+
+//     if (!isAuth && !publicRoutes.includes(view)) {
+//         console.log(isAuth);
+//         history.pushState(null, '', '/');
+//         homeView(appDiv);
+//     } else {
+//         console.log(isAuth);
+//         //don't go in login or register if already logged in
+//         if (isAuth && (view === '/login' || view === '/register')) {
+//             history.pushState(null, '', '/');
+//             homeView(appDiv);
+//             return;
+//         }
+//         appDiv.innerHTML = '';
+//         const viewFunction = routes[view] || notFoundView;
+//         viewFunction(appDiv);
+//         history.pushState(null, '', view);
+//     }
+// }
+
+async function getLang() {
+    try {
+        const response = await fetch('/api/get_accessibility/', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+        });
+        if (response.ok) {
+            const data = await response.json();
+            console.log('data:', data);
+            return data.language;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('Error checking authentication:', error);
+        return null;
+    }
+}
+
+export async function navigateTo(view) {
+    // On modifie l'URL pour ne garder que la view sans la langue
+    const viewParts = view.split('/');
+
     const isAuth = await isAuthenticated();
     const publicRoutes = ['/login', '/register', '/404'];
 
-    if (!isAuth && !publicRoutes.includes(view)) {
-        console.log(isAuth);
-        history.pushState(null, '', '/');
+    let lang = 'fr'; // Par défaut
+    if (isAuth === true) {
+        // Extraire la langue dans le choix de l'utilisateur dans le backend
+        lang = await getLang();
+    }
+    const currentLang = lang || 'fr'; 
+
+    // Définir la route de base si la langue n'est pas définie
+    const viewPath = `/${viewParts.slice(2).join('/')}` || '/';
+
+    if (!routes[currentLang]) {
+        // Si la langue n'est pas supportée, rediriger vers la page 404
+        history.pushState(null, '', `/${currentLang}/404`);
+        notFoundView(appDiv);
+        return;
+    }
+
+    if (!isAuth && !publicRoutes.includes(viewPath)) {
+        history.pushState(null, '', `/${currentLang}/`);
         homeView(appDiv);
     } else {
-        console.log(isAuth);
-        //don't go in login or register if already logged in
-        if (isAuth && (view === '/login' || view === '/register')) {
-            history.pushState(null, '', '/');
+        if (isAuth && (viewPath === '/login' || viewPath === '/register')) {
+            history.pushState(null, '', `/${currentLang}/`);
             homeView(appDiv);
             return;
         }
         appDiv.innerHTML = '';
-        const viewFunction = routes[view] || notFoundView;
+        const viewFunction = routes[currentLang][viewPath] || notFoundView;
+
         viewFunction(appDiv);
-        history.pushState(null, '', view);
+        history.pushState(null, '', `/${currentLang}${viewPath}`);
     }
 }
+
 
 document.querySelectorAll('nav a').forEach(link => {
     link.addEventListener('click', (event) => {
         event.preventDefault();
         const path = `/${event.target.getAttribute('data-link')}`;
-        history.pushState(null, '', path);
+        // history.pushState(null, '', path);
         navigateTo(path);
     });
 });
@@ -78,5 +175,4 @@ window.addEventListener('popstate', () => {
     navigateTo(location.pathname);
 });
 
-// Initial load test
-navigateTo(location.pathname || '/home');
+navigateTo(location.pathname || '/');
