@@ -1,4 +1,5 @@
-import { navigateTo } from '../../app.js';
+// import { navigateTo } from '../../app.js';
+import { navigateTo } from '../utils.js';
 import { getCookie } from '../utils.js';
 
 export function homeView(container) {

@@ -22,32 +22,11 @@ export function getCookie(name) {
     return cookieValue;
 };
 
-async function getLang() {
-    try {
-        const response = await fetch('/api/get_accessibility/', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-        });
-        if (response.ok) {
-            const data = await response.json();
-            console.log('data:', data);
-            return data.language;
-        } else {
-            return null;
-        }
-    } catch (error) {
-        console.error('Error checking authentication:', error);
-        return null;
-    }
-}
-
 export async function navigateTo(url) {
     // Recuperer la langue de l'utilisateur
     let language = 'fr'; // Par défaut
+
+    //TODO CHECK IF USER IS AUTHENTICATED BEFORE GETTING LANGUAGE
     language = await getLang();
     const currentLang = language || 'fr'; 
 
@@ -58,38 +37,39 @@ export async function navigateTo(url) {
     handleRouteChange(currentLang);
 }
 
-// import { routes } from '../app.js';
-// function handleRouteChange(language) {
-//     const container = document.getElementById('app');
-//     const path = window.location.pathname;
+import { routes } from '../app.js';
+import { getLang } from '../app.js';
+function handleRouteChange(language) {
+    const container = document.getElementById('app');
+    const path = window.location.pathname;
 
-//     if (!routes[language]) {
-//         // Si la langue n'est pas supportée, rediriger vers la page 404
-//         history.pushState(null, '', `/${language}/404`);
-//         notFoundView(container); // FIXME Modifier pour afficher la vue 404 en fonction de la langue 
-//         return;
-//     }
+    if (!routes[language]) {
+        // Si la langue n'est pas supportée, rediriger vers la page 404
+        history.pushState(null, '', `/${language}/404`);
+        notFoundView(container); // FIXME Modifier pour afficher la vue 404 en fonction de la langue 
+        return;
+    }
 
-//     appDiv.innerHTML = '';
-//     const viewFunction = routes[language][viewPath] || notFoundView; // FIXME Modifier pour afficher la vue 404 en fonction de la langue 
+    container.innerHTML = '';
+    const viewFunction = routes[language][path] || notFoundView; // FIXME Modifier pour afficher la vue 404 en fonction de la langue 
 
-//     viewFunction(container);
-//     history.pushState(null, '', `/${language}${path}`);
+    viewFunction(container);
+    history.pushState(null, '', `/${language}${path}`);
 
-//     // if (path === '/login') {
-//     //     loginView(container);
-//     // } else if (path === '/') {
-//     //     homeView(container);
-//     // } else if (path === '/register') {
-//     //     registerView(container);
-//     // } else if (path === '/settings') {
-//     //     settingsView(container);
-//     // } else if (path === '/chat') {
-//     //     chatView(container);
-//     // } else if (path === '/password') {
-//     //     passwordView(container);
-//     // } else {
-//     //     notFoundView(container);
-//     // }
-//     // Add more else if clauses for new routes
-// }
+    // if (path === '/login') {
+    //     loginView(container);
+    // } else if (path === '/') {
+    //     homeView(container);
+    // } else if (path === '/register') {
+    //     registerView(container);
+    // } else if (path === '/settings') {
+    //     settingsView(container);
+    // } else if (path === '/chat') {
+    //     chatView(container);
+    // } else if (path === '/password') {
+    //     passwordView(container);
+    // } else {
+    //     notFoundView(container);
+    // }
+    // Add more else if clauses for new routes
+}

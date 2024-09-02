@@ -40,16 +40,7 @@ export const routes = {
     'sp': {
         '/404': notFoundViewSP,
         '/': homeViewSP,
-    },
-
-    // '/': homeView,
-    // '/register': registerView,
-    // '/login': loginView,
-    // '/settings': settingsView,
-    // // '/profile': profileView,
-    // '/404': notFoundView,
-    // '/chat': chatView,
-    // '/password': passwordView,
+    }
 };
 
 async function isAuthenticated() {
@@ -74,30 +65,7 @@ async function isAuthenticated() {
     }
 }
 
-// async function navigateTo(view) {
-//     const isAuth = await isAuthenticated();
-//     const publicRoutes = ['/login', '/register', '/404'];
-
-//     if (!isAuth && !publicRoutes.includes(view)) {
-//         console.log(isAuth);
-//         history.pushState(null, '', '/');
-//         homeView(appDiv);
-//     } else {
-//         console.log(isAuth);
-//         //don't go in login or register if already logged in
-//         if (isAuth && (view === '/login' || view === '/register')) {
-//             history.pushState(null, '', '/');
-//             homeView(appDiv);
-//             return;
-//         }
-//         appDiv.innerHTML = '';
-//         const viewFunction = routes[view] || notFoundView;
-//         viewFunction(appDiv);
-//         history.pushState(null, '', view);
-//     }
-// }
-
-async function getLang() {
+export async function getLang() {
     try {
         const response = await fetch('/api/get_accessibility/', {
             method: 'GET',
@@ -130,6 +98,7 @@ export async function navigateTo(view) {
     let lang = 'fr'; // Par défaut
     if (isAuth === true) {
         // Extraire la langue dans le choix de l'utilisateur dans le backend
+        console.log('isAuth:', isAuth);
         lang = await getLang();
     }
     const currentLang = lang || 'fr'; 

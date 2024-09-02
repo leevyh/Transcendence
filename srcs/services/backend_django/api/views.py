@@ -276,8 +276,8 @@ def get_accessibility(request):
             return JsonResponse(data, status=200)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
-        except token_user.DoesNotExist:
-            return JsonResponse({'error': 'Token not found'}, status=404)        # FIXME Check if token user exists here and in other functions
+        # except token_user.DoesNotExist:
+        #     return JsonResponse({'error': 'Token not found'}, status=404)        # FIXME Check if token user exists here and in other functions
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
