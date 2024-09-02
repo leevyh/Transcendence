@@ -10,6 +10,7 @@ urlpatterns = [
 	path('updateSettings/', views.updateSettings, name='updateSettings'),
 	path('updateAccessibility/', views.updateAccessibility, name='updateAccessibility'),
 	path('updatePassword/', views.updatePassword, name='updatePassword'),
+    path('get_accessibility/', views.get_accessibility, name='get_accessibility'),
 	path('stats/', views.get_Stats, name='stats'),
 	path('updateStats/', views.update_Stats, name='updateStats'),
 	path('status_user/', views.get_status_all_users, name='status_user'),

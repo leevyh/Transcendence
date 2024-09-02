@@ -233,6 +233,31 @@ def updatePassword(request):
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+# Acceder au choix d'accessibilité de l'utilisateur
+@login_required(login_url='/api/login')
+def get_accessibility(request):
+    if request.method == 'GET':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            user = User_site.objects.get(username=username)
+            user_id = user.id
+            accessibility = Accessibility.objects.get(user=user_id)
+            data = {'language': accessibility.language,
+                    'font_size': accessibility.font_size,
+                    'dark_mode': accessibility.dark_mode}
+            return JsonResponse(data, status=200)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except token_user.DoesNotExist:
+            return JsonResponse({'error': 'Token not found'}, status=404)        # FIXME Check if token user exists here and in other functions
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
 @login_required(login_url='/api/login') # TODO CHANGE THIS ROUTE TO GO
