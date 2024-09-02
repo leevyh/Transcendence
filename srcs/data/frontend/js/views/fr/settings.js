@@ -1,11 +1,10 @@
-import { navigateTo } from './utils.js';
-import { getCookie } from './utils.js';
+import { getCookie } from '../utils.js';
+// import { navigateTo } from '../utils.js';
+import { navigateTo } from '../../app.js';
 
 export function settingsView(container) {
-    // Suppression du contenu précédent
     container.innerHTML = '';
 
-    // Titre de la page
     const pageTitle = document.createElement('h2');
     pageTitle.className = 'text-center mb-4';
     pageTitle.textContent = 'Paramètres';
@@ -20,13 +19,13 @@ export function settingsView(container) {
             'X-CSRFToken': getCookie('csrftoken'),
         },
     })
-    //If the status response is 200, we get the data else throw an error or redirect to login if status is 307 without passing in the data block
+    // Si le status de la reponse est 200, on recupere les donnees sinon on lance une erreur ou on redirige vers la page de connexion 
+    // Si le status est 307 sans passer dans le bloc de donnees
     .then(response => {
         if (response.status === 200) {
             return response.json();
         }
         else if (response.status === 307) {
-            //Call the logout function
             localStorage.removeItem('token');
             fetch('/api/logout/', {
                 method: 'POST',
@@ -76,6 +75,7 @@ export function settingsView(container) {
         const avatarImage = document.createElement('img');
         avatarImage.src = `data:image/png;base64, ${userData.avatar}`;
         avatarImage.className = 'img-fluid rounded-circle';
+        avatarImage.alt = 'Avatar';
         avatarItem.appendChild(avatarImage);
         personalInfoList.appendChild(nicknameItem);
         personalInfoList.appendChild(emailItem);
@@ -103,10 +103,10 @@ export function settingsView(container) {
     form.className = 'w-100';
   
     // Creation du label pour le nickname
-    const label = document.createElement('label');
-    label.className = 'form-label';
-    label.htmlFor = 'nickname';
-    label.textContent = 'Nickname';
+    const newNicknameLabel = document.createElement('label');
+    newNicknameLabel.className = 'form-label';
+    newNicknameLabel.htmlFor = 'nickname';
+    newNicknameLabel.textContent = 'Nickname';
 
     // Creation du champ de saisie pour le nickname
     const newNickname = document.createElement('input');
@@ -117,10 +117,10 @@ export function settingsView(container) {
     newNickname.placeholder = 'Entrez votre nickname';
 
     // Creation du label pour l'email
-    const label2 = document.createElement('label');
-    label2.className = 'form-label';
-    label2.htmlFor = 'email';
-    label2.textContent = 'Email';
+    const newEmailLabel = document.createElement('label');
+    newEmailLabel.className = 'form-label';
+    newEmailLabel.htmlFor = 'email';
+    newEmailLabel.textContent = 'Email';
 
     // Creation du champ de saisie pour l'email
     const newEmail = document.createElement('input');
@@ -188,9 +188,9 @@ export function settingsView(container) {
     settingsDiv.appendChild(settingsHeader);
     settingsDiv.appendChild(settingsBody);
     settingsBody.appendChild(form);
-    form.appendChild(label);
+    form.appendChild(newNicknameLabel);
     form.appendChild(newNickname);
-    form.appendChild(label2);
+    form.appendChild(newEmailLabel);
     form.appendChild(newEmail);
     // form.appendChild(newAvatar);
     form.appendChild(submitButton);
@@ -214,6 +214,7 @@ export function settingsView(container) {
 
     // Creation du champ de saisie pour l'avatar
     const newAvatar = document.createElement('input');
+    newAvatar.for = 'avatar';
     newAvatar.type = 'file';
     newAvatar.id = 'avatar';
     newAvatar.name = 'newAvatar';
@@ -426,17 +427,14 @@ export function settingsView(container) {
     const passwordDiv = document.createElement('div');
     passwordDiv.className = 'card mb-4';
 
-
     const passwordBody = document.createElement('div');
     passwordBody.className = 'card-body';
 
     // Bouton de redirection vers la page de modification du mot de passe
     const passwordButton = document.createElement('button');
-    passwordButton.className = 'btn btn-light w-100';
-    passwordButton.innerHTML = '<a href="#" id=passwordLink>Modifier le mot de passe</a>';  // Attention a la couleur du lien, a changer
-
-    // Ajouter un gestionnaire d'événements au lien
-    passwordButton.querySelector('#passwordLink').addEventListener('click', function(event) {
+    passwordButton.textContent = 'Modifier le mot de passe';
+    passwordButton.className = 'btn btn-primary';
+    passwordButton.addEventListener('click', (event) => {
         event.preventDefault();
         navigateTo('/password');
     });
@@ -452,7 +450,6 @@ export function settingsView(container) {
     logoutButton.textContent = 'Logout';
     logoutButton.className = 'btn btn-danger';
     logoutButton.addEventListener('click', (event) => {
-        
         fetch('/api/logout/', {
             method: 'POST',
             headers: {

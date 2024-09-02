@@ -1,18 +1,17 @@
-import { navigateTo } from './utils.js';
+// import { navigateTo } from '../utils.js';
+import { navigateTo } from '../../app.js';
 
 export function notFoundView(container) {
-    // Clear previous content
     container.innerHTML = '';
 
-    // Create and append 404 elements
     const h1 = document.createElement('h1');
-    h1.textContent = '404 - Page Not Found';
+    h1.textContent = '404 - La page n\'existe pas';
 
     const p = document.createElement('p');
-    p.textContent = 'The page you are looking for does not exist.';
+    p.textContent = 'La page que vous recherchez n\'existe pas.';
 
     const homeButton = document.createElement('button');
-    homeButton.textContent = 'Go to Home';
+    homeButton.textContent = 'Aller à la page d\'accueil';
     homeButton.className = 'btn btn-primary';
     homeButton.addEventListener('click', (event) => {
         event.preventDefault();

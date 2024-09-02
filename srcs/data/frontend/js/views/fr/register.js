@@ -1,13 +1,12 @@
-import { getCookie } from './utils.js';
-import { navigateTo } from './utils.js';
+import { getCookie } from '../utils.js';
+// import { navigateTo } from '../utils.js';
+import { navigateTo } from '../../app.js';
 
 export async function registerView(container) {
-    // Clear previous content
     container.innerHTML = '';
 
-    // Create elements
     const h1 = document.createElement('h1');
-    h1.textContent = 'Register';
+    h1.textContent = 'Inscription';
 
     // Créer le conteneur principal
     container.className = 'container';
@@ -38,11 +37,11 @@ export async function registerView(container) {
   
     // Champs du formulaire
     const fields = [
-      { label: 'Username', type: 'text', id: 'username', placeholder: 'Entrez votre username' },
-      { label: 'Nickname', type: 'text', id: 'nickname', placeholder: 'Entrez votre nickname' },
-      { label: 'Adresse email', type: 'email', id: 'email', placeholder: 'Entrez votre email' },
-      { label: 'Mot de passe', type: 'password', id: 'password', placeholder: 'Entrez un mot de passe' },
-      { label: 'Confirmer le mot de passe', type: 'password', id: 'confirmpassword', placeholder: 'Confirmez votre mot de passe' },
+        { label: 'Nom d\'utilisateur' , type: 'text', id: 'username', placeholder: 'Entrez votre nom d\'utilisateur' },
+        { label: 'Pseudo', type: 'text', id: 'nickname', placeholder: 'Entrez votre pseudo' },
+        { label: 'Adresse email', type: 'email', id: 'email', placeholder: 'Entrez votre email' },
+        { label: 'Mot de passe', type: 'password', id: 'password', placeholder: 'Entrez un mot de passe' },
+        { label: 'Confirmer le mot de passe', type: 'password', id: 'confirmpassword', placeholder: 'Confirmez votre mot de passe' },
     ];
   
     fields.forEach(field => {
@@ -139,7 +138,6 @@ export async function registerView(container) {
             })
             .then(data => {
                 if (data.message === 'User registered successfully') {
-                    // alert('Registration successful!');
                     event.preventDefault();
                     navigateTo('/login');
                 } else if (data.errors) {
