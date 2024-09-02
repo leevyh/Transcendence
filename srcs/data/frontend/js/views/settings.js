@@ -225,7 +225,7 @@ export function settingsView(container) {
     avatarSubmitButton.className = 'btn btn-primary w-100';
     avatarSubmitButton.textContent = 'Enregistrer l\'avatar';
 
-    // Gestion de la soumission du formulaire FIXME A FIX RAPIDEMENT
+    // Gestion de la soumission du formulaire
     avatarForm.addEventListener('submit', async (event) => {
         event.preventDefault(); // Empêche la soumission par défaut du formulaire
 
