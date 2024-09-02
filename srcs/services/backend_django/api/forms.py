@@ -26,6 +26,12 @@ class AccessibilityUpdateForm(forms.ModelForm):
                   'font_size',
                   'dark_mode']
 
+class SettingsForm(forms.ModelForm):
+    class Meta:
+        model = User_site
+        fields = ['email',
+                  'nickname',]
+
 # class NewGameForm(forms.ModelForm):
 #     class Meta:
 #         model = Stats_user
