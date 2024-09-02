@@ -155,8 +155,8 @@ export function settingsView(container) {
 
         // Récupération des données du formulaire
         const data = new FormData(form);
-        const new_nickname = data.get('newNickname');
-        const new_email = data.get('newEmail');
+        const nickname = data.get('newNickname');
+        const email = data.get('newEmail');
         // const new_avatar = data.get('avatar');
 
         // Envoi des données au serveur
@@ -167,7 +167,7 @@ export function settingsView(container) {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken'),
             },
-            body: JSON.stringify({ new_nickname, new_email, /*new_avatar*/ })
+            body: JSON.stringify({ nickname, email, /*new_avatar*/ })
             // body: data,
         });
         if (response.ok) {
@@ -225,6 +225,54 @@ export function settingsView(container) {
     avatarSubmitButton.type = 'submit';
     avatarSubmitButton.className = 'btn btn-primary w-100';
     avatarSubmitButton.textContent = 'Enregistrer l\'avatar';
+
+    // Gestion de la soumission du formulaire
+    avatarForm.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Empêche la soumission par défaut du formulaire
+
+        // Suppression des messages d'erreur précédents
+        const errorMessages = avatarForm.querySelectorAll('.text-danger');
+        errorMessages.forEach(message => message.remove());
+
+        // Récupération des données du formulaire
+        const data = new FormData(avatarForm);
+        const avatar = data.get('newAvatar');
+        console.log(avatar);
+        if (!avatar.size || avatar.name === '') {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Veuillez choisir un fichier';
+            avatarForm.insertBefore(errorMessage, avatarSubmitButton);
+            return;
+        }
+        if (avatar.size > 1000000) {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Fichier trop volumineux (max 1 Mo)';
+            avatarForm.insertBefore(errorMessage, avatarSubmitButton);
+        }
+        // Envoi des données au serveur
+        const response = await fetch('/api/updateAvatar/', {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: avatar,
+        });
+        if (response.ok) {
+            avatarForm.innerHTML = '';
+            const successMessage = document.createElement('p');
+            successMessage.className = 'text-success';
+            successMessage.textContent = 'Avatar modifié avec succès';
+            avatarForm.appendChild(successMessage);
+        } else {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Erreur lors de la modification de l\'avatar';
+            avatarForm.insertBefore(errorMessage, avatarSubmitButton);
+        }
+    })
 
     // Ajout des éléments au DOM
     avatarDiv.appendChild(avatarHeader);
