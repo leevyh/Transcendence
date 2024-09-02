@@ -76,6 +76,14 @@ export function loginView(container) {
         
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
+
+        if (!username || !password) {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Tous les champs sont obligatoires';
+            form.insertBefore(errorMessage, submitButton);
+            return;
+        }
         
         fetch('/api/login/', {
             method: 'POST',
