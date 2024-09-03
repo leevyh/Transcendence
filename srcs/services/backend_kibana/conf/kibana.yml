@@ -77,4 +77,4 @@ xpack:
         is_default_monitoring: true
         ssl:
           verification_mode: certificate
-          certificate_authorities: ["/usr/share/kibana/config/certs/ca/ca.crt"]
+          certificate_authorities: ["/usr/share/elastic-agent/config/certs/ca/ca.crt"]
