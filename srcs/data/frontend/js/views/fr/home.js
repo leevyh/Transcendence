@@ -1,36 +1,74 @@
-// import { navigateTo } from '../../app.js';
-import { navigateTo } from '../utils.js';
+import { changeLanguage } from '../utils.js';
 import { getCookie } from '../utils.js';
+import { navigateTo, isAuthenticated } from '../../app.js';
 
-export function homeView(container) {
+export async function homeView(container) {
     container.innerHTML = '';
 
     const h1 = document.createElement('h1');
+    h1.setAttribute('data-i18n', 'home');
     h1.textContent = 'Page d\'accueil';
 
     const p = document.createElement('p');
+    p.setAttribute('data-i18n', 'welcome');
     p.textContent = 'Bienvenue sur la page d\'accueil!';
 
-    // Bouton pour aller à la page de connexion
+// SELECTEUR DE LANGUE
+    const languageDiv = document.createElement('div');
+    languageDiv.id = 'language';
+
+    const languageSelector = document.createElement('select');
+    languageSelector.id = 'language-selector';
+
+    const optionFr = document.createElement('option');
+    optionFr.value = 'fr';
+    optionFr.innerHTML = '🇫🇷&emsp;FR';
+
+    const optionEn = document.createElement('option');
+    optionEn.value = 'en';
+    optionEn.innerHTML = '🇬🇧&emsp;EN';
+
+    const optionEs = document.createElement('option');
+    optionEs.value = 'sp';
+    optionEs.innerHTML = '🇪🇸&emsp;SP';
+
+    languageSelector.appendChild(optionFr);
+    languageSelector.appendChild(optionEn);
+    languageSelector.appendChild(optionEs);
+    languageDiv.appendChild(languageSelector);
+    container.appendChild(languageDiv);
+
+    let choiceLanguage = 'fr';
+    document.querySelector("#language-selector").addEventListener("change", function() {
+        console.log('this.value', this.value);
+        choiceLanguage = this.value;
+        changeLanguage(this.value);
+    });
+
+ // BOUTONS CONNEXION
     const loginButton = document.createElement('button');
+    loginButton.setAttribute('data-i18n', 'login');
     loginButton.textContent = 'Se connecter';
     loginButton.className = 'btn btn-primary';
     loginButton.addEventListener('click', (event) => {
         event.preventDefault();
-        navigateTo('/login');
+        console.log('nouvelle url:', '/' + choiceLanguage + '/login');
+        navigateTo('/' + choiceLanguage + '/login');
     });
 
-    // Bouton pour aller à la page d'inscription
+// BOUTONS INSCRIPTION
     const registerButton = document.createElement('button');
+    registerButton.setAttribute('data-i18n', 'register');
     registerButton.textContent = 'S\'inscrire';
     registerButton.className = 'btn btn-primary';
     registerButton.addEventListener('click', (event) => {
         event.preventDefault();
-        navigateTo('/register');
+        navigateTo('/' + choiceLanguage + '/register');
     });
 
-    // Bouton de déconnexion
+// BOUTON DECONNEXION
     const logoutButton = document.createElement('button');
+    logoutButton.setAttribute('data-i18n', 'logout');
     logoutButton.textContent = 'Se déconnecter';
     logoutButton.className = 'btn btn-danger';
     logoutButton.addEventListener('click', (event) => {
@@ -47,26 +85,25 @@ export function homeView(container) {
             console.log(data);
 
             event.preventDefault();
-            navigateTo('/login');
+            navigateTo('/' + choiceLanguage + '/login');
         });
     });
 
-    // Bouton d'accès aux paramètres
+// BOUTON PARAMETRES
     const settingsButton = document.createElement('button');
+    settingsButton.setAttribute('data-i18n', 'settings');
     settingsButton.textContent = 'Paramètres';
     settingsButton.className = 'btn btn-primary';
     settingsButton.addEventListener('click', (event) => {
         event.preventDefault();
-        navigateTo('/settings');
+        navigateTo('/' + choiceLanguage + '/settings');
     });
 
     container.appendChild(h1);
     container.appendChild(p);
 
-    // Si l'utilisateur est connecté, on affiche le bouton de déconnexion
-    // Sinon, on affiche les boutons de connexion et d'inscription
-    const token = localStorage.getItem('token'); // A modifier avec appel API
-    if (token) {
+    const isAuth = await isAuthenticated();
+    if (isAuth) {
         container.appendChild(settingsButton);
         container.appendChild(logoutButton);
     } else {

@@ -1,5 +1,4 @@
 import { getCookie } from '../utils.js';
-// import { navigateTo } from '../utils.js';
 import { navigateTo } from '../../app.js';
 
 export function loginView(container) {
@@ -114,7 +113,6 @@ export function loginView(container) {
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
             form.insertBefore(errorMessage, submitButton);
-            console.error('Error:', error); // A supprimer plus tard, debug
         });
     });
     cardBody.appendChild(form);
@@ -157,7 +155,6 @@ export function loginView(container) {
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
                 form.insertBefore(errorMessage, submitButton);
-                console.error('Error:', error); // A supprimer plus tard, debug
             });
             }
         });
@@ -165,11 +162,10 @@ export function loginView(container) {
     // Connexion avec 42
     const cardLogin42 = document.createElement('div');
     cardLogin42.className = 'card-footer text-center';
-    cardLogin42.innerHTML = '<small>Connexion avec 42</small>';
 
     const login42Button = document.createElement('button');
     login42Button.type = 'button';
-    login42Button.className = 'btn btn-primary w-100';
+    login42Button.className = 'btn btn-dark w-100';
     login42Button.textContent = 'Se connecter avec 42';
     cardLogin42.appendChild(login42Button);
     cardLogin42.addEventListener('click', (event) => {
@@ -197,7 +193,6 @@ export function loginView(container) {
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
                 form.insertBefore(errorMessage, submitButton);
-                console.error('Error:', error); // A supprimer plus tard, debug
             }
         })
         .catch(error => {
@@ -205,7 +200,6 @@ export function loginView(container) {
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
             form.insertBefore(errorMessage, submitButton);
-            console.error('Error:', error); // A supprimer plus tard, debug
         });
     });
 

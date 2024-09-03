@@ -1,4 +1,4 @@
-import { navigateTo } from '../utils.js';
+import { navigateTo } from '../../app.js';
 
 export function notFoundViewSP(container) {
     container.innerHTML = '';
