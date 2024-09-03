@@ -2,23 +2,15 @@ FROM elastic/elastic-agent:8.14.1
 
 USER root
 
-ENV FLEET_ENROLL=1
+ENV FLEET_ENROLL=true
 ENV FLEET_URL=https://backend-fleet:8220
-ENV FLEET_ENROLLMENT_TOKEN="UU9Xb2twQUJwNWZiMF9fdVp2U286eVQ3T2RValZRVW1HNXF4NWcydzlsZw=="
 ENV FLEET_CA=/usr/share/elastic-agent/config/certs/ca/ca.crt
 
 ENV ELASTIC_AGENT_CERT=/usr/share/elastic-agent/config/certs/backend-fleet/backend-fleet.crt
 ENV ELASTIC_AGENT_CERT_KEY=/usr/share/elastic-agent/config/certs/backend-fleet/backend-fleet.key
 
-ENV ELASTICSEARCH_HOST=https://backend-elastic:9200
-ENV ELASTICSEARCH_USERNAME=elastic
-ENV ELASTICSEARCH_PASSWORD=changeme
-ENV ELASTICSEARCH_CA=/usr/share/elastic-agent/config/certs/ca/ca.crt
-
-ENV FLEET_SERVER_ES_CERT=/usr/share/elastic-agent/config/certs/backend-elastic/backend-elastic.crt
-ENV FLEET_SERVER_ES_CERT_KEY=/usr/share/elastic-agent/config/certs/backend-elastic/backend-elastic.key
-
-ENV KIBANA_CA=/usr/share/elastic-agent/config/certs/ca/ca.crt
+ENV KIBANA_FLEET_HOST=https://backend-kibana:5601
+ENV FLEET_TOKEN_POLICY_NAME=elastic-agent-policy
 
 ENV NON_INTERACTIVE=true
 
