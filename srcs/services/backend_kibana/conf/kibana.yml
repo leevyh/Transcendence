@@ -10,6 +10,8 @@ server:
     key: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.key
     certificateAuthorities: "/usr/share/kibana/config/certs/ca/ca.crt"
 
+telemetry.optIn: false
+
 # Elasticsearch connection configuration
 elasticsearch:
   hosts: ["https://backend-elastic:9200"]
