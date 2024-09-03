@@ -17,56 +17,102 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column; /* new navbar*/
     height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 20px; /* Ajoute un padding autour de tout le contenu */
 }
+
+.base {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1200px; /* Augmente la taille maximale de .base pour plus d'espace */
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
 
 .contener {
     display: flex;
     justify-content: center;
-    align-items: center;
-    width: 100%; /* Facultatif, dépend de la taille souhaitée */
-    max-width: 800px; /* Vous pouvez ajuster cette valeur selon vos besoins */
+    align-items: stretch;
+    width: 100%;
+    max-width: 1000px; /* Augmente la taille maximale de .contener */
+    box-sizing: border-box;
+}
+
+.card-body, img {
+    flex: 1;
+    width: 100%; /* Assure que chaque div occupe toute la largeur disponible */
+    max-width: 48%; /* Limite la taille de chaque div à 48% pour laisser de l'espace autour */
+    box-sizing: border-box;
+    margin: 10px; /* Ajoute un espacement entre les divs */
 }
 
 .card-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     padding: 20px;
     background-color: white;
-    width: 100%; /* Occupe toute la largeur disponible */
-    max-width: 50%; /* Limite la taille de la carte à 50% de la largeur du conteneur */
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
 }
 
 .title {
-	color: #012970;
-	font-weight: 600;
-	font-size: 24px;
+    color: #012970;
+    font-weight: 600;
+    font-size: 100px;
+}
+
+p {
+    display: flex;
+    justify-content: center;
+    color: #a19e9e91;
+    font-weight: 200;
+    font-size: 20px;
 }
 
 ul {
-	display: flex;
+    display: flex;
+    justify-content: space-evenly;
 }
 
 li {
-	list-style-type: none;
+    list-style-type: none;
 }
+
 img {
-    width: 100%;
-    max-width: 50%; /* Limite la taille de l'image à 50% de la largeur du conteneur */
-    height: auto; /* Conserve le ratio d'aspect de l'image */
-    object-fit: cover; /* Ajuste l'image pour qu'elle couvre toute la zone disponible */
+    height: auto;
+    object-fit: cover;
     border: 1px solid #ccc;
-    box-sizing: border-box;
 }
 
 .btn.btn-primary {
     background-color: #012970;
     color: white;
-    margin: 5px; /* Ajoute un espacement entre les boutons */
+    margin: 5px;
 }
 
 .card {
-    margin-right: 20px; /* Espacement entre la carte et l'image */
+    margin-right: 20px;
+}
+
+/*NAVBAR*/
+
+
+.navbar-brand {
+    /* padding: 5px;
+    width: 10px; */
+    color: #012970;
+}
+
+.nav-icon {
+    width: 50%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    color: #012970;
 }
