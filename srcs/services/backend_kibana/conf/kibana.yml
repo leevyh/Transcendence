@@ -32,6 +32,12 @@ xpack:
     packages:
         - name: fleet_server
           version: latest
+        - name: system
+          version: latest
+        - name: nginx
+          version: latest
+        - name: logstash
+          version: latest
     agentPolicies:
         - name: Fleet Server Policy
           id: fleet-server-policy
@@ -40,7 +46,33 @@ xpack:
               - name: Fleet Server Integration
                 package:
                   name: fleet_server
+        - name: Elastic Agent Policy
+          id: elastic-agent-policy
+          namespace: default
+          is_default: true
+          package_policies:
+              - name: Elastic Agent Integration
+                package:
+                  name: system
+              - name: Nginx Integration
+                package:
+                  name: nginx
+              - name: Logstash Integration
+                package:
+                  name: logstash
     fleetServerHosts:
-      - id: "fleet-server"
-        name: "Fleet Server"
+      - id: fleet-server
+        name: Fleet Server
         host_urls: ["https://backend-fleet:8220"]
+        is_default: true
+    outputs:
+      - id: default-output
+        name: Default Output
+        type: elasticsearch
+        hosts:
+          - "https://backend-elastic:9200"
+        is_default: true
+        is_default_monitoring: true
+        ssl:
+          verification_mode: certificate
+          certificate_authorities: ["/usr/share/kibana/config/certs/ca/ca.crt"]
