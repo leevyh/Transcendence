@@ -111,6 +111,12 @@ svg,
 	height: 26px;
 }
 
+#error404 {
+	width: 50%;
+	height: 50%;
+}
+
+
 #login {
 	display: flex;
 }

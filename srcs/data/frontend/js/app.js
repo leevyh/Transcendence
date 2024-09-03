@@ -11,16 +11,11 @@ import { chatView } from './views/chat.js'; // FR
 
 // EN
 import { notFoundViewEN } from './views/en/404.js';
-import { homeViewEN } from './views/en/home.js';
 
 // SP
 import { notFoundViewSP } from './views/sp/404.js';
-import { homeViewSP } from './views/sp/home.js';
 
 const appDiv = document.getElementById('app');
-const defaultLang = 'fr'; // ou 'en' selon votre choix
-const initialPath = location.pathname !== '/' ? location.pathname : `/${defaultLang}/home`;
-navigateTo(initialPath);
 
 export const routes = {
     'fr': {
@@ -35,15 +30,19 @@ export const routes = {
     },
     'en': {
         '/404': notFoundViewEN,
-        '/': homeViewEN,
+        '/': homeView,
+        '/login': loginView,
+
     },
     'sp': {
         '/404': notFoundViewSP,
-        '/': homeViewSP,
+        '/': homeView,
+        '/login': loginView,
+
     }
 };
 
-async function isAuthenticated() {
+export async function isAuthenticated() {
     try {
         const response = await fetch('/api/check_auth/', {
             method: 'GET',
@@ -65,7 +64,8 @@ async function isAuthenticated() {
     }
 }
 
-export async function getLang() {
+// Récupérer la langue de l'utilisateur
+async function getLang() {
     try {
         const response = await fetch('/api/get_accessibility/', {
             method: 'GET',
@@ -88,54 +88,71 @@ export async function getLang() {
     }
 }
 
-export async function navigateTo(view) {
-    // On modifie l'URL pour ne garder que la view sans la langue
-    const viewParts = view.split('/');
-
+export async function navigateTo(url) {
+    console.log('url:', url);
     const isAuth = await isAuthenticated();
     const publicRoutes = ['/login', '/register', '/404'];
-
-    let lang = 'fr'; // Par défaut
+    
+    // Language de l'utilisateur
+    // Si l'url contient deja la langue, on la supprime
+    let currentLanguage = null;
+    let language = null;
+    
+    const splitPath = url.split('/');
     if (isAuth === true) {
-        // Extraire la langue dans le choix de l'utilisateur dans le backend
-        console.log('isAuth:', isAuth);
-        lang = await getLang();
+        // Si l'utilisateur est authentifié
+        if (splitPath.length > 2) {
+            // Si l'url contient déjà la langue, on la supprime
+            url = `/${splitPath[2]}`;
+        } 
+        language = await getLang();
+        currentLanguage = language || 'fr';
+    } else {
+        // Si l'utilisateur n'est pas authentifié
+        if (splitPath.length > 2) {
+            // Si l'url contient déjà la langue, on la récupère
+            url = `/${splitPath[2]}`;
+            language = splitPath[1];
+        }
+        // Si l'ancienne url contient la langue, on la récupère
+        const oldUrl = location.pathname.split('/');
+        if (oldUrl.length > 2) {
+            language = oldUrl[1];
+        }
+        currentLanguage = language || 'fr';
     }
-    const currentLang = lang || 'fr'; 
+    console.log('currentLanguage:', currentLanguage);
 
-    // Définir la route de base si la langue n'est pas définie
-    const viewPath = `/${viewParts.slice(2).join('/')}` || '/';
-
-    if (!routes[currentLang]) {
+    if (!routes[currentLanguage]) {
         // Si la langue n'est pas supportée, rediriger vers la page 404
-        history.pushState(null, '', `/${currentLang}/404`);
+        history.pushState(null, '', `/${currentLanguage}/404`);
         notFoundView(appDiv);
         return;
     }
 
-    if (!isAuth && !publicRoutes.includes(viewPath)) {
-        history.pushState(null, '', `/${currentLang}/`);
+    if (!isAuth && !publicRoutes.includes(url)) {
+        // Si l'utilisateur n'est pas authentifié et qu'il tente d'accéder à une page privée, rediriger vers la page de connexion
+        history.pushState(null, '', '/');
         homeView(appDiv);
     } else {
-        if (isAuth && (viewPath === '/login' || viewPath === '/register')) {
-            history.pushState(null, '', `/${currentLang}/`);
+        // Si l'utilisateur est authentifié
+        if (isAuth && (url === '/login' || url === '/register')) {
+            history.pushState(null, '', `/${currentLanguage}/`);
             homeView(appDiv);
             return;
         }
         appDiv.innerHTML = '';
-        const viewFunction = routes[currentLang][viewPath] || notFoundView;
-
+        const viewFunction = routes[currentLanguage][url] || notFoundView;
         viewFunction(appDiv);
-        history.pushState(null, '', `/${currentLang}${viewPath}`);
+        history.pushState(null, '', `/${currentLanguage}${url}`);
     }
 }
-
 
 document.querySelectorAll('nav a').forEach(link => {
     link.addEventListener('click', (event) => {
         event.preventDefault();
         const path = `/${event.target.getAttribute('data-link')}`;
-        // history.pushState(null, '', path);
+        history.pushState(null, '', path);
         navigateTo(path);
     });
 });

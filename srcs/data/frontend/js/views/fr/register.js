@@ -1,5 +1,4 @@
 import { getCookie } from '../utils.js';
-// import { navigateTo } from '../utils.js';
 import { navigateTo } from '../../app.js';
 
 export async function registerView(container) {
