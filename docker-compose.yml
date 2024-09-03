@@ -113,7 +113,8 @@ services:
     build: ./srcs/services/backend_fleet
     env_file: .env
     volumes:
-      - backend-elk-certs:/usr/share/fleet/config/certs
+      - backend-elk-certs:/usr/share/elastic-agent/config/certs
+      - backend-fleet:/usr/share/elastic-agent/data
     ports:
       - 8220:8220
     networks:
@@ -161,6 +162,12 @@ volumes:
         type: none
         device: ./srcs/data/kibana
         o: bind
+  backend-fleet:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/fleet
+      o: bind
   ea-proxy-nginx:
       driver: local
       driver_opts:
