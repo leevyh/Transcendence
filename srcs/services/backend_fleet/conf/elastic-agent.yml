@@ -1,0 +1,7 @@
+outputs:
+  default:
+    type: elasticsearch
+    hosts: [https://backend-elastic:9200]
+    username: "elastic"
+    password: "changeme"
+    preset: balanced
