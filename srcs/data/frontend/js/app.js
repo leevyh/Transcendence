@@ -105,6 +105,4 @@ window.addEventListener('popstate', () => {
 });
 
 // Initial load test
-navigateTo(location.pathname || '/home');
-
 navigateTo(location.pathname || '/');
