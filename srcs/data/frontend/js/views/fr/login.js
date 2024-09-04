@@ -1,11 +1,11 @@
-import { getCookie } from './utils.js';
-import { navigateTo } from './utils.js';
+import { getCookie } from '../utils.js';
+import { navigateTo } from '../../app.js';
 
 export function loginView(container) {
     container.innerHTML = '';
 
     const h1 = document.createElement('h1');
-    h1.textContent = 'Login';
+    h1.textContent = 'Connexion';
 
     container.className = 'container';
   
@@ -35,7 +35,7 @@ export function loginView(container) {
   
     // Champs du formulaire
     const fields = [
-      { label: 'Username', type: 'username', id: 'username', placeholder: 'Entrez votre username' },
+      { label: 'Nom d\'utilisateur', type: 'username', id: 'username', placeholder: 'Entrez votre nom d\'utilisateur' },
       { label: 'Mot de passe', type: 'password', id: 'password', placeholder: 'Entrez votre mot de passe' },
     ];
   
@@ -64,15 +64,25 @@ export function loginView(container) {
     submitButton.type = 'submit';
     submitButton.className = 'btn btn-primary w-100';
     submitButton.textContent = 'Se connecter';
-  
     form.appendChild(submitButton);
 
     form.addEventListener('submit', (event) => {
         event.preventDefault();
+
+        // Suppression des messages d'erreur précédents
+        const errorMessages = form.querySelectorAll('.text-danger');
+        errorMessages.forEach(message => message.remove());
         
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-        
+
+        if (!username || !password) {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Tous les champs sont obligatoires';
+            form.insertBefore(errorMessage, submitButton);
+            return;
+        }
         fetch('/api/login/', {
             method: 'POST',
             headers: {
@@ -85,25 +95,20 @@ export function loginView(container) {
         .then(data => {
             if (data.message === 'User logged in successfully') {
                 localStorage.setItem('token', data.token);
-                const loggindiv = document.getElementById('loginLink')
-                loggindiv.setAttribute("hidden", true);
-                const settingsdiv = document.getElementById('settingsLink')
-                settingsdiv.removeAttribute("hidden");
                 event.preventDefault();
                 navigateTo('/');
             } else if (data.error) {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'Bad password or username, please try again';
+                errorMessage.textContent = 'Mauvais mot de passe ou nom d\'utilisateur, veuillez réessayer';
                 form.insertBefore(errorMessage, submitButton);
             }
         })
         .catch(error => {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
-            errorMessage.textContent = 'An error occurred. Please try again.';
+            errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
             form.insertBefore(errorMessage, submitButton);
-            console.error('Error:', error); // A supprimer plus tard, debug
         });
     });
     cardBody.appendChild(form);
@@ -134,30 +139,29 @@ export function loginView(container) {
             .then(response => response.json())
             .then(data => {
                 if (data) {
-                    console.log(data);
+                    // console.log(data);
                     navigateTo('/');
                 }
                 else {
-                    console.log('No data');
+                    // console.log('No data');
                 }
             })
             .catch(error => {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'An error occurred. Please try again.';
+                errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
                 form.insertBefore(errorMessage, submitButton);
-                console.error('Error:', error); // A supprimer plus tard, debug
             });
             }
         });
 
-    // Connexion with 42 button with redirection to 42 to get autorization link
+    // Connexion avec 42
     const cardLogin42 = document.createElement('div');
     cardLogin42.className = 'card-footer text-center';
-    cardLogin42.innerHTML = '<small>Connexion avec 42</small>';
+
     const login42Button = document.createElement('button');
     login42Button.type = 'button';
-    login42Button.className = 'btn btn-primary w-100';
+    login42Button.className = 'btn btn-dark w-100';
     login42Button.textContent = 'Se connecter avec 42';
     cardLogin42.appendChild(login42Button);
     cardLogin42.addEventListener('click', (event) => {
@@ -176,24 +180,22 @@ export function loginView(container) {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            // console.log(data);
             if (data.url) {
-                console.log(data.url);
+                // console.log(data.url);
                 window.location.href = data.url;
             } else if (data.error) {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'An error occurred. Please try again.';
+                errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
                 form.insertBefore(errorMessage, submitButton);
-                console.error('Error:', error); // A supprimer plus tard, debug
             }
         })
         .catch(error => {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
-            errorMessage.textContent = 'An error occurred. Please try again.';
+            errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
             form.insertBefore(errorMessage, submitButton);
-            console.error('Error:', error); // A supprimer plus tard, debug
         });
     });
 

@@ -3,14 +3,12 @@ from .models import User_site, Accessibility, Stats_user
 
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
-    # confirm_password = forms.CharField(widget=forms.PasswordInput, label='Confirm Password')
 
     class Meta:
         model = User_site
         fields = ['email',
                   'nickname',
                   'password',
-                #   'confirm_password',
                   'username',]
 
     def clean_password(self):
@@ -25,6 +23,12 @@ class AccessibilityUpdateForm(forms.ModelForm):
         fields = ['language',
                   'font_size',
                   'dark_mode']
+
+class SettingsForm(forms.ModelForm):
+    class Meta:
+        model = User_site
+        fields = ['email',
+                  'nickname',]
 
 # class NewGameForm(forms.ModelForm):
 #     class Meta:

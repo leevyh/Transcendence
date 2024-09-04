@@ -1,10 +1,8 @@
-import { navigateTo } from './utils.js';
+import { navigateTo } from '../../app.js';
 
-export function notFoundView(container) {
-    // Clear previous content
+export function notFoundViewEN(container) {
     container.innerHTML = '';
 
-    // Create and append 404 elements
     const h1 = document.createElement('h1');
     h1.textContent = '404 - Page Not Found';
 

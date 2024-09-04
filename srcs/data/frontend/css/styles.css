@@ -9,8 +9,22 @@ html, body {
 
 body {
     font-family: 'Quicksand', sans-serif;
-    font-size: 18px;
+    font-size: 16px;
     background: #cdd0d491;
+}
+
+body.small-font {
+    font-size: 12px;
+}
+
+body.large-font {
+    font-size: 20px;
+}
+
+/* Pour le mode sombre */
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
 }
 
 #app {
@@ -114,6 +128,12 @@ img {
     width: 10px; */
     color: #012970;
 }
+
+#error404 {
+	width: 50%;
+	height: 50%;
+}
+
 
 .nav-icon {
     width: 50%;

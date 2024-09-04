@@ -1,93 +1,95 @@
-import { homeView } from './views/home.js';
-import { registerView } from './views/register.js';
-import { loginView } from './views/login.js';
-import { settingsView } from './views/settings.js';
-import { notFoundView } from './views/404.js';
+import { isAuthenticated, getAccessibility, applyAccessibilitySettings } from './views/utils.js';
+
+// FR
+import { notFoundView } from './views/fr/404.js';
+import { homeView } from './views/fr/home.js';
+import { registerView } from './views/fr/register.js';
+import { loginView } from './views/fr/login.js';
+import { settingsView } from './views/fr/settings.js';
+import { passwordView } from './views/fr/password.js';
 import { chatView } from './views/chat.js';
-import { passwordView } from './views/password.js';
-import { getCookie } from './views/utils.js';
 
 const appDiv = document.getElementById('app');
 
 const routes = {
-    '/': homeView,
-    '/register': registerView,
-    '/login': loginView,
-    '/settings': settingsView,
-    // '/profile': profileView,
-    '/404': notFoundView,
-    '/chat': chatView,
-    '/password': passwordView,
+    'fr': {
+        '/404': notFoundView,
+        '/': homeView,
+        '/register': registerView,
+        '/login': loginView,
+        '/settings': settingsView,
+        '/password': passwordView,
+        // '/profile': profileView,
+        '/chat': chatView,
+    },
+    'en': {
+        '/404': notFoundView,
+        '/': homeView,
+        '/login': loginView,
+        '/register': registerView,
+        '/settings': settingsView,
+    },
+    'sp': {
+        '/404': notFoundView,
+        '/': homeView,
+        '/login': loginView,
+        '/register': registerView,
+        '/settings': settingsView,
+    }
 };
 
-async function isAuthenticated() {
-    try {
-        const response = await fetch('/api/check_auth/', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-        });
-        if (response.ok) {
-            const data = await response.json();
-            console.log('data:', data);
-            return data.value;
-        } else {
-            return false;
-        }
-    } catch (error) {
-        console.error('Error checking authentication:', error);
-        return false;
-    }
-}
 
-async function navigateTo(view) {
+export async function navigateTo(url) {
     const isAuth = await isAuthenticated();
     const publicRoutes = ['/login', '/register', '/404'];
 
-    if (!isAuth && !publicRoutes.includes(view)) {
-        console.log(isAuth);
+    let currentLanguage = null;
+    let language = null;
+
+    const splitPath = url.split('/');
+    let userSettings = null;
+
+    if (isAuth === true) {
+        if (splitPath.length > 2) {
+            url = `/${splitPath[2]}`;
+        }
+        userSettings = await getAccessibility();
+        language = `${userSettings.language}`;
+        currentLanguage = language || 'fr';
+    } else {
+        if (splitPath.length > 2) {
+            url = `/${splitPath[2]}`;
+            language = splitPath[1];
+        }
+        const oldUrl = location.pathname.split('/');
+        if (oldUrl.length > 2) {
+            language = oldUrl[1];
+        }
+        currentLanguage = language || 'fr';
+    }
+    applyAccessibilitySettings(userSettings);
+
+    if (!routes[currentLanguage]) {
+        history.pushState(null, '', `/${currentLanguage}/404`);
+        notFoundView(appDiv);
+        return;
+    }
+
+    if (!isAuth && !publicRoutes.includes(url)) {
         history.pushState(null, '', '/');
         homeView(appDiv);
     } else {
-        console.log(isAuth);
-        //don't go in login or register if already logged in
-        if (isAuth && (view === '/login' || view === '/register')) {
+        if (isAuth && (url === '/login' || url === '/register')) {
             history.pushState(null, '', '/');
             homeView(appDiv);
             return;
         }
         appDiv.innerHTML = '';
-        const viewFunction = routes[view] || notFoundView;
+        const viewFunction = routes[currentLanguage][url] || notFoundView;
         viewFunction(appDiv);
-        history.pushState(null, '', view);
+        history.pushState(null, '', `/${currentLanguage}${url}`);
     }
 }
-
-// async function navigateTo(view) {
-//     const isAuth = await isAuthenticated();
-//     const publicRoutes = ['/login', '/register', '/404'];
-
-//     if (!isAuth && !publicRoutes.includes(view)) {
-//         console.log(isAuth);
-//         history.pushState(null, '', '/');
-//         appDiv.innerHTML = homeView(appDiv); // Insert HTML into appDiv
-//     } else {
-//         console.log(isAuth);
-//         // Don't go to login or register if already logged in
-//         if (isAuth && (view === '/login' || view === '/register')) {
-//             history.pushState(null, '', '/');
-//             appDiv.innerHTML = homeView(appDiv); // Insert HTML into appDiv
-//             return;
-//         }
-//         appDiv.innerHTML = '';
-//         const viewFunction = routes[view] || notFoundView;
-//         appDiv.innerHTML = viewFunction(appDiv); // Insert HTML into appDiv
-//         history.pushState(null, '', view);
-//     }
-// }
-
 
 document.querySelectorAll('nav a').forEach(link => {
     link.addEventListener('click', (event) => {
@@ -104,3 +106,5 @@ window.addEventListener('popstate', () => {
 
 // Initial load test
 navigateTo(location.pathname || '/home');
+
+navigateTo(location.pathname || '/');

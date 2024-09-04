@@ -1,65 +1,45 @@
-import { navigateTo } from './utils.js';
-import { getCookie } from './utils.js';
+import { getCookie } from '../utils.js';
+import { navigateTo } from '../../app.js';
 
 export function passwordView(container) {
-    // Suppression du contenu précédent
     container.innerHTML = '';
 
-    // Titre de la page
     const pageTitle = document.createElement('h2');
     pageTitle.className = 'text-center mb-4';
     pageTitle.textContent = 'Modification de Mot de Passe';
     container.appendChild(pageTitle);
 
-    // Formulaire de modification de mot de passe
+    // Creation du formulaire de modification de mot de passe
     const form = document.createElement('form');
     form.className = 'w-100';
     container.appendChild(form);
 
-    // Creation du label
-    const label = document.createElement('label');
-    label.className = 'form-label';
-    label.htmlFor = 'oldPassword';
-    label.textContent = 'Ancien mot de passe';
-    form.appendChild(label);
+    // Champs du formulaire
+    const fields = [
+        { label: 'Ancien mot de passe', type: 'password', id: 'oldPassword', placeholder: 'Ancien mot de passe' },
+        { label: 'Nouveau mot de passe', type: 'password', id: 'newPassword', placeholder: 'Nouveau mot de passe' },
+        { label: 'Confirmer le nouveau mot de passe', type: 'password', id: 'confirmPassword', placeholder: 'Confirmer le nouveau mot de passe' },
+    ];
 
-    // Champ de l'ancien mot de passe
-    const oldPassword = document.createElement('input');
-    oldPassword.type = 'password';
-    oldPassword.name = 'oldPassword';
-    oldPassword.className = 'form-control mb-4';
-    oldPassword.placeholder = 'Ancien mot de passe';
-    form.appendChild(oldPassword);
+    fields.forEach(field => {
+        const formGroup = document.createElement('div');
+        formGroup.className = 'mb-3';
 
-    // Creation du label
-    const label2 = document.createElement('label');
-    label2.className = 'form-label';
-    label2.htmlFor = 'newPassword';
-    label2.textContent = 'Nouveau mot de passe';
-    form.appendChild(label2);
+        const label = document.createElement('label');
+        label.className = 'form-label';
+        label.htmlFor = field.id;
+        label.textContent = field.label;
 
-    // Champ du nouveau mot de passe
-    const newPassword = document.createElement('input');
-    newPassword.type = 'password';
-    newPassword.name = 'newPassword';
-    newPassword.className = 'form-control mb-4';
-    newPassword.placeholder = 'Nouveau mot de passe';
-    form.appendChild(newPassword);
+        const input = document.createElement('input');
+        input.type = field.type;
+        input.className = 'form-control';
+        input.id = field.id;
+        input.placeholder = field.placeholder;
 
-    // Creation du label
-    const label3 = document.createElement('label');
-    label3.className = 'form-label';
-    label3.htmlFor = 'confirmPassword';
-    label3.textContent = 'Confirmer le nouveau mot de passe';
-    form.appendChild(label3);
-    
-    // Champ de confirmation du nouveau mot de passe
-    const confirmPassword = document.createElement('input');
-    confirmPassword.type = 'password';
-    confirmPassword.name = 'confirmPassword';
-    confirmPassword.className = 'form-control mb-4';
-    confirmPassword.placeholder = 'Confirmer le nouveau mot de passe';
-    form.appendChild(confirmPassword);
+        formGroup.appendChild(label);
+        formGroup.appendChild(input);
+        form.appendChild(formGroup);
+    });
 
     // Bouton de soumission
     const submitButton = document.createElement('button');
@@ -77,10 +57,9 @@ export function passwordView(container) {
         errorMessages.forEach(message => message.remove());
 
         // Récupération des données du formulaire
-        const data = new FormData(form);
-        const old_password = data.get('oldPassword');
-        const new_password = data.get('newPassword');
-        const confirmPassword = data.get('confirmPassword');
+        const old_password = document.getElementById('oldPassword').value;
+        const new_password = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
 
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,12}$/;
         // Si un champ est vide
@@ -108,13 +87,13 @@ export function passwordView(container) {
             return;
         }
         // Si le nouveau mot de passe a la bonne forme
-        // else if (!passwordRegex.test(new_password)) {
-        //     const errorMessage = document.createElement('p');
-        //     errorMessage.className = 'text-danger';
-        //     errorMessage.textContent = 'Le mot de passe doit contenir entre 8 et 12 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre';
-        //     form.insertBefore(errorMessage, submitButton);
-        //     return;
-        // }
+        else if (!passwordRegex.test(new_password)) {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Le mot de passe doit contenir entre 8 et 12 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre';
+            form.insertBefore(errorMessage, submitButton);
+            return;
+        }
 
         const response = await fetch(`/api/updatePassword/`, {
             method: 'PUT',
