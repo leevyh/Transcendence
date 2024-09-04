@@ -104,4 +104,5 @@ window.addEventListener('popstate', () => {
     navigateTo(location.pathname);
 });
 
+// Initial load test
 navigateTo(location.pathname || '/');

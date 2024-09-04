@@ -1,11 +1,18 @@
-body {
-    --nav-width: 200px;
-    margin: 0 0 0 var(--nav-width);
-    font-family: 'Quicksand', sans-serif;
-    font-size: 16px; /* Taille de police par défaut */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Pour les différentes tailles de police */
+body {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 16px;
+    background: #cdd0d491;
+}
+
 body.small-font {
     font-size: 12px;
 }
@@ -20,110 +27,106 @@ body.dark-mode {
     color: #ffffff;
 }
 
-/* Navigation menu */
-.nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: var(--nav-width);
-    height: 100vh;
-    background: #222222;
-}
-
-.nav__link {
-    display: block;
-    padding: 12px 18px;
-    text-decoration: none;
-    color: #eeeeee;
-    font-weight: 500;
-}
-
-.nav__link:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
 #app {
-	display:flex;
-	flex-direction: column;
-    margin: 2em;
-    line-height: 1.5;
-    font-weight: 500;
-}
-
-/* The 'dcode' green always needs to make an appearance */
-a {
-    color: #009579;
-}
-
-select {
-	height: 32px;
-	line-height: 32px;
-	font-size: 12pt;
-}
-
-class {
-	display: flex;
-}
-
-#language {
-	display: flex;
-	justify-content: flex-end;
+    display: flex;
+    justify-content: center;
+   align-items: center;
+    flex-direction: column; /* new navbar*/
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 20px; /* Ajoute un padding autour de tout le contenu */
 }
 
 #language-selector {
-	display: flex;
-	justify-content: flex-end;
+
+    background: white;
+    border-radius: 10px;
 }
 
-/* Sign in form */
-form {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+.base {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1200px; /* Augmente la taille maximale de .base pour plus d'espace */
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-.form-signin {
-	width: 100%;
-	max-width: 330px;
-	/* padding: 15px; */
-	margin: 0 auto;
+
+.contener {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    width: 100%;
+    max-width: 1000px; /* Augmente la taille maximale de .contener */
+    box-sizing: border-box;
 }
 
-.form-signin .checkbox {
-	font-weight: 400;
+.card-body, img {
+    flex: 1;
+    width: 100%; /* Assure que chaque div occupe toute la largeur disponible */
+    max-width: 48%; /* Limite la taille de chaque div à 48% pour laisser de l'espace autour */
+    box-sizing: border-box;
+    margin: 10px; /* Ajoute un espacement entre les divs */
 }
 
-.form-signin .form-control {
-	position: flex;
-	/* box-sizing: border-box; */
-	height: auto;
-	padding: 10px;
-	font-size: 16px;
+.card-body {
+    padding: 20px;
+    background-color: white;
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
 }
 
-.form-signin .form-control:focus {
-	z-index: 2;
+.title {
+    color: #012970;
+    font-weight: 600;
+    font-size: 100px;
 }
 
-.form-signin input[type="email"] {
-	margin-bottom: -1px;
-	border-bottom-right-radius: 0;
-	border-bottom-left-radius: 0;
+p {
+    display: flex;
+    justify-content: center;
+    color: #a19e9e91;
+    font-weight: 200;
+    font-size: 20px;
 }
 
-.form-signin input[type="password"] {
-	margin-bottom: 10px;
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
+ul {
+    display: flex;
+    justify-content: space-evenly;
 }
 
-img,
-svg,
-#logo {
-	vertical-align: middle;
-	width: 26px;
-	height: 26px;
+li {
+    list-style-type: none;
+}
+
+img {
+    height: auto;
+    object-fit: cover;
+    border: 1px solid #ccc;
+}
+
+.btn.btn-primary {
+    background-color: #012970;
+    color: white;
+    margin: 5px;
+}
+
+.card {
+    margin-right: 20px;
+}
+
+/*NAVBAR*/
+
+
+.navbar-brand {
+    /* padding: 5px;
+    width: 10px; */
+    color: #012970;
 }
 
 #error404 {
@@ -132,10 +135,10 @@ svg,
 }
 
 
-#login {
-	display: flex;
-}
-
-#roomSelect {
-	height: 300px;
+.nav-icon {
+    width: 50%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    color: #012970;
 }
