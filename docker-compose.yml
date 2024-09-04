@@ -3,7 +3,7 @@ services:
     container_name: backend-django
     build: ./srcs/services/backend_django
     volumes:
-      - backend-elk-certs:/usr/share/elasticsearch/config/certs
+      - backend-elk-certs:/usr/share/elasticsearch/config/certs/
     expose:
       - 9001
     restart: on-failure
@@ -16,8 +16,8 @@ services:
     expose:
       - 9000:80
     volumes:
-      - frontend:/var/www/ft_transcendence
-      - backend-elk-certs:/usr/share/elasticsearch/config/certs
+      - frontend:/var/www/ft_transcendence/
+      - backend-elk-certs:/usr/share/elasticsearch/config/certs/
     depends_on:
       - backend-django
     restart: on-failure
@@ -29,7 +29,7 @@ services:
     env_file: .env
     build: ./srcs/services/proxy_nginx
     volumes:
-      - ea-proxy-nginx:/usr/share/elastic-agent/data
+      - ea-proxy-nginx:/usr/share/elastic-agent/
       - backend-elk-certs:/usr/share/elastic-agent/config/certs
     ports:
       - 8888:80
@@ -44,10 +44,10 @@ services:
     container_name: setup-elastic
     build: ./srcs/services/setup_elastic/
     volumes:
-      - backend-elastic:/usr/share/elasticsearch/data
-      - backend-elk-certs:/usr/share/elasticsearch/config/certs
-      - backend-elk-logs:/usr/share/elasticsearch/logs
-      - backend-kibana:/usr/share/kibana/data
+      - backend-kibana:/usr/share/kibana/data/
+      - backend-elastic:/usr/share/elasticsearch/data/
+      - backend-elk-logs:/usr/share/elasticsearch/logs/
+      - backend-elk-certs:/usr/share/elasticsearch/config/certs/
     user: "0"
     command: /usr/share/elasticsearch/setup.sh "${ELASTIC_PASSWORD}" "${KIBANA_PASSWORD}"
     healthcheck:
@@ -65,9 +65,9 @@ services:
         condition: service_healthy
     build: ./srcs/services/backend_elastic
     volumes:
-      - backend-elk-certs:/usr/share/elasticsearch/config/certs
-      - backend-elk-logs:/usr/share/elasticsearch/logs
-      - backend-elastic:/usr/share/elasticsearch/data
+      - backend-elastic:/usr/share/elasticsearch/data/
+      - backend-elk-logs:/usr/share/elasticsearch/logs/
+      - backend-elk-certs:/usr/share/elasticsearch/config/certs/
     ports:
       - 9200:9200
     healthcheck:
@@ -91,9 +91,9 @@ services:
         condition: service_healthy
     build: ./srcs/services/backend_kibana
     volumes:
-      - backend-elk-certs:/usr/share/kibana/config/certs
-      - backend-elk-logs:/usr/share/kibana/logs
-      - backend-kibana:/usr/share/kibana/data
+      - backend-kibana:/usr/share/kibana/data/
+      - backend-elk-logs:/usr/share/kibana/logs/
+      - backend-elk-certs:/usr/share/kibana/config/certs/
     ports:
       - 5601:5601
     healthcheck:
@@ -113,8 +113,7 @@ services:
     build: ./srcs/services/backend_fleet
     env_file: .env
     volumes:
-      - backend-elk-certs:/usr/share/elastic-agent/config/certs
-      - backend-fleet:/usr/share/elastic-agent/data
+      - backend-elk-certs:/usr/share/elastic-agent/config/certs/
     ports:
       - 8220:8220
     networks:
@@ -127,7 +126,7 @@ services:
         condition: service_healthy
     build: ./srcs/services/backend_logstash
     volumes:
-      - backend-elk-certs:/usr/share/logstash/config/certs
+      - backend-elk-certs:/usr/share/logstash/config/certs/
     ports:
         - 5044:5044
 
