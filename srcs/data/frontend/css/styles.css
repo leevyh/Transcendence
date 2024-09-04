@@ -16,12 +16,18 @@ body {
 #app {
     display: flex;
     justify-content: center;
-    align-items: center;
+   align-items: center;
     flex-direction: column; /* new navbar*/
     height: 100%;
     width: 100%;
     box-sizing: border-box;
     padding: 20px; /* Ajoute un padding autour de tout le contenu */
+}
+
+#language-selector {
+
+    background: white;
+    border-radius: 10px;
 }
 
 .base {
