@@ -2,7 +2,22 @@ body {
     --nav-width: 200px;
     margin: 0 0 0 var(--nav-width);
     font-family: 'Quicksand', sans-serif;
-    font-size: 18px;
+    font-size: 16px; /* Taille de police par défaut */
+}
+
+/* Pour les différentes tailles de police */
+body.small-font {
+    font-size: 12px;
+}
+
+body.large-font {
+    font-size: 20px;
+}
+
+/* Pour le mode sombre */
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
 }
 
 /* Navigation menu */

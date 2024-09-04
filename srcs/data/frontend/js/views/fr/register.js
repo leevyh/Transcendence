@@ -110,6 +110,16 @@ export async function registerView(container) {
         //     return;
         // }
 
+
+        // Si la langue est deja dans l'url, on la recupere
+        let url = window.location.pathname;
+        let language = null;
+        const splitPath = url.split('/');
+        if (splitPath.length > 2) {
+            url = `/${splitPath[2]}`;
+            language = splitPath[1];
+        }
+
         // Envoi des données du formulaire
         fetch('/api/register/', {
             method: 'POST',
@@ -122,7 +132,8 @@ export async function registerView(container) {
                     username: username,
                     password: password,
                     nickname: nickname,
-                    email: email
+                    email: email,
+                    language: language
                 }
             )
         })
@@ -130,26 +141,18 @@ export async function registerView(container) {
                 if (!response.ok) {
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'text-danger';
-                    errorMessage.textContent = 'Erreur lors de l\'inscription, veuillez réessayer';
+                    errorMessage.textContent = '0 Erreur lors de l\'inscription, veuillez réessayer';
                     form.insertBefore(errorMessage, submitButton);
                 }
-                return response.json();
-            })
-            .then(data => {
-                if (data.message === 'User registered successfully') {
+                else {
                     event.preventDefault();
                     navigateTo('/login');
-                } else if (data.errors) {
-                    const errorMessage = document.createElement('p');
-                    errorMessage.className = 'text-danger';
-                    errorMessage.textContent = 'Erreur lors de l\'inscription: ' + JSON.stringify(data.errors);
-                    form.insertBefore(errorMessage, submitButton);
                 }
             })
             .catch(error => {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'Erreur: ' + error.message;
+                errorMessage.textContent = '2 Erreur lors de l\'inscription, veuillez réessayer';
                 form.insertBefore(errorMessage, submitButton);
             });
     });
