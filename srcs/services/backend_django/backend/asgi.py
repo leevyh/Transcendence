@@ -22,14 +22,14 @@ from channels.security.websocket import AllowedHostsOriginValidator
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 
-import chat.routing
+import api.routing
 
 application = ProtocolTypeRouter(
     {
         "http": get_asgi_application(),
         "websocket": AuthMiddlewareStack(
             URLRouter(
-                chat.routing.websocket_urlpatterns
+                api.routing.websocket_urlpatterns
             )
         ),
     }

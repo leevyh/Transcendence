@@ -14,8 +14,12 @@ urlpatterns = [
 	path('stats/', views.get_Stats, name='stats'),
 	path('updateStats/', views.update_Stats, name='updateStats'),
 	path('status_user/', views.get_status_all_users, name='status_user'),
+	path('users/', views.all_users, name='users'),
 	path('logout/', views.logoutView, name='logout'),
 	path('check_auth/', views.check_auth, name='check_auth'),
 	path('auth/', views.auth_42, name='auth'),
 	path('token/', views.token_42, name='token'),
+	# path('request_friend/', views.send_notification, name='friends'),
+	# path('game_invite/', views.send_notification, name='game_invite'),
+	# path('notifications/', views.get_notifications, name='get_notifications'),
 ]
