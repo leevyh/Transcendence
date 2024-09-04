@@ -47,7 +47,7 @@ export function settingsView(container) {
             nickname: data.nickname,
             email: data.email,
             language: data.language,
-            accessibility: data.accessibility,
+            font_size: data.font_size,
             theme: data.dark_mode,
             avatar: data.avatar,
         };
@@ -129,15 +129,6 @@ export function settingsView(container) {
     newEmail.className = 'form-control mb-4';
     newEmail.placeholder = 'Entrez votre email';
 
-////////////////////////////////////////////////////////
-    // // Creation du champ de saisie pour l'avatar
-    // const newAvatar = document.createElement('input');
-    // newAvatar.type = 'file';
-    // newAvatar.id = 'avatar';
-    // newAvatar.name = 'newAvatar';
-    // newAvatar.className = 'form-control mb-4';
-////////////////////////////////////////////////////////
-
     // Bouton de soumission
     const submitButton = document.createElement('button');
     submitButton.type = 'submit';
@@ -148,15 +139,16 @@ export function settingsView(container) {
     form.addEventListener('submit', async (event) => {
         event.preventDefault(); // Empêche la soumission par défaut du formulaire
 
-        // Suppression des messages d'erreur précédents
-        const errorMessages = form.querySelectorAll('.text-danger');
+        // Suppression des messages précédents
+        const errorMessages = avatarForm.querySelectorAll('.text-danger');
         errorMessages.forEach(message => message.remove());
+        const successMessages = AccessibilityForm.querySelectorAll('.text-success');
+        successMessages.forEach(message => message.remove());
 
         // Récupération des données du formulaire
         const data = new FormData(form);
         const nickname = data.get('newNickname');
         const email = data.get('newEmail');
-        // const new_avatar = data.get('avatar');
 
         // Envoi des données au serveur
         const response = await fetch('/api/updateSettings/', {
@@ -166,8 +158,7 @@ export function settingsView(container) {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken'),
             },
-            body: JSON.stringify({ nickname, email, /*new_avatar*/ })
-            // body: data,
+            body: JSON.stringify({ nickname, email })
         });
         if (response.ok) {
             form.innerHTML = '';
@@ -191,7 +182,6 @@ export function settingsView(container) {
     form.appendChild(newNickname);
     form.appendChild(newEmailLabel);
     form.appendChild(newEmail);
-    // form.appendChild(newAvatar);
     form.appendChild(submitButton);
     container.appendChild(settingsDiv);
 // *************** Fin de modification des paramètres ***************
@@ -229,14 +219,15 @@ export function settingsView(container) {
     avatarForm.addEventListener('submit', async (event) => {
         event.preventDefault(); // Empêche la soumission par défaut du formulaire
 
-        // Suppression des messages d'erreur précédents
+        // Suppression des messages précédents
         const errorMessages = avatarForm.querySelectorAll('.text-danger');
         errorMessages.forEach(message => message.remove());
+        const successMessages = AccessibilityForm.querySelectorAll('.text-success');
+        successMessages.forEach(message => message.remove());
 
         // Récupération des données du formulaire
         const data = new FormData(avatarForm);
         const avatar = data.get('newAvatar');
-        console.log(avatar);
         if (!avatar.size || avatar.name === '') {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
@@ -273,7 +264,6 @@ export function settingsView(container) {
         }
     })
 
-
     // Ajout des éléments au DOM
     avatarDiv.appendChild(avatarHeader);
     avatarDiv.appendChild(avatarBody);
@@ -283,7 +273,7 @@ export function settingsView(container) {
     container.appendChild(avatarDiv);
 // *************** Fin de modification de l'avatar ***************
 
-// *************** Modification de l'accessibilite ***************
+// *************** Modification de l'accessibilité ***************
     const accessibilityDiv = document.createElement('div');
     accessibilityDiv.className = 'card mb-4';
 
@@ -311,12 +301,14 @@ export function settingsView(container) {
     fontSize.className = 'form-control-range mb-4';
     fontSize.min = 1;
     fontSize.max = 3;
-    fontSize.value = 1;
+    fontSize.value = userData.font_size;
 
     const exampleElement = document.createElement('p');
     exampleElement.id = 'example-font-size';
     exampleElement.textContent = 'Aa';
-    exampleElement.style.fontSize = '1rem'; // Default value, to be changed by the user's choice later
+    exampleElement.style.fontFamily = "'Quicksand', sans-serif";
+    exampleElement.style.fontSize = `${userData.font_size}rem`;
+    // exampleElement.style.fontSize = '2rem'; // Default value, to be changed by the user's choice later
     fontSize.addEventListener('input', () => {
         exampleElement.style.fontSize = `${fontSize.value}rem`;
     });
@@ -347,6 +339,8 @@ export function settingsView(container) {
     option3.textContent = 'Spanish';
     language.appendChild(option3);
 
+    language.value = userData.language;
+
     // Champ du mode sombre
     const labelDarkMode = document.createElement('label');
     labelDarkMode.className = 'form-label';
@@ -358,6 +352,7 @@ export function settingsView(container) {
     darkMode.id = 'dark-mode';
     darkMode.name = 'dark-mode';
     darkMode.className = 'form-check-input mb-4';
+    darkMode.checked = userData.theme;
 
     // Bouton de validation
     const accessSubmitButton = document.createElement('button');
@@ -369,16 +364,18 @@ export function settingsView(container) {
     AccessibilityForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        // Suppression des messages d'erreur précédents
+        // Suppression des messages précédents
         const errorMessages = AccessibilityForm.querySelectorAll('.text-danger');
         errorMessages.forEach(message => message.remove());
+        // const successMessages = AccessibilityForm.querySelectorAll('.text-success');
+        // successMessages.forEach(message => message.remove());
 
         // Récupération des données du formulaire
         const data = new FormData(AccessibilityForm);
         const font_size = data.get('font-size');
         const language = data.get('language');
         const dark_mode = data.get('dark-mode');
-
+        
         // Envoi des données au serveur
         const response = await fetch('/api/updateAccessibility/', {
             method: 'PUT',
@@ -394,15 +391,11 @@ export function settingsView(container) {
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Erreur lors de la modification des paramètres';
             AccessibilityForm.insertBefore(errorMessage, accessSubmitButton);
-            console.error('Error:', error);
+            // console.error('Error:', error);
         });
-
         if (response.ok) {
-            AccessibilityForm.innerHTML = '';
-            const successMessage = document.createElement('p');
-            successMessage.className = 'text-success';
-            successMessage.textContent = 'Paramètres modifiés avec succès';
-            AccessibilityForm.appendChild(successMessage);
+            event.preventDefault();
+            navigateTo('/settings');
         } 
     })
 
@@ -459,8 +452,6 @@ export function settingsView(container) {
         .then(response => response.json())
         .then(data => {
             localStorage.removeItem('token');
-            console.log(data);
-
             event.preventDefault();
             navigateTo('/login');
         });

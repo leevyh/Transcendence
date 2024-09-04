@@ -87,13 +87,13 @@ export function passwordView(container) {
             return;
         }
         // Si le nouveau mot de passe a la bonne forme
-        // else if (!passwordRegex.test(new_password)) {
-        //     const errorMessage = document.createElement('p');
-        //     errorMessage.className = 'text-danger';
-        //     errorMessage.textContent = 'Le mot de passe doit contenir entre 8 et 12 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre';
-        //     form.insertBefore(errorMessage, submitButton);
-        //     return;
-        // }
+        else if (!passwordRegex.test(new_password)) {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Le mot de passe doit contenir entre 8 et 12 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre';
+            form.insertBefore(errorMessage, submitButton);
+            return;
+        }
 
         const response = await fetch(`/api/updatePassword/`, {
             method: 'PUT',

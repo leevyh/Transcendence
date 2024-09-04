@@ -1,6 +1,5 @@
-import { changeLanguage } from '../utils.js';
-import { getCookie } from '../utils.js';
-import { navigateTo, isAuthenticated } from '../../app.js';
+import { getCookie, changeLanguage, isAuthenticated } from '../utils.js';
+import { navigateTo } from '../../app.js';
 
 export async function homeView(container) {
     container.innerHTML = '';
@@ -40,7 +39,6 @@ export async function homeView(container) {
 
     let choiceLanguage = 'fr';
     document.querySelector("#language-selector").addEventListener("change", function() {
-        console.log('this.value', this.value);
         choiceLanguage = this.value;
         changeLanguage(this.value);
     });
@@ -52,7 +50,6 @@ export async function homeView(container) {
     loginButton.className = 'btn btn-primary';
     loginButton.addEventListener('click', (event) => {
         event.preventDefault();
-        console.log('nouvelle url:', '/' + choiceLanguage + '/login');
         navigateTo('/' + choiceLanguage + '/login');
     });
 
@@ -82,8 +79,6 @@ export async function homeView(container) {
         .then(response => response.json())
         .then(data => {
             localStorage.removeItem('token');
-            console.log(data);
-
             event.preventDefault();
             navigateTo('/' + choiceLanguage + '/login');
         });

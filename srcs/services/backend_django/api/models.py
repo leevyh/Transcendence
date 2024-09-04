@@ -23,8 +23,7 @@ class Accessibility(models.Model):
         SPANISH = "sp"
     user = models.OneToOneField(User_site, on_delete=models.CASCADE, primary_key=True)
     language = models.CharField(max_length=255, default=Language.FRENCH, choices=Language.choices)
-    # font_size = models.IntegerField(default=1, choices=[(1, 'Small'), (2, 'Medium'), (3, 'Large')])
-    font_size = models.IntegerField(default=1)
+    font_size = models.IntegerField(default=2, choices=[(1, 'Small'), (2, 'Medium'), (3, 'Large')])
     dark_mode = models.BooleanField(default=False)
 
 

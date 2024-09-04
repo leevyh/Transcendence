@@ -95,10 +95,6 @@ export function loginView(container) {
         .then(data => {
             if (data.message === 'User logged in successfully') {
                 localStorage.setItem('token', data.token);
-                // const loggindiv = document.getElementById('loginLink')
-                // loggindiv.setAttribute("hidden", true);
-                // const settingsdiv = document.getElementById('settingsLink')
-                // settingsdiv.removeAttribute("hidden");
                 event.preventDefault();
                 navigateTo('/');
             } else if (data.error) {
@@ -143,11 +139,11 @@ export function loginView(container) {
             .then(response => response.json())
             .then(data => {
                 if (data) {
-                    console.log(data);
+                    // console.log(data);
                     navigateTo('/');
                 }
                 else {
-                    console.log('No data');
+                    // console.log('No data');
                 }
             })
             .catch(error => {
@@ -184,9 +180,9 @@ export function loginView(container) {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            // console.log(data);
             if (data.url) {
-                console.log(data.url);
+                // console.log(data.url);
                 window.location.href = data.url;
             } else if (data.error) {
                 const errorMessage = document.createElement('p');
