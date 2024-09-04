@@ -5,10 +5,8 @@ umask 0007;
 
 set -eo pipefail;
 
-# For information on the possible environment variables that can be passed into the container. Run the following
-# command for information on the options that are available.
-
-# `./elastic-agent container --help`
+# For information on the possible environment variables that can be passed into the container. Run the following command for information on the options that are available.
+# ./elastic-agent container --help
 
 nginx &
 
