@@ -1,4 +1,4 @@
-import { navigateTo } from '../../app.js';
+import { navigateTo } from '../app.js';
 
 export function notFoundView(container) {
     container.innerHTML = '';

@@ -141,7 +141,7 @@ export async function registerView(container) {
                 if (!response.ok) {
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'text-danger';
-                    errorMessage.textContent = '0 Erreur lors de l\'inscription, veuillez réessayer';
+                    errorMessage.textContent = 'Erreur lors de l\'inscription, veuillez réessayer';
                     form.insertBefore(errorMessage, submitButton);
                 }
                 else {
@@ -152,7 +152,7 @@ export async function registerView(container) {
             .catch(error => {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = '2 Erreur lors de l\'inscription, veuillez réessayer';
+                errorMessage.textContent = 'Erreur lors de l\'inscription, veuillez réessayer';
                 form.insertBefore(errorMessage, submitButton);
             });
     });

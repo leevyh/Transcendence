@@ -1,4 +1,4 @@
-import { getCookie } from './utils.js';
+import { getCookie } from '../utils.js';
 
 export function chatView() {
 const app = document.getElementById('app');

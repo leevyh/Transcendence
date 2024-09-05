@@ -1,19 +1,19 @@
 import { isAuthenticated, getAccessibility, applyAccessibilitySettings } from './views/utils.js';
 
+import { notFoundView } from './views/404.js';
+
 // FR
-import { notFoundView } from './views/fr/404.js';
-import { homeView } from './views/fr/home.js';
+import { homeView } from './views/home.js';
 import { registerView } from './views/fr/register.js';
 import { loginView } from './views/fr/login.js';
 import { settingsView } from './views/fr/settings.js';
 import { passwordView } from './views/fr/password.js';
-import { chatView } from './views/chat.js';
+import { chatView } from './views/fr/chat.js';
 
 const appDiv = document.getElementById('app');
 
 const routes = {
     'fr': {
-        '/404': notFoundView,
         '/': homeView,
         '/register': registerView,
         '/login': loginView,
@@ -23,19 +23,19 @@ const routes = {
         '/chat': chatView,
     },
     'en': {
-        '/404': notFoundView,
         '/': homeView,
         '/login': loginView,
         '/register': registerView,
         '/settings': settingsView,
     },
     'sp': {
-        '/404': notFoundView,
         '/': homeView,
         '/login': loginView,
         '/register': registerView,
         '/settings': settingsView,
-    }
+    },
+    '/': homeView, // A modifier plus tard
+    '/404': notFoundView,
 };
 
 
@@ -90,15 +90,6 @@ export async function navigateTo(url) {
         history.pushState(null, '', `/${currentLanguage}${url}`);
     }
 }
-
-document.querySelectorAll('nav a').forEach(link => {
-    link.addEventListener('click', (event) => {
-        event.preventDefault();
-        const path = `/${event.target.getAttribute('data-link')}`;
-        history.pushState(null, '', path);
-        navigateTo(path);
-    });
-});
 
 window.addEventListener('popstate', () => {
     navigateTo(location.pathname);

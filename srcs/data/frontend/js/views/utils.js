@@ -17,30 +17,33 @@ export function getCookie(name) {
 const translations = {
 	en: {
 		// Home page
-		home: "Home page",
-		welcome: "Welcome to the home page!",
-		login: "Log in",
+		home: 'Welcome',
+		homeText: 'This is our transcendence homepage. This project involves creating a website for the mighty Pong competition! We hope you enjoy your visit to our site.',
+		login: "Login",
 		register: "Register",
 		logout: "Log out",
 		settings: "Settings",
+        language_selector: "Language: ",
 	},
 	fr: {
 		// Home page
-		home: "Page d'accueil",
-		welcome: "Bienvenue sur la page d'accueil!",
+		home: 'Bienvenue',
+		homeText: 'Voici notre page d\'accueil transcendance. Ce projet consiste en la création d\'un site web pour le concours « Pong » ! Nous espérons que vous apprécierez votre visite sur notre site',
 		login: "Se connecter",
 		register: "S'inscrire",
 		logout: "Se déconnecter",
 		settings: "Paramètres",
+        language_selector: "Langue: ",
 	},
 	sp: {
 		// Home page
-		home: "Página de inicio",
-		welcome: "¡Bienvenido a la página de inicio!",
+		home: '¡Bienvenido!',
+		homeText: 'Esta es nuestra página web de trascendencia. Este proyecto consiste en crear un sitio web para la poderosa competición Pong. Esperamos que disfrute de su visita a nuestro sitio.',
 		login: "Iniciar sesión",
 		register: "Registrarse",
 		logout: "Cerrar sesión",
 		settings: "Ajustes",
+        language_selector: "Idioma: ",
 	},
 };
 
