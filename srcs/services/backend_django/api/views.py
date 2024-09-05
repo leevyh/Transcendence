@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.hashers import make_password, check_password
 
 from .forms import UserRegistrationForm, AccessibilityUpdateForm
-from .models import User_site, Accessibility, Stats_user
+from .models import User_site, Accessibility, Stats_user, FriendRequest
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from typing import Optional
@@ -100,6 +100,37 @@ def get_profile(request, nickname):
                 return JsonResponse({'error': 'Stats not found'}, status=404)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def get_friend_request(request, nickname):
+    if request.method == 'GET':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            try:
+                user = User_site.objects.get(username=payload['username'])
+            except User_site.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+            try:
+                friend = User_site.objects.get(nickname=nickname)
+            except User_site.DoesNotExist:
+                return JsonResponse({'error': 'User to request not found'}, status=404)
+            friend_request = FriendRequest.objects.filter(user=user, friend=friend).exclude(status='refused').first()
+            if friend_request:
+                print("FIND FRIEND REQUEST")
+                data = {'user': friend_request.user.nickname,
+                        'friend': friend_request.friend.nickname,
+                        'status': friend_request.status,
+                        'created_at': friend_request.created_at}
+                return JsonResponse(data, status=200)
+            else:
+                return JsonResponse(None, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 

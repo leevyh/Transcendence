@@ -98,6 +98,11 @@ export async function friendsView(container) {
     }
 
     function sendFriendRequest(nickname) {
+
+        //Check if the user already sent a friend request to the user
+        const friendRequestStatus = checkFriendAsBeenRequested(nickname);
+        console.log(friendRequestStatus);
+
         const friendRequestSocket = new WebSocket('ws://localhost:8888/ws/friend_request/');
         friendRequestSocket.onopen = function(event) {
             console.log('Friend request socket opened');
@@ -112,4 +117,20 @@ export async function friendsView(container) {
             console.error('Friend request socket closed correctly', event);
         };
     }
+
+    async function checkFriendAsBeenRequested(nickname) {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/get_friend_request/' +, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        });
+        const data = await response.json();
+        console.log(data);
+        const friendRequestStatus = data.includes(nickname);
+        return friendRequestStatus;
+            }
 }
