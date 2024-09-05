@@ -73,6 +73,9 @@ friendRequestSocket.onmessage = function(event) {
         console.log('Enter in displayFriendRequestNotification');
 		displayFriendRequestNotification(data.nickname);
 	}
+    else if (data.type === 'error') {
+        alert(data.message);
+    }
 };
 
 friendRequestSocket.onclose = function() {

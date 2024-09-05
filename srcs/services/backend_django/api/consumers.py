@@ -58,11 +58,21 @@ class FriendRequestConsumer(AsyncWebsocketConsumer):
 
     async def handle_friend_request(self, data):
         from .models import User_site, Friend_Request
-
         print(f'Handling friend request from {self.room_name}')
         nickname = data['nickname']
         user = self.scope['user']
         friend = await database_sync_to_async(User_site.objects.get)(nickname=nickname)
+
+        existing_request = await database_sync_to_async(Friend_Request.objects.filter)(
+            user=user, friend=friend, status=['pending', 'accepted']).exists()
+
+        if existing_request:
+            await self.send(text_data=json.dumps({
+                'type': 'error',
+                'message': 'Friend request already sent or accepted'
+            }))
+            return
+
         await database_sync_to_async(Friend_Request.objects.create)(
             user=user, friend=friend
         )

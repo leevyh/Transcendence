@@ -54,10 +54,20 @@ class Stats_user(models.Model):
     win_rate = models.FloatField(default=0.0)
 
 class Friend_Request(models.Model):
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+
+    STATUS = {
+        (PENDING, "Pending"),
+        (ACCEPTED, "Accepted"),
+        (REJECTED, "Rejected"),
+    }
+
     user = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name="user")
     friend = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name="friend")
+    status = models.CharField(max_length=255, default=PENDING, choices=STATUS)
     created_at = models.DateTimeField(default=timezone.now)
-    accepted = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         super(Friend_Request, self).save(*args, **kwargs)
