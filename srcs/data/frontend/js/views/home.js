@@ -10,7 +10,7 @@ export function homeView(container) {
     container.appendChild(base);
 
     const h5 = document.createElement('h5');
-    h5.className = 'title';
+    h5.className = 'titleWelcome';
     h5.setAttribute('data-i18n', 'welcome');
     h5.textContent = 'Welcome';
     base.appendChild(h5);
@@ -20,26 +20,26 @@ export function homeView(container) {
     base.appendChild(divContener);
 
     const divCardBody = document.createElement('div');
-    divCardBody.className = 'card-body';
+    divCardBody.className = 'card-body twodivWelcome welcome';
     divContener.appendChild(divCardBody);
 
     const p = document.createElement('p');
-    // p.className = 'card-text';
+    p.className = 'paragraphWelcome';
     p.setAttribute('data-i18n', 'homeText');
     p.textContent = 'This is our transcendence homepage. This project involves creating a website for the mighty Pong competition! We hope you enjoy your visit to our site.';
     divCardBody.appendChild(p);
 
     // Creation d'une liste de boutons
     const ul = document.createElement('ul');
-    //ul.className = 'list-group list-group-horizontal';
+    ul.className = 'listButton';
     divCardBody.appendChild(ul);
 
     const liLogin = document.createElement('li');
-    // liLogin.className = 'list-group-item';
+    liLogin.className = 'listElemWelcome';
     ul.appendChild(liLogin);
 
     const buttonLogin = document.createElement('button');
-    buttonLogin.className = 'btn btn-primary';
+    buttonLogin.className = 'btn btn-primary Buttonselem';
     buttonLogin.setAttribute('data-i18n', 'login');
     buttonLogin.textContent = 'Login'; // Ou 'Sign in'
     buttonLogin.addEventListener('click', (event) => {
@@ -49,11 +49,11 @@ export function homeView(container) {
     liLogin.appendChild(buttonLogin);
 
     const liRegister = document.createElement('li');
-    // liRegister.className = 'list-group-item';
+    liRegister.className = 'listElemWelcome';
     ul.appendChild(liRegister);
 
     const buttonRegister = document.createElement('button');
-    buttonRegister.className = 'btn btn-primary';
+    buttonRegister.className = 'btn btn-primary Buttonselem';
     buttonRegister.setAttribute('data-i18n', 'register');
     buttonRegister.textContent = 'Register'; // Ou 'Sign up'
     buttonRegister.addEventListener('click', (event) => {
@@ -67,7 +67,7 @@ export function homeView(container) {
     img.setAttribute('src', '/assets/pong.png');
     img.setAttribute('alt', 'Pong');
 
-    img.className = 'object-fit-fill border rounded';
+    img.className = 'object-fit-fill border rounded twodivWelcome imgPong';
     divContener.appendChild(img);
 
     // SELECTEUR DE LANGUE
