@@ -1,0 +1,62 @@
+.containerRegister {
+	padding: 0;
+}
+
+.rowRegister {
+	width: 100%;
+}
+
+.DivMainRegister {
+	width: 100%;
+}
+
+.cardRegister {
+	border: solid, 2px ,#012970 ;
+	border-radius: 20px;
+}
+
+.titleRegister {
+	color: #012970;
+	font-weight: 400;
+    font-size: 100px;
+	border-color: #012970;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.titleLabelRegister {
+	color: #012970;
+	font-weight: 400;
+}
+
+.homesvg {
+	margin-left: 10px;
+}
+
+.FooterRegister {
+	border-color: #012970;
+	color: #012970;
+}
+
+#loginLink {
+	color : #2759af;
+}
+
+#loginLink:hover {
+	color: #012970;
+}
+
+.FormChamp {
+	border-color: #012970;
+}
+
+/* .FormChamp::placeholder {
+	color : #2759af;
+} */
+
+
+
+/* .svgHome:hover {
+	color : #2759af;
+} */

@@ -188,7 +188,7 @@ export async function homeView(container) {
         container.appendChild(loginButton);
         container.appendChild(registerButton);
     }
-    
+
     function sendFriendRequest(nickname) {
         const friendRequestSocket = new WebSocket('ws://localhost:8888/ws/friend_request/');
         friendRequestSocket.onopen = function(event) {
