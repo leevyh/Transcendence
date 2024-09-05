@@ -4,36 +4,66 @@ import { navigateTo } from '../../app.js';
 export async function registerView(container) {
     container.innerHTML = '';
 
+    // Creation d'une barre de navigation
+    const nav = document.createElement('nav');
+    nav.className = 'navbar fixed-top bg-body-tertiary';
+    container.appendChild(nav);
+
+    // Reecrire le code ci-dessus en utilisant du JS
+    const containerFluid = document.createElement('div');
+    containerFluid.className = 'container-fluid';
+    nav.appendChild(containerFluid);
+
+    const aHome = document.createElement('a');
+    aHome.className = 'navbar-brand homesvg';
+    containerFluid.appendChild(aHome);
+
+    const svgHome = document.createElement('svg');
+    svgHome.className = 'svgHome';
+    svgHome.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svgHome.setAttribute('width', '30');
+    svgHome.setAttribute('height', '24');
+    svgHome.setAttribute('fill', 'currentColor');
+    svgHome.setAttribute('class', 'bi bi-house-door-fill');
+    svgHome.setAttribute('viewBox', '0 0 16 16');
+
+    aHome.appendChild(svgHome);
+    svgHome.addEventListener('click', () => {
+        navigateTo('/home');
+    });
+
+    ////////////////////////////////////////////////////
+
     const h1 = document.createElement('h1');
     h1.textContent = 'Inscription';
 
     // Créer le conteneur principal
-    container.className = 'container';
-  
+    container.className = 'containerRegister';
+
     // Créer la ligne pour centrer le formulaire
     const row = document.createElement('div');
-    row.className = 'row justify-content-center';
-  
+    row.className = 'row justify-content-center rowRegister';
+
     // Créer la colonne qui contiendra la carte
     const col = document.createElement('div');
-    col.className = 'col-md-6';
-  
+    col.className = 'col-md-6 DivMainRegister';
+
     // Créer la carte
     const card = document.createElement('div');
-    card.className = 'card mt-5';
-  
+    card.className = 'card mt-5 cardRegister';
+
     // Créer l'en-tête de la carte
     const cardHeader = document.createElement('div');
-    cardHeader.className = 'card-header text-center';
+    cardHeader.className = 'card-header text-center titleRegister';
     cardHeader.innerHTML = '<h2>Inscription</h2>';
-  
+
     // Créer le corps de la carte
     const cardBody = document.createElement('div');
-    cardBody.className = 'card-body';
-  
+    cardBody.className = 'card-body cardbodyRegister';
+
     // Créer le formulaire
     const form = document.createElement('form');
-  
+
     // Champs du formulaire
     const fields = [
         { label: 'Nom d\'utilisateur' , type: 'text', id: 'username', placeholder: 'Entrez votre nom d\'utilisateur' },
@@ -42,34 +72,34 @@ export async function registerView(container) {
         { label: 'Mot de passe', type: 'password', id: 'password', placeholder: 'Entrez un mot de passe' },
         { label: 'Confirmer le mot de passe', type: 'password', id: 'confirmpassword', placeholder: 'Confirmez votre mot de passe' },
     ];
-  
+
     fields.forEach(field => {
       const formGroup = document.createElement('div');
       formGroup.className = 'mb-3';
-  
+
       const label = document.createElement('label');
-      label.className = 'form-label';
+      label.className = 'form-label titleLabelRegister';
       label.htmlFor = field.id;
       label.textContent = field.label;
-  
+
       const input = document.createElement('input');
       input.type = field.type;
-      input.className = 'form-control';
+      input.className = 'form-control FormChamp';
       input.id = field.id;
       input.placeholder = field.placeholder;
-  
+
       formGroup.appendChild(label);
       formGroup.appendChild(input);
       form.appendChild(formGroup);
     });
-  
+
     // Bouton de soumission
     const submitButton = document.createElement('button');
     submitButton.setAttribute('type', 'submit');
-    submitButton.className = 'btn btn-primary w-100';
+    submitButton.className = 'btn btn-primary w-100 Buttonselem';
     submitButton.textContent = "S'inscrire";
     form.appendChild(submitButton);
-  
+
     form.addEventListener('submit', (event) => {
         event.preventDefault();
 
@@ -158,10 +188,10 @@ export async function registerView(container) {
     });
 
     cardBody.appendChild(form);
-  
+
     // Créer le pied de page de la carte
     const cardFooter = document.createElement('div');
-    cardFooter.className = 'card-footer text-center';
+    cardFooter.className = 'card-footer text-center FooterRegister';
     cardFooter.innerHTML = '<small>Déjà un compte ? <a href="#" id="loginLink">Connectez-vous</a></small>';
 
     // Ajouter un gestionnaire d'événements au lien

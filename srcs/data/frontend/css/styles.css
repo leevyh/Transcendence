@@ -30,7 +30,7 @@ body.dark-mode {
 #app {
     display: flex;
     justify-content: center;
-   align-items: center;
+    align-items: center;
     flex-direction: column; /* new navbar*/
     height: 100%;
     width: 100%;
@@ -65,7 +65,7 @@ body.dark-mode {
     box-sizing: border-box;
 }
 
-.card-body, img {
+.twodivWelcome {
     flex: 1;
     width: 100%; /* Assure que chaque div occupe toute la largeur disponible */
     max-width: 48%; /* Limite la taille de chaque div à 48% pour laisser de l'espace autour */
@@ -73,7 +73,7 @@ body.dark-mode {
     margin: 10px; /* Ajoute un espacement entre les divs */
 }
 
-.card-body {
+.welcome{
     padding: 20px;
     background-color: white;
     display: flex;
@@ -81,47 +81,54 @@ body.dark-mode {
     flex-direction: column;
 }
 
-.title {
+.titleWelcome {
     color: #012970;
     font-weight: 600;
     font-size: 100px;
 }
 
-p {
+.paragraphWelcome {
     display: flex;
     justify-content: center;
     color: #a19e9e91;
+
     font-weight: 200;
     font-size: 20px;
 }
 
-ul {
+.listButton {
     display: flex;
     justify-content: space-evenly;
+    padding: 0;
 }
 
-li {
+.listElemWelcome {
     list-style-type: none;
 }
 
-img {
+.imgPong {
     height: auto;
     object-fit: cover;
     border: 1px solid #ccc;
 }
 
-.btn.btn-primary {
+.Buttonselem {
     background-color: #012970;
     color: white;
     margin: 5px;
 }
 
-.card {
-    margin-right: 20px;
+.Buttonselem {
+    background-color: #012970;
+    color: white;
+    margin: 5px;
+}
+
+.Buttonselem:hover {
+    background-color: #2759af;
 }
 
 /*NAVBAR*/
-
 
 .navbar-brand {
     /* padding: 5px;
@@ -129,16 +136,21 @@ img {
     color: #012970;
 }
 
-#error404 {
-	width: 50%;
-	height: 50%;
-}
-
-
 .nav-icon {
     width: 50%;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
     color: #012970;
+}
+
+/* .nav-icon:hover {
+    color: #2759af;
+} */
+
+/*Livia */
+
+#error404 {
+	width: 50%;
+	height: 50%;
 }
