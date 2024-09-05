@@ -1,6 +1,7 @@
 import { isAuthenticated, getAccessibility, applyAccessibilitySettings } from './views/utils.js';
 
 import { notFoundView } from './views/404.js';
+import { friendsView } from './views/friends.js';
 
 // FR
 import { homeView } from './views/home.js';
@@ -27,6 +28,7 @@ const routes = {
         '/login': loginView,
         '/register': registerView,
         '/settings': settingsView,
+        '/friends' : friendsView,
     },
     'sp': {
         '/': homeView,

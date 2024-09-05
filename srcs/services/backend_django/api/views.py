@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth.hashers import make_password, check_password
+
 from .forms import UserRegistrationForm, AccessibilityUpdateForm
 from .models import User_site, Accessibility, Stats_user
 from django.contrib.auth import authenticate, login, logout
@@ -158,6 +159,35 @@ def get_status_all_users(request):
         return JsonResponse(data, status=200, safe=False)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@login_required(login_url='/api/login')
+def all_users(request):
+    if request.method == 'GET':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            if username:
+                users = User_site.objects.all()
+                data = []
+                i = 0
+                for user in users:
+                    print(i)
+                    i += 1
+                    #get the avatar of the user and encode it in base64 to send it in the response + nickname
+                    avatar_image = user.avatar
+                    avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
+                    data.append({'nickname': user.nickname,
+                                    'avatar': avatar,
+                                    'status': user.status})
+                return JsonResponse(data, status=200, safe=False)
+            else:
+                return JsonResponse({'error': 'Invalid token'}, status=401)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
 
 @login_required(login_url='/api/login')
 def updateSettings(request):

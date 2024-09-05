@@ -60,6 +60,93 @@ export function changeLanguage(lang) {
 	});
 }
 
+const friendRequestSocket = new WebSocket('ws://localhost:8888/ws/friend_request/');
+
+friendRequestSocket.onopen = function() {
+	console.log('Friend request socket opened');
+}
+
+friendRequestSocket.onmessage = function(event) {
+	const data = JSON.parse(event.data);
+	console.log('Friend request socket message:', data);
+	if (data.type === 'friend_request') {
+        console.log('Enter in displayFriendRequestNotification');
+		displayFriendRequestNotification(data.nickname);
+	}
+    else if (data.type === 'error') {
+        alert(data.message);
+    }
+};
+
+friendRequestSocket.onclose = function() {
+	console.log('Friend request socket closed');
+}
+
+function displayFriendRequestNotification(nickname) {
+    const friendRequestNotificationModal = document.createElement('div');
+    friendRequestNotificationModal.className = 'modal';
+
+
+    const modalDialog = document.createElement('div');
+    modalDialog.className = 'modal-dialog';
+    friendRequestNotificationModal.appendChild(modalDialog);
+
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+    friendRequestNotificationModal.appendChild(modalContent);
+
+    const modalHeader = document.createElement('div');
+    modalHeader.className = 'modal-header';
+    modalContent.appendChild(modalHeader);
+
+    const modalTitle = document.createElement('h5');
+    modalTitle.className = 'modal-title';
+    modalTitle.textContent = 'Friend request';
+    modalHeader.appendChild(modalTitle);
+
+    const modalBody = document.createElement('div');
+    modalBody.className = 'modal-body';
+    modalBody.textContent = `${nickname} sent you a friend request`;
+    modalContent.appendChild(modalBody);
+
+    const modalFooter = document.createElement('div');
+    modalFooter.className = 'modal-footer';
+    modalContent.appendChild(modalFooter);
+
+
+    const acceptButton = document.createElement('button');
+    acceptButton.className = 'btn btn-success';
+    acceptButton.textContent = 'Accept';
+    acceptButton.style = 'display: block; margin: 0 auto; width: 50%;';
+    modalFooter.appendChild(acceptButton);
+
+    const rejectButton = document.createElement('button');
+    rejectButton.className = 'btn btn-danger';
+    rejectButton.textContent = 'Reject';
+    rejectButton.style = 'display: block; margin: 0 auto; width: 50%;';
+    modalFooter.appendChild(rejectButton);
+
+    //Add button close to the modal
+    const closeButton = document.createElement('button');
+    closeButton.className = 'btn btn-secondary';
+    closeButton.textContent = 'Close';
+    closeButton.style = 'display: block; margin: 0 auto; width: 50%;';
+    closeButton.addEventListener('click', () => {
+        friendRequestNotificationModal.remove();
+    });
+    
+    modalFooter.appendChild(closeButton);
+    // Close the modal when the user clicks on the close button and remove the modal from the DOM
+    document.body.appendChild(friendRequestNotificationModal);
+    friendRequestNotificationModal.style.display = 'block';
+
+    //
+
+
+
+}
+
+
 // Récupérer le token CSRF depuis les cookies et vérifier si l'utilisateur est authentifié
 export async function isAuthenticated() {
     try {
