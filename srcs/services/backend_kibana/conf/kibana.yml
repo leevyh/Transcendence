@@ -62,6 +62,27 @@ xpack:
               - name: Logstash Integration
                 package:
                   name: logstash
+        - name: Agent System Policy
+          id: agent-system-policy
+          namespace: default
+          package_policies:
+              - name: System Integration
+                package:
+                  name: system
+        - name: Agent Nginx Policy
+          id: agent-nginx-policy
+          namespace: default
+          package_policies:
+            - name: Nginx Integration
+              package:
+                name: nginx
+        - name: Agent Logstash Policy
+          id: agent-logstash-policy
+          namespace: default
+          package_policies:
+            - name: Logstash Integration
+              package:
+                name: logstash
     fleetServerHosts:
       - id: fleet-server
         name: Fleet Server
