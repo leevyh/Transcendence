@@ -17,7 +17,8 @@ services:
       - 9000:80
     volumes:
       - frontend:/var/www/ft_transcendence/
-      - backend-elk-certs:/usr/share/elasticsearch/config/certs/
+      - ea-frontend-nginx:/usr/share/elastic-agent/
+      - backend-elk-certs:/usr/share/elastic-agent/config/certs/
     depends_on:
       - backend-django
     restart: on-failure
@@ -76,10 +77,10 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
+#    ulimits:
+#      memlock:
+#        soft: -1
+#        hard: -1
     mem_limit: 1g
     networks:
         - default
@@ -173,6 +174,12 @@ volumes:
           type: none
           device: ./srcs/data/ea/proxy-nginx
           o: bind
+  ea-frontend-nginx:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/ea/frontend-nginx
+      o: bind
 
 networks:
     default:

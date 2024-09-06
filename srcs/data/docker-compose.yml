@@ -8,7 +8,7 @@ services:
     user: "0"
     volumes:
       - elk:/data
-    command: "rm -rf /data/certs/ /data/elastic/ /data/kibana/ /data/logs/ /data/ea/proxy-nginx/ && mkdir /data/certs/ /data/elastic/ /data/kibana/ /data/logs/ /data/ea/proxy-nginx/"
+    command: "rm -rf /data/certs/ /data/elastic/ /data/kibana/ /data/logs/ /data/ea/proxy-nginx/ /data/ea/frontend-nginx/ && mkdir /data/certs/ /data/elastic/ /data/kibana/ /data/logs/ /data/ea/proxy-nginx/ /data/ea/frontend-nginx/"
 
 volumes:
   elk:

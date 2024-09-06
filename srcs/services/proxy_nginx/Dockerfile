@@ -28,6 +28,7 @@ RUN openssl req -x509 -nodes \
 
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 COPY ./conf/elastic-agent.sh /elastic-agent.sh
+
 RUN chmod +x /elastic-agent.sh
 
-CMD ["/elastic-agent.sh"]
+ENTRYPOINT ["/elastic-agent.sh"]
