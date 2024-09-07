@@ -1,0 +1,19 @@
+# DEV ONLY /!\ DO NOT USE IN PRODUCTION /!\ DEV ONLY #
+#  You will lose all elk related data so be careful  #
+
+services:
+  uninstall-elk:
+    container_name: uninstall-elk
+    image: debian
+    user: "0"
+    volumes:
+      - elk:/data
+    command: "rm -rf /data/certs/ /data/elastic/ /data/kibana/ /data/logs/ /data/ea/proxy-nginx/ /data/ea/frontend-nginx/ && mkdir /data/certs/ /data/elastic/ /data/kibana/ /data/logs/ /data/ea/proxy-nginx/ /data/ea/frontend-nginx/"
+
+volumes:
+  elk:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./../data
+      o: bind

@@ -1,0 +1,6 @@
+FROM elasticsearch:8.14.1
+
+ENV ELASTIC_PASSWORD=changeme
+ENV ES_JAVA_OPTS="-Xms512m -Xmx512m"
+
+COPY ./conf/elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml

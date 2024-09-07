@@ -1,0 +1,31 @@
+# Server configuration
+cluster.name: "backend-elk"
+network.host: "backend-elastic"
+discovery.type: single-node
+
+# Elasticsearch configuration
+xpack:
+  security:
+    enabled: true
+
+    transport.ssl:
+      enabled: true
+      verification_mode: certificate
+      certificate: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt"
+      key: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.key"
+      certificate_authorities: "/usr/share/elasticsearch/config/certs/ca/ca.crt"
+
+    http.ssl:
+      enabled: true
+      verification_mode: certificate
+      certificate: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt"
+      key: "/usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.key"
+      certificate_authorities: ["/usr/share/elasticsearch/config/certs/ca/ca.crt"]
+
+  license.self_generated:
+    type: basic
+
+  monitoring.collection.enabled: true
+
+# Memory configuration
+bootstrap.memory_lock: true

@@ -1,0 +1,14 @@
+outputs:
+  default:
+    type: elasticsearch
+    hosts: [https://backend-elastic:9200]
+    username: "elastic"
+    password: "changeme"
+    preset: balanced
+
+fleet:
+  agent:
+    id: fleet-server-agent
+  hosts:
+    id: fleet-server-host
+    name: Fleet Server
