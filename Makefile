@@ -10,6 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
+
 NAME	= ft_transcendence
 COMPOSE	= ./docker-compose.yml
 
@@ -19,19 +20,18 @@ all:
 debug:
 	docker compose -f ${COMPOSE} up --build
 
-clean:
+down:
 	docker compose -f ${COMPOSE} down --rmi all
-
-folder:
-	@mkdir -p ./srcs/data/certs
-	@mkdir -p ./srcs/data/elastic
-	@mkdir -p ./srcs/data/kibana
-	@mkdir -p ./srcs/data/logs
 
 prune:
 	docker system prune -af
 
-re: clean all
+status:
+	docker compose ps
+
+re: down
+	$(MAKE) all
+
 
 .PHONY: all debug clean folder prune re
 .SILENT: all debug clean folder prune re

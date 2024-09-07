@@ -5,7 +5,13 @@ services:
     volumes:
       - backend-elk-certs:/usr/share/elasticsearch/config/certs/
     expose:
-      - 9001
+      -  8000
+#     - 9001
+    env_file:
+        - ./env/postgresql.env
+        - ./env/42app.env
+#    volumes:
+#      - ./srcs/data/backend:/home/app
     restart: on-failure
     networks:
         - default
@@ -130,6 +136,15 @@ services:
       - backend-elk-certs:/usr/share/logstash/config/certs/
     ports:
         - 5044:5044
+
+  postgresql:
+    container_name: postgresql
+    build: ./srcs/services/postgresql
+    ports:
+      - 5432:5432
+    env_file:
+      - ./env/postgresql.env
+    restart: on-failure
 
 volumes:
   frontend:
