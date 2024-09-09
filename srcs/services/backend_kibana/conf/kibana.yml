@@ -73,6 +73,9 @@ xpack:
           id: agent-nginx-policy
           namespace: default
           package_policies:
+            - name: System Integration
+              package:
+                name: system
             - name: Nginx Integration
               package:
                 name: nginx
@@ -80,6 +83,9 @@ xpack:
           id: agent-logstash-policy
           namespace: default
           package_policies:
+            - name: System Integration
+              package:
+                name: system
             - name: Logstash Integration
               package:
                 name: logstash
