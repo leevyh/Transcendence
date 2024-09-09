@@ -10,7 +10,6 @@
 #                                                                              #
 # **************************************************************************** #
 
-
 NAME	= ft_transcendence
 COMPOSE	= ./docker-compose.yml
 
@@ -23,15 +22,17 @@ debug:
 down:
 	docker compose -f ${COMPOSE} down --rmi all
 
-prune:
-	docker system prune -af
+logs:
+	docker compose logs -f
 
 status:
 	docker compose ps
 
+prune:
+	docker system prune -af
+
 re: down
 	$(MAKE) all
-
 
 .PHONY: all debug clean folder prune re
 .SILENT: all debug clean folder prune re
