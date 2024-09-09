@@ -5,8 +5,7 @@ services:
     volumes:
       - backend-elk-certs:/usr/share/elasticsearch/config/certs/
     expose:
-      -  8000
-#     - 9001
+      - 9004
     env_file:
         - ./env/postgresql.env
         - ./env/42app.env
@@ -20,7 +19,8 @@ services:
     container_name: frontend-nginx
     build: ./srcs/services/frontend_nginx
     expose:
-      - 9000:80
+      - 9002
+      - 9003
     volumes:
       - frontend:/var/www/ft_transcendence/
       - ea-frontend-nginx:/usr/share/elastic-agent/
@@ -39,7 +39,8 @@ services:
       - ea-proxy-nginx:/usr/share/elastic-agent/
       - backend-elk-certs:/usr/share/elastic-agent/config/certs
     ports:
-      - 8888:80
+      - 9000:9000
+      - 9001:9001
     depends_on:
       backend-fleet:
         condition: service_started
