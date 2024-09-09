@@ -20,6 +20,4 @@ RUN chmod +x /home/app/init.sh
 
 COPY . .
 
-#CMD ["sh", "-c", "/home/app/init.sh && gunicorn backend.wsgi:application --bind 0.0.0.0:8000"]
-
 CMD ["sh", "-c", "/home/app/init.sh && daphne -b 0.0.0.0 -p 8000 backend.asgi:application"]
