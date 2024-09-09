@@ -53,24 +53,32 @@ class Stats_user(models.Model):
     nb_point_given = models.IntegerField(default=0)
     win_rate = models.FloatField(default=0.0)
 
-class Friend_Request(models.Model):
-    PENDING = "pending"
-    ACCEPTED = "accepted"
-    REJECTED = "rejected"
+class Notifications(models.Model):
+    TYPE = (
+        ('friend_request', 'friend_request'),
+        ('game_invite', 'game_invite'),
+        ('tournament_invite', 'tournament_invite'),
+    )
 
-    STATUS = {
-        (PENDING, "Pending"),
-        (ACCEPTED, "Accepted"),
-        (REJECTED, "Rejected"),
-    }
+    user = models.ForeignKey(User_site, on_delete=models.CASCADE)
+    type = models.CharField(max_length=255, choices=TYPE)
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(default=timezone.now)
 
-    user = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name="user")
-    friend = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name="friend")
-    status = models.CharField(max_length=255, default=PENDING, choices=STATUS)
+class FriendRequest(models.Model):
+    STATUS = (
+        ('pending', 'pending'),
+        ('accepted', 'accepted'),
+        ('refused', 'refused'),
+    )
+
+    user = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='user')
+    friend = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='friend')
+    status = models.CharField(max_length=255, default='pending', choices=STATUS)
     created_at = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
-        super(Friend_Request, self).save(*args, **kwargs)
+        super(FriendRequest, self).save(*args, **kwargs)
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             "friend_requests",
@@ -85,64 +93,10 @@ class Friend_Request(models.Model):
         )
 
 
+# class PrivateGameInvite(model.Model):
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# class User_site(models.Model):
-#     ONLINE = "green"
-#     OFFLINE = "gray"
-#     INGAME = "yellow"
-#     STATUS = {
-#         ONLINE: "Online",
-#         OFFLINE: "Offline",
-#         INGAME: "In-Game",
-#     }
-#     email  = models.EmailField(max_length=255, unique=True)
-#     login = models.CharField(max_length=255, unique=True)
-#     password = models.CharField(max_length=128)
-#     nickname = models.CharField(max_length=255)
-#     status = models.CharField(max_length=255, default=OFFLINE, choices=STATUS) #check si ca marche
-#     created_at = models.DateTimeField(default=timezone.now)
-
-
-    # ONLINE = "green"
-    # OFFLINE = "gray"
-    # INGAME = "yellow"
-    # STATUS = {
-    #     ONLINE: "Online",
-    #     OFFLINE: "Offline",
-    #     INGAME: "In-Game",
-    # }
-    # email  = models.EmailField(max_length=255, unique=True)
-    # login = models.CharField(max_length=255, unique=True)
-    # password = models.CharField(max_length=128)
-    # nickname = models.CharField(max_length=255)
-    # status = models.CharField(max_length=255, default=OFFLINE, choices=STATUS) #check si ca marche
-    # created_at = models.DateTimeField(default=timezone.now)
+# class TournamentInvite(model.Model):
 
 
 

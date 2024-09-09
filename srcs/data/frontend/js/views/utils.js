@@ -61,7 +61,7 @@ export function changeLanguage(lang) {
 		}
 	});
 }
-
+// if check_auth open websocket
 const friendRequestSocket = new WebSocket('ws://localhost:8888/ws/friend_request/');
 
 friendRequestSocket.onopen = function() {
@@ -73,7 +73,7 @@ friendRequestSocket.onmessage = function(event) {
 	console.log('Friend request socket message:', data);
 	if (data.type === 'friend_request') {
         console.log('Enter in displayFriendRequestNotification');
-		displayFriendRequestNotification(data.nickname);
+		displayFriendRequestNotification(data.from_nickname);
 	}
     else if (data.type === 'error') {
         alert(data.message);
@@ -136,16 +136,11 @@ function displayFriendRequestNotification(nickname) {
     closeButton.addEventListener('click', () => {
         friendRequestNotificationModal.remove();
     });
-    
+
     modalFooter.appendChild(closeButton);
     // Close the modal when the user clicks on the close button and remove the modal from the DOM
     document.body.appendChild(friendRequestNotificationModal);
     friendRequestNotificationModal.style.display = 'block';
-
-    //
-
-
-
 }
 
 

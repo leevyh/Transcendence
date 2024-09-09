@@ -161,11 +161,13 @@ export function settingsView(container) {
             body: JSON.stringify({ nickname, email })
         });
         if (response.ok) {
-            form.innerHTML = '';
-            const successMessage = document.createElement('p');
-            successMessage.className = 'text-success';
-            successMessage.textContent = 'Paramètres modifiés avec succès';
-            form.appendChild(successMessage);
+            // form.innerHTML = '';
+            // const successMessage = document.createElement('p');
+            // successMessage.className = 'text-success';
+            // successMessage.textContent = 'Paramètres modifiés avec succès';
+            // form.appendChild(successMessage);
+            event.preventDefault();
+            navigateTo('/settings');
         } else {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
