@@ -27,8 +27,7 @@ SECRET_KEY = 'django-insecure-a4=7pox#i*0jn++(jt$dj+wrjp6+xucis%dy&pukjdj7qxan+4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.25.139.193"]
-
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 
 # Application definition
 AUTH_USER_MODEL = 'api.User_site'
@@ -110,7 +109,7 @@ CHANNEL_LAYERS = {
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Utilisation de la base de données pour stocker les sessions
 SESSION_COOKIE_NAME = 'sessionid'  # Nom du cookie de session
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = False  # True si HTTPS
+#SESSION_COOKIE_SECURE = False  # True si HTTPS
 
 # Autres backends possibles
 # SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
