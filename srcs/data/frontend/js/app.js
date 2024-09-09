@@ -29,6 +29,7 @@ const routes = {
         '/settings': settingsView,
         '/friends' : friendsView,
         '/chat': chatView,
+        '/pong': pongView,
     },
     'sp': {
         '/': homeView,
