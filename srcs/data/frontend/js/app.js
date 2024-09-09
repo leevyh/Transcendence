@@ -20,8 +20,6 @@ const routes = {
         '/login': loginView,
         '/settings': settingsView,
         '/password': passwordView,
-        // '/profile': profileView,
-        '/chat': chatView,
     },
     'en': {
         '/': homeView,
@@ -29,6 +27,7 @@ const routes = {
         '/register': registerView,
         '/settings': settingsView,
         '/friends' : friendsView,
+        '/chat': chatView,
     },
     'sp': {
         '/': homeView,
@@ -56,8 +55,10 @@ export async function navigateTo(url) {
             url = `/${splitPath[2]}`;
         }
         userSettings = await getAccessibility();
-        language = `${userSettings.language}`;
-        currentLanguage = language || 'fr';
+        console.log('userSettings: ', userSettings);
+        if (userSettings) {
+            language = `${userSettings.language}`;
+        }
     } else {
         if (splitPath.length > 2) {
             url = `/${splitPath[2]}`;
@@ -67,8 +68,8 @@ export async function navigateTo(url) {
         if (oldUrl.length > 2) {
             language = oldUrl[1];
         }
-        currentLanguage = language || 'fr';
     }
+    currentLanguage = language || 'en';
     applyAccessibilitySettings(userSettings);
 
     if (!routes[currentLanguage]) {

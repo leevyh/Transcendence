@@ -148,9 +148,10 @@ def get_settings(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+@login_required(login_url='/api/login')
 def get_status_all_users(request):
     if request.method == 'GET':
-        users = User_site.objects.all()
+        users = User_site.objects.all().exclude(id=request.user.id)  # Exclure l'utilisateur actuel
         data = []
         for user in users:
             data.append({'nickname': user.nickname,
@@ -171,7 +172,7 @@ def all_users(request):
                 return JsonResponse({'error': 'Token expired'}, status=307)
             username = payload['username']
             if username:
-                users = User_site.objects.all()
+                users = User_site.objects.all().exclude(id=request.user.id)  # Exclure l'utilisateur actuel
                 data = []
                 i = 0
                 for user in users:

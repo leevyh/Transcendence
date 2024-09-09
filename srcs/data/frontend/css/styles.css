@@ -154,3 +154,15 @@ body.dark-mode {
 	width: 50%;
 	height: 50%;
 }
+
+.user-connected {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    /* padding: 20px; */
+    box-sizing: 0;
+}

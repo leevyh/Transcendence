@@ -1,3 +1,5 @@
+import { navigateTo } from '../app.js';
+
 // Helper function to get CSRF token from cookies
 export function getCookie(name) {
     let cookieValue = null;
@@ -180,19 +182,37 @@ export async function getAccessibility() {
                 'X-CSRFToken': getCookie('csrftoken')
             },
         });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+
+        console.log('response:', response);
+
+        if (response.status === 200) {
+            const data = await response.json();
+            const userData = {
+                language: data.language,
+                font_size: data.font_size,
+                theme: data.dark_mode,
+            };
+            console.log('data:', userData);
+            return userData;
+        } else if (response.status === 307) {
+            localStorage.removeItem('token');
+
+            const logoutResponse = await fetch('/api/logout/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            });
+
+            await logoutResponse.json(); // Traiter la réponse de logout si nécessaire
+            navigateTo('/login');
+            return null;
+        } else {
+            throw new Error('Something went wrong');
         }
-        const data = await response.json();
-        const userData = {
-            language: data.language,
-            font_size: data.font_size,
-            theme: data.dark_mode,
-        };
-        console.log('data:', userData);
-        return userData;
     } catch (error) {
-        console.error('Error retrieving settings:', error);
+        console.error('Error fetching accessibility settings:', error);
         return null;
     }
 }
