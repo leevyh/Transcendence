@@ -5,7 +5,7 @@ services:
     volumes:
       - backend-elk-certs:/usr/share/elasticsearch/config/certs/
     expose:
-      - 9004
+      - 8000
     env_file:
         - ./env/postgresql.env
         - ./env/42app.env
@@ -19,8 +19,7 @@ services:
     container_name: frontend-nginx
     build: ./srcs/services/frontend_nginx
     expose:
-      - 9002
-      - 9003
+      - 443
     volumes:
       - frontend:/var/www/ft_transcendence/
       - ea-frontend-nginx:/usr/share/elastic-agent/
@@ -39,8 +38,7 @@ services:
       - ea-proxy-nginx:/usr/share/elastic-agent/
       - backend-elk-certs:/usr/share/elastic-agent/config/certs
     ports:
-      - 9000:9000
-      - 9001:9001
+      - 8888:8888
     depends_on:
       backend-fleet:
         condition: service_started
@@ -76,8 +74,8 @@ services:
       - backend-elastic:/usr/share/elasticsearch/data/
       - backend-elk-logs:/usr/share/elasticsearch/logs/
       - backend-elk-certs:/usr/share/elasticsearch/config/certs/
-    ports:
-      - 9200:9200
+    expose:
+      - 9200
     healthcheck:
       test:
         [ "CMD-SHELL", "curl -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://backend-elastic:9200 | grep -q 'missing authentication credentials'" ]
@@ -122,8 +120,8 @@ services:
     env_file: .env
     volumes:
       - backend-elk-certs:/usr/share/elastic-agent/config/certs/
-    ports:
-      - 8220:8220
+    expose:
+      - 8220
     networks:
         - default
 
@@ -135,8 +133,8 @@ services:
     build: ./srcs/services/backend_logstash
     volumes:
       - backend-elk-certs:/usr/share/logstash/config/certs/
-    ports:
-        - 5044:5044
+    expose:
+        - 5044
 
   postgresql:
     container_name: postgresql
