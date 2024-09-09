@@ -11,7 +11,7 @@ export function homeView(container) {
 
     const h5 = document.createElement('h5');
     h5.className = 'titleWelcome';
-    h5.setAttribute('data-i18n', 'welcome');
+    h5.setAttribute('data-i18n', 'home');
     h5.textContent = 'Welcome';
     base.appendChild(h5);
 
