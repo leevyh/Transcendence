@@ -60,7 +60,7 @@ export function changeLanguage(lang) {
 	});
 }
 
-const friendRequestSocket = new WebSocket('ws://localhost:8888/ws/friend_request/');
+const friendRequestSocket = new WebSocket('wss://localhost:8888/wss/friend_request/');
 
 friendRequestSocket.onopen = function() {
 	console.log('Friend request socket opened');

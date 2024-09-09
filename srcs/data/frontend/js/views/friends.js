@@ -6,7 +6,7 @@ export async function friendsView(container) {
     container.innerHTML = '';
 
 
-    const statusSocket = new WebSocket('ws://localhost:8888/ws/status/');
+    const statusSocket = new WebSocket('wss://localhost:8888/wss/status/');
 
     statusSocket.onopen = function(event) {
         console.log('Status socket opened');
@@ -98,7 +98,7 @@ export async function friendsView(container) {
     }
 
     function sendFriendRequest(nickname) {
-        const friendRequestSocket = new WebSocket('ws://localhost:8888/ws/friend_request/');
+        const friendRequestSocket = new WebSocket('wss://localhost:8888/wss/friend_request/');
         friendRequestSocket.onopen = function(event) {
             console.log('Friend request socket opened');
             const message = {
