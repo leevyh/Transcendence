@@ -61,7 +61,7 @@ export function changeLanguage(lang) {
 		}
 	});
 }
-
+// if check_auth open websocket
 const friendRequestSocket = new WebSocket('ws://localhost:8888/ws/friend_request/');
 
 friendRequestSocket.onopen = function() {

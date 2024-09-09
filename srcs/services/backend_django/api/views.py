@@ -120,6 +120,7 @@ def get_friend_request(request, nickname):
             except User_site.DoesNotExist:
                 return JsonResponse({'error': 'User to request not found'}, status=404)
             friend_request = FriendRequest.objects.filter(user=user, friend=friend).exclude(status='refused').first()
+            data = {}
             if friend_request:
                 print("FIND FRIEND REQUEST")
                 data = {'user': friend_request.user.nickname,
@@ -128,7 +129,8 @@ def get_friend_request(request, nickname):
                         'created_at': friend_request.created_at}
                 return JsonResponse(data, status=200)
             else:
-                return JsonResponse(None, status=200)
+                data = {'status': 'not_found'}
+                return JsonResponse(data, status=200)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     else:
