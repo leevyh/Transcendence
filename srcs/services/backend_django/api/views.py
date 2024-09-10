@@ -84,6 +84,7 @@ def get_profile(request, nickname):
                 avatar_image = user.avatar
                 avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
                 data = {'nickname': user.nickname,
+                        'username': user.username,
                         'email': user.email,
                         'created_at': user.created_at,
                         'status': user.status,
@@ -325,7 +326,7 @@ def updatePassword(request):
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
-    
+
 @login_required(login_url='/api/login') # TODO CHANGE THIS ROUTE TO GO
 def update_Stats(request): #TODO without form and with json.loads. Need to changed if we use a view in python or views in js
     if request.method == 'POST':
