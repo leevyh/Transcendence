@@ -37,6 +37,8 @@ const routes = {
     },
     '/': homeView, // A modifier plus tard
     '/404': notFoundView,
+
+    // '/pong/<int:game_id>': pongView,
 };
 
 
@@ -55,7 +57,6 @@ export async function navigateTo(url) {
             url = `/${splitPath[2]}`;
         }
         userSettings = await getAccessibility();
-        console.log('userSettings: ', userSettings);
         if (userSettings) {
             language = `${userSettings.language}`;
         }

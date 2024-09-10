@@ -44,7 +44,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         type = ['friend_request', 'game_invite', 'tournament_invite', 'friend_accept', 'friend_refuse', 'game_accept', 'game_refuse', 'tournament_accept', 'tournament_refuse']
         if data['type'] in type:
-            print(f"Notification type {data['type']} received")
+            # print(f"Notification type {data['type']} received")         # DEBUG
             await self.handle_notification(data)
 
     async def handle_notification(self, data):
@@ -52,12 +52,12 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         nickname = data['nickname']
         user = self.scope["user"]
         type = data['type']
-        print(f"Data received: {data}")
+        # print(f"Data received: {data}")         # DEBUG
         #if type is friend_request -> Save friend request with from_user and to_user, status pending
         if type == 'friend_request':
             friend = await database_sync_to_async(User_site.objects.get)(nickname=nickname)
             friend_request = await database_sync_to_async(FriendRequest.objects.create)(user=user, friend=friend)
-            print(f"Friend request from {user.nickname} to {friend.nickname} created and saved in database")
+            # print(f"Friend request from {user.nickname} to {friend.nickname} created and saved in database")         # DEBUG
             await self.channel_layer.group_send(
                 f"user_{friend.id}",
                 {
@@ -76,5 +76,5 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     async def send_notification(self, event):
         await self.send(text_data=json.dumps(event["message"]))
 
-# class FriendRequestConsumer(AsyncWebsocketConsumer):
-#     pass
+class FriendRequestConsumer(AsyncWebsocketConsumer):
+    pass

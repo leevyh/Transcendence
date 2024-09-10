@@ -8,6 +8,6 @@ class AuthenticationMiddleware:
     def __call__(self, request):
         if not request.user.is_authenticated and request.path not in ['/login/', '/register/']:
             url = request.path
-            print(url)
+            # print(url)         # DEBUG
         response = self.get_response(request)
         return response

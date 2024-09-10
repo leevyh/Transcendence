@@ -9,11 +9,11 @@ export async function friendsView(container) {
     const statusSocket = new WebSocket('ws://localhost:8888/ws/status/');
 
     statusSocket.onopen = function (event) {
-        console.log('Status socket opened');
+        console.log('Status socket opened');         // DEBUG
     }
 
     statusSocket.onmessage = function (event) {
-        console.log('Message reçu:', event.data);  // Ajoutez ceci pour déboguer
+        // console.log('Message reçu:', event.data);         // DEBUG
         const data = JSON.parse(event.data);
         //Update status of user in the card
         //Get the card with the nickname
@@ -94,7 +94,7 @@ export async function friendsView(container) {
                 });
             });
     } else {
-        console.log("ELSE");
+        console.log("ELSE");         // DEBUG
     }
 
     function sendFriendRequest(nickname) {
@@ -105,7 +105,7 @@ export async function friendsView(container) {
                 //Send friend request
                 sendFriendRequestToServer(nickname);
             } else {
-                console.log('Friend request already sent');
+                console.log('Friend request already sent');         // DEBUG
             }
         });
 
@@ -121,14 +121,14 @@ export async function friendsView(container) {
                 },
             });
             const data = await response.json();
-            console.log(data);
+            // console.log(data);         // DEBUG
             return data.status;
         }
 
         async function sendFriendRequestToServer(nickname) {
             const friendRequestSocket = new WebSocket('ws://localhost:8888/ws/friend_request/');
             friendRequestSocket.onopen = function(event) {
-                console.log('Friend request socket opened');
+                console.log('Friend request socket opened');         // DEBUG
                 const message = {
                     type: 'friend_request',
                     nickname: nickname,
