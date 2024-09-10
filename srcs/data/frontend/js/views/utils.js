@@ -1,4 +1,5 @@
 import { navigateTo } from '../app.js';
+import wsManager from './wsManager.js';
 
 // Helper function to get CSRF token from cookies
 export function getCookie(name) {
@@ -14,7 +15,7 @@ export function getCookie(name) {
         }
     }
     return cookieValue;
-};
+}
 
 const translations = {
 	en: {
@@ -62,27 +63,36 @@ export function changeLanguage(lang) {
 	});
 }
 // if check_auth open websocket
-const friendRequestSocket = new WebSocket('ws://localhost:8888/ws/friend_request/');
+// const friendRequestSocket = new WebSocket('ws://localhost:8888/ws/friend_request/');
+//
+// friendRequestSocket.onopen = function() {
+// 	console.log('Friend request socket opened');
+// }
+//
+// friendRequestSocket.onmessage = function(event) {
+// 	const data = JSON.parse(event.data);
+// 	console.log('Friend request socket message:', data);
+// 	if (data.type === 'friend_request') {
+//         console.log('Enter in displayFriendRequestNotification');
+// 		displayFriendRequestNotification(data.from_nickname);
+// 	}
+//     else if (data.type === 'error') {
+//         alert(data.message);
+//     }
+// };
+//
+// friendRequestSocket.onclose = function() {
+// 	console.log('Friend request socket closed');
+// }
 
-friendRequestSocket.onopen = function() {
-	console.log('Friend request socket opened');         // DEBUG
-}
-
-friendRequestSocket.onmessage = function(event) {
-	const data = JSON.parse(event.data);
-	console.log('Friend request socket message:', data);         // DEBUG
-	if (data.type === 'friend_request') {
-        // console.log('Enter in displayFriendRequestNotification');         // DEBUG
-		displayFriendRequestNotification(data.from_nickname);
-	}
-    else if (data.type === 'error') {
-        alert(data.message);
+wsManager.AddNotificationListener((data) => {
+    if (data.type === 'friend_request') {
+        console.log('New friend request received from ', data.from_nickname);
+        displayFriendRequestNotification(data.from_nickname);
     }
-};
+})
 
-friendRequestSocket.onclose = function() {
-	console.log('Friend request socket closed');         // DEBUG
-}
+
 
 function displayFriendRequestNotification(nickname) {
     const friendRequestNotificationModal = document.createElement('div');
@@ -120,12 +130,27 @@ function displayFriendRequestNotification(nickname) {
     acceptButton.className = 'btn btn-success';
     acceptButton.textContent = 'Accept';
     acceptButton.style = 'display: block; margin: 0 auto; width: 50%;';
+    // Add event listener to accept the friend request with websocket, remove the modal
+    acceptButton.addEventListener('click', () => {
+        wsManager.send({
+            type: 'accept_friend_request',
+            nickname: nickname,
+        });
+        friendRequestNotificationModal.remove();
+    });
     modalFooter.appendChild(acceptButton);
 
     const rejectButton = document.createElement('button');
     rejectButton.className = 'btn btn-danger';
     rejectButton.textContent = 'Reject';
     rejectButton.style = 'display: block; margin: 0 auto; width: 50%;';
+    rejectButton.addEventListener('click', () => {
+        wsManager.send({
+            type: 'reject_friend_request',
+            nickname: nickname,
+        });
+        friendRequestNotificationModal.remove();
+    });
     modalFooter.appendChild(rejectButton);
 
     //Add button close to the modal
@@ -178,7 +203,7 @@ export async function getAccessibility() {
             },
         });
 
-        // console.log('response:', response);         // DEBUG
+        console.log('response:', response);
 
         if (response.status === 200) {
             const data = await response.json();
@@ -187,7 +212,7 @@ export async function getAccessibility() {
                 font_size: data.font_size,
                 theme: data.dark_mode,
             };
-            // console.log('data:', userData);         // DEBUG
+            console.log('data:', userData);
             return userData;
         } else if (response.status === 307) {
             localStorage.removeItem('token');
