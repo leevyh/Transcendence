@@ -65,14 +65,14 @@ export function changeLanguage(lang) {
 const friendRequestSocket = new WebSocket('ws://localhost:8888/ws/friend_request/');
 
 friendRequestSocket.onopen = function() {
-	console.log('Friend request socket opened');
+	console.log('Friend request socket opened');         // DEBUG
 }
 
 friendRequestSocket.onmessage = function(event) {
 	const data = JSON.parse(event.data);
-	console.log('Friend request socket message:', data);
+	console.log('Friend request socket message:', data);         // DEBUG
 	if (data.type === 'friend_request') {
-        console.log('Enter in displayFriendRequestNotification');
+        // console.log('Enter in displayFriendRequestNotification');         // DEBUG
 		displayFriendRequestNotification(data.from_nickname);
 	}
     else if (data.type === 'error') {
@@ -81,7 +81,7 @@ friendRequestSocket.onmessage = function(event) {
 };
 
 friendRequestSocket.onclose = function() {
-	console.log('Friend request socket closed');
+	console.log('Friend request socket closed');         // DEBUG
 }
 
 function displayFriendRequestNotification(nickname) {
@@ -178,7 +178,7 @@ export async function getAccessibility() {
             },
         });
 
-        console.log('response:', response);
+        // console.log('response:', response);         // DEBUG
 
         if (response.status === 200) {
             const data = await response.json();
@@ -187,7 +187,7 @@ export async function getAccessibility() {
                 font_size: data.font_size,
                 theme: data.dark_mode,
             };
-            console.log('data:', userData);
+            // console.log('data:', userData);         // DEBUG
             return userData;
         } else if (response.status === 307) {
             localStorage.removeItem('token');
