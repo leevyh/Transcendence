@@ -9,7 +9,7 @@ class ChatMessagesConsumer(AsyncWebsocketConsumer):
         # Joindre un groupe pour les messages de la conversation
         await self.channel_layer.group_add(
             self.room_group_name,
-            self.conversation_id
+            self.channel_name
         )
 
         # Accepter la connexion WebSocket
@@ -19,7 +19,7 @@ class ChatMessagesConsumer(AsyncWebsocketConsumer):
         # Quitter le groupe des messages de la conversation
         await self.channel_layer.group_discard(
             self.room_group_name,
-            self.conversation_id
+            self.channel_name
         )
 
     # Recevoir un message du WebSocket
@@ -44,6 +44,7 @@ class ChatMessagesConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         message = event['message']
         sender = event['sender']
+
         timestamp = event['timestamp']
 
         # Envoyer le message à WebSocket avec l'identifiant de l'expéditeur
