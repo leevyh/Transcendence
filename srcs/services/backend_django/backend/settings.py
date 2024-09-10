@@ -187,24 +187,22 @@ DATABASES = {
 
 LOGGING = {
   'version': 1,
-  'disable_existing_loggers': False,
-  'handlers': {
-      'logstash': {
-          'level': 'INFO',
-          'class': 'logstash.LogstashHandler',
-          'host': 'backend-logstash',
-          'port': 5959,
-          'version': 1,
-          'message_type': 'logstash',
-          'fqdn': False,
-          'tags': ['django'],
-      },
-  },
-  'loggers': {
-      'django.request': {
-          'handlers': ['logstash'],
-          'level': 'INFO',
-          'propagate': True,
-      },
-  },
+    'handlers': {
+        'logstash': {
+            'level': 'INFO',
+            'class': 'logstash.TCPLogstashHandler',
+            'host': 'backend-logstash',
+            'port': 5959,
+            'version': 1,
+            'message_type': 'django',
+            'fqdn': False,
+            'tags': ['django.request'],
+        },
+    },
+    'loggers': {
+        'django.server': {
+            'handlers': ['logstash'],
+            'level': 'INFO',
+        }
+    },
 }
