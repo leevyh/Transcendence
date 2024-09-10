@@ -184,3 +184,27 @@ DATABASES = {
 		'PORT': 5432,
 	}
 }
+
+LOGGING = {
+  'version': 1,
+  'disable_existing_loggers': False,
+  'handlers': {
+      'logstash': {
+          'level': 'INFO',
+          'class': 'logstash.LogstashHandler',
+          'host': 'backend-logstash',
+          'port': 5959,
+          'version': 1,
+          'message_type': 'logstash',
+          'fqdn': False,
+          'tags': ['django'],
+      },
+  },
+  'loggers': {
+      'django.request': {
+          'handlers': ['logstash'],
+          'level': 'INFO',
+          'propagate': True,
+      },
+  },
+}

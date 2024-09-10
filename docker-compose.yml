@@ -134,7 +134,7 @@ services:
     volumes:
       - backend-elk-certs:/usr/share/logstash/config/certs/
     expose:
-        - 5044
+        - 5959
 
   postgresql:
     container_name: postgresql
