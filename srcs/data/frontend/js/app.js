@@ -39,7 +39,6 @@ const routes = {
     },
     '/': homeView, // A modifier plus tard
     '/404': notFoundView,
-    '/pong': pongView,
 };
 
 
