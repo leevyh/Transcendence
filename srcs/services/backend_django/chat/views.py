@@ -2,10 +2,12 @@ from django.http import JsonResponse
 from api.models import User_site as User
 from django.contrib.auth.decorators import login_required
 from .models import Conversation
+import base64
 
 @login_required(login_url='/api/login')
 def conversationID(request, nickname):
     if request.method == 'GET':
+        print('conversationID')
         try:
             # Récupérer l'utilisateur effectuant la requête
             sender = request.user
@@ -19,11 +21,24 @@ def conversationID(request, nickname):
             # Rechercher une conversation où les deux utilisateurs sont membres
             conversation = Conversation.objects.filter(members=sender).filter(members=receiver).first()
 
+            def encode_avatar(user):
+                """Convertir l'avatar de l'utilisateur en base64"""
+                if user.avatar:  # Vérifier que l'utilisateur a un avatar
+                    avatar_image = user.avatar.open()  # Ouvrir l'image
+                    avatar_base64 = base64.b64encode(avatar_image.read()).decode('utf-8')
+                    avatar_image.close()
+                    return avatar_base64
+                return None
+
             if conversation:
-                # Si la conversation existe, on retourne ses détails
+                sender_avatar_base64 = encode_avatar(sender)
+                receiver_avatar_base64 = encode_avatar(receiver)
                 return JsonResponse({
                     'id': conversation.id,
-                    'members': list(conversation.members.values('id', 'username')),
+                    'members': [
+                        {'id': sender.id, 'username': sender.username, 'avatar': sender_avatar_base64},
+                        {'id': receiver.id, 'username': receiver.username, 'avatar': receiver_avatar_base64},
+                    ],
                     'created_at': conversation.created_at
                 })
             else:
@@ -31,9 +46,16 @@ def conversationID(request, nickname):
                 conversation = Conversation.objects.create()
                 conversation.members.add(sender, receiver)
                 conversation.save()
+
+                sender_avatar_base64 = encode_avatar(sender)
+                receiver_avatar_base64 = encode_avatar(receiver)
+
                 return JsonResponse({
                     'id': conversation.id,
-                    'members': list(conversation.members.values('id', 'username')),
+                    'members': [
+                        {'id': sender.id, 'username': sender.username, 'avatar': sender_avatar_base64},
+                        {'id': receiver.id, 'username': receiver.username, 'avatar': receiver_avatar_base64},
+                    ],
                     'created_at': conversation.created_at
                 })
         except Exception as e:
