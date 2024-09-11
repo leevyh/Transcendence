@@ -1,5 +1,4 @@
-# DEV ONLY /!\ DO NOT USE IN PRODUCTION /!\ DEV ONLY #
-#  You will lose all elk related data so be careful  #
+# /!\ DEV ONLY /!\ #
 
 services:
   uninstall-elk:
@@ -8,7 +7,7 @@ services:
     user: "0"
     volumes:
       - elk:/data
-    command: "rm -rf /data/certs/ /data/elastic/ /data/kibana/ /data/logs/ /data/ea/proxy-nginx/ /data/ea/frontend-nginx/ && mkdir /data/certs/ /data/elastic/ /data/kibana/ /data/logs/ /data/ea/proxy-nginx/ /data/ea/frontend-nginx/"
+    command: "rm -rf /data/elastic/ /data/kibana/ /data/logstash/ /data/fleet/ /data/certs/ /data/logs/ /data/ea/proxy-nginx/ /data/ea/frontend-nginx/ && mkdir -p /data/elastic/ /data/kibana/ /data/logstash/ /data/fleet/ /data/certs/ /data/logs/ /data/ea/proxy-nginx/ /data/ea/frontend-nginx/"
 
 volumes:
   elk:

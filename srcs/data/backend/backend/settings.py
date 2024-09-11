@@ -180,7 +180,7 @@ DATABASES = {
 		'NAME': 'transcendence',
 		'USER': 'postgres',
 		'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-		'HOST': 'postgresql',
+		'HOST': 'backend-postgresql',
 		'PORT': 5432,
 	}
 }

@@ -1,94 +1,30 @@
 services:
-  backend-django:
-    container_name: backend-django
-    build: ./srcs/services/backend_django
-    volumes:
-      - backend-elk-certs:/usr/share/elasticsearch/config/certs/
-    expose:
-      - 8000
-    env_file:
-        - ./env/postgresql.env
-        - ./env/42app.env
-#    volumes:
-#      - ./srcs/data/backend:/home/app
-    restart: on-failure
-    networks:
-        - default
-
-  frontend-nginx:
-    container_name: frontend-nginx
-    build: ./srcs/services/frontend_nginx
-    expose:
-      - 443
-    volumes:
-      - frontend:/var/www/ft_transcendence/
-      - ea-frontend-nginx:/usr/share/elastic-agent/
-      - backend-elk-certs:/usr/share/elastic-agent/config/certs/
-    depends_on:
-      - backend-django
-    restart: on-failure
-    networks:
-        - default
-
-  proxy-nginx:
-    container_name: proxy-nginx
-    env_file: .env
-    build: ./srcs/services/proxy_nginx
-    volumes:
-      - ea-proxy-nginx:/usr/share/elastic-agent/
-      - backend-elk-certs:/usr/share/elastic-agent/config/certs
-    ports:
-      - 8888:8888
-    depends_on:
-      backend-fleet:
-        condition: service_started
-    restart: on-failure
-    networks:
-        - default
-
-  setup-elastic:
-    container_name: setup-elastic
-    build: ./srcs/services/setup_elastic/
-    volumes:
-      - backend-kibana:/usr/share/kibana/data/
-      - backend-elastic:/usr/share/elasticsearch/data/
-      - backend-elk-logs:/usr/share/elasticsearch/logs/
-      - backend-elk-certs:/usr/share/elasticsearch/config/certs/
-    user: "0"
-    command: /usr/share/elasticsearch/setup.sh "${ELASTIC_PASSWORD}" "${KIBANA_PASSWORD}"
-    healthcheck:
-      test: ["CMD-SHELL", "[ -f /usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt ]"]
-      interval: 1s
-      timeout: 5s
-      retries: 120
-    networks:
-        - default
-
   backend-elastic:
     container_name: backend-elastic
-    depends_on:
-      setup-elastic:
-        condition: service_healthy
     build: ./srcs/services/backend_elastic
+    #   ulimits:
+    #     memlock:
+    #       soft: -1
+    #       hard: -1
+    mem_limit: 1g
     volumes:
       - backend-elastic:/usr/share/elasticsearch/data/
       - backend-elk-logs:/usr/share/elasticsearch/logs/
       - backend-elk-certs:/usr/share/elasticsearch/config/certs/
+    networks:
+      - default
     expose:
       - 9200
     healthcheck:
       test:
-        [ "CMD-SHELL", "curl -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://backend-elastic:9200 | grep -q 'missing authentication credentials'" ]
+        ["CMD-SHELL", "curl -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://backend-elastic:9200 | grep -q 'missing authentication credentials'"]
       interval: 10s
       timeout: 10s
       retries: 120
-#    ulimits:
-#      memlock:
-#        soft: -1
-#        hard: -1
-    mem_limit: 1g
-    networks:
-        - default
+    depends_on:
+      setup-elastic:
+        condition: service_healthy
+    restart: on-failure
 
   backend-kibana:
     container_name: backend-kibana
@@ -100,49 +36,135 @@ services:
       - backend-kibana:/usr/share/kibana/data/
       - backend-elk-logs:/usr/share/kibana/logs/
       - backend-elk-certs:/usr/share/kibana/config/certs/
+    networks:
+      - default
     ports:
       - 5601:5601
     healthcheck:
       test:
-        [ "CMD-SHELL", "curl -s --cacert /usr/share/kibana/config/certs/ca/ca.crt -I https://backend-kibana:5601 | grep -q 'HTTP/1.1 302 Found'" ]
+        ["CMD-SHELL", "curl -s --cacert /usr/share/kibana/config/certs/ca/ca.crt -I https://backend-kibana:5601 | grep -q 'HTTP/1.1 302 Found'"]
       interval: 10s
       timeout: 10s
       retries: 120
-    networks:
-        - default
-
-  backend-fleet:
-    container_name: backend-fleet
-    depends_on:
-      backend-kibana:
-        condition: service_healthy
-    build: ./srcs/services/backend_fleet
-    env_file: .env
-    volumes:
-      - backend-elk-certs:/usr/share/elastic-agent/config/certs/
-    expose:
-      - 8220
-    networks:
-        - default
+    restart: on-failure
 
   backend-logstash:
     container_name: backend-logstash
+    build: ./srcs/services/backend_logstash
+    volumes:
+      - backend-logstash:/usr/share/logstash/data/
+      - backend-elk-certs:/usr/share/logstash/config/certs/
+    networks:
+      - default
+    expose:
+      - 5959
     depends_on:
       backend-kibana:
         condition: service_healthy
-    build: ./srcs/services/backend_logstash
-    volumes:
-      - backend-elk-certs:/usr/share/logstash/config/certs/
-    expose:
-        - 5959
+    restart: on-failure
 
-  postgresql:
-    container_name: postgresql
-    build: ./srcs/services/postgresql
-    ports:
-      - 5432:5432
+  backend-fleet:
+    container_name: backend-fleet
+    build: ./srcs/services/backend_fleet
+    volumes:
+      - backend-fleet:/usr/share/elastic-agent/data/
+      - backend-elk-certs:/usr/share/elastic-agent/config/certs/
+    networks:
+      - default
+    expose:
+      - 8220
+    depends_on:
+      backend-kibana:
+        condition: service_healthy
+    restart: on-failure
+
+  backend-django:
+    container_name: backend-django
+    build: ./srcs/services/backend_django
+    volumes:
+      - backend-django:/home/app
+      - backend-elk-certs:/usr/share/elasticsearch/config/certs/
+    networks:
+      - default
+    expose:
+      - 8000
     env_file:
       - ./env/postgresql.env
+      - ./env/42app.env
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://backend-django:8000/"]
+    depends_on:
+      backend-logstash:
+        condition: service_started
+    restart: on-failure
+
+  backend-postgresql:
+    container_name: backend-postgresql
+    build: ./srcs/services/backend-postgresql
+    volumes:
+      - backend-postgresql:/var/lib/postgresql/data
+    networks:
+      - default
+    expose:
+      - 5432
+    env_file:
+      - ./env/postgresql.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+    restart: on-failure
+
+  frontend-nginx:
+    container_name: frontend-nginx
+    build: ./srcs/services/frontend_nginx
+    volumes:
+      - frontend:/var/www/ft_transcendence/
+      - ea-frontend-nginx:/usr/share/elastic-agent/
+      - backend-elk-certs:/usr/share/elastic-agent/config/certs/
+    networks:
+      - default
+    expose:
+      - 443
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://frontend-nginx:80/nginx_status | grep -q 'Active connections'"]
+    depends_on:
+      backend-fleet:
+        condition: service_started
+    restart: on-failure
+
+  proxy-nginx:
+    container_name: proxy-nginx
+    build: ./srcs/services/proxy_nginx
+    volumes:
+      - ea-proxy-nginx:/usr/share/elastic-agent/
+      - backend-elk-certs:/usr/share/elastic-agent/config/certs
+    networks:
+      - default
+    ports:
+      - 8888:8888
+    healthcheck:
+        test: ["CMD-SHELL", "curl -f http://proxy-nginx:80/nginx_status | grep -q 'Active connections'"]
+    depends_on:
+      backend-fleet:
+        condition: service_started
+    restart: on-failure
+
+  setup-elastic:
+    container_name: setup-elastic
+    build: ./srcs/services/setup_elastic/
+    user: "0"
+    command: /usr/share/elasticsearch/setup.sh "${ELASTIC_PASSWORD}" "${KIBANA_PASSWORD}"
+    volumes:
+      - backend-kibana:/usr/share/kibana/data/
+      - backend-elastic:/usr/share/elasticsearch/data/
+      - backend-elk-logs:/usr/share/elasticsearch/logs/
+      - backend-elk-certs:/usr/share/elasticsearch/config/certs/
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt ]"]
+      interval: 1s
+      timeout: 5s
+      retries: 120
     restart: on-failure
 
 volumes:
@@ -152,18 +174,6 @@ volumes:
       type: none
       device: ./srcs/data/frontend
       o: bind
-  backend-elk-certs:
-    driver: local
-    driver_opts:
-        type: none
-        device: ./srcs/data/certs
-        o: bind
-  backend-elk-logs:
-    driver: local
-    driver_opts:
-        type: none
-        device: ./srcs/data/logs
-        o: bind
   backend-elastic:
     driver: local
     driver_opts:
@@ -176,11 +186,41 @@ volumes:
         type: none
         device: ./srcs/data/kibana
         o: bind
+  backend-logstash:
+    driver: local
+    driver_opts:
+        type: none
+        device: ./srcs/data/logstash
+        o: bind
   backend-fleet:
     driver: local
     driver_opts:
       type: none
       device: ./srcs/data/fleet
+      o: bind
+  backend-django:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/backend
+      o: bind
+  backend-postgresql:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/database
+      o: bind
+  backend-elk-certs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/certs
+      o: bind
+  backend-elk-logs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/logs
       o: bind
   ea-proxy-nginx:
       driver: local
