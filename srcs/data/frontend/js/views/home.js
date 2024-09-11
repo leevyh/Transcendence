@@ -67,7 +67,7 @@ export function homeView(container) {
     img.setAttribute('src', '/assets/pong.png');
     img.setAttribute('alt', 'Pong');
 
-    img.className = 'object-fit-fill border rounded twodivWelcome imgPong';
+    img.className = 'object-fit-fill border rounded twodivWelcome imgLogin';
     divContener.appendChild(img);
 
     // SELECTEUR DE LANGUE
@@ -78,6 +78,7 @@ export function homeView(container) {
     languageLabel.htmlFor = 'language-selector';
     languageLabel.setAttribute('data-i18n', 'language_selector');
     languageLabel.textContent = 'Language: ';
+    languageLabel.className = 'languageLabel';
     languageDiv.appendChild(languageLabel);
 
     const languageSelector = document.createElement('select');

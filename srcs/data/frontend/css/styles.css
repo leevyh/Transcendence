@@ -2,9 +2,9 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    display: flex;
+    /* display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: center; */
 }
 
 body {
@@ -29,9 +29,9 @@ body.dark-mode {
 
 #app {
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
     align-items: center;
-    flex-direction: column; /* new navbar*/
+   /* flex-direction: column;  new navbar*/
     height: 100%;
     width: 100%;
     box-sizing: border-box;
@@ -54,7 +54,6 @@ body.dark-mode {
     padding: 20px;
     box-sizing: border-box;
 }
-
 
 .contener {
     display: flex;
@@ -126,6 +125,16 @@ body.dark-mode {
 
 .Buttonselem:hover {
     background-color: #2759af;
+}
+
+#language {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 9px;
+}
+
+.languageLabel {
+    color: #012970;
 }
 
 /*NAVBAR*/

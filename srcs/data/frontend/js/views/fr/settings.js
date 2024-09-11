@@ -1,13 +1,30 @@
 import { getCookie } from '../utils.js';
 import { navigateTo } from '../../app.js';
+import { navigationBar } from './navigation.js';
 
 export function settingsView(container) {
+    container.classList.add('settings-container');
     container.innerHTML = '';
 
+    //Appel de la navbar
+    navigationBar(container);
+
     const pageTitle = document.createElement('h2');
-    pageTitle.className = 'text-center mb-4';
+    pageTitle.className = 'text-center mb-4 titleWelcome titleSettings';
     pageTitle.textContent = 'Paramètres';
-    container.appendChild(pageTitle);
+
+
+    const HeaderSettingsDivFirst = document.createElement('div');
+    HeaderSettingsDivFirst.className = 'HeaderSettingsDivFirst';
+
+    container.appendChild( HeaderSettingsDivFirst);
+    HeaderSettingsDivFirst.appendChild( pageTitle);
+
+    // Créer une div parent pour regrouper les sections settings, avatar et accessibilité
+    const mainSettingsDiv = document.createElement('div');
+    mainSettingsDiv.className = 'main-settings-div';  // Vous pouvez appliquer des styles spécifiques ici
+    mainSettingsDiv.style.display = 'none';
+
 
     // Recuperer les infos de l'utilisateur dans le backend
     fetch(`/api/settings/`, {
@@ -18,7 +35,7 @@ export function settingsView(container) {
             'X-CSRFToken': getCookie('csrftoken'),
         },
     })
-    // Si le status de la reponse est 200, on recupere les donnees sinon on lance une erreur ou on redirige vers la page de connexion 
+    // Si le status de la reponse est 200, on recupere les donnees sinon on lance une erreur ou on redirige vers la page de connexion
     // Si le status est 307 sans passer dans le bloc de donnees
     .then(response => {
         if (response.status === 200) {
@@ -44,6 +61,7 @@ export function settingsView(container) {
             return;
         }
         const userData = {
+            username: data.username,
             nickname: data.nickname,
             email: data.email,
             language: data.language,
@@ -54,35 +72,82 @@ export function settingsView(container) {
 
 // *************** Affichage des informations personnelles ***************
         const personalInfo = document.createElement('div');
-        personalInfo.className = 'card mb-4';
+        personalInfo.className = 'card mb-4 cardWidget';
+
+        const personalInfoHeaderContener = document.createElement('div');
+        personalInfoHeaderContener.className = 'card-header personalInfoHeaderContener';
         const personalInfoHeader = document.createElement('div');
-        personalInfoHeader.className = 'card-header';
+        personalInfoHeader.className = 'card-header cardTitlewidget';
         personalInfoHeader.textContent = 'Informations personnelles';
+        const personalInfoIconContener = document.createElement('a');
+        personalInfoIconContener.className = 'personalInfoIconContener';
+
+
+        const buttonModifs = document.createElement('button')
+        buttonModifs.className = 'buttonModifs';
+        buttonModifs.addEventListener('click', () => {
+            const mainSettingsDiv = document.querySelector('.main-settings-div');
+            mainSettingsDiv.style.display = 'flex';
+        });
+
+        const svgpersonalInfoIcon = document.createElement('svg');
+        svgpersonalInfoIcon.setAttribute('xmlns', "http://www.w3.org/2000/svg");
+        svgpersonalInfoIcon.setAttribute('width', '30');
+        svgpersonalInfoIcon.setAttribute('height', '24');
+        svgpersonalInfoIcon.setAttribute('fill', 'currentColor');
+        svgpersonalInfoIcon.setAttribute('class', '"bi bi-pen-fill');
+        svgpersonalInfoIcon.setAttribute('viewBox', '0 0 16 16');
+
+        buttonModifs.appendChild(svgpersonalInfoIcon);
+
         const personalInfoBody = document.createElement('div');
-        personalInfoBody.className = 'card-body';
-        const personalInfoList = document.createElement('ul');
-        personalInfoList.className = 'list-group list-group-flush';
-        const nicknameItem = document.createElement('li');
-        nicknameItem.className = 'list-group-item';
-        nicknameItem.textContent = `Nickname: ${userData.nickname}`;
-        const emailItem = document.createElement('li');
-        emailItem.className = 'list-group-item';
-        emailItem.textContent = `Email: ${userData.email}`;
-        const avatarItem = document.createElement('li');
-        avatarItem.className = 'list-group-item';
-        avatarItem.textContent = 'Avatar: ';
+        personalInfoBody.className = 'card-body cardBodywidget';
+
+        const avatarItem = document.createElement('div');
+        avatarItem.className = 'list-group-item imgAvatarContener';
+        //avatarItem.textContent = 'Avatar: ';
         const avatarImage = document.createElement('img');
         avatarImage.src = `data:image/png;base64, ${userData.avatar}`;
-        avatarImage.className = 'img-fluid rounded-circle';
+        avatarImage.className = 'img-fluid rounded-circle imgAvatarProfile';
         avatarImage.alt = 'Avatar';
+
+        const personalInfoList = document.createElement('ul');
+        personalInfoList.className = 'list-group list-group-flush cardBodyListElemProfile';
+        const nicknameItem = document.createElement('li');
+        nicknameItem.className = 'list-group-item cardBodyElemProfile';
+        nicknameItem.textContent = `Nickname: ${userData.nickname}`;
+        const emailItem = document.createElement('li');
+        emailItem.className = 'list-group-item cardBodyElemProfile';
+        emailItem.textContent = `Email: ${userData.email}`;
+
+        ///
+        const languageItem = document.createElement('li');
+        languageItem.className = 'list-group-item';
+        languageItem.textContent = `Langue: ${userData.language}`;
+
+        const fontSizeItem = document.createElement('li');
+        fontSizeItem.className = 'list-group-item cardBodyElemProfile';
+        fontSizeItem.textContent = `Taille de la police: ${userData.font_size}`;
+
+        const darkModeItem = document.createElement('li');
+        darkModeItem.className = 'list-group-item cardBodyElemProfile';
+        darkModeItem.textContent = `Mode sombre: ${userData.theme ? 'Activé' : 'Désactivé'}`;
+
         avatarItem.appendChild(avatarImage);
         personalInfoList.appendChild(nicknameItem);
         personalInfoList.appendChild(emailItem);
-        personalInfoList.appendChild(avatarItem);
+        personalInfoBody.appendChild(avatarItem);
+        personalInfoList.appendChild(languageItem);
+        personalInfoList.appendChild(fontSizeItem);
+        personalInfoList.appendChild(darkModeItem);
         personalInfoBody.appendChild(personalInfoList);
         personalInfo.appendChild(personalInfoHeader);
-        personalInfo.appendChild(personalInfoBody);
-        container.appendChild(personalInfo);
+        personalInfo.appendChild(personalInfoBody); //personalInfoHeaderContener?
+        personalInfo.appendChild(personalInfoHeaderContener);
+        personalInfoHeaderContener.appendChild(personalInfoHeader);
+        personalInfoHeaderContener.appendChild(personalInfoIconContener);
+        personalInfoIconContener.appendChild(buttonModifs); // button
+        HeaderSettingsDivFirst.appendChild(personalInfo);
 // *************** Fin d'affichage des informations personnelles ***************
 
 // *************** Modification des paramètres ***************
@@ -91,7 +156,7 @@ export function settingsView(container) {
     settingsDiv.className = 'card mb-4';
 
     const settingsHeader = document.createElement('div');
-    settingsHeader.className = 'card-header';
+    settingsHeader.className = 'card-header cardTitleModifs';
     settingsHeader.textContent = 'Modifier les paramètres';
 
     const settingsBody = document.createElement('div');
@@ -100,7 +165,7 @@ export function settingsView(container) {
     // Formulaire de modification des paramètres
     const form = document.createElement('form');
     form.className = 'w-100';
-  
+
     // Creation du label pour le nickname
     const newNicknameLabel = document.createElement('label');
     newNicknameLabel.className = 'form-label';
@@ -132,7 +197,7 @@ export function settingsView(container) {
     // Bouton de soumission
     const submitButton = document.createElement('button');
     submitButton.type = 'submit';
-    submitButton.className = 'btn btn-primary w-100';
+    submitButton.className = 'btn btn-primary w-100 Buttonselem';
     submitButton.textContent = 'Enregistrer les modifications';
 
     // Gestion de la soumission du formulaire
@@ -193,7 +258,7 @@ export function settingsView(container) {
     avatarDiv.className = 'card mb-4';
 
     const avatarHeader = document.createElement('div');
-    avatarHeader.className = 'card-header';
+    avatarHeader.className = 'card-header cardTitleModifs';
     avatarHeader.textContent = 'Modifier l\'avatar';
 
     const avatarBody = document.createElement('div');
@@ -214,7 +279,7 @@ export function settingsView(container) {
     // Bouton de soumission
     const avatarSubmitButton = document.createElement('button');
     avatarSubmitButton.type = 'submit';
-    avatarSubmitButton.className = 'btn btn-primary w-100';
+    avatarSubmitButton.className = 'btn btn-primary w-100 Buttonselem';
     avatarSubmitButton.textContent = 'Enregistrer l\'avatar';
 
     // Gestion de la soumission du formulaire
@@ -254,10 +319,12 @@ export function settingsView(container) {
         });
         if (response.ok) {
             avatarForm.innerHTML = '';
-            const successMessage = document.createElement('p');
-            successMessage.className = 'text-success';
-            successMessage.textContent = 'Avatar modifié avec succès';
-            avatarForm.appendChild(successMessage);
+            // const successMessage = document.createElement('p');
+            // successMessage.className = 'text-success';
+            // successMessage.textContent = 'Avatar modifié avec succès';
+            // avatarForm.appendChild(successMessage);
+            navigateTo('/settings');
+
         } else {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
@@ -280,7 +347,7 @@ export function settingsView(container) {
     accessibilityDiv.className = 'card mb-4';
 
     const accessibilityHeader = document.createElement('div');
-    accessibilityHeader.className = 'card-header';
+    accessibilityHeader.className = 'card-header cardTitleModifs';
     accessibilityHeader.textContent = 'Accessibilité';
 
     const accessibilityBody = document.createElement('div');
@@ -290,6 +357,11 @@ export function settingsView(container) {
     const AccessibilityForm = document.createElement('form');
     AccessibilityForm.className = 'w-100';
 
+
+    const PoliceContener = document.createElement('div');
+    PoliceContener.className = 'PoliceContener';
+
+    AccessibilityForm.appendChild(PoliceContener);
     // Champ de la taille de la police
     const labelFontSize = document.createElement('label');
     labelFontSize.className = 'form-label';
@@ -300,7 +372,7 @@ export function settingsView(container) {
     fontSize.type = 'range';
     fontSize.id = 'font-size';
     fontSize.name = 'font-size';
-    fontSize.className = 'form-control-range mb-4';
+    fontSize.className = 'form-control-range mb-4 cursor';
     fontSize.min = 1;
     fontSize.max = 3;
     fontSize.value = userData.font_size;
@@ -315,16 +387,21 @@ export function settingsView(container) {
         exampleElement.style.fontSize = `${fontSize.value}rem`;
     });
 
+
+    const LanguageContenerSettings = document.createElement('div');
+    LanguageContenerSettings.className = 'LanguageContenerSettings';
+
+    accessibilityBody.appendChild(LanguageContenerSettings);
     // Champ de la langue
     const labelLanguage = document.createElement('label');
-    labelLanguage.className = 'form-label';
+    labelLanguage.className = 'form-label labelLanguageSettings';
     labelLanguage.htmlFor = 'language';
     labelLanguage.textContent = 'Langue';
 
     const language = document.createElement('select');
     language.name = 'language';
     language.id = 'language';
-    language.className = 'form-select';
+    language.className = 'form-select selectLanguageSettings';
 
     const option1 = document.createElement('option');
     option1.value = 'fr';
@@ -344,6 +421,10 @@ export function settingsView(container) {
     language.value = userData.language;
 
     // Champ du mode sombre
+    const DarkModeContenerSettings = document.createElement('div');
+    DarkModeContenerSettings.className = 'DarkModeContenerSettings';
+
+    accessibilityBody.appendChild(DarkModeContenerSettings);
     const labelDarkMode = document.createElement('label');
     labelDarkMode.className = 'form-label';
     labelDarkMode.htmlFor = 'dark-mode';
@@ -359,11 +440,11 @@ export function settingsView(container) {
     // Bouton de validation
     const accessSubmitButton = document.createElement('button');
     accessSubmitButton.type = 'submit';
-    accessSubmitButton.className = 'btn btn-primary w-100';
+    accessSubmitButton.className = 'btn btn-primary w-100 Buttonselem';
     accessSubmitButton.textContent = 'Enregistrer les modifications';
 
     // Gestion de la soumission du formulaire
-    AccessibilityForm.addEventListener('submit', async (event) => {
+    accessSubmitButton.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         // Suppression des messages précédents
@@ -377,7 +458,7 @@ export function settingsView(container) {
         const font_size = data.get('font-size');
         const language = data.get('language');
         const dark_mode = data.get('dark-mode');
-        
+
         // Envoi des données au serveur
         const response = await fetch('/api/updateAccessibility/', {
             method: 'PUT',
@@ -398,51 +479,54 @@ export function settingsView(container) {
         if (response.ok) {
             event.preventDefault();
             navigateTo('/settings');
-        } 
+        }
     })
 
     // Ajout des éléments au DOM
     accessibilityDiv.appendChild(accessibilityHeader);
     accessibilityDiv.appendChild(accessibilityBody);
     accessibilityBody.appendChild(AccessibilityForm);
-    AccessibilityForm.appendChild(labelFontSize);
-    AccessibilityForm.appendChild(fontSize);
+    PoliceContener.appendChild(labelFontSize);
+    PoliceContener.appendChild(fontSize);
     AccessibilityForm.appendChild(exampleElement);
-    AccessibilityForm.appendChild(labelLanguage);
-    AccessibilityForm.appendChild(language);
-    AccessibilityForm.appendChild(labelDarkMode);
-    AccessibilityForm.appendChild(darkMode);
+    LanguageContenerSettings.appendChild(labelLanguage);
+    LanguageContenerSettings.appendChild(language);
+    DarkModeContenerSettings.appendChild(labelDarkMode);
+    DarkModeContenerSettings.appendChild(darkMode);
     AccessibilityForm.appendChild(accessSubmitButton);
-    container.appendChild(accessibilityDiv);
+
+    mainSettingsDiv.appendChild(settingsDiv);
+    mainSettingsDiv.appendChild(avatarDiv);
+    mainSettingsDiv.appendChild(accessibilityDiv);
+
+    container.appendChild(mainSettingsDiv);
 // *************** Fin de modification de l'accessibilité ***************
 
 
 // *************** Modification du mot de passe ***************
-    const passwordDiv = document.createElement('div');
-    passwordDiv.className = 'card mb-4';
 
-    const passwordBody = document.createElement('div');
-    passwordBody.className = 'card-body';
+    const ButtonsSettings = document.createElement('div');
+    ButtonsSettings.className = 'ButtonsSettings';
 
     // Bouton de redirection vers la page de modification du mot de passe
     const passwordButton = document.createElement('button');
     passwordButton.textContent = 'Modifier le mot de passe';
-    passwordButton.className = 'btn btn-primary';
+    passwordButton.className = 'btn btn-primary Buttonselem';
     passwordButton.addEventListener('click', (event) => {
         event.preventDefault();
         navigateTo('/password');
     });
 
-    passwordDiv.appendChild(passwordBody);
-    passwordBody.appendChild(passwordButton);
-    container.appendChild(passwordDiv);
+
+    ButtonsSettings.appendChild(passwordButton);
+    container.appendChild(ButtonsSettings);
 // *************** Fin de modification du mot de passe ***************
 
 
 // *************** Deconnexion ***************
     const logoutButton = document.createElement('button');
     logoutButton.textContent = 'Logout';
-    logoutButton.className = 'btn btn-danger';
+    logoutButton.className = 'btn btn-danger Buttonselem ButtonLogOut';
     logoutButton.addEventListener('click', (event) => {
         fetch('/api/logout/', {
             method: 'POST',
@@ -458,7 +542,7 @@ export function settingsView(container) {
             navigateTo('/login');
         });
     });
-    container.appendChild(logoutButton);
+    ButtonsSettings.appendChild(logoutButton);
 // *************** Fin de deconnexion ***************
     });
 }
