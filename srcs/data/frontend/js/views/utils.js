@@ -202,9 +202,6 @@ export async function getAccessibility() {
                 'X-CSRFToken': getCookie('csrftoken')
             },
         });
-
-        console.log('response:', response);
-
         if (response.status === 200) {
             const data = await response.json();
             const userData = {
@@ -212,7 +209,6 @@ export async function getAccessibility() {
                 font_size: data.font_size,
                 theme: data.dark_mode,
             };
-            console.log('data:', userData);
             return userData;
         } else if (response.status === 307) {
             localStorage.removeItem('token');
@@ -232,7 +228,7 @@ export async function getAccessibility() {
             throw new Error('Something went wrong');
         }
     } catch (error) {
-        console.error('Error fetching accessibility settings:', error);
+        console.error('Error fetching accessibility settings:', error); // A enlever plus tard
         return null;
     }
 }

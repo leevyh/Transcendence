@@ -87,7 +87,11 @@ export function settingsView(container) {
         buttonModifs.className = 'buttonModifs';
         buttonModifs.addEventListener('click', () => {
             const mainSettingsDiv = document.querySelector('.main-settings-div');
-            mainSettingsDiv.style.display = 'flex';
+            if (mainSettingsDiv.style.display === 'flex') {
+                mainSettingsDiv.style.display = 'none';
+            } else if (mainSettingsDiv.style.display === 'none') {
+                mainSettingsDiv.style.display = 'flex';
+            }
         });
 
         const svgpersonalInfoIcon = document.createElement('svg');
@@ -103,9 +107,9 @@ export function settingsView(container) {
         const personalInfoBody = document.createElement('div');
         personalInfoBody.className = 'card-body cardBodywidget';
 
+        // Avatar
         const avatarItem = document.createElement('div');
-        avatarItem.className = 'list-group-item imgAvatarContener';
-        //avatarItem.textContent = 'Avatar: ';
+        avatarItem.className = 'list-group-item imgAvatarContainer';
         const avatarImage = document.createElement('img');
         avatarImage.src = `data:image/png;base64, ${userData.avatar}`;
         avatarImage.className = 'img-fluid rounded-circle imgAvatarProfile';
@@ -113,29 +117,53 @@ export function settingsView(container) {
 
         const personalInfoList = document.createElement('ul');
         personalInfoList.className = 'list-group list-group-flush cardBodyListElemProfile';
+
+        // Personal infos
+        const usernameItem = document.createElement('li');
+        usernameItem.className = 'list-group-item cardBodyElemProfile';
+        usernameItem.textContent = `Nom d'utilisateur: ${userData.username}`;
         const nicknameItem = document.createElement('li');
         nicknameItem.className = 'list-group-item cardBodyElemProfile';
-        nicknameItem.textContent = `Nickname: ${userData.nickname}`;
+        nicknameItem.textContent = `Pseudo: ${userData.nickname}`;
         const emailItem = document.createElement('li');
         emailItem.className = 'list-group-item cardBodyElemProfile';
         emailItem.textContent = `Email: ${userData.email}`;
+        const passwordItem = document.createElement('li');
+        passwordItem.className = 'list-group-item cardBodyElemProfile';
+        passwordItem.textContent = `Mot de passe: **********`;
 
-        ///
+        // Accessibility infos
         const languageItem = document.createElement('li');
         languageItem.className = 'list-group-item';
-        languageItem.textContent = `Langue: ${userData.language}`;
-
+        let languageChoice = '';
+        if (userData.language === 'fr') {
+            languageChoice = 'Français';
+        } else if (userData.language === 'en') {
+            languageChoice = 'English';
+        } else if (userData.language === 'sp') {
+            languageChoice = 'Spanish';
+        }
+        languageItem.textContent = `Langue: ${languageChoice}`;
         const fontSizeItem = document.createElement('li');
         fontSizeItem.className = 'list-group-item cardBodyElemProfile';
-        fontSizeItem.textContent = `Taille de la police: ${userData.font_size}`;
-
+        let fontSizeChoice = '';
+        if (userData.font_size === 1) {
+            fontSizeChoice = 'Petite';
+        } else if (userData.font_size === 2) {
+            fontSizeChoice = 'Moyenne';
+        } else if (userData.font_size === 3) {
+            fontSizeChoice = 'Grande';
+        }
+        fontSizeItem.textContent = `Taille de la police: ${fontSizeChoice}`;
         const darkModeItem = document.createElement('li');
         darkModeItem.className = 'list-group-item cardBodyElemProfile';
         darkModeItem.textContent = `Mode sombre: ${userData.theme ? 'Activé' : 'Désactivé'}`;
 
         avatarItem.appendChild(avatarImage);
+        personalInfoList.appendChild(usernameItem);
         personalInfoList.appendChild(nicknameItem);
         personalInfoList.appendChild(emailItem);
+        personalInfoList.appendChild(passwordItem);
         personalInfoBody.appendChild(avatarItem);
         personalInfoList.appendChild(languageItem);
         personalInfoList.appendChild(fontSizeItem);
@@ -163,8 +191,8 @@ export function settingsView(container) {
     settingsBody.className = 'card-body';
 
     // Formulaire de modification des paramètres
-    const form = document.createElement('form');
-    form.className = 'w-100';
+    const infoForm = document.createElement('form');
+    infoForm.className = 'w-100';
 
     // Creation du label pour le nickname
     const newNicknameLabel = document.createElement('label');
@@ -201,13 +229,13 @@ export function settingsView(container) {
     submitButton.textContent = 'Enregistrer les modifications';
 
     // Gestion de la soumission du formulaire
-    form.addEventListener('submit', async (event) => {
+    infoForm.addEventListener('submit', async (event) => {
         event.preventDefault(); // Empêche la soumission par défaut du formulaire
 
         // Suppression des messages précédents
         const errorMessages = avatarForm.querySelectorAll('.text-danger');
         errorMessages.forEach(message => message.remove());
-        const successMessages = AccessibilityForm.querySelectorAll('.text-success');
+        const successMessages = accessibilityForm.querySelectorAll('.text-success');
         successMessages.forEach(message => message.remove());
 
         // Récupération des données du formulaire
@@ -226,30 +254,30 @@ export function settingsView(container) {
             body: JSON.stringify({ nickname, email })
         });
         if (response.ok) {
-            // form.innerHTML = '';
-            // const successMessage = document.createElement('p');
-            // successMessage.className = 'text-success';
-            // successMessage.textContent = 'Paramètres modifiés avec succès';
-            // form.appendChild(successMessage);
-            event.preventDefault();
-            navigateTo('/settings');
+            infoForm.innerHTML = '';
+            const successMessage = document.createElement('p');
+            successMessage.className = 'text-success';
+            successMessage.textContent = 'Paramètres modifiés avec succès';
+            infoForm.appendChild(successMessage);
+            // event.preventDefault();
+            // navigateTo('/settings');
         } else {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Erreur lors de la modification des paramètres';
-            form.insertBefore(errorMessage, submitButton);
+            infoForm.insertBefore(errorMessage, submitButton);
         }
     })
 
     // Ajout des éléments au DOM
     settingsDiv.appendChild(settingsHeader);
     settingsDiv.appendChild(settingsBody);
-    settingsBody.appendChild(form);
-    form.appendChild(newNicknameLabel);
-    form.appendChild(newNickname);
-    form.appendChild(newEmailLabel);
-    form.appendChild(newEmail);
-    form.appendChild(submitButton);
+    settingsBody.appendChild(infoForm);
+    infoForm.appendChild(newNicknameLabel);
+    infoForm.appendChild(newNickname);
+    infoForm.appendChild(newEmailLabel);
+    infoForm.appendChild(newEmail);
+    infoForm.appendChild(submitButton);
     container.appendChild(settingsDiv);
 // *************** Fin de modification des paramètres ***************
 
@@ -289,7 +317,7 @@ export function settingsView(container) {
         // Suppression des messages précédents
         const errorMessages = avatarForm.querySelectorAll('.text-danger');
         errorMessages.forEach(message => message.remove());
-        const successMessages = AccessibilityForm.querySelectorAll('.text-success');
+        const successMessages = accessibilityForm.querySelectorAll('.text-success');
         successMessages.forEach(message => message.remove());
 
         // Récupération des données du formulaire
@@ -318,11 +346,12 @@ export function settingsView(container) {
             body: avatar,
         });
         if (response.ok) {
-            avatarForm.innerHTML = '';
+            // avatarForm.innerHTML = '';
             // const successMessage = document.createElement('p');
             // successMessage.className = 'text-success';
             // successMessage.textContent = 'Avatar modifié avec succès';
             // avatarForm.appendChild(successMessage);
+            event.preventDefault();
             navigateTo('/settings');
 
         } else {
@@ -354,15 +383,13 @@ export function settingsView(container) {
     accessibilityBody.className = 'card-body';
 
     // Formulaire de modification de l'accessibilité
-    const AccessibilityForm = document.createElement('form');
-    AccessibilityForm.className = 'w-100';
+    const accessibilityForm = document.createElement('form');
+    accessibilityForm.className = 'w-100';
 
-
-    const PoliceContener = document.createElement('div');
-    PoliceContener.className = 'PoliceContener';
-
-    AccessibilityForm.appendChild(PoliceContener);
     // Champ de la taille de la police
+    const fontSizeContainer = document.createElement('div');
+    fontSizeContainer.className = 'fontSizeContainer';
+
     const labelFontSize = document.createElement('label');
     labelFontSize.className = 'form-label';
     labelFontSize.htmlFor = 'font-size';
@@ -370,8 +397,8 @@ export function settingsView(container) {
 
     const fontSize = document.createElement('input');
     fontSize.type = 'range';
-    fontSize.id = 'font-size';
     fontSize.name = 'font-size';
+    fontSize.id = 'font-size'; // Pour le label
     fontSize.className = 'form-control-range mb-4 cursor';
     fontSize.min = 1;
     fontSize.max = 3;
@@ -382,17 +409,14 @@ export function settingsView(container) {
     exampleElement.textContent = 'Aa';
     exampleElement.style.fontFamily = "'Quicksand', sans-serif";
     exampleElement.style.fontSize = `${userData.font_size}rem`;
-    // exampleElement.style.fontSize = '2rem'; // Default value, to be changed by the user's choice later
     fontSize.addEventListener('input', () => {
         exampleElement.style.fontSize = `${fontSize.value}rem`;
     });
 
-
-    const LanguageContenerSettings = document.createElement('div');
-    LanguageContenerSettings.className = 'LanguageContenerSettings';
-
-    accessibilityBody.appendChild(LanguageContenerSettings);
     // Champ de la langue
+    const languageContainer = document.createElement('div');
+    languageContainer.className = 'LanguageContainer';
+
     const labelLanguage = document.createElement('label');
     labelLanguage.className = 'form-label labelLanguageSettings';
     labelLanguage.htmlFor = 'language';
@@ -400,7 +424,7 @@ export function settingsView(container) {
 
     const language = document.createElement('select');
     language.name = 'language';
-    language.id = 'language';
+    language.id = 'language'; // Pour le label
     language.className = 'form-select selectLanguageSettings';
 
     const option1 = document.createElement('option');
@@ -417,14 +441,12 @@ export function settingsView(container) {
     option3.value = 'sp';
     option3.textContent = 'Spanish';
     language.appendChild(option3);
-
     language.value = userData.language;
 
     // Champ du mode sombre
-    const DarkModeContenerSettings = document.createElement('div');
-    DarkModeContenerSettings.className = 'DarkModeContenerSettings';
+    const darkModeContainer = document.createElement('div');
+    darkModeContainer.className = 'DarkModeContainer';
 
-    accessibilityBody.appendChild(DarkModeContenerSettings);
     const labelDarkMode = document.createElement('label');
     labelDarkMode.className = 'form-label';
     labelDarkMode.htmlFor = 'dark-mode';
@@ -432,8 +454,8 @@ export function settingsView(container) {
 
     const darkMode = document.createElement('input');
     darkMode.type = 'checkbox';
-    darkMode.id = 'dark-mode';
     darkMode.name = 'dark-mode';
+    darkMode.id = 'dark-mode';  // Pour le label
     darkMode.className = 'form-check-input mb-4';
     darkMode.checked = userData.theme;
 
@@ -443,106 +465,111 @@ export function settingsView(container) {
     accessSubmitButton.className = 'btn btn-primary w-100 Buttonselem';
     accessSubmitButton.textContent = 'Enregistrer les modifications';
 
-    // Gestion de la soumission du formulaire
-    accessSubmitButton.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        // Suppression des messages précédents
-        const errorMessages = AccessibilityForm.querySelectorAll('.text-danger');
-        errorMessages.forEach(message => message.remove());
-        // const successMessages = AccessibilityForm.querySelectorAll('.text-success');
-        // successMessages.forEach(message => message.remove());
-
-        // Récupération des données du formulaire
-        const data = new FormData(AccessibilityForm);
-        const font_size = data.get('font-size');
-        const language = data.get('language');
-        const dark_mode = data.get('dark-mode');
-
-        // Envoi des données au serveur
-        const response = await fetch('/api/updateAccessibility/', {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-            body: JSON.stringify({ font_size, language, dark_mode })
-        })
-        .catch((error) => {
-            const errorMessage = document.createElement('p');
-            errorMessage.className = 'text-danger';
-            errorMessage.textContent = 'Erreur lors de la modification des paramètres';
-            AccessibilityForm.insertBefore(errorMessage, accessSubmitButton);
-            // console.error('Error:', error);
-        });
-        if (response.ok) {
+        // Gestion de la soumission du formulaire
+        accessibilityForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            navigateTo('/settings');
-        }
-    })
 
-    // Ajout des éléments au DOM
-    accessibilityDiv.appendChild(accessibilityHeader);
-    accessibilityDiv.appendChild(accessibilityBody);
-    accessibilityBody.appendChild(AccessibilityForm);
-    PoliceContener.appendChild(labelFontSize);
-    PoliceContener.appendChild(fontSize);
-    AccessibilityForm.appendChild(exampleElement);
-    LanguageContenerSettings.appendChild(labelLanguage);
-    LanguageContenerSettings.appendChild(language);
-    DarkModeContenerSettings.appendChild(labelDarkMode);
-    DarkModeContenerSettings.appendChild(darkMode);
-    AccessibilityForm.appendChild(accessSubmitButton);
+            // Suppression des messages précédents
+            const errorMessages = accessibilityForm.querySelectorAll('.text-danger');
+            errorMessages.forEach(message => message.remove());
+            const successMessages = accessibilityForm.querySelectorAll('.text-success');
+            successMessages.forEach(message => message.remove());
 
-    mainSettingsDiv.appendChild(settingsDiv);
-    mainSettingsDiv.appendChild(avatarDiv);
-    mainSettingsDiv.appendChild(accessibilityDiv);
+            // Récupération des données du formulaire
+            const data = new FormData(accessibilityForm);
+            const font_size = data.get('font-size');
+            const language = data.get('language');
+            const dark_mode = data.get('dark-mode');
 
-    container.appendChild(mainSettingsDiv);
+            // Envoi des données au serveur
+            const response = await fetch('/api/updateAccessibility/', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify({ font_size, language, dark_mode })
+            })
+            .catch((error) => {
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'Erreur lors de la modification des paramètres';
+                accessibilityForm.insertBefore(errorMessage, accessSubmitButton);
+                // console.error('Error:', error);
+            });
+            if (response.ok) {
+                // const successMessage = document.createElement('p');
+                // successMessage.className = 'text-success';
+                // successMessage.textContent = 'Accessibilité modifié avec succès';
+                // accessibilityForm.appendChild(successMessage);
+                event.preventDefault();
+                navigateTo('/settings');
+            }
+        })
+
+        // Ajout des éléments au DOM
+        accessibilityDiv.appendChild(accessibilityHeader);
+        accessibilityDiv.appendChild(accessibilityBody);
+        accessibilityBody.appendChild(accessibilityForm);
+        fontSizeContainer.appendChild(labelFontSize);
+        fontSizeContainer.appendChild(fontSize);
+        accessibilityForm.appendChild(languageContainer);
+        accessibilityForm.appendChild(fontSizeContainer);
+        accessibilityForm.appendChild(exampleElement);
+        accessibilityForm.appendChild(darkModeContainer)
+        languageContainer.appendChild(labelLanguage);
+        languageContainer.appendChild(language);
+        darkModeContainer.appendChild(labelDarkMode);
+        darkModeContainer.appendChild(darkMode);
+        accessibilityForm.appendChild(accessSubmitButton);
+
+        mainSettingsDiv.appendChild(settingsDiv);
+        mainSettingsDiv.appendChild(avatarDiv);
+        mainSettingsDiv.appendChild(accessibilityDiv);
+
+        container.appendChild(mainSettingsDiv);
 // *************** Fin de modification de l'accessibilité ***************
 
 
 // *************** Modification du mot de passe ***************
+        const ButtonsSettings = document.createElement('div');
+        ButtonsSettings.className = 'ButtonsSettings';
 
-    const ButtonsSettings = document.createElement('div');
-    ButtonsSettings.className = 'ButtonsSettings';
+        // Bouton de redirection vers la page de modification du mot de passe
+        const passwordButton = document.createElement('button');
+        passwordButton.textContent = 'Modifier le mot de passe';
+        passwordButton.className = 'btn btn-primary Buttonselem';
+        passwordButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            navigateTo('/password');
+        });
 
-    // Bouton de redirection vers la page de modification du mot de passe
-    const passwordButton = document.createElement('button');
-    passwordButton.textContent = 'Modifier le mot de passe';
-    passwordButton.className = 'btn btn-primary Buttonselem';
-    passwordButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        navigateTo('/password');
-    });
-
-
-    ButtonsSettings.appendChild(passwordButton);
-    container.appendChild(ButtonsSettings);
+        ButtonsSettings.appendChild(passwordButton);
+        container.appendChild(ButtonsSettings);
 // *************** Fin de modification du mot de passe ***************
 
 
 // *************** Deconnexion ***************
-    const logoutButton = document.createElement('button');
-    logoutButton.textContent = 'Logout';
-    logoutButton.className = 'btn btn-danger Buttonselem ButtonLogOut';
-    logoutButton.addEventListener('click', (event) => {
-        fetch('/api/logout/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            localStorage.removeItem('token');
-            event.preventDefault();
-            navigateTo('/login');
+        const logoutButton = document.createElement('button');
+        logoutButton.textContent = 'Logout';
+        logoutButton.className = 'btn btn-danger Buttonselem ButtonLogOut';
+        logoutButton.addEventListener('click', (event) => {
+            fetch('/api/logout/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                localStorage.removeItem('token');
+                event.preventDefault();
+                navigateTo('/login');
+            });
         });
-    });
-    ButtonsSettings.appendChild(logoutButton);
+        ButtonsSettings.appendChild(logoutButton);
 // *************** Fin de deconnexion ***************
     });
 }
