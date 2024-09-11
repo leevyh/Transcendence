@@ -127,9 +127,44 @@ export function navigationBar(container) {
         navigateTo('/settings');
     });
 
+    // Path c'est l'icone de parametre
     const path5 = document.createElement('path');
     path5.setAttribute('d', 'M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z');
     svgSettings.appendChild(path5);
+
+    // Creation d'un bouton pour les notifications
+    const userActionsDiv = document.createElement('div');
+    userActionsDiv.className = 'user-actions hidden-xs';
+
+    const aNotification = document.createElement('a');
+    aNotification.className = 'navbar-brand notification';
+    div.appendChild(aNotification);
+
+    const svgNotification = document.createElement('svg');
+    svgNotification.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svgNotification.setAttribute('width', '16');
+    svgNotification.setAttribute('height', '16');
+    svgNotification.setAttribute('fill', 'currentColor');
+    svgNotification.setAttribute('class', 'bi bi-bell-fill');
+    svgNotification.setAttribute('viewBox', '0 0 16 16');
+    aNotification.appendChild(svgNotification);
+    aNotification.addEventListener('click', (event) => {
+        event.preventDefault();
+        navigateTo('/notifications');
+    });
+    
+// TODO: Afficher lorsque l'utilisateur a des notifications
+    // Création du compteur de notifications
+    const countElement = document.createElement('span');
+    countElement.className = 'user-action-count labeled redNotification';
+    countElement.setAttribute('data-counter-count', '2');
+    countElement.style.display = 'none';
+    countElement.textContent = '2'; //TOTO : Websocket pour récupérer le nombre de notifications
+    aNotification.appendChild(countElement);
+
+    const path6 = document.createElement('path');
+    path6.setAttribute('d', 'M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm2-3a1 1 0 0 0-2 0h2zm-2-4a4 4 0 0 0-4 4h8a4 4 0 0 0-4-4z');
+    svgNotification.appendChild(path6);
 
     // Creation d'un formulaire de recherche
     const form = document.createElement('form');
@@ -158,9 +193,9 @@ export function navigationBar(container) {
     svgSearch.setAttribute('viewBox', '0 0 16 16');
     button.appendChild(svgSearch);
 
-    const path6 = document.createElement('path');
-    path6.setAttribute('d', 'M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0');
-    svgSearch.appendChild(path6);
+    const path7 = document.createElement('path');
+    path7.setAttribute('d', 'M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0');
+    svgSearch.appendChild(path7);
 
     form.addEventListener('submit', (event) => {
         event.preventDefault();

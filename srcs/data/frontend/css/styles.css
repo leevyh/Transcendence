@@ -144,6 +144,24 @@ body.dark-mode {
     width: 10px; */
     color: #012970;
 }
+/* .notification {
+    color: #ff0202;
+} */
+
+.redNotification {
+    border-radius: 100%;
+    color: white;
+    background-color: #dc3545;
+    text-align: center;
+    font-weight: bold;
+    height: 15px;
+    width: 15px;
+    margin-left: -10px;
+    align-content: center;
+    font-size: 10px;
+    display: inline-block;
+    position: absolute;
+}
 
 .nav-icon {
     width: 50%;
