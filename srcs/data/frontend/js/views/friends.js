@@ -100,14 +100,7 @@ export async function friendsView(container) {
     }
 
     function sendFriendRequest(nickname) {
-        checkFriendAsBeenRequested(nickname).then(status => {
-            if (status === 'not_found') {
-                //Send friend request
-                sendFriendRequestToServer(nickname);
-            } else {
-                console.log('Friend request already sent');         // DEBUG
-            }
-        });
+        sendFriendRequestToServer(nickname);
     }
 
     async function checkFriendAsBeenRequested(nickname) {
