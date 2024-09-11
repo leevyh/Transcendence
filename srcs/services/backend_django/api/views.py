@@ -168,7 +168,8 @@ def get_settings(request):
             settings = Accessibility.objects.get(user=user_id)
             avatar_image = user.avatar
             avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
-            data = {'nickname': user.nickname,
+            data = {'username': user.username,
+                    'nickname': user.nickname,
                     'email': user.email,
                     'language': settings.language,
                     'font_size': settings.font_size,

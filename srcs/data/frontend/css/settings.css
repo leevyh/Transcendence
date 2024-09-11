@@ -70,16 +70,15 @@
 	display: flex;
 }
 
-.imgAvatarContener {
+
+.imgAvatarContainer {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	width: 20%;
 	border-right-color:#012970;
-}
-
+} 
 .imgAvatarProfile {
-
 	width: 50%;
 }
 
@@ -100,7 +99,7 @@
 	border: none;
 }
 
-.PoliceContener {
+.fontSizeContainer {
 	display: flex;
 	justify-content: space-around;
 	align-items: baseline;
@@ -116,7 +115,7 @@
 	margin: 0;
 }
 
-.LanguageContenerSettings {
+.LanguageContainer {
 	display:flex;
 	flex-direction: row;
 	align-items: center;
@@ -134,7 +133,7 @@
 	border-color: #012970;
 	margin-right: 0;
 }
-.DarkModeContenerSettings {
+.DarkModeContainer {
 	display: flex;
 	justify-content: space-between;
 }
