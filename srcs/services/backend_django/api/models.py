@@ -92,6 +92,21 @@ class FriendRequest(models.Model):
             },
         )
 
+class Friendship(models.Model):
+    user1 = models.ForeignKey(User_site, related_name='friendships_initiated', on_delete=models.CASCADE)
+    user2 = models.ForeignKey(User_site, related_name='friendships_received', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = (('user1', 'user2'), ('user2', 'user1'))
+        constraints = [
+            models.UniqueConstraint(fields=['user1', 'user2'], name='unique_friendship'),
+            models.UniqueConstraint(fields=['user2', 'user1'], name='inverse_unique_friendship')
+        ]
+
+    def __str__(self):
+        return f"Friendship between {self.user1} and {self.user2}"
+
 
 # class PrivateGameInvite(model.Model):
 
