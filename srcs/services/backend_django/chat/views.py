@@ -7,7 +7,6 @@ import base64
 @login_required(login_url='/api/login')
 def conversationID(request, nickname):
     if request.method == 'GET':
-        print('conversationID')
         try:
             # Récupérer l'utilisateur effectuant la requête
             sender = request.user
@@ -22,9 +21,9 @@ def conversationID(request, nickname):
             conversation = Conversation.objects.filter(members=sender).filter(members=receiver).first()
 
             def encode_avatar(user):
-                """Convertir l'avatar de l'utilisateur en base64"""
+                # Convertir l'avatar de l'utilisateur en base64
                 if user.avatar:  # Vérifier que l'utilisateur a un avatar
-                    avatar_image = user.avatar.open()  # Ouvrir l'image
+                    avatar_image = user.avatar.open()
                     avatar_base64 = base64.b64encode(avatar_image.read()).decode('utf-8')
                     avatar_image.close()
                     return avatar_base64
@@ -33,6 +32,7 @@ def conversationID(request, nickname):
             if conversation:
                 sender_avatar_base64 = encode_avatar(sender)
                 receiver_avatar_base64 = encode_avatar(receiver)
+
                 return JsonResponse({
                     'id': conversation.id,
                     'members': [
