@@ -82,7 +82,7 @@ services:
     container_name: backend-django
     build: ./srcs/services/backend_django
     volumes:
-      - backend-django:/home/app
+      - backend-django:/var/app/ft_transcendence/
       - backend-elk-certs:/usr/share/elasticsearch/config/certs/
     networks:
       - default
@@ -92,7 +92,7 @@ services:
       - ./env/postgresql.env
       - ./env/42app.env
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://backend-django:8000/"]
+      test: ["CMD-SHELL", "curl -IL http://backend-django:8000/api/django_status | grep -q 'HTTP/1.1 200 OK'"]
     depends_on:
       backend-logstash:
         condition: service_started
