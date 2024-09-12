@@ -2,7 +2,7 @@ from django.db import models
 from api.models import User_site as User
 
 class Conversation(models.Model):
-    members = models.ManyToManyField(User, related_name='conversations')
+    members = models.ManyToManyField(User, related_name='conversation')
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Message(models.Model):
@@ -10,3 +10,6 @@ class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender.username}: {self.content[:20]}"

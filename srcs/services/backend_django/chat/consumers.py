@@ -1,37 +1,37 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-class ChatMessagesConsumer(AsyncWebsocketConsumer):
+class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.conversation_id = self.scope['url_route']['kwargs']['conversationID']
-        self.room_group_name = f'messages_{self.conversation_id}'
+        self.conversation_group_name = f'conversation_{self.conversation_id}'
 
-        # Joindre un groupe pour les messages de la conversation
+        # Join conversation group
         await self.channel_layer.group_add(
-            self.room_group_name,
+            self.conversation_group_name,
             self.channel_name
         )
 
-        # Accepter la connexion WebSocket
+        # Accept the WebSocket connection
         await self.accept()
 
     async def disconnect(self, close_code):
-        # Quitter le groupe des messages de la conversation
+        # Leave conversation group
         await self.channel_layer.group_discard(
-            self.room_group_name,
+            self.conversation_group_name,
             self.channel_name
         )
 
-    # Recevoir un message du WebSocket
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        sender = text_data_json['sender']
-        timestamp = text_data_json['timestamp']
+        # Receive message from WebSocket
+        data = json.loads(text_data)
+        message = data['message']
+        sender = data['sender']
+        timestamp = data['timestamp']
 
-        # Diffuser le message au groupe de messages
+        # Send message to conversation group
         await self.channel_layer.group_send(
-            self.room_group_name,
+            self.conversation_group_name,
             {
                 'type': 'chat_message',
                 'message': message,
@@ -40,14 +40,13 @@ class ChatMessagesConsumer(AsyncWebsocketConsumer):
             }
         )
 
-    # Recevoir un message du groupe de messages
+    # Receive message from conversation group
     async def chat_message(self, event):
         message = event['message']
         sender = event['sender']
-
         timestamp = event['timestamp']
 
-        # Envoyer le message à WebSocket avec l'identifiant de l'expéditeur
+        # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
             'sender': sender,

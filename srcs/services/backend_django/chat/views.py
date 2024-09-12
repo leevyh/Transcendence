@@ -13,7 +13,7 @@ def conversationID(request, nickname):
 
             # Récupérer l'utilisateur avec le nickname
             try:
-                receiver = User.objects.get(username=nickname)
+                receiver = User.objects.get(nickname=nickname)
             except User.DoesNotExist:
                 return JsonResponse({'error': 'User not found'}, status=404)
 
@@ -36,8 +36,8 @@ def conversationID(request, nickname):
                 return JsonResponse({
                     'id': conversation.id,
                     'members': [
-                        {'id': sender.id, 'username': sender.username, 'avatar': sender_avatar_base64},
-                        {'id': receiver.id, 'username': receiver.username, 'avatar': receiver_avatar_base64},
+                        {'id': sender.id, 'nickname': sender.nickname, 'avatar': sender_avatar_base64},
+                        {'id': receiver.id, 'nickname': receiver.nickname, 'avatar': receiver_avatar_base64},
                     ],
                     'created_at': conversation.created_at
                 })
@@ -53,8 +53,8 @@ def conversationID(request, nickname):
                 return JsonResponse({
                     'id': conversation.id,
                     'members': [
-                        {'id': sender.id, 'username': sender.username, 'avatar': sender_avatar_base64},
-                        {'id': receiver.id, 'username': receiver.username, 'avatar': receiver_avatar_base64},
+                        {'id': sender.id, 'nickname': sender.nickname, 'avatar': sender_avatar_base64},
+                        {'id': receiver.id, 'nickname': receiver.nickname, 'avatar': receiver_avatar_base64},
                     ],
                     'created_at': conversation.created_at
                 })

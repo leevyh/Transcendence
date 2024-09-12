@@ -123,6 +123,7 @@ function openChat(nickname) {
     // Afficher la deuxième colonne (col-md-8)
     const col2 = document.querySelector('.col-md-8');
     col2.style.display = 'block';
+    col2.innerHTML = '';
 
     // Mettre à jour le titre de la fenêtre de chat
     const chatHeader = document.getElementById('chat-header');
@@ -161,6 +162,7 @@ function openChat(nickname) {
         }
 
         ws.onmessage = function(event) {
+
             const receivedMessage = JSON.parse(event.data);
             if (receivedMessage.sender === nickname) {
                 displayMessage(receivedMessage, 'received-message');
@@ -186,7 +188,7 @@ function handleMessages(message) {
         const messageData = {
             type: 'chat_message',
             message: message,
-            sender: conversationData.members[0].username === receiver ? conversationData.members[1].username : conversationData.members[0].username,
+            sender: conversationData.members[0].nickname === receiver ? conversationData.members[1].nickname : conversationData.members[0].nickname,
             timestamp: new Date().toISOString()
         };
         ws.send(JSON.stringify(messageData)); 
@@ -201,72 +203,70 @@ function handleMessages(message) {
 function displayMessage(messageData, messageID) {
     const chatBody = document.getElementById('chat-body');
 
-    if (messageID === 'sent-message') {
-// Si l'utilisateur est le sender, on affiche le message à droite
+    if (messageID === 'received-message') {
+// Si l'utilisateur est le destinataire, on affiche le message à gauche
         const messageElement = document.createElement('div');
-        messageElement.className = messageData.sender === localStorage.getItem('nickname') ? 'sent-message' : 'received-message';
+        messageElement.className = messageData.receiver === localStorage.getItem('nickname') ? 'sent-message' : 'received-message';
         messageElement.classList.add('d-flex', 'flex-row', 'justify-content-start', 'mb-4');
 
         // Créer l'image
-        const Avatar = conversationData.members[0].username === messageData.sender ? conversationData.members[0].avatar : conversationData.members[1].avatar;
+        const Avatar = conversationData.members[0].nickname === messageData.receiver ? conversationData.members[0].avatar : conversationData.members[1].avatar;
         const img = document.createElement('img');
         img.src = `data:image/png;base64, ${Avatar}`;
         img.alt = 'avatar 1';
         img.style.width = '45px';
         img.style.height = '100%';
-
+        img.style.borderRadius = '50%';
 
         // Créer la div du message
         const messageDiv = document.createElement('div');
-        messageDiv.classList.add('p-3', 'ms-3');
+        messageDiv.classList.add('p-3', 'border', 'bg-body-secondary');
         messageDiv.style.borderRadius = '15px';
         messageDiv.style.backgroundColor = 'rgba(57, 192, 237, 0.2)';
+        messageDiv.style.marginLeft = '1rem';
 
         // Créer le paragraphe contenant le texte
         const paragraph = document.createElement('p');
         paragraph.classList.add('small', 'mb-0');
-        paragraph.textContent = 'Hello and thank you for visiting MDBootstrap. Please click the video below.';
         paragraph.innerHTML = `
             <strong>${messageData.sender}:</strong> ${messageData.message} <br>
             <small>${new Date(messageData.timestamp).toLocaleTimeString()}</small>
         `;
 
-        // Ajouter le paragraphe à la div du message
         messageDiv.appendChild(paragraph);
-        // Ajouter l'image et la div du message à la div principale
         messageElement.appendChild(img);
         messageElement.appendChild(messageDiv);
-
         chatBody.appendChild(messageElement);
 
-    } else if (messageID === 'received-message') {
-// Si l'utilisateur est le receiver, on affiche le message à gauche
+    } else if (messageID === 'sent-message') {
+// Si l'utilisateur est l'expediteur, on affiche le message à droite
         const messageElement = document.createElement('div');
         messageElement.className = messageData.sender === localStorage.getItem('nickname') ? 'sent-message' : 'received-message';
         messageElement.classList.add('d-flex', 'flex-row', 'justify-content-end', 'mb-4');
 
         // Créer l'image
-        const Avatar = conversationData.members[0].username === messageData.receiver ? conversationData.members[0].avatar : conversationData.members[1].avatar;
+        const Avatar = conversationData.members[0].nickname === messageData.sender ? conversationData.members[0].avatar : conversationData.members[1].avatar;
         const img = document.createElement('img');
         img.src = `data:image/png;base64, ${Avatar}`;
-        img.alt = 'avatar 1';
+        img.alt = 'avatar';
         img.style.width = '45px';
         img.style.height = '100%';
+        img.style.borderRadius = '50%';
 
         // Créer la div du message
         const messageDiv = document.createElement('div');
-        messageDiv.classList.add('p-3', 'ms-3', 'border', 'bg-body-tertiary');
+        messageDiv.classList.add('p-3', 'border', 'bg-body-tertiary');
         messageDiv.style.borderRadius = '15px';
+        messageDiv.style.marginRight = '1rem';
 
         // Créer le paragraphe contenant le texte
         const paragraph = document.createElement('p');
         paragraph.classList.add('small', 'mb-0');
-        paragraph.textContent = 'Hello and thank you for visiting MDBootstrap. Please click the video below.';
         paragraph.innerHTML = `
             <strong>${messageData.sender}:</strong> ${messageData.message} <br>
             <small>${new Date(messageData.timestamp).toLocaleTimeString()}</small>
         `;
-        // Ajouter le paragraphe à la div du message
+
         messageDiv.appendChild(paragraph);
         messageElement.appendChild(messageDiv);
         messageElement.appendChild(img);
@@ -274,35 +274,3 @@ function displayMessage(messageData, messageID) {
     }
     chatBody.scrollTop = chatBody.scrollHeight;
 }
-
-// // Créer une div principale
-// const mainDiv = document.createElement('div');
-// mainDiv.classList.add('d-flex', 'flex-row', 'justify-content-start', 'mb-4');
-
-// // Créer l'image
-// const img = document.createElement('img');
-// img.src = 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp';
-// img.alt = 'avatar 1';
-// img.style.width = '45px';
-// img.style.height = '100%';
-
-// // Créer la div du message
-// const messageDiv = document.createElement('div');
-// messageDiv.classList.add('p-3', 'ms-3');
-// messageDiv.style.borderRadius = '15px';
-// messageDiv.style.backgroundColor = 'rgba(57, 192, 237, 0.2)';
-
-// // Créer le paragraphe contenant le texte
-// const paragraph = document.createElement('p');
-// paragraph.classList.add('small', 'mb-0');
-// paragraph.textContent = 'Hello and thank you for visiting MDBootstrap. Please click the video below.';
-
-// // Ajouter le paragraphe à la div du message
-// messageDiv.appendChild(paragraph);
-
-// // Ajouter l'image et la div du message à la div principale
-// mainDiv.appendChild(img);
-// mainDiv.appendChild(messageDiv);
-
-// // Ajouter le tout à l'élément parent (par exemple, body ou une autre div)
-// document.body.appendChild(mainDiv);  // ou utiliser une autre div spécifique si nécessaire
