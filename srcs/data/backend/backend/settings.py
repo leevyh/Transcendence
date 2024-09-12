@@ -186,7 +186,8 @@ DATABASES = {
 }
 
 LOGGING = {
-  'version': 1,
+    'version': 1,
+    'disable_existing_loggers': False,
     'handlers': {
         'logstash': {
             'level': 'INFO',
@@ -198,11 +199,15 @@ LOGGING = {
             'fqdn': False,
             'tags': ['django.request'],
         },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
     },
     'loggers': {
         'django.server': {
-            'handlers': ['logstash'],
+            'handlers': ['logstash', 'console'],
             'level': 'INFO',
-        }
+        },
     },
 }

@@ -24,4 +24,5 @@ urlpatterns = [
 	# path('game_invite/', views.send_notification, name='game_invite'),
 	# path('notifications/', views.get_notifications, name='get_notifications'),
 	path('django_status/', status.django_status, name='django_status'),
+	path('logging_status/', status.logging_status, name='logging_status'),
 ]
