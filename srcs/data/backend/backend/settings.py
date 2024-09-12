@@ -191,7 +191,7 @@ LOGGING = {
     'handlers': {
         'logstash': {
             'level': 'INFO',
-            'class': 'logstash.TCPLogstashHandler',
+            'class': 'logstash.LogstashHandler',
             'host': 'backend-logstash',
             'port': 5959,
             'version': 1,
@@ -200,14 +200,40 @@ LOGGING = {
             'tags': ['django.request'],
         },
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
         },
     },
     'loggers': {
+        'django': {
+            'handlers': ['logstash', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['logstash', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
         'django.server': {
             'handlers': ['logstash', 'console'],
             'level': 'INFO',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['logstash', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['logstash', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.channels': {
+            'handlers': ['logstash', 'console'],
+            'level': 'INFO',
+            'propagate': False,
         },
     },
 }
