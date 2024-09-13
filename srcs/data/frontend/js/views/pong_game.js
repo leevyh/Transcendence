@@ -75,6 +75,17 @@ export function movePlayerWithKeyboard() {
     } else if (game.player.y > canvas.height - PLAYER_HEIGHT) {
         game.player.y = canvas.height - PLAYER_HEIGHT;
     }
+    // // Envoi des données au serveur via WebSocket
+    // if (socket && socket.readyState === WebSocket.OPEN) {
+    //     socket.send(JSON.stringify({
+    //         action_type: 'update_position',
+    //         player_position: game.player.y,
+    //         ball_position: {
+    //             x: game.ball.x,
+    //             y: game.ball.y
+    //         }
+    //     }));
+    // }
 }
 
 export function computerMove() {

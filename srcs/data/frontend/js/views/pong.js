@@ -102,6 +102,33 @@ export async function pongView(container) {
     draw();
     // Event
 
+    // // Établir la connexion WebSocket ici
+    // socket = new WebSocket('ws://localhost:8888/ws/game/your_game_id/');
+
+    // // Gérer les messages reçus du serveur via WebSocket
+    // socket.onmessage = function (event) {
+    //     const data = JSON.parse(event.data);
+
+    //     if (data.action_type === 'update_position') {
+    //         // Mise à jour des positions des joueurs ou de la balle
+    //         game.computer.y = data.computer_position;
+    //         game.ball.x = data.ball_position.x;
+    //         game.ball.y = data.ball_position.y;
+    //     } else if (data.action_type === 'score_update') {
+    //         // Mise à jour des scores
+    //         document.querySelector('#player-score').textContent = data.player_score;
+    //         document.querySelector('#computer-score').textContent = data.computer_score;
+    //     }
+    // };
+
+    // socket.onopen = function () {
+    //     console.log("WebSocket connected");
+    // };
+
+    // socket.onclose = function () {
+    //     console.log("WebSocket disconnected");
+    // };
+
     document.addEventListener('keydown', (event) => handleKeyDown(event, startButton, stopButton));
     document.addEventListener('keyup', handleKeyUp);
 

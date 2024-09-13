@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'daphne',
     'channels',
     'chat',
+    'pong',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
