@@ -100,34 +100,33 @@ export async function pongView(container) {
 
 	reset(); // Init game
     draw();
-    // Event
+    console.log("coucou");
 
-    // // Établir la connexion WebSocket ici
-    // socket = new WebSocket('ws://localhost:8888/ws/game/your_game_id/');
+    // WebSocket pour le matchmaking
+    const socket = new WebSocket('ws://localhost:8888/ws/matchmaking/');
 
-    // // Gérer les messages reçus du serveur via WebSocket
-    // socket.onmessage = function (event) {
-    //     const data = JSON.parse(event.data);
+    socket.onopen = () => {
+        console.log("WebSocket connected");
+    };
 
-    //     if (data.action_type === 'update_position') {
-    //         // Mise à jour des positions des joueurs ou de la balle
-    //         game.computer.y = data.computer_position;
-    //         game.ball.x = data.ball_position.x;
-    //         game.ball.y = data.ball_position.y;
-    //     } else if (data.action_type === 'score_update') {
-    //         // Mise à jour des scores
-    //         document.querySelector('#player-score').textContent = data.player_score;
-    //         document.querySelector('#computer-score').textContent = data.computer_score;
-    //     }
-    // };
+    socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
 
-    // socket.onopen = function () {
-    //     console.log("WebSocket connected");
-    // };
+        if (data.action_type === 'start_game') {
+            startGame(startButton, stopButton);
+        }
+    };
 
-    // socket.onclose = function () {
-    //     console.log("WebSocket disconnected");
-    // };
+    socket.onclose = () => {
+        console.log("WebSocket disconnected");
+    };
+
+    // Quand le joueur appuie sur "Start", il entre dans la file d'attente
+    startButton.addEventListener('click', () => {
+        socket.send(JSON.stringify({ action_type: 'join_queue' }));
+        startButton.disabled = true; // Désactiver le bouton Start pendant l'attente
+        alert('En attente d\'un autre joueur...');
+    });
 
     document.addEventListener('keydown', (event) => handleKeyDown(event, startButton, stopButton));
     document.addEventListener('keyup', handleKeyUp);
@@ -135,13 +134,13 @@ export async function pongView(container) {
     const startGameButton = document.querySelector('#start-game');
     const stopGameButton = document.querySelector('#stop-game');
 
-    startGameButton.addEventListener('click', () => {
-        if (!GameOn) {
-            play();
-            startGameButton.disabled = true; // Désactiver le bouton Start
-            stopGameButton.disabled = false; // Activer le bouton Stop
-        }
-    });
+    // startGameButton.addEventListener('click', () => {
+    //     if (!GameOn) {
+    //         play();
+    //         startGameButton.disabled = true; // Désactiver le bouton Start
+    //         stopGameButton.disabled = false; // Activer le bouton Stop
+    //     }
+    // });
 
     stopGameButton.addEventListener('click', () => {
         if (GameOn) {
@@ -157,6 +156,14 @@ export async function pongView(container) {
     div.appendChild(notifications_div);
 }
 
+// Fonction pour démarrer le jeu lorsque le serveur jumelle deux joueurs
+function startGame(startButton, stopButton) {
+    if (!GameOn) {
+        play(); // Démarrer le jeu
+        startButton.disabled = true; // Désactiver le bouton Start
+        stopButton.disabled = false; // Activer le bouton Stop
+    }
+}
 
 // CSS Pong
 function loadPongCSS() {

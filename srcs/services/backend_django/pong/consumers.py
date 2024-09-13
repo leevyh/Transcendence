@@ -1,73 +1,42 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-class PongConsumer(AsyncWebsocketConsumer):
+# File d'attente pour le matchmaking
+queue = []
+
+class MatchmakingConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.game_id = self.scope['url_route']['kwargs']['game_id']
-        self.game_group_name = f'game_{self.game_id}'
-
-        # Join game group
-        await self.channel_layer.group_add(
-            self.game_group_name,
-            self.channel_name
-        )
-
+        # Accepter la connexion WebSocket
         await self.accept()
+        self.player_id = None  # Identifiant du joueur
 
     async def disconnect(self, close_code):
-        # Leave game group
-        await self.channel_layer.group_discard(
-            self.game_group_name,
-            self.channel_name
-        )
+        # Si le joueur est dans la file d'attente, le retirer
+        if self in queue:
+            queue.remove(self)
 
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        action_type = text_data_json.get('action_type')
+        data = json.loads(text_data)
 
-        if action_type == 'update_position':
-            player_id = text_data_json['player_id']
-            position = text_data_json['position']
+        if data['action_type'] == 'join_queue':
+            # Ajouter le joueur à la file d'attente
+            await self.join_queue()
 
-            # Send position update to game group
-            await self.channel_layer.group_send(
-                self.game_group_name,
-                {
-                    'type': 'game_update',
-                    'player_id': player_id,
-                    'position': position
-                }
-            )
-        elif action_type == 'score_update':
-            score = text_data_json['score']
+    async def join_queue(self):
+        # Ajouter le joueur à la file d'attente
+        queue.append(self)
 
-            # Send score update to game group
-            await self.channel_layer.group_send(
-                self.game_group_name,
-                {
-                    'type': 'score_update',
-                    'score': score
-                }
-            )
+        # Si un autre joueur est dans la file d'attente, démarrer une partie
+        if len(queue) >= 2:
+            player1 = queue.pop(0)  # Le premier joueur
+            player2 = queue.pop(0)  # Le deuxième joueur
 
-    # Receive game update from game group
-    async def game_update(self, event):
-        player_id = event['player_id']
-        position = event['position']
+            # Démarrer une partie en informant les deux joueurs
+            await player1.start_game()
+            await player2.start_game()
 
-        # Send game update to WebSocket
+    async def start_game(self):
+        # Envoyer un message pour démarrer le jeu
         await self.send(text_data=json.dumps({
-            'action_type': 'update_position',
-            'player_id': player_id,
-            'position': position
-        }))
-
-    # Receive score update from game group
-    async def score_update(self, event):
-        score = event['score']
-
-        # Send score update to WebSocket
-        await self.send(text_data=json.dumps({
-            'action_type': 'score_update',
-            'score': score
+            'action_type': 'start_game',
         }))
