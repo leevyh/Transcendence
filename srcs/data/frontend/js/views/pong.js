@@ -102,8 +102,7 @@ export async function pongView(container) {
     draw();
     console.log("coucou");
 
-    // WebSocket pour le matchmaking
-    const socket = new WebSocket('ws://localhost:8888/ws/matchmaking/');
+    const socket = new WebSocket('ws://localhost:8888/ws/pong/');
 
     socket.onopen = () => {
         console.log("WebSocket connected");
@@ -120,7 +119,6 @@ export async function pongView(container) {
     socket.onclose = () => {
         console.log("WebSocket disconnected");
     };
-
     // Quand le joueur appuie sur "Start", il entre dans la file d'attente
     startButton.addEventListener('click', () => {
         socket.send(JSON.stringify({ action_type: 'join_queue' }));

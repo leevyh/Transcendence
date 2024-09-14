@@ -21,5 +21,5 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('admin/', admin.site.urls),
     path('api_chat/', include('chat.urls')),
-    # path('pong/', include('pong.urls')),
+    path('pong/', include('pong.urls')),
 ]
