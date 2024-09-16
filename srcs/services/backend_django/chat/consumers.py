@@ -1,5 +1,8 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from asgiref.sync import sync_to_async
+from channels.db import database_sync_to_async
+from django.db import models
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -15,6 +18,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Accept the WebSocket connection
         await self.accept()
 
+        from chat.models import Conversation_History, Message, Conversation
+        conversation = await database_sync_to_async(Conversation.objects.get)(id=self.conversation_id) # good
+
+        messages = await database_sync_to_async(list)(
+            Message.objects.filter(conversation=conversation).order_by('timestamp').values('content', 'sender__username', 'timestamp')
+        )
+
+        await self.send(text_data=json.dumps({
+            'type': 'chat_history',
+            'messages': [
+                {
+                    'message': message['content'],
+                    'sender': message['sender__username'],
+                    'timestamp': str(message['timestamp'])
+                } for message in messages
+            ]
+        }))
+
+
     async def disconnect(self, close_code):
         # Leave conversation group
         await self.channel_layer.group_discard(
@@ -23,32 +45,57 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
+        from chat.models import Conversation_History, Message, Conversation
+        from api.models import User_site as User
         # Receive message from WebSocket
         data = json.loads(text_data)
-        message = data['message']
+        message_content = data['message']
         sender = data['sender']
         timestamp = data['timestamp']
 
-        # Send message to conversation group
+        # Get conversation id to create a conversation history and add message to it
+        conversation_id = self.conversation_id
+        conversation = await database_sync_to_async(Conversation.objects.get)(id=conversation_id) # good
+
+        sender = await database_sync_to_async(User.objects.get)(username=sender) # good
+        message = await database_sync_to_async(Message.objects.create)(
+            conversation=conversation,
+            sender=sender,
+            content=message_content,
+            timestamp=timestamp
+        )
+
+        # Check if a Conversation_History exists, and create it if it doesn't
+        history, created = await database_sync_to_async(Conversation_History.objects.get_or_create)(
+            conversation=conversation
+        )
+
+        # Add the message to the conversation history
+        await database_sync_to_async(history.messages.add)(message)
+
+        print("SUCCESSFULLY ADDED MESSAGE TO CONVERSATION HISTORY")
+
+        message_data = {
+            'message': message.content,
+            'sender': sender.username,
+            'timestamp': str(message.timestamp)
+        }
+
         await self.channel_layer.group_send(
             self.conversation_group_name,
             {
                 'type': 'chat_message',
-                'message': message,
-                'sender': sender,
-                'timestamp': timestamp
+                'message': message_data
             }
         )
 
-    # Receive message from conversation group
     async def chat_message(self, event):
-        message = event['message']
-        sender = event['sender']
-        timestamp = event['timestamp']
+        message_data = event['message']
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            'message': message,
-            'sender': sender,
-            'timestamp': timestamp,
+            'type': 'received_message',
+            'message': message_data['message'],
+            'sender': message_data['sender'],
+            'timestamp': message_data['timestamp']
         }))

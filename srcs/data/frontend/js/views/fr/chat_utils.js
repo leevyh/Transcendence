@@ -123,7 +123,7 @@ function openChat(nickname) {
     // Afficher la deuxième colonne (col-md-8)
     const col2 = document.querySelector('.col-md-8');
     col2.style.display = 'block';
-    col2.innerHTML = '';
+    // col2.innerHTML = '';
 
     // Mettre à jour le titre de la fenêtre de chat
     const chatHeader = document.getElementById('chat-header');
@@ -167,6 +167,7 @@ function openChat(nickname) {
             if (receivedMessage.sender === nickname) {
                 displayMessage(receivedMessage, 'received-message');
             }
+
         }
 
         ws.onclose = function() {
@@ -202,6 +203,8 @@ function handleMessages(message) {
 // Fonction pour afficher les messages
 function displayMessage(messageData, messageID) {
     const chatBody = document.getElementById('chat-body');
+
+    console.log('messageData:', messageData);         // DEBUG
 
     if (messageID === 'received-message') {
 // Si l'utilisateur est le destinataire, on affiche le message à gauche
