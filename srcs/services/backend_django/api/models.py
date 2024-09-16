@@ -109,14 +109,8 @@ class Friendship(models.Model):
 
 
 class MatchHistory(models.Model):
-
-    class Result(models.TextChoices):
-        WIN = "win"
-        LOSS = "loss"
-
     player1 = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='player1')
     opponent = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='player2')
-    result = models.CharField(max_length=255, choices=Result.choices)
     player_1_score = models.IntegerField()
     player_2_score = models.IntegerField()
     created_at = models.DateTimeField(default=timezone.now)
