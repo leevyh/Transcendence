@@ -3,7 +3,12 @@ services:
     container_name: backend_django
     build: ./srcs/services/backend_django
     expose:
-      -  9001
+      -  8000
+    env_file:
+        - ./env/postgresql.env
+        - ./env/42app.env
+#    volumes:
+#      - ./srcs/data/backend:/home/app
     restart: on-failure
 
   frontend_nginx:
@@ -25,6 +30,15 @@ services:
     depends_on:
       - frontend_nginx
       - backend_django
+    restart: on-failure
+
+  postgresql:
+    container_name: postgresql
+    build: ./srcs/services/postgresql
+    ports:
+      - 5432:5432
+    env_file:
+      - ./env/postgresql.env
     restart: on-failure
 
 volumes:

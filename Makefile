@@ -1,43 +1,18 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: acrespy <acrespy@student.42.fr>            +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2023/05/15 14:54:39 by acrespy           #+#    #+#              #
-#    Updated: 2023/05/16 15:01:53 by acrespy          ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
-NAME	= ft_transcendence
-COMPOSE	= ./docker-compose.yml
+NAME = Transcendence
 
 all:
-	docker compose -f ${COMPOSE} up -d --build
+	docker compose up --build -d
+#create volume maybe needed
 
-debug:
-	docker compose -f ${COMPOSE} up --build
-
-build:
-	docker compose -f ${COMPOSE} build
-
-start:
-	docker compose -f ${COMPOSE} up -d
-
-stop:
-	docker compose -f ${COMPOSE} stop
-
-restart:
-	docker compose -f ${COMPOSE} restart
-
-clean:
-	docker compose -f ${COMPOSE} down --rmi all
-
-prune:
+down:
+	docker compose down
 	docker system prune -af
 
-re: clean all
+logs:
+	docker compose logs -f
 
-.PHONY: all debug build start stop restart clean prune re
-.SILENT: all debug build start stop restart clean prune re
+status:
+	docker compose ps
+
+re: down
+	$(MAKE) all
