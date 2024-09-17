@@ -62,9 +62,25 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'api.middleware.AuthenticationMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 ]
+
+
+""" MIDDLEWARE = [
+    'api.middleware.AuthenticationMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.http.ConditionalGetMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+] """
+
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -197,7 +213,7 @@ LOGGING = {
             'version': 1,
             'message_type': 'django',
             'fqdn': False,
-            'tags': ['django.request'],
+            'tags': ['django'],
         },
         'console': {
             'level': 'INFO',
@@ -210,30 +226,30 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
-        'django.request': {
-            'handlers': ['logstash', 'console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
         'django.server': {
             'handlers': ['logstash', 'console'],
             'level': 'INFO',
-            'propagate': False,
+            'propagate': True,
         },
-        'django.db.backends': {
+        'django.request': {
             'handlers': ['logstash', 'console'],
             'level': 'INFO',
-            'propagate': False,
+            'propagate': True,
+        },
+        'django.db': {
+            'handlers': ['logstash', 'console'],
+            'level': 'INFO',
+            'propagate': True,
         },
         'django.security': {
             'handlers': ['logstash', 'console'],
             'level': 'INFO',
-            'propagate': False,
+            'propagate': True,
         },
         'django.channels': {
             'handlers': ['logstash', 'console'],
             'level': 'INFO',
-            'propagate': False,
+            'propagate': True,
         },
     },
 }
