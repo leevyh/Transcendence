@@ -14,20 +14,14 @@ class Message(models.Model):
     def __str__(self):
         return f"{self.sender.username}: {self.content[:20]}"
 
-class Conversation_History(models.Model): # Bloc contenant les messages de la conversation
-    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='history')
-    messages = models.ManyToManyField(Message, related_name='history')
+class UserBlock(models.Model):
+    blocker = models.ForeignKey(User, related_name="blocker", on_delete=models.CASCADE)
+    blocked = models.ForeignKey(User, related_name="blocked", on_delete=models.CASCADE)
+    blocked_at = models.DateTimeField(auto_now_add=True)
+
+    # Ensure that a user cannot block themselves and cannot block the same user multiple times
+    class Meta:
+        unique_together = ('blocker', 'blocked')
 
     def __str__(self):
-        return f"{self.conversation} history"
-    
-    # def add_message(self, message):
-    #     self.messages.add(message)
-    #     self.save()
-    #     
-    # def get_messages(self):
-    #     return self.messages.all()
-    # 
-    # def clear_history(self):
-    #     self.messages.clear()
-    #     self.save()
+        return f"{self.blocker} blocked {self.blocked}"
