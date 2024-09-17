@@ -73,6 +73,11 @@ services:
       - default
     expose:
       - 8220
+    healthcheck:
+      test: ["CMD-SHELL", "curl -IL http://localhost:6791/liveness | grep -q 'HTTP/1.1 200 OK'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
     depends_on:
       backend-kibana:
         condition: service_healthy

@@ -12,3 +12,10 @@ fleet:
   hosts:
     id: fleet-server-host
     name: Fleet Server
+
+agent.monitoring:
+ http:
+     enabled: true
+     host: localhost
+     port: 6791
+     buffer.enabled: false
