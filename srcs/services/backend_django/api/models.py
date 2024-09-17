@@ -108,6 +108,13 @@ class Friendship(models.Model):
         return f"Friendship between {self.user1} and {self.user2}"
 
 
+class MatchHistory(models.Model):
+    player1 = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='player1')
+    opponent = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='player2')
+    player_1_score = models.IntegerField()
+    player_2_score = models.IntegerField()
+    created_at = models.DateTimeField(default=timezone.now)
+
 # class PrivateGameInvite(model.Model):
 
 
