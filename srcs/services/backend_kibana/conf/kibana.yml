@@ -26,9 +26,9 @@ elasticsearch:
 
 # Kibana configuration
 xpack:
-  security.encryptionKey: "du$?IN8$LVAnAV9F9Rthkm#wPIrLC2@Z"
-  encryptedSavedObjects.encryptionKey: "du$?IN8$LVAnAV9F9Rthkm#wPIrLC2@Z"
-  reporting.encryptionKey: "du$?IN8$LVAnAV9F9Rthkm#wPIrLC2@Z"
+  security.encryptionKey: "du?IN8LVA0anAV9F9Rthkm#wPIrLC2@Z"
+  encryptedSavedObjects.encryptionKey: "du?IN8LVA0anAV9F9Rthkm#wPIrLC2@Z"
+  reporting.encryptionKey: "du?IN8LVA0anAV9F9Rthkm#wPIrLC2@Z"
 
   fleet:
     packages:
@@ -48,42 +48,22 @@ xpack:
               - name: Fleet Server Integration
                 package:
                   name: fleet_server
-        - name: Elastic Agent Policy
-          id: elastic-agent-policy
+        - name: Agent Nginx Policy
+          id: agent-nginx-policy
           namespace: default
           is_default: true
           package_policies:
-              - name: Elastic Agent Integration
+              - name: Elastic Agent System Integration
                 package:
                   name: system
               - name: Nginx Integration
                 package:
                   name: nginx
-              - name: Logstash Integration
-                package:
-                  name: logstash
-        - name: Agent System Policy
-          id: agent-system-policy
-          namespace: default
-          package_policies:
-              - name: System Integration
-                package:
-                  name: system
-        - name: Agent Nginx Policy
-          id: agent-nginx-policy
-          namespace: default
-          package_policies:
-            - name: System Integration
-              package:
-                name: system
-            - name: Nginx Integration
-              package:
-                name: nginx
         - name: Agent Logstash Policy
           id: agent-logstash-policy
           namespace: default
           package_policies:
-            - name: System Integration
+            - name: Elastic Agent System Integration
               package:
                 name: system
             - name: Logstash Integration

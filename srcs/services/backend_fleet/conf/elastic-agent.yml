@@ -3,7 +3,7 @@ outputs:
     type: elasticsearch
     hosts: [https://backend-elastic:9200]
     username: "elastic"
-    password: "changeme"
+    password: "${ELASTIC_PASSWORD}"
     preset: balanced
 
 fleet:

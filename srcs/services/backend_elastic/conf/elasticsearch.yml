@@ -27,5 +27,7 @@ xpack:
 
   monitoring.collection.enabled: true
 
+logger.org.elasticsearch.discovery: WARN
+
 # Memory configuration
 bootstrap.memory_lock: true
