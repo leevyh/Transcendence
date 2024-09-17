@@ -17,7 +17,6 @@ services:
       - 9200
     env_file:
       - ./env/elastic.env
-      - ./env/kibana.env
     healthcheck:
       test:
         ["CMD-SHELL", "curl -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://backend-elastic:9200 | grep -q 'missing authentication credentials'"]
@@ -80,8 +79,7 @@ services:
     expose:
       - 8220
     env_file:
-      - ./env/elastic.env
-      - ./env/kibana.env
+      - ./env/fleet.env
       - ./srcs/services/backend_fleet/conf/elastic-agent.env
     healthcheck:
       test: ["CMD-SHELL", "curl -IL http://localhost:6791/liveness | grep -q 'HTTP/1.1 200 OK'"]
@@ -120,7 +118,7 @@ services:
     container_name: backend-postgresql
     build: ./srcs/services/backend-postgresql
     volumes:
-      - backend-postgresql:/var/lib/postgresql/data
+      - backend-postgresql:/var/lib/postgresql/
     networks:
       - default
     expose:
@@ -148,6 +146,9 @@ services:
       - default
     expose:
       - 443
+    env_file:
+      - ./env/fleet.env
+      - ./srcs/services/frontend_nginx/conf/elastic-agent.env
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://frontend-nginx:80/nginx_status | grep -q 'Active connections'"]
       interval: 10s
@@ -168,6 +169,9 @@ services:
       - default
     ports:
       - 8888:8888
+    env_file:
+      - ./env/fleet.env
+      - ./srcs/services/proxy_nginx/conf/elastic-agent.env
     healthcheck:
         test: ["CMD-SHELL", "curl -f http://proxy-nginx:80/nginx_status | grep -q 'Active connections'"]
         interval: 10s

@@ -2,8 +2,8 @@ outputs:
   default:
     type: elasticsearch
     hosts: [https://backend-elastic:9200]
-    username: "elastic"
-    password: "${ELASTIC_PASSWORD}"
+    username: "kibana_system"
+    password: "transcendence"
     preset: balanced
 
 fleet:

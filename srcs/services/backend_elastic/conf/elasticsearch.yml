@@ -1,5 +1,6 @@
 # Server configuration
 cluster.name: "backend-elk"
+node.name: "backend-elastic"
 network.host: "backend-elastic"
 discovery.type: single-node
 

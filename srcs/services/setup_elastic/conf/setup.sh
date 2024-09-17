@@ -60,7 +60,7 @@ if [ ! -f config/certs/certs.zip ] && [ ! -f config/certs/ca.zip ]; then
   done;
 
   echo "Setting kibana password";
-  until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/_security/user/kibana_system/_password -d "{\"password\":\"$2\"}" | grep -q "^{}"; do
+  until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/_security/user/kibana_system/_password -d "{\"password\":\"$KIBANA_PASSWORD\"}" | grep -q "^{}"; do
     sleep 1;
   done;
 fi;
