@@ -9,6 +9,7 @@ urlpatterns = [
 	path('settings/', views.get_settings, name='settings'),
 	path('updateSettings/', views.updateSettings, name='updateSettings'),
 	path('updateAvatar/', views.updateAvatar, name='updateAvatar'),
+	path('deleteAvatar/', views.deleteAvatar, name='deleteAvatar'),
 	path('updateAccessibility/', views.updateAccessibility, name='updateAccessibility'),
 	path('updatePassword/', views.updatePassword, name='updatePassword'),
 	path('stats/', views.get_Stats, name='stats'),

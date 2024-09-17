@@ -310,6 +310,11 @@ export function settingsView(container) {
     avatarSubmitButton.className = 'btn btn-primary w-100 Buttonselem';
     avatarSubmitButton.textContent = 'Enregistrer l\'avatar';
 
+    const removeAvatarButton = document.createElement('button');
+    removeAvatarButton.type = 'submit';
+    removeAvatarButton.className = 'btn btn-danger w-100 Buttonselem';
+    removeAvatarButton.textContent = 'Supprimer l\'avatar';
+
     // Gestion de la soumission du formulaire
     avatarForm.addEventListener('submit', async (event) => {
         event.preventDefault(); // Empêche la soumission par défaut du formulaire
@@ -361,8 +366,10 @@ export function settingsView(container) {
             avatarForm.insertBefore(errorMessage, avatarSubmitButton);
         }
     })
+        
+    //TODO: ADD BUTTON TO REMOVE AVATAR WITH THIS ROUTE /api/deleteAvatar/
 
-    // Ajout des éléments au DOM
+        // Ajout des éléments au DOM
     avatarDiv.appendChild(avatarHeader);
     avatarDiv.appendChild(avatarBody);
     avatarBody.appendChild(avatarForm);

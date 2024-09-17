@@ -277,6 +277,28 @@ def updateAvatar(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+def deleteAvatar(request):
+    if request.method == 'DELETE':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            #Delete the avatar of the user and set the default avatar
+            user = User_site.objects.get(username=username)
+            user.avatar = 'default.jpg'
+            user.save()
+            #delete the file in the media directory
+            os.remove(f'media/{username}.jpg')
+            return JsonResponse({'message': 'Avatar deleted successfully'}, status=200)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
 
 @login_required(login_url='/api/login')
 def updateAccessibility(request):
