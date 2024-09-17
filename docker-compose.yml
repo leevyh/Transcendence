@@ -189,7 +189,7 @@ services:
     container_name: setup-elastic
     build: ./srcs/services/setup_elastic/
     user: "0"
-    command: /usr/share/elasticsearch/setup.sh "${ELASTIC_PASSWORD}" "${KIBANA_PASSWORD}"
+    command: /usr/share/elasticsearch/setup.sh
     volumes:
       - backend-kibana:/usr/share/kibana/data/
       - backend-elastic:/usr/share/elasticsearch/data/
