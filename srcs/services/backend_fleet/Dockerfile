@@ -1,4 +1,3 @@
-FROM elastic/elastic-agent:8.14.1
 
 ENV FLEET_ENROLL=true
 ENV FLEET_SERVER_ENABLE=true
@@ -7,6 +6,7 @@ ENV FLEET_SERVER_POLICY_ID=fleet-server-policy
 ENV FLEET_SERVER_CERT=/usr/share/elastic-agent/config/certs/backend-fleet/backend-fleet.crt
 ENV FLEET_SERVER_CERT_KEY=/usr/share/elastic-agent/config/certs/backend-fleet/backend-fleet.key
 ENV FLEET_CA=/usr/share/elastic-agent/config/certs/ca/ca.crt
+FROM elastic/elastic-agent:8.15.0
 
 ENV KIBANA_FLEET_SETUP=true
 ENV KIBANA_HOST=https://backend-kibana:5601

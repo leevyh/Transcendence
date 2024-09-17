@@ -1,4 +1,4 @@
-FROM elasticsearch:8.14.1
+FROM elasticsearch:8.15.0
 
 ENV ELASTIC_PASSWORD=changeme
 ENV ES_JAVA_OPTS="-Xms512m -Xmx512m"

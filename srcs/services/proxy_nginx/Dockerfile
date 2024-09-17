@@ -1,4 +1,4 @@
-FROM elastic/elastic-agent:8.14.1
+FROM elastic/elastic-agent:8.15.0
 
 USER root
 
