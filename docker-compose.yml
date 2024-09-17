@@ -63,6 +63,8 @@ services:
       - default
     expose:
       - 5959
+    env_file:
+      - ./env/elastic.env
     depends_on:
       backend-kibana:
         condition: service_healthy
@@ -80,6 +82,7 @@ services:
       - 8220
     env_file:
       - ./env/fleet.env
+      - ./env/elastic.env
       - ./srcs/services/backend_fleet/conf/elastic-agent.env
     healthcheck:
       test: ["CMD-SHELL", "curl -IL http://localhost:6791/liveness | grep -q 'HTTP/1.1 200 OK'"]
