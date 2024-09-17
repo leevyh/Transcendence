@@ -9,7 +9,6 @@ export async function registerView(container) {
     nav.className = 'navbar fixed-top bg-body-tertiary';
     container.appendChild(nav);
 
-    // Reecrire le code ci-dessus en utilisant du JS
     const containerFluid = document.createElement('div');
     containerFluid.className = 'container-fluid';
     nav.appendChild(containerFluid);
@@ -29,7 +28,7 @@ export async function registerView(container) {
 
     aHome.appendChild(svgHome);
     svgHome.addEventListener('click', () => {
-        navigateTo('/home');
+        navigateTo('/');
     });
 
     ////////////////////////////////////////////////////
@@ -40,9 +39,28 @@ export async function registerView(container) {
     // Créer le conteneur principal
     container.className = 'containerRegister';
 
+    const background = document.createElement('div')
+    background.className = 'background';
+    container.appendChild(background);
+
     // Créer la ligne pour centrer le formulaire
     const row = document.createElement('div');
     row.className = 'row justify-content-center rowRegister';
+
+    const contenerImgRegister = document.createElement('div');
+    contenerImgRegister.className = 'contenerImgRegister';
+
+
+    background.appendChild(contenerImgRegister);
+
+
+    const ImgRegister = document.createElement('img');
+    ImgRegister.setAttribute('src', '/assets/login0.png');
+    ImgRegister.setAttribute('alt', 'Register');
+
+    ImgRegister.className = 'object-fit-fill imgLogin';
+    contenerImgRegister.appendChild(ImgRegister);
+
 
     // Créer la colonne qui contiendra la carte
     const col = document.createElement('div');
@@ -96,7 +114,7 @@ export async function registerView(container) {
     // Bouton de soumission
     const submitButton = document.createElement('button');
     submitButton.setAttribute('type', 'submit');
-    submitButton.className = 'btn btn-primary w-100 Buttonselem';
+    submitButton.className = 'btn btn-primary w-100 ButtonRegister';
     submitButton.textContent = "S'inscrire";
     form.appendChild(submitButton);
 
@@ -206,6 +224,6 @@ export async function registerView(container) {
     card.appendChild(cardFooter);
     col.appendChild(card);
     row.appendChild(col);
-    container.appendChild(row);
+    contenerImgRegister.appendChild(row);
     document.body.appendChild(container);
 }

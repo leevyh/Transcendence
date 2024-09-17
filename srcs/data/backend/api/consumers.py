@@ -1,10 +1,11 @@
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer, AsyncJsonWebsocketConsumer
 import json
 from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
+from django.db import models
 
 
-class StatusConsumer(AsyncWebsocketConsumer):
+class StatusConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add("status_updates", self.channel_name)
         await self.accept()
@@ -16,18 +17,17 @@ class StatusConsumer(AsyncWebsocketConsumer):
         pass  # No need to handle incoming messages for status updates
 
     async def send_status_update(self, event):
-        await self.send(text_data=json.dumps(event["message"]))
+        await self.send_json(event["message"])
 
 
-# srcs/services/backend_django/api/consumers.py
-
-class FriendRequestConsumer(AsyncWebsocketConsumer):
+class NotificationConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
-        print(f'Connecting to {self.channel_name}')
-        user = self.scope['user']
+        if not self.scope["user"].is_authenticated:
+            await self.close()
+            return
+        user = self.scope["user"]
         if user.is_authenticated:
             self.room_name = f"user_{user.id}"
-            print(f'Adding {self.channel_name} to {self.room_name}')
             await self.channel_layer.group_add(
                 self.room_name,
                 self.channel_name
@@ -37,88 +37,89 @@ class FriendRequestConsumer(AsyncWebsocketConsumer):
             await self.close()
 
     async def disconnect(self, close_code):
-        print(f'Disconnecting from {self.channel_name}')
-        user = self.scope['user']
+        user = self.scope["user"]
         if user.is_authenticated:
             await self.channel_layer.group_discard(
-                f"user_{user.id}",
+                self.room_name,
                 self.channel_name
             )
 
-    async def receive(self, text_data):
-        print(f'Receiving message from {self.channel_name}')
-        data = json.loads(text_data)
-        if data['type'] == 'friend_request':
-            await self.handle_friend_request(data)
-        elif data['type'] == 'friend_request_response':
-            await self.handle_friend_request_response(data)
+    async def receive_json(self, content):
+        type = ['friend_request', 'game_invite', 'tournament_invite', 'accept_friend_request', 'reject_friend_request', 'game_accept', 'game_refuse', 'tournament_accept', 'tournament_refuse']
+        if content['type'] in type:
+            # print(f"Notification type {content['type']} received")         # DEBUG
+            await self.handle_notification(content)
+
+    async def handle_notification(self, data):
+        from .models import User_site, FriendRequest, Friendship
+        user = self.scope["user"]
+        type = data['type']
+        print(f"Data received: {data}")
+        #if type is friend_request -> Save friend request with from_user and to_user, status pending
+        if type == 'friend_request':
+            if not data['url'] == 'friends':
+                await self.send_json({"error": "You can only send friend requests from the friends page"})
+                return
+
+            nickname = data['nickname']
+            friend = await database_sync_to_async(User_site.objects.get)(nickname=nickname)
+
+            existing_friendship = await database_sync_to_async(lambda: Friendship.objects.filter(
+                models.Q(user1=user, user2=friend) | models.Q(user1=friend, user2=user)
+            ).exists())()
+            if existing_friendship:
+                await self.send_json({"error": "You are already friends with this user"})
+                return
+
+            existing_request = await database_sync_to_async(lambda: FriendRequest.objects.filter(
+                models.Q(user=user, friend=friend) | models.Q(user=friend, friend=user)
+            ).exists())()
+            if existing_request:
+                await self.send_json({"error": "A friend request is already pending between you and this user"})
+                return
+
+            await database_sync_to_async(FriendRequest.objects.create)(user=user, friend=friend)
+            print(f"Friend request from {user.nickname} to {friend.nickname} created and saved in database")
+            await self.channel_layer.group_send(
+                f"user_{friend.id}",
+                {
+                    "type": "send_notification", #call function async send_notification
+                    "message": {
+                        "type": "friend_request",
+                        "from_user": user.id,
+                        "from_nickname": user.nickname,
+                    },
+                },
+            )
+        elif type == 'accept_friend_request' or type == 'reject_friend_request':
+            print(f"data: {data}")
+            friend = await database_sync_to_async(User_site.objects.get)(nickname=data['nickname'])
+
+            # Récupérer la demande d'ami existante
+            try:
+                friend_request = await database_sync_to_async(FriendRequest.objects.get)(
+                    user=friend, friend=user
+                )
+            except FriendRequest.DoesNotExist:
+                await self.send_json({"error": "No friend request found"})
+                return
+
+            # Mise à jour du statut de la demande d'ami
+            friend_request.status = 'accepted' if type == 'accept_friend_request' else 'refused'
+            await database_sync_to_async(friend_request.save)()
+
+            # Si la demande est acceptée, créer une relation d'amitié bidirectionnelle
+            if friend_request.status == 'accepted':
+                await database_sync_to_async(Friendship.objects.create)(user1=user, user2=friend)
+                print(f"Friendship created between {user.nickname} and {friend.nickname}")
+
+            # Supprimer la demande d'ami après traitement (acceptée ou refusée)
+            await database_sync_to_async(friend_request.delete)()
         else:
-            #close the connection
             await self.close()
 
-    async def handle_friend_request(self, data):
-        from .models import User_site, Friend_Request
-        print(f'Handling friend request from {self.room_name}')
-        nickname = data['nickname']
-        user = self.scope['user']
-        friend = await database_sync_to_async(User_site.objects.get)(nickname=nickname)
+    async def send_notification(self, event):
+        await self.send_json(event["message"])
 
-        existing_request = await database_sync_to_async(Friend_Request.objects.filter)(
-            user=user, friend=friend, status=['pending', 'accepted']).exists()
-
-        if existing_request:
-            await self.send(text_data=json.dumps({
-                'type': 'error',
-                'message': 'Friend request already sent or accepted'
-            }))
-            return
-
-        await database_sync_to_async(Friend_Request.objects.create)(
-            user=user, friend=friend
-        )
-        print(f"friend {friend}")
-        print(f"Nickname of friend {friend.nickname}")
-        await self.channel_layer.group_send(
-            f"user_{friend.id}",
-            {
-                "type": "send_friend_request",
-                "message": {
-                    "nickname": user.nickname,
-                    "user_id": user.id,
-                    "type": "friend_request",
-                },
-            },
-        )
-        print(f"Sent friend request to {friend.nickname}")
-
-    async def handle_friend_request_response(self, data):
-        from .models import User_site, Friend_Request
-
-        print(f'Handling friend request response from {self.room_name}')
-        user_id = data['user_id']
-        accepted = data['accepted']
-        user = self.scope['user']
-        friend_request = await database_sync_to_async(Friend_Request.objects.get)(
-            user_id=user_id, friend=user
-        )
-        friend_request.accepted = accepted
-        await database_sync_to_async(friend_request.save)()
-        await self.channel_layer.group_send(
-            f"user_{user_id}",
-            {
-                "type": "send_friend_request_response",
-                "message": {
-                    "nickname": user.nickname,
-                    "accepted": accepted,
-                    "type": "friend_request_response",
-                },
-            },
-        )
-
-    async def send_friend_request(self, event):
-        print(f'Sending friend request to {self.room_name}')
-        await self.send(text_data=json.dumps(event["message"]))
-
-    async def send_friend_request_response(self, event):
-        print(f'Sending friend request response to {self.room_name}')
-        await self.send(text_data=json.dumps(event["message"]))
+# class FriendRequestConsumer(AsyncWebsocketConsumer):
+#     pass

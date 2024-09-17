@@ -28,7 +28,7 @@ export function loginView(container) {
 
     aHome.appendChild(svgHome);
     svgHome.addEventListener('click', () => {
-        navigateTo('/home');
+        navigateTo('/');
     });
 
 
@@ -38,9 +38,28 @@ export function loginView(container) {
 
     container.className = 'containerRegister';
 
+    const background = document.createElement('div')
+    background.className = 'background';
+
+    container.appendChild(background);
     // Créer la ligne pour centrer le formulaire
     const row = document.createElement('div');
     row.className = 'row justify-content-center rowRegister';
+
+    const contenerImgRegister = document.createElement('div');
+    contenerImgRegister.className = 'contenerImgRegister';
+
+
+    background.appendChild(contenerImgRegister);
+
+
+    const ImgRegister = document.createElement('img');
+    ImgRegister.setAttribute('src', '/assets/login0.png');
+    ImgRegister.setAttribute('alt', 'Register');
+
+    ImgRegister.className = 'object-fit-fill imglogin login';
+    contenerImgRegister.appendChild(ImgRegister);
+
 
     // Créer la colonne qui contiendra la carte
     const col = document.createElement('div');
@@ -91,7 +110,7 @@ export function loginView(container) {
     // Bouton de soumission
     const submitButton = document.createElement('button');
     submitButton.type = 'submit';
-    submitButton.className = 'btn btn-primary w-100 Buttonselem';
+    submitButton.className = 'btn btn-primary w-100 ButtonRegister';
     submitButton.textContent = 'Se connecter';
     form.appendChild(submitButton);
 
@@ -125,7 +144,7 @@ export function loginView(container) {
             if (data.message === 'User logged in successfully') {
                 localStorage.setItem('token', data.token);
                 event.preventDefault();
-                navigateTo('/');
+                navigateTo('/settings'); //dashboard
             } else if (data.error) {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
@@ -190,7 +209,7 @@ export function loginView(container) {
 
     const login42Button = document.createElement('button');
     login42Button.type = 'button';
-    login42Button.className = 'btn btn-dark w-100 Buttonselem';
+    login42Button.className = 'btn btn-dark w-100 ButtonRegister';
     login42Button.textContent = 'Se connecter avec 42';
     cardLogin42.appendChild(login42Button);
     cardLogin42.addEventListener('click', (event) => {
@@ -235,6 +254,6 @@ export function loginView(container) {
     card.appendChild(cardFooter);
     col.appendChild(card);
     row.appendChild(col);
-    container.appendChild(row);
+    contenerImgRegister.appendChild(row);
     document.body.appendChild(container);
 }

@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.hashers import make_password, check_password
 
 from .forms import UserRegistrationForm, AccessibilityUpdateForm
-from .models import User_site, Accessibility, Stats_user
+from .models import User_site, Accessibility, Stats_user, FriendRequest
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from typing import Optional
@@ -84,6 +84,7 @@ def get_profile(request, nickname):
                 avatar_image = user.avatar
                 avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
                 data = {'nickname': user.nickname,
+                        'username': user.username,
                         'email': user.email,
                         'created_at': user.created_at,
                         'status': user.status,
@@ -100,6 +101,39 @@ def get_profile(request, nickname):
                 return JsonResponse({'error': 'Stats not found'}, status=404)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def get_friend_request(request, nickname):
+    if request.method == 'GET':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            try:
+                user = User_site.objects.get(username=payload['username'])
+            except User_site.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+            try:
+                friend = User_site.objects.get(nickname=nickname)
+            except User_site.DoesNotExist:
+                return JsonResponse({'error': 'User to request not found'}, status=404)
+            friend_request = FriendRequest.objects.filter(user=user, friend=friend).exclude(status='refused').first()
+            data = {}
+            if friend_request:
+                # print("FIND FRIEND REQUEST")         # DEBUG
+                data = {'user': friend_request.user.nickname,
+                        'friend': friend_request.friend.nickname,
+                        'status': friend_request.status,
+                        'created_at': friend_request.created_at}
+                return JsonResponse(data, status=200)
+            else:
+                data = {'status': 'not_found'}
+                return JsonResponse(data, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
@@ -134,7 +168,8 @@ def get_settings(request):
             settings = Accessibility.objects.get(user=user_id)
             avatar_image = user.avatar
             avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
-            data = {'nickname': user.nickname,
+            data = {'username': user.username,
+                    'nickname': user.nickname,
                     'email': user.email,
                     'language': settings.language,
                     'font_size': settings.font_size,
@@ -148,14 +183,15 @@ def get_settings(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+@login_required(login_url='/api/login')
 def get_status_all_users(request):
     if request.method == 'GET':
-        users = User_site.objects.all()
+        users = User_site.objects.all().exclude(id=request.user.id)  # Exclure l'utilisateur actuel
         data = []
         for user in users:
             data.append({'nickname': user.nickname,
                          'status': user.status})
-            print(data)
+            # print(data)         # DEBUG
         return JsonResponse(data, status=200, safe=False)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
@@ -171,11 +207,11 @@ def all_users(request):
                 return JsonResponse({'error': 'Token expired'}, status=307)
             username = payload['username']
             if username:
-                users = User_site.objects.all()
+                users = User_site.objects.all().exclude(id=request.user.id)  # Exclure l'utilisateur actuel
                 data = []
                 i = 0
                 for user in users:
-                    print(i)
+                    # print(i)         # DEBUG
                     i += 1
                     #get the avatar of the user and encode it in base64 to send it in the response + nickname
                     avatar_image = user.avatar
@@ -200,7 +236,7 @@ def updateSettings(request):
                 return JsonResponse({'error': 'Token expired'}, status=307)
             username = payload['username']
             data = json.loads(request.body)
-            print('settings_data:', data)
+            # print('settings_data:', data)         # DEBUG
             user = User_site.objects.get(username=username)
             #update user settings. If data[nickname] is not empty, update the nickname else let the nickname as it is
             if data['nickname']:
@@ -249,7 +285,7 @@ def updateAccessibility(request):
             token_user = request.headers.get('Authorization').split(' ')[1]
             payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
             data = json.loads(request.body)
-            print(f'data: {data}')
+            # print(f'data: {data}')         # DEBUG
             username = payload['username']
             user_id = User_site.objects.get(username=username).id
             accessibility_id = Accessibility.objects.get(user=user_id)
@@ -277,7 +313,7 @@ def updatePassword(request):
                 return JsonResponse({'error': 'Token expired'}, status=307)
             nickname = payload['username']
             data = json.loads(request.body)
-            print('password_data:', data)
+            # print('password_data:', data)         # DEBUG
             user = User_site.objects.get(nickname=nickname)
             if check_password(data['old_password'], user.password):
                 user.set_password(data['new_password'])
@@ -291,7 +327,7 @@ def updatePassword(request):
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
-    
+
 @login_required(login_url='/api/login') # TODO CHANGE THIS ROUTE TO GO
 def update_Stats(request): #TODO without form and with json.loads. Need to changed if we use a view in python or views in js
     if request.method == 'POST':
@@ -420,13 +456,13 @@ def token_42(request):
         redirect_uri = os.getenv('REDIRECT_URI')
         data = json.loads(request.body)
         code = data['code']
-        print(f"code: {code}")
-        print(f"client_id: {client_id}")
-        print(f"client_secret: {client_secret}")
+        # print(f"code: {code}")         # DEBUG
+        # print(f"client_id: {client_id}")         # DEBUG
+        # print(f"client_secret: {client_secret}")         # DEBUG
         url = f"https://api.intra.42.fr/oauth/token?client_id={client_id}&client_secret={client_secret}&code={code}&redirect_uri={redirect_uri}&grant_type=authorization_code"
         r = requests.post(url)
         if r.status_code == 200:
-            print('OKI MA GUEULE')
+            # print('OKI MA GUEULE')         # DEBUG
             create_user42(r)
             encoded_jwt = jwt.encode({'username': data['login'], 'exp': time.time + 3600}, 'secret', algorithm='HS256')
             return JsonResponse({'message': 'Token created successfully', 'token': encoded_jwt}, status=200)

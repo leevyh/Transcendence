@@ -1,3 +1,6 @@
+import { navigateTo } from '../app.js';
+import wsManager from './wsManager.js';
+
 // Helper function to get CSRF token from cookies
 export function getCookie(name) {
     let cookieValue = null;
@@ -12,7 +15,7 @@ export function getCookie(name) {
         }
     }
     return cookieValue;
-};
+}
 
 const translations = {
 	en: {
@@ -59,28 +62,37 @@ export function changeLanguage(lang) {
 		}
 	});
 }
+// if check_auth open websocket
+// const friendRequestSocket = new WebSocket('wss://localhost:8888/wss/friend_request/');
+//
+// friendRequestSocket.onopen = function() {
+// 	console.log('Friend request socket opened');
+// }
+//
+// friendRequestSocket.onmessage = function(event) {
+// 	const data = JSON.parse(event.data);
+// 	console.log('Friend request socket message:', data);
+// 	if (data.type === 'friend_request') {
+//         console.log('Enter in displayFriendRequestNotification');
+// 		displayFriendRequestNotification(data.from_nickname);
+// 	}
+//     else if (data.type === 'error') {
+//         alert(data.message);
+//     }
+// };
+//
+// friendRequestSocket.onclose = function() {
+// 	console.log('Friend request socket closed');
+// }
 
-const friendRequestSocket = new WebSocket('wss://localhost:8888/wss/friend_request/');
-
-friendRequestSocket.onopen = function() {
-	console.log('Friend request socket opened');
-}
-
-friendRequestSocket.onmessage = function(event) {
-	const data = JSON.parse(event.data);
-	console.log('Friend request socket message:', data);
-	if (data.type === 'friend_request') {
-        console.log('Enter in displayFriendRequestNotification');
-		displayFriendRequestNotification(data.nickname);
-	}
-    else if (data.type === 'error') {
-        alert(data.message);
+wsManager.AddNotificationListener((data) => {
+    if (data.type === 'friend_request') {
+        console.log('New friend request received from ', data.from_nickname);
+        displayFriendRequestNotification(data.from_nickname);
     }
-};
+})
 
-friendRequestSocket.onclose = function() {
-	console.log('Friend request socket closed');
-}
+
 
 function displayFriendRequestNotification(nickname) {
     const friendRequestNotificationModal = document.createElement('div');
@@ -118,12 +130,27 @@ function displayFriendRequestNotification(nickname) {
     acceptButton.className = 'btn btn-success';
     acceptButton.textContent = 'Accept';
     acceptButton.style = 'display: block; margin: 0 auto; width: 50%;';
+    // Add event listener to accept the friend request with websocket, remove the modal
+    acceptButton.addEventListener('click', () => {
+        wsManager.send({
+            type: 'accept_friend_request',
+            nickname: nickname,
+        });
+        friendRequestNotificationModal.remove();
+    });
     modalFooter.appendChild(acceptButton);
 
     const rejectButton = document.createElement('button');
     rejectButton.className = 'btn btn-danger';
     rejectButton.textContent = 'Reject';
     rejectButton.style = 'display: block; margin: 0 auto; width: 50%;';
+    rejectButton.addEventListener('click', () => {
+        wsManager.send({
+            type: 'reject_friend_request',
+            nickname: nickname,
+        });
+        friendRequestNotificationModal.remove();
+    });
     modalFooter.appendChild(rejectButton);
 
     //Add button close to the modal
@@ -134,16 +161,11 @@ function displayFriendRequestNotification(nickname) {
     closeButton.addEventListener('click', () => {
         friendRequestNotificationModal.remove();
     });
-    
+
     modalFooter.appendChild(closeButton);
     // Close the modal when the user clicks on the close button and remove the modal from the DOM
     document.body.appendChild(friendRequestNotificationModal);
     friendRequestNotificationModal.style.display = 'block';
-
-    //
-
-
-
 }
 
 
@@ -180,19 +202,33 @@ export async function getAccessibility() {
                 'X-CSRFToken': getCookie('csrftoken')
             },
         });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        if (response.status === 200) {
+            const data = await response.json();
+            const userData = {
+                language: data.language,
+                font_size: data.font_size,
+                theme: data.dark_mode,
+            };
+            return userData;
+        } else if (response.status === 307) {
+            localStorage.removeItem('token');
+
+            const logoutResponse = await fetch('/api/logout/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            });
+
+            await logoutResponse.json(); // Traiter la réponse de logout si nécessaire
+            navigateTo('/login');
+            return null;
+        } else {
+            throw new Error('Something went wrong');
         }
-        const data = await response.json();
-        const userData = {
-            language: data.language,
-            font_size: data.font_size,
-            theme: data.dark_mode,
-        };
-        console.log('data:', userData);
-        return userData;
     } catch (error) {
-        console.error('Error retrieving settings:', error);
+        console.error('Error fetching accessibility settings:', error); // A enlever plus tard
         return null;
     }
 }
