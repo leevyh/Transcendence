@@ -1,0 +1,18 @@
+# /!\ DEV ONLY /!\ #
+
+services:
+  uninstall-elk:
+    container_name: uninstall-elk
+    image: debian
+    user: "0"
+    volumes:
+      - elk:/data
+    command: "rm -rf /data/elastic/ /data/kibana/ /data/logstash/ /data/fleet/ /data/certs/ /data/logs/ /data/ea/proxy-nginx/ /data/ea/frontend-nginx/ && mkdir -p /data/elastic/ /data/kibana/ /data/logstash/ /data/fleet/ /data/certs/ /data/logs/ /data/ea/proxy-nginx/ /data/ea/frontend-nginx/"
+
+volumes:
+  elk:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./../data
+      o: bind
