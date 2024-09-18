@@ -218,7 +218,8 @@ def all_users(request):
                     avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
                     data.append({'nickname': user.nickname,
                                     'avatar': avatar,
-                                    'status': user.status})
+                                    'status': user.status,
+                                    'id': user.id})
                 return JsonResponse(data, status=200, safe=False)
             else:
                 return JsonResponse({'error': 'Invalid token'}, status=401)

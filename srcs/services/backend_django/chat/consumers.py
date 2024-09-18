@@ -31,19 +31,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Join conversation group
         await self.channel_layer.group_add(self.conversation_group_name, self.channel_name)
-
-        # Accept the WebSocket connection
         await self.accept()
 
         # Send chat history
         conversation = await database_sync_to_async(Conversation.objects.get)(id=self.conversation_id)
         messages = await database_sync_to_async(list)(
-            Message.objects.filter(conversation=conversation).order_by('timestamp').values('content', 'sender__username', 'timestamp')
+            Message.objects.filter(conversation=conversation).order_by('timestamp').values('content', 'sender__nickname', 'timestamp')
         )
 
         # Convert avatars to base64
         for message in messages:
-            sender = await database_sync_to_async(User.objects.get)(username=message['sender__username'])
+            sender = await database_sync_to_async(User.objects.get)(nickname=message['sender__nickname'])
             message['sender__avatar'] = encode_avatar(sender)
 
         # Send chat history to WebSocket
@@ -53,7 +51,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 {
                     'message': message['content'],
                     'sender': {
-                        'username': message['sender__username'],
+                        'nickname': message['sender__nickname'],
                         'avatar': message['sender__avatar'],
                     },
                     'user': user.nickname, # Who am I
@@ -74,57 +72,60 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Receive message from WebSocket
         data = json.loads(text_data)
-        message_content = data['message']
+        message_type = data.get('type')
         sender = self.scope['user'].nickname
-        timestamp = data['timestamp']
 
-        # Get the current conversation
-        conversation = await database_sync_to_async(Conversation.objects.get)(id=self.conversation_id)
+        if message_type == 'block_user':
+            blocked = data.get('blocked')
+            # blocked_id = await database_sync_to_async(User.objects.get)(nickname=blocked)
+            await self.handle_block_user(blocked)
+        elif message_type == 'unblock_user':
+            blocked = data.get('blocked')
+            # blocked_id = await database_sync_to_async(User.objects.get)(nickname=blocked)
+            await self.handle_unblock_user(blocked)
+        else:
+            message_content = data['message']
+            timestamp = data['timestamp']
 
-        # Get the sender and conversation members
-        sender = await database_sync_to_async(User.objects.get)(nickname=sender)
-        members = await database_sync_to_async(list)(conversation.members.all())
+            # Get the current conversation and the members
+            conversation = await database_sync_to_async(Conversation.objects.get)(id=self.conversation_id)
+            sender = await database_sync_to_async(User.objects.get)(nickname=sender)
+            members = await database_sync_to_async(list)(conversation.members.all())
 
-        # Check if the sender is blocked by any member
-        for member in members:
-            is_blocked = await database_sync_to_async(lambda: UserBlock.objects.filter(blocker=member, blocked=sender).exists())()
-            if is_blocked:
-                # Optionally: Send a message back to the sender notifying them they are blocked
-                await self.send(text_data=json.dumps({
-                    'type': 'error',
-                    'message': "You are blocked by a participant in this conversation."
-                }))
-                return
+            # Check if the sender is blocked by any member
+            for member in members:
+                is_blocked = await database_sync_to_async(lambda: UserBlock.objects.filter(blocker=member, blocked=sender).exists())()
+                if is_blocked:
+                    await self.send(text_data=json.dumps({'type': 'blocked'}))
+                    return
 
-        # Proceed with saving the message and broadcasting to the group
-        message = await database_sync_to_async(Message.objects.create)(
-            conversation=conversation,
-            sender=sender,
-            content=message_content,
-            timestamp=timestamp
-        )
+            # Proceed with saving the message and broadcasting to the group
+            message = await database_sync_to_async(Message.objects.create)(
+                conversation=conversation,
+                sender=sender,
+                content=message_content,
+                timestamp=timestamp
+            )
 
-        # Convert sender avatar to base64
-        sender_avatar_base64 = encode_avatar(sender)
-
-        # Prepare message data to send to the group
-        message_data = {
-            'message': message.content,
-            'sender': {
-                'username': sender.nickname,
-                'id': sender.id,
-                'avatar': sender_avatar_base64,
-            },
-            'timestamp': str(message.timestamp)
-        }
-
-        await self.channel_layer.group_send(
-            self.conversation_group_name,
-            {
-                'type': 'chat_message',
-                'message': message_data
+            # Prepare message data to send to the group
+            sender_avatar_base64 = encode_avatar(sender)
+            message_data = {
+                'message': message.content,
+                'sender': {
+                    'nickname': sender.nickname,
+                    'id': sender.id,
+                    'avatar': sender_avatar_base64,
+                },
+                'timestamp': str(message.timestamp)
             }
-        )
+
+            await self.channel_layer.group_send(
+                self.conversation_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message_data
+                }
+            )
 
 
     async def chat_message(self, event):
@@ -136,12 +137,67 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'type': 'chat_message',
             'message': message_data['message'],
             'sender': {
-                'username': message_data['sender']['username'],
+                'nickname': message_data['sender']['nickname'],
                 'id': message_data['sender']['id'],
                 'avatar': message_data['sender']['avatar'],
             },
-            'user': user.username, # Who am I
+            'user': user.nickname, # Who am I
             'timestamp': message_data['timestamp']
+        }))
+
+    async def handle_block_user(self, blocked):
+        from chat.models import UserBlock
+        from api.models import User_site as User
+
+        blocker = self.scope['user']
+        blocked_user = await database_sync_to_async(User.objects.get)(nickname=blocked)
+
+        # Look for existing block
+        existing_block = await database_sync_to_async(UserBlock.objects.filter)(blocker=blocker, blocked=blocked_user)
+        if existing_block.exists():
+            return
+        else:
+            await database_sync_to_async(UserBlock.objects.create)(blocker=blocker, blocked=blocked_user)
+
+        # Envoyer un message à l'utilisateur bloqué
+        await self.channel_layer.group_send(
+            self.conversation_group_name,
+            {
+                'type': 'block_user',
+                'blocked': blocked_user.id
+            }
+        )
+
+    async def handle_unblock_user(self, blocked):
+        from chat.models import UserBlock
+        from api.models import User_site as User
+
+        blocker = self.scope['user']
+        blocked_user = await database_sync_to_async(User.objects.get)(nickname=blocked)
+
+        await database_sync_to_async(UserBlock.objects.filter(blocker=blocker, blocked=blocked_user).delete)()
+
+        # Envoyer un message à l'utilisateur débloqué
+        await self.channel_layer.group_send(
+            self.conversation_group_name,
+            {
+                'type': 'unblock_user',
+                'blocked': blocked_user.id
+            }
+        )
+
+    async def block_user(self, event):
+        blocked_id = event['blocked']
+        await self.send(text_data=json.dumps({
+            'type': 'user_blocked',
+            'blocked_id': blocked_id
+        }))
+
+    async def unblock_user(self, event):
+        blocked_id = event['blocked']
+        await self.send(text_data=json.dumps({
+            'type': 'user_unblocked',
+            'blocked_id': blocked_id
         }))
 
 
