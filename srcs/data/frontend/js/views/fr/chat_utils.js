@@ -60,7 +60,7 @@ export async function openConversation(conversationID) {
     // Fermer l'ancienne connexion WebSocket, si elle existe
     if (ws) {ws.close();}
 
-    ws = new WebSocket(`ws://localhost:8888/ws/${conversationID}/messages/`);
+    ws = new WebSocket('ws://' + window.location.host + `/ws/${conversationID}/messages/`);
 
     ws.onopen = function() {
         // console.log('WebSocket OK - conversationID:', conversationID);         // DEBUG

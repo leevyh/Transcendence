@@ -10,7 +10,7 @@ export async function chatView(container) {
     container.appendChild(globalContainer);
 
     // Create the WebSocket for user status
-    const statusSocket = new WebSocket('ws://localhost:8888/ws/status/');
+    const statusSocket = new WebSocket('ws://' + window.location.host + '/ws/status/');
 
     // Onopen event
     statusSocket.onopen = function(event) {
