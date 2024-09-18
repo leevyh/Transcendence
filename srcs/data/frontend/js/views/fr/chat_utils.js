@@ -201,8 +201,10 @@ function handleMessages(message) {
 function displayMessage(messageData, messageID) {
     const chatBody = document.getElementById('chat-body');
 
+    ws = new WebSocket('wss://' + window.location.host + '/wss/${conversationID}/messages/');
+
     if (messageID === 'sent-message') {
-// Si l'utilisateur est le sender, on affiche le message à droite
+        // Si l'utilisateur est le sender, on affiche le message à droite
         const messageElement = document.createElement('div');
         messageElement.className = messageData.sender === localStorage.getItem('nickname') ? 'sent-message' : 'received-message';
         messageElement.classList.add('d-flex', 'flex-row', 'justify-content-start', 'mb-4');
@@ -240,7 +242,7 @@ function displayMessage(messageData, messageID) {
         chatBody.appendChild(messageElement);
 
     } else if (messageID === 'received-message') {
-// Si l'utilisateur est le receiver, on affiche le message à gauche
+        // Si l'utilisateur est le receiver, on affiche le message à gauche
         const messageElement = document.createElement('div');
         messageElement.className = messageData.sender === localStorage.getItem('nickname') ? 'sent-message' : 'received-message';
         messageElement.classList.add('d-flex', 'flex-row', 'justify-content-end', 'mb-4');

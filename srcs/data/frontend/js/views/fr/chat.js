@@ -5,7 +5,7 @@ export function chatView(container) {
     container.innerHTML = '';
 
     // Création du WebSocket pour le statut des utilisateurs
-    const statusSocket = new WebSocket('ws://localhost:8888/ws/status/');
+    const statusSocket = new WebSocket('wss://' + window.location.host + '/wss/status/');
 
     // Onopen event
     statusSocket.onopen = function(event) {

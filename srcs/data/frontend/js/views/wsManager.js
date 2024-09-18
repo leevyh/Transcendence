@@ -61,7 +61,7 @@ class WebSocketManager {
         this.callbacks = this.callbacks.filter(cb => cb !== callback);
     }
 }
-const wsManager = new WebSocketManager('ws://localhost:8888/ws/friend_request/');
+const wsManager = new WebSocketManager('wss://' + window.location.host + '/wss/friend_request/');
 export default wsManager;
 
 wsManager.connect();
