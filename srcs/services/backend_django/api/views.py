@@ -32,6 +32,7 @@ def register(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
+            print(data)
             language = data.pop('language', None)
             form = UserRegistrationForm(data)
             if form.is_valid():
@@ -48,6 +49,7 @@ def register(request):
                 stats.save()
                 return JsonResponse({'message': 'User registered successfully'}, status=201)
             else:
+                print("DEBUG")
                 return JsonResponse({'errors': form.errors}, status=400)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
