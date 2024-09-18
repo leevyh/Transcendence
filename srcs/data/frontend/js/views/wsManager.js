@@ -18,7 +18,12 @@ class WebSocketManager {
                 console.error('Invalid token');
                 return;
             }
-            this.socket = new WebSocket(this.url);
+            try {
+                this.socket = new WebSocket(this.url);
+            } catch (error) {
+                console.error('WebSocket connection error:', error);
+                return;
+            }
             this.socket.onopen = () => {
                 console.log('WebSocket connection established');
                 this.isConnected = true;

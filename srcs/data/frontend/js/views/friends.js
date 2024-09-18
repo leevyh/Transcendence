@@ -103,20 +103,20 @@ export async function friendsView(container) {
         sendFriendRequestToServer(nickname);
     }
 
-    async function checkFriendAsBeenRequested(nickname) {
-        const token = localStorage.getItem('token');
-        const response = await fetch('/api/get_friend_request/' + nickname, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-        });
-        const data = await response.json();
-        // console.log(data);         // DEBUG
-        return data.status;
-    }
+    // async function checkFriendAsBeenRequested(nickname) {
+    //     const token = localStorage.getItem('token');
+    //     const response = await fetch('/api/get_friend_request/' + nickname, {
+    //         method: 'GET',
+    //         headers: {
+    //             'Authorization': `Bearer ${token}`,
+    //             'Content-Type': 'application/json',
+    //             'X-CSRFToken': getCookie('csrftoken'),
+    //         },
+    //     });
+    //     const data = await response.json();
+    //     // console.log(data);         // DEBUG
+    //     return data.status;
+    // }
 
     async function sendFriendRequestToServer(nickname) {
         if (wsManager.socket.readyState === WebSocket.OPEN) {

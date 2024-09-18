@@ -25,7 +25,7 @@ def check_auth(request):
         return JsonResponse({'value': value}, status=200)
     else:
         value = False
-        return JsonResponse({'value': value}, status=200)
+        return JsonResponse({'value': value}, status=401)
 
 @csrf_exempt
 def register(request):
@@ -391,8 +391,10 @@ def update_Stats(request): #TODO without form and with json.loads. Need to chang
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
+@csrf_exempt
 def logoutView(request):
     if request.method == 'POST':
+        username = request.user.username
         status = User_site.Status.OFFLINE
         user = User_site.objects.get(id=request.user.id)
         user.status = status

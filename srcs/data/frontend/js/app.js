@@ -27,6 +27,7 @@ const routes = {
         '/login': loginView,
         '/register': registerView,
         '/settings': settingsView,
+        '/password': passwordView,
         '/friends' : friendsView,
         '/chat': chatView,
         '/pong': pongView,
@@ -36,6 +37,7 @@ const routes = {
         '/login': loginView,
         '/register': registerView,
         '/settings': settingsView,
+        '/password': passwordView,
     },
     '/': homeView, // A modifier plus tard
     '/404': notFoundView,

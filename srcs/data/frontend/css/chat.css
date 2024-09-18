@@ -1,0 +1,89 @@
+/* Chat */
+.container-chat {
+    position: relative;
+    display: flex;
+}
+
+.users-container {
+    position: absolute;
+    width: 30%;
+    /* height: 100%; */
+    top: -250px;
+    /* background-color: red; */
+    overflow-y: auto;
+    flex-direction: column;
+    left: 0px;
+}
+
+.user-card {
+    width: 50%;
+}
+
+.dot-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.chat-window {
+    border-radius: 40%;
+}
+
+.chat-body {
+    height: 400px;
+    overflow-y: scroll;
+}
+
+.chat-container {
+    /* background-color: blue; */
+    position: absolute;
+    left: 30%;
+    top: -250px;
+    
+}
+
+.chat-header {
+    display: flex;
+    /* background-color: green; */
+    justify-content: space-between;
+}
+
+
+/* Messages */
+.sent-message {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-bottom: 1rem; /* correspond à mb-4 en Bootstrap */
+}
+.received-message {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    margin-bottom: 1rem; /* correspond à mb-4 en Bootstrap */
+}
+.avatar {
+    width: 45px;
+    height: 100%;
+    border-radius: 50%;
+}
+.message-div {
+    padding: 1rem; /* correspond à p-3 en Bootstrap */
+    border: 1px solid; /* correspond à la classe Bootstrap 'border' */
+    background-color: var(--bs-body-tertiary); /* correspond à 'bg-body-tertiary' en Bootstrap */
+    border-radius: 15px;
+    margin-right: 1rem;
+}
+.message-div-received {
+    padding: 1rem; /* correspond à p-3 en Bootstrap */
+    border: 1px solid; /* correspond à la classe Bootstrap 'border' */
+    background-color: var(--bs-body-secondary); /* correspond à 'bg-body-secondary' en Bootstrap */
+    border-radius: 15px;
+    background-color: rgba(57, 192, 237, 0.2); /* couleur spécifique en rgba */
+    margin-left: 1rem;
+}
+.message-content {
+    font-size: 0.875rem; /* correspond à la classe Bootstrap 'small' */
+    margin-bottom: 0; /* correspond à la classe Bootstrap 'mb-0' */
+}
