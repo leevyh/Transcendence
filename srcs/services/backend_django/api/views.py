@@ -183,18 +183,18 @@ def get_settings(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-@login_required(login_url='/api/login')
-def get_status_all_users(request):
-    if request.method == 'GET':
-        users = User_site.objects.all().exclude(id=request.user.id)  # Exclure l'utilisateur actuel
-        data = []
-        for user in users:
-            data.append({'nickname': user.nickname,
-                         'status': user.status})
-            # print(data)         # DEBUG
-        return JsonResponse(data, status=200, safe=False)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
+# @login_required(login_url='/api/login')
+# def get_status_all_users(request):
+#     if request.method == 'GET':
+#         users = User_site.objects.all().exclude(id=request.user.id)  # Exclure l'utilisateur actuel
+#         data = []
+#         for user in users:
+#             data.append({'nickname': user.nickname,
+#                          'status': user.status})
+#             # print(data)         # DEBUG
+#         return JsonResponse(data, status=200, safe=False)
+#     else:
+#         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
 def all_users(request):
@@ -218,8 +218,7 @@ def all_users(request):
                     avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
                     data.append({'nickname': user.nickname,
                                     'avatar': avatar,
-                                    'status': user.status,
-                                    'id': user.id})
+                                    'status': user.status})
                 return JsonResponse(data, status=200, safe=False)
             else:
                 return JsonResponse({'error': 'Invalid token'}, status=401)

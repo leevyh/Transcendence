@@ -14,11 +14,17 @@
     flex-direction: column;
     left: 0px;
 }
-
 .user-card {
-    width: 50%;
+    width: 100%;
 }
-
+.user-connected {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid;
+    cursor: pointer;
+}
 .dot-status {
     width: 10px;
     height: 10px;
@@ -29,20 +35,16 @@
 .chat-window {
     border-radius: 40%;
 }
-
 .chat-body {
     height: 400px;
     overflow-y: scroll;
 }
-
 .chat-container {
     /* background-color: blue; */
     position: absolute;
     left: 30%;
     top: -250px;
-    
 }
-
 .chat-header {
     display: flex;
     /* background-color: green; */

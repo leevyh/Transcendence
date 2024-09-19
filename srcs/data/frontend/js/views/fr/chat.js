@@ -21,6 +21,7 @@ export async function chatView(container) {
     statusSocket.onmessage = function(event) {
         // FIXME: Handle the message properly, if I'm the one who sent the message, don't send an error
         const data = JSON.parse(event.data);
+        console.log('Message received:', data);          // DEBUG
         // Update the user list with the new status
         const userList = document.getElementById('user-list');
         createUserCard(data, userList);
