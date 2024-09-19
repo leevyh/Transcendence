@@ -119,7 +119,7 @@ services:
 
   backend-postgresql:
     container_name: backend-postgresql
-    build: ./srcs/services/backend-postgresql
+    build: ./srcs/services/backend_postgresql
     volumes:
       - backend-postgresql:/var/lib/postgresql/
     networks:
