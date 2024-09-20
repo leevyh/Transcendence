@@ -12,6 +12,9 @@ import { passwordView } from './views/fr/password.js';
 import { chatView } from './views/fr/chat.js';
 import { pongView } from './views/pong.js';
 
+
+import { ChatWS } from './views/fr/chat_utils.js';
+
 const appDiv = document.getElementById('app');
 
 const routes = {
@@ -45,6 +48,8 @@ const routes = {
 
 
 export async function navigateTo(url) {
+    if (ChatWS) {ChatWS.close();}
+
     const isAuth = await isAuthenticated();
     const publicRoutes = ['/login', '/register', '/404'];
 
@@ -103,3 +108,5 @@ window.addEventListener('popstate', () => {
 
 // Initial load test
 navigateTo(location.pathname || '/');
+
+// PUSHSTATE = Add new state to history | POPSTATE = Go back in history

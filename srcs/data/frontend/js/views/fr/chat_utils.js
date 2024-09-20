@@ -1,17 +1,15 @@
 import { getCookie } from '../utils.js';
 
-let ws = null;
+export let ChatWS = null;
 
 // Function for global container creation
 export async function createGlobalContainer() {
     const globalContainer = document.createElement('div');
     globalContainer.className = 'container-fluid container-chat';
 
-    // Create the users container
     const usersContainer = await createUsersContainer();
     globalContainer.appendChild(usersContainer);
 
-    // Create the chat container
     const chatContainer = await createChatContainer();
     globalContainer.appendChild(chatContainer);
 
@@ -24,7 +22,7 @@ async function createUsersContainer() {
     usersContainer.className = 'col-md-4 users-container';
 
     const usersTitle = document.createElement('h5');
-    usersTitle.setAttribute('data-i18n', 'onlineUsers'); // For multilingual support
+    usersTitle.setAttribute('data-i18n', 'onlineUsers'); // TODO: For multilingual support
     usersTitle.textContent = 'Online Users:';
 
     const usersList = document.createElement('ul');
@@ -50,37 +48,51 @@ export function createUserCard(user, userList) {
         const userCardBody = document.createElement('div');
         userCardBody.className = 'card-body user-connected';
 
+        const userNicknameDiv = document.createElement('div');
+        userNicknameDiv.className = 'user-nickname';
         const userNickname = document.createElement('h5');
         userNickname.className = 'card-title';
         userNickname.textContent = user.nickname;
+        userNicknameDiv.appendChild(userNickname);
 
         const dot = document.createElement('span');
         dot.className = 'dot dot-status';
 
+
+        // Create div for block/unblock buttons
+        const blockUnblockDiv = document.createElement('div');
+        blockUnblockDiv.className = 'block-unblock';
+        blockUnblockDiv.id = 'user.nickname';
+        blockUnblockDiv.style.display = 'none'; // Initially hidden
+
         // Create Block Button
         const blockUserButton = document.createElement('button');
-        blockUserButton.className = 'btn btn-danger';
+        blockUserButton.className = 'btn btn-danger block-button';
+        blockUserButton.id = 'user.nickname';
         blockUserButton.textContent = 'Bloquer';
         blockUserButton.addEventListener('click', () => {
-            blockUser(user.nickname); // Pass the user ID to the blockUser function
+            blockUser(user.nickname);
         });
 
         // Create Unblock Button
         const unblockUserButton = document.createElement('button');
-        unblockUserButton.className = 'btn btn-success';
+        unblockUserButton.className = 'btn btn-success unblock-button';
+        unblockUserButton.id = 'user.nickname';
         unblockUserButton.textContent = 'Débloquer';
+        unblockUserButton.style.display = 'none'; // Initially hidden
         unblockUserButton.addEventListener('click', () => {
-            unblockUser(user.nickname); // Pass the user ID to the unblockUser function
+            unblockUser(user.nickname);
         });
 
         userCardBody.appendChild(dot);
-        userCardBody.appendChild(userNickname);
-        userCardBody.appendChild(blockUserButton);
-        userCardBody.appendChild(unblockUserButton);
+        userCardBody.appendChild(userNicknameDiv);
+        blockUnblockDiv.appendChild(blockUserButton);
+        blockUnblockDiv.appendChild(unblockUserButton);
+        userCardBody.appendChild(blockUnblockDiv);
         userCard.appendChild(userCardBody);
 
         // Add click event to open chat
-        userCard.addEventListener('click', () => {
+        userNicknameDiv.addEventListener('click', () => {
             const isChatOpen = document.getElementById('chat-window');
             // If the chat is already open for this user, close it. Else, open it.
             if (isChatOpen.style.display === 'block' && isChatOpen.querySelector('.chat-title').textContent.includes(user.nickname)) {
@@ -94,7 +106,6 @@ export function createUserCard(user, userList) {
                 isChatOpen.style.display = 'block';
             }
         });
-
         userList.appendChild(userCard);
     }
 
@@ -102,11 +113,10 @@ export function createUserCard(user, userList) {
     const dot = userCard.querySelector('.dot');
     if (user.status === 'online') {
         dot.style.backgroundColor = 'green';
-    } else if (user.status === 'offline') {
-        // userCard.remove();
-        dot.style.backgroundColor = 'red';
     } else if (user.status === 'in game') {
         dot.style.backgroundColor = 'orange';
+    } else if (user.status === 'offline') {
+        dot.style.backgroundColor = 'red';
     }
     return userCard;
 }
@@ -140,18 +150,20 @@ async function createChatContainer() {
     chatInput.className = 'form-control';
     chatInput.placeholder = 'Type your message here...';
     chatInput.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && chatInput.value !== '') {
             chatSendButton.click();
         }
     });
 
     const chatSendButton = document.createElement('button');
-    chatSendButton.className = 'btn btn-primary';
+    chatSendButton.className = 'btn btn-primary chat-send-button';
     chatSendButton.textContent = 'Send';
     chatSendButton.addEventListener('click', () => {
         const message = chatInput.value;
-        handleMessage(message);
-        chatInput.value = ''; // Clear input after sending
+        if (message !== '') {
+            handleMessage(message);
+            chatInput.value = '';
+        }
     });
 
     chatInputGroup.appendChild(chatInput);
@@ -187,7 +199,7 @@ function createChatHeaderButtons() {
     
 // INVITE GAME BUTTON
     const inviteGameButton = document.createElement('button');
-    inviteGameButton.className = 'btn btn-primary';
+    inviteGameButton.className = 'btn btn-primary invite-game-button';
     inviteGameButton.textContent = 'Invite to Game';
     inviteGameButton.addEventListener('click', (event) => {
         console.log('User invited to play Pong (TODO)');
@@ -207,6 +219,7 @@ function createChatHeaderButtons() {
     viewProfileButton.className = 'btn btn-light';
     viewProfileButton.addEventListener('click', (event) => {
         console.log('User profile opened (TODO)');
+        // TODO: Implement link to user profile
     });
 
     const svgUPlink = "http://www.w3.org/2000/svg";
@@ -232,10 +245,10 @@ function createChatHeaderButtons() {
 
 function openChat(user) {
     const chatTitle = document.querySelector('.chat-title');
-    chatTitle.textContent = `Chat with ${user}`; // TODO: Add nickname and link to profile
+    chatTitle.textContent = `Chat with ${user}`;
 
     checkConversationID(user).then(conversationID => {
-        openConversation(conversationID);
+        openConversation(conversationID, user);
     });
 
     // Function to check if a conversation ID exists for the users, if not create one
@@ -319,30 +332,30 @@ function displayMessage(messageData) {
 
 // Function to send a message
 export function handleMessage(message) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (ChatWS && ChatWS.readyState === WebSocket.OPEN) {
         const messageData = {
             type: 'chat_message',
             message: message,
             timestamp: new Date().toISOString()
         };
-        ws.send(JSON.stringify(messageData)); 
+        ChatWS.send(JSON.stringify(messageData)); 
     } else {
         console.error('WebSocket is not open.');        // DEBUG
     }
 }
 
 // Function to initialize the chat
-export async function openConversation(conversationID) {
+export async function openConversation(conversationID, otherUser) {
     // Fermer l'ancienne connexion WebSocket, si elle existe
-    if (ws) {ws.close();}
+    if (ChatWS) {ChatWS.close();}
 
-    ws = new WebSocket('ws://' + window.location.host + `/ws/${conversationID}/messages/`);
+    ChatWS = new WebSocket('ws://' + window.location.host + `/ws/${conversationID}/messages/`);
 
-    ws.onopen = function() {
-        // console.log('WebSocket OK - conversationID:', conversationID);         // DEBUG
+    ChatWS.onopen = function() {
+        console.log('WebSocket OPEN - conversationID:', conversationID);         // DEBUG
     }
 
-    ws.onmessage = function(event) {
+    ChatWS.onmessage = function(event) {
         // Handle incoming messages
         const receivedMessage = JSON.parse(event.data);
 
@@ -352,6 +365,24 @@ export async function openConversation(conversationID) {
                     displayMessage(message);
                 });
             }
+            if (receivedMessage.block.blocked_user === false) {
+                enableChat();
+                const blockUnblockDiv = document.getElementById(otherUser).querySelector('.block-unblock')
+                blockUnblockDiv.style.display = 'block';
+            } else {
+                disableChat();
+                if (receivedMessage.block.blocked === receivedMessage.block.user) {
+                    const blockUnblockDiv = document.getElementById(receivedMessage.block.blocked).querySelector('.block-unblock')
+                    blockUnblockDiv.style.display = 'none';
+                } else if (receivedMessage.block.blocker === receivedMessage.block.user) {
+                    const blockUnblockDiv = document.getElementById(receivedMessage.block.blocked).querySelector('.block-unblock')
+                    blockUnblockDiv.style.display = 'block';
+                    const blockUserButton = document.getElementById(receivedMessage.block.blocked).querySelector('.block-button')
+                    blockUserButton.style.display = 'none';
+                    const unblockUserButton = document.getElementById(receivedMessage.block.blocked).querySelector('.unblock-button')
+                    unblockUserButton.style.display = 'block';
+                }
+            }
         } else if (receivedMessage.type === 'chat_message') {
             const messageData = {
                 sender: receivedMessage.sender,
@@ -360,31 +391,37 @@ export async function openConversation(conversationID) {
                 user: receivedMessage.user
             };
             displayMessage(messageData);
-        } else if (receivedMessage.type === 'block_user') {
-            console.log('receivedMessage.type', receivedMessage.type);      // FIXME
-            // Si vous êtes le destinataire du blocage, gérer la situation ici
-            if (receivedMessage.blocked_id === currentUser.id) {
-                alert('You have been blocked by this user.');
-                // Désactiver les fonctionnalités de chat avec cet utilisateur
-                disableChatForBlockedUser(receivedMessage.blocked_id);
+        } else if (receivedMessage.type === 'user_blocked') {
+            disableChat();
+            if (receivedMessage.blocked === receivedMessage.user) {
+                const blockUnblockDiv = document.getElementById(receivedMessage.blocker).querySelector('.block-unblock')
+                blockUnblockDiv.style.display = 'none';
+            } else if (receivedMessage.blocked !== receivedMessage.user) {
+                const blockUserButton = document.getElementById(receivedMessage.blocked).querySelector('.block-button')
+                blockUserButton.style.display = 'none';
+                const unblockUserButton = document.getElementById(receivedMessage.blocked).querySelector('.unblock-button')
+                unblockUserButton.style.display = 'block';
             }
-        } else if (receivedMessage.type === 'unblock_user') {
-            console.log('receivedMessage.type', receivedMessage.type);      // FIXME
-            // Si vous êtes le destinataire du déblocage
-            if (receivedMessage.blocked_id === currentUser.id) {
-                alert('You have been unblocked.');
-                // Réactiver les fonctionnalités de chat avec cet utilisateur
-                enableChatForUnblockedUser(receivedMessage.blocked_id);
+        } else if (receivedMessage.type === 'user_unblocked') {
+            enableChat();
+            if (receivedMessage.blocked === receivedMessage.user) {
+                const blockUnblockDiv = document.getElementById(receivedMessage.blocker).querySelector('.block-unblock')
+                blockUnblockDiv.style.display = 'block';
+            } else if (receivedMessage.blocked !== receivedMessage.user) {
+                const blockUserButton = document.getElementById(receivedMessage.blocked).querySelector('.block-button')
+                blockUserButton.style.display = 'block';
+                const unblockUserButton = document.getElementById(receivedMessage.blocked).querySelector('.unblock-button')
+                unblockUserButton.style.display = 'none';
             }
         }
     }
 
-    ws.onclose = function() {
-        // console.log('WebSocket connection closed');         // DEBUG
+    ChatWS.onclose = function() {
+        console.log('WebSocket CLOSE - conversationID:', conversationID);
     }
 
-    ws.onerror = function(event) {
-        console.error('WebSocket error:', event);         // DEBUG
+    ChatWS.onerror = function(event) {
+        console.error('WebSocket error:', event);
     }
 }
 
@@ -394,89 +431,47 @@ export async function openConversation(conversationID) {
 
 // Function to block a user
 function blockUser(blockedUser) {
-    fetch('/api_chat/block/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({
-            'blocked': blockedUser
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message) {
-            console.log("User has been blocked.");
-
-            // Send a notification via WebSocket
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                const messageData = {
-                    type: 'block_user',
-                    blocked: blockedUser
-                };
-                ws.send(JSON.stringify(messageData));
-            }
-        } else if (data.error) {
-            if (data.error === 'User already blocked') {
-                console.log("This user has already been blocked.");
-            }
-        }
-    });
+    if (ChatWS && ChatWS.readyState === WebSocket.OPEN) {
+        const messageData = {
+            type: 'block_user',
+            blocked: blockedUser
+        };
+        ChatWS.send(JSON.stringify(messageData));
+    }
 }
 
 // Function to unblock a user
 function unblockUser(blockedUser) {
-    fetch('/api_chat/unblock/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({
-            'blocked': blockedUser
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message) {
-            console.log("User has been unblocked.");
-
-            // Send a notification via WebSocket
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                const messageData = {
-                    type: 'unblock_user',
-                    blocked: blockedUser
-                };
-                ws.send(JSON.stringify(messageData));
-            }
-        } else if (data.error) {
-            if (data.error === 'User not blocked') {
-                console.log("This user haven't been blocked.");
-            }
-        }
-    });
+    if (ChatWS && ChatWS.readyState === WebSocket.OPEN) {
+        const messageData = {
+            type: 'unblock_user',
+            blocked: blockedUser
+        };
+        ChatWS.send(JSON.stringify(messageData));
+    }
 }
 
-function disableChatForBlockedUser(blockedUser) {
+function disableChat() {
     const chatInput = document.getElementById('chat-input');
-    const chatSendButton = document.querySelector('.btn-primary');
+    const chatSendButton = document.querySelector('.chat-send-button');
+    const inviteGameButton = document.querySelector('.invite-game-button');
     
     if (chatInput && chatSendButton) {
         chatInput.disabled = true;
         chatSendButton.disabled = true;
-        alert(`You cannot chat with user ${blockedUser} as they have blocked you.`);                 // A CHANGER
+        inviteGameButton.disabled = true;
     }
 }
 
-function enableChatForUnblockedUser(blockedUser) {
+function enableChat() {
     const chatInput = document.getElementById('chat-input');
-    const chatSendButton = document.querySelector('.btn-primary');
+    const chatSendButton = document.querySelector('.chat-send-button');
+    const inviteGameButton = document.querySelector('.invite-game-button');
     
     if (chatInput && chatSendButton) {
         chatInput.disabled = false;
         chatSendButton.disabled = false;
-        alert(`You can now chat with user ${blockedUser}.`);                 // A CHANGER
+        inviteGameButton.disabled = false;
     }
 }
 
