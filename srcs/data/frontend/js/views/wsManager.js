@@ -33,6 +33,15 @@ class WebSocketManager {
                 const data = JSON.parse(event.data);
                 console.log('Received notification:', data);
 
+                if (data.type === 'new_message') {
+                    console.log('You received a new message from', data.from_nickname);
+                    // TODO: Handle new message notification
+                }
+                if (data.type === 'friend_request') {
+                    console.log('You received a friend request from', data.from_nickname);
+                    // TODO: Handle friend request notification
+                }
+
                 this.callbacks.forEach(callback => callback(data));
             };
 

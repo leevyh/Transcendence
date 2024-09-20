@@ -1,6 +1,6 @@
 import { getCookie } from '../utils.js';
 
-let ws = null;
+export let ChatWS = null;
 
 // Function for global container creation
 export async function createGlobalContainer() {
@@ -332,13 +332,13 @@ function displayMessage(messageData) {
 
 // Function to send a message
 export function handleMessage(message) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (ChatWS && ChatWS.readyState === WebSocket.OPEN) {
         const messageData = {
             type: 'chat_message',
             message: message,
             timestamp: new Date().toISOString()
         };
-        ws.send(JSON.stringify(messageData)); 
+        ChatWS.send(JSON.stringify(messageData)); 
     } else {
         console.error('WebSocket is not open.');        // DEBUG
     }
@@ -347,15 +347,15 @@ export function handleMessage(message) {
 // Function to initialize the chat
 export async function openConversation(conversationID, otherUser) {
     // Fermer l'ancienne connexion WebSocket, si elle existe
-    if (ws) {ws.close();}
+    if (ChatWS) {ChatWS.close();}
 
-    ws = new WebSocket('ws://' + window.location.host + `/ws/${conversationID}/messages/`);
+    ChatWS = new WebSocket('ws://' + window.location.host + `/ws/${conversationID}/messages/`);
 
-    ws.onopen = function() {
-        // console.log('WebSocket OK - conversationID:', conversationID);         // DEBUG
+    ChatWS.onopen = function() {
+        console.log('WebSocket OPEN - conversationID:', conversationID);         // DEBUG
     }
 
-    ws.onmessage = function(event) {
+    ChatWS.onmessage = function(event) {
         // Handle incoming messages
         const receivedMessage = JSON.parse(event.data);
 
@@ -416,12 +416,12 @@ export async function openConversation(conversationID, otherUser) {
         }
     }
 
-    ws.onclose = function() {
-        // console.log('WebSocket connection closed');         // DEBUG
+    ChatWS.onclose = function() {
+        console.log('WebSocket CLOSE - conversationID:', conversationID);
     }
 
-    ws.onerror = function(event) {
-        console.error('WebSocket error:', event);         // DEBUG
+    ChatWS.onerror = function(event) {
+        console.error('WebSocket error:', event);
     }
 }
 
@@ -431,23 +431,23 @@ export async function openConversation(conversationID, otherUser) {
 
 // Function to block a user
 function blockUser(blockedUser) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (ChatWS && ChatWS.readyState === WebSocket.OPEN) {
         const messageData = {
             type: 'block_user',
             blocked: blockedUser
         };
-        ws.send(JSON.stringify(messageData));
+        ChatWS.send(JSON.stringify(messageData));
     }
 }
 
 // Function to unblock a user
 function unblockUser(blockedUser) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (ChatWS && ChatWS.readyState === WebSocket.OPEN) {
         const messageData = {
             type: 'unblock_user',
             blocked: blockedUser
         };
-        ws.send(JSON.stringify(messageData));
+        ChatWS.send(JSON.stringify(messageData));
     }
 }
 
