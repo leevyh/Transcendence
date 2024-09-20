@@ -36,9 +36,13 @@ xpack:
           version: latest
         - name: system
           version: latest
-        - name: nginx
+        - name: elastic_agent
           version: latest
         - name: logstash
+          version: latest
+        - name: nginx
+          version: latest
+        - name: postgresql
           version: latest
     agentPolicies:
         - name: Fleet Server Policy
@@ -48,14 +52,21 @@ xpack:
               - name: Fleet Server Integration
                 package:
                   name: fleet_server
-        - name: Agent Nginx Policy
-          id: agent-nginx-policy
+        - name: System Policy
+          id: system-policy
           namespace: default
           is_default: true
           package_policies:
-              - name: Elastic Agent System Integration
+            - name: System Integration
+              package:
+                name: system
+        - name: Agent Nginx Policy
+          id: agent-nginx-policy
+          namespace: default
+          package_policies:
+              - name: Elastic Agent Integration
                 package:
-                  name: system
+                  name: elastic_agent
               - name: Nginx Integration
                 package:
                   name: nginx
@@ -63,20 +74,30 @@ xpack:
           id: agent-logstash-policy
           namespace: default
           package_policies:
-            - name: Elastic Agent System Integration
+            - name: Elastic Agent Integration
               package:
-                name: system
+                name: elastic_agent
             - name: Logstash Integration
               package:
                 name: logstash
+        - name: Agent Postgresql Policy
+          id: agent-postgresql-policy
+          namespace: default
+          package_policies:
+              - name: Elastic Agent Integration
+                package:
+                  name: elastic_agent
+              - name: Postgresql Integration
+                package:
+                  name: postgresql
     fleetServerHosts:
       - id: fleet-server
         name: Fleet Server
         host_urls: ["https://backend-fleet:8220"]
         is_default: true
     outputs:
-      - id: default-output
-        name: Default Output
+      - id: elastic-output
+        name: Elasticsearch Output
         type: elasticsearch
         hosts:
           - "https://backend-elastic:9200"

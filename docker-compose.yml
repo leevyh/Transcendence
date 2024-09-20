@@ -105,14 +105,16 @@ services:
     expose:
       - 8000
     env_file:
-      - ./env/postgresql.env
       - ./env/42api.env
+      - ./env/postgresql.env
     healthcheck:
       test: ["CMD-SHELL", "curl -IL http://backend-django:8000/api/django_status | grep -q 'HTTP/1.1 200 OK'"]
       interval: 10s
       timeout: 10s
       retries: 120
     depends_on:
+      backend-postgresql:
+          condition: service_healthy
       backend-logstash:
         condition: service_started
     restart: on-failure
@@ -121,13 +123,16 @@ services:
     container_name: backend-postgresql
     build: ./srcs/services/backend_postgresql
     volumes:
-      - backend-postgresql:/var/lib/postgresql/
+#      - backend-postgresql:/var/lib/postgresql/
+      - backend-elk-certs:/usr/share/elastic-agent/config/certs/
     networks:
       - default
     expose:
       - 5432
     env_file:
+      - ./env/fleet.env
       - ./env/postgresql.env
+      - ./srcs/services/backend_postgresql/conf/elastic-agent.env
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s

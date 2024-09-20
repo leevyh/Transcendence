@@ -17,7 +17,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -67,21 +66,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
 ]
 
-
-""" MIDDLEWARE = [
-    'api.middleware.AuthenticationMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.http.ConditionalGetMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-] """
-
-
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
@@ -103,18 +87,27 @@ TEMPLATES = [
 # Ajouter ces paramètres pour autoriser les requêtes depuis votre SPA
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8888",
+    "https://localhost:8888",
 ]
 
 # Autoriser les requêtes API
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8888",
+    "https://localhost:8888",
 ]
+
+#CSRF_COOKIE_SECURE = True
+
+#SECURE_SSL_REDIRECT = True
+#SECURE_HSTS_SECONDS = 3600
+#SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+#SECURE_HSTS_PRELOAD = True
 
 LOGIN_URL = '/api/login'
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-
 ASGI_APPLICATION = 'backend.asgi.application'
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
@@ -125,7 +118,7 @@ CHANNEL_LAYERS = {
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Utilisation de la base de données pour stocker les sessions
 SESSION_COOKIE_NAME = 'sessionid'  # Nom du cookie de session
 SESSION_COOKIE_HTTPONLY = True
-#SESSION_COOKIE_SECURE = False  # True si HTTPS
+# SESSION_COOKIE_SECURE = True
 
 # Autres backends possibles
 # SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
@@ -221,32 +214,12 @@ LOGGING = {
         },
     },
     'loggers': {
+        'backend': {
+            'handlers': ['logstash', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
         'django': {
-            'handlers': ['logstash', 'console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'django.server': {
-            'handlers': ['logstash', 'console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'django.request': {
-            'handlers': ['logstash', 'console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'django.db': {
-            'handlers': ['logstash', 'console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'django.security': {
-            'handlers': ['logstash', 'console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'django.channels': {
             'handlers': ['logstash', 'console'],
             'level': 'INFO',
             'propagate': True,
