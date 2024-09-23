@@ -1,4 +1,7 @@
 import { navigateTo } from '../../app.js';
+import { getCookie } from '../utils.js';
+//import { navigationBar } from './navigation.js';
+
 
 export function navigationBar(container) {
     container.innerHTML = '';

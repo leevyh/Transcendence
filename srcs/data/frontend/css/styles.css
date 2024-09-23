@@ -2,10 +2,16 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
+    /*display: flex;
+     justify-content: center; */
+    /* align-items: center; */ /*a remettre*/
+}
+
+.navbarr {
     display: flex;
     justify-content: center;
-    /* align-items: center; */
-}
+
+} /*NEWWWWW*/
 
 body {
     display: flex;
@@ -15,16 +21,6 @@ body {
     background-image: linear-gradient(to bottom, black, #012970);
 }
 
-#app {
-    display: flex;
-    /* justify-content: space-evenly;
-    align-items: center;
-     flex-direction: column;
-    height: 100%;
-    width: 100%;
-    box-sizing: border-box; */
-}
-
 .base {
 
     display: flex;
@@ -32,7 +28,7 @@ body {
     /* align-items: center; */
     flex-direction: column;
     /* background-color: aqua; */
-    width: 100%;
+    width: 100%; /*100vh*////////////////////////////////////////////////////////////////////////////////////
     height: 100%;
 }
 
@@ -102,9 +98,11 @@ body {
     transition: transform 0.5s ease, opacity 0.5s ease ;
     transform: translateY(-1000px); /* Départ de l'animation, hors écran */
 }
+
 .modalLoginTitle {
     color : #F4ED37;
-    ;
+    cursor: pointer;
+
 }
 
 .ModalLoginBase-show .ModalLogin {
@@ -148,170 +146,4 @@ body {
 #error404 {
 	width: 50%;
 	height: 50%;
-}
-
-/* body.small-font {
-    font-size: 12px;
-}
-
-body.large-font {
-    font-size: 20px;
-}
-
-/* Pour le mode sombre */
-/* body.dark-mode {
-    background-color: #121212;
-    color: #ffffff;
-}
-
-
-#language-selector {
-
-    background: white;
-    border-radius: 10px;
-}
-
-.base {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    width: 100%;
-
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.contener {
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-    width: 100%;
-    max-width: 1000px;
-    box-sizing: border-box;
-}
-
-.twodivWelcome {
-    flex: 1;
-    width: 100%;
-    max-width: 48%;
-    box-sizing: border-box;
-    margin: 10px;
-}
-
-.welcome{
-    padding: 20px;
-    background-color: white;
-    display: flex;
-    justify-content: space-evenly;
-    flex-direction: column;
-}
-
-.titleWelcome {
-    color: #012970;
-    font-weight: 600;
-    font-size: 100px;
-}
-
-.paragraphWelcome {
-    display: flex;
-    justify-content: center;
-    color: #a19e9e91;
-
-    font-weight: 200;
-    font-size: 20px;
-}
-
-.listButton {
-    display: flex;
-    justify-content: space-evenly;
-    padding: 0;
-}
-
-.listElemWelcome {
-    list-style-type: none;
-}
-
-.imgPong {
-    height: auto;
-    object-fit: cover;
-    border: 1px solid #ccc;
-}
-
-.Buttonselem {
-    background-color: #012970;
-    color: white;
-    margin: 5px;
-}
-
-.Buttonselem {
-    background-color: #012970;
-    color: white;
-    margin: 5px;
-}
-
-.Buttonselem:hover {
-    background-color: #2759af;
-}
-
-#language {
-    display: flex;
-    justify-content: flex-end;
-    margin-right: 9px;
-}
-
-.languageLabel {
-    color: #012970;
-}
-*/
-/*NAVBAR*/
-/*
-.navbar-brand {
-    /* padding: 5px;
-    width: 10px;
-    color: #012970;
-}
-/* .notification {
-    color: #ff0202;
-} */
-
-.redNotification {
-    border-radius: 100%;
-    color: white;
-    background-color: #dc3545;
-    text-align: center;
-    font-weight: bold;
-    height: 15px;
-    width: 15px;
-    margin-left: -10px;
-    align-content: center;
-    font-size: 10px;
-    display: inline-block;
-    position: absolute;
-}
-
-.nav-icon {
-    width: 50%;
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    color: #012970;
-}
-
-/* .nav-icon:hover {
-    color: #2759af;
-} */
-
-
-.user-connected {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    /* padding: 20px; */
-    box-sizing: 0;
 }

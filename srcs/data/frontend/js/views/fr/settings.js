@@ -5,8 +5,7 @@ import { navigationBar } from './navigation.js';
 export function settingsView(container) {
     container.innerHTML = '';
 
-
-    // Recuperer les infos de l'utilisateur dans le backend
+    // Récupérer les infos de l'utilisateur depuis le backend
     fetch(`/api/settings/`, {
         method: 'GET',
         headers: {
@@ -15,13 +14,10 @@ export function settingsView(container) {
             'X-CSRFToken': getCookie('csrftoken'),
         },
     })
-    // Si le status de la reponse est 200, on recupere les donnees sinon on lance une erreur ou on redirige vers la page de connexion
-    // Si le status est 307 sans passer dans le bloc de donnees
     .then(response => {
         if (response.status === 200) {
             return response.json();
-        }
-        else if (response.status === 307) {
+        } else if (response.status === 307) {
             localStorage.removeItem('token');
             fetch('/api/logout/', {
                 method: 'POST',
@@ -29,8 +25,7 @@ export function settingsView(container) {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
-            }).then(r => r.json())
-            navigateTo('/login');
+            }).then(() => navigateTo('/login'));
             return null;
         } else {
             if (DEBUG) {console.error('Error:', response);}
@@ -50,38 +45,533 @@ export function settingsView(container) {
             font_size: data.font_size,
             theme: data.dark_mode,
             avatar: data.avatar,
-        }
+        };
+
+        // Créer la structure de profil avec Bootstrap
         const baseProfil = document.createElement('div');
-        baseProfil.className = 'baseProfil';
+        baseProfil.className = 'baseProfil w-100 h-100 d-flex flex-column';  // Utilisation des classes Bootstrap ici
         container.appendChild(baseProfil);
 
         const nav = document.createElement('nav');
-        nav.className = 'nav';
+        nav.className = 'nav d-flex flex-column justify-content-start align-items-center shadow-lg'; // Transition vers Bootstrap
+        nav.style.backgroundColor = '#435574';  // Couleur personnalisée, Bootstrap ne fournit pas cette couleur directement
         baseProfil.appendChild(nav);
 
         const divProfil = document.createElement('div');
-        divProfil.className = 'divProfil';
+        divProfil.className = 'divProfil w-50 text-center';  // Bootstrap padding et text-align
         nav.appendChild(divProfil);
 
         const avatarItem = document.createElement('div');
-        avatarItem.className = 'list-group-item imgAvatarContener';
+        avatarItem.className = 'avatarItem rounded-circle overflow-hidden shadow-sm';  // Bootstrap arrondi et ombre
+        divProfil.appendChild(avatarItem);
+
         const avatarImage = document.createElement('img');
         avatarImage.src = `data:image/png;base64, ${userData.avatar}`;
-        avatarImage.className = 'img-fluid rounded-circle imgAvatarProfile';
+        avatarImage.className = 'avatarImage w-100 h-auto pb-2';  // Bootstrap pour la taille
         avatarImage.alt = 'Avatar';
-        divProfil.appendChild(avatarItem);
         avatarItem.appendChild(avatarImage);
+
+        avatarImage.addEventListener('click', () => {
+            modal.style.display = 'flex';  // Affichage du modal
+            setTimeout(() => {
+                modal.classList.add('ModalLoginBase-show');
+            }, 10);
+        });
+
+        const TitleNickname = document.createElement('h4');
+        TitleNickname.className = 'TitleNickname mt-2 pb-4';  // Bootstrap pour couleur et marge
+        TitleNickname.textContent = `${userData.nickname}`;
+        divProfil.appendChild(TitleNickname);
+
+        // Navigation list
         const divNav = document.createElement('div');
-        divNav.className = 'divListFriends';
+        divNav.className = 'divNav border-top border-2 border-bottom border-custom-color py-3 w-100';  // Utilisation de Bootstrap
         nav.appendChild(divNav);
 
+        const NavBarList = document.createElement('ul');
+        NavBarList.className = 'NavBarList list-unstyled d-flex flex-column';  // Flex column via Bootstrap
+        divNav.appendChild(NavBarList);
+
+        const PlayElem = document.createElement('li');
+        PlayElem.className = 'PlayElem text-center text-primary py-2';  // Text et padding avec Bootstrap
+        PlayElem.textContent = 'Play';
+        NavBarList.appendChild(PlayElem);
+
+        const ChatElem = document.createElement('li');
+        ChatElem.className = 'ElemListNavBar text-center text-primary py-2';  // Même traitement
+        ChatElem.textContent = 'Chat';
+        NavBarList.appendChild(ChatElem);
+
+        const FriendsElem = document.createElement('li');
+        FriendsElem.className = 'ElemListNavBar text-center text-primary py-2';
+        FriendsElem.textContent = 'Friends';
+        NavBarList.appendChild(FriendsElem);
+
+        const LeaderboardElem = document.createElement('li');
+        LeaderboardElem.className = 'ElemListNavBar text-center text-primary py-2';
+        LeaderboardElem.textContent = 'Leaderboard';
+        NavBarList.appendChild(LeaderboardElem);
+
+        // Liste des amis
         const divListFriends = document.createElement('div');
-        divListFriends.className = 'divListFriends';
+        divListFriends.className = 'divListFriends d-flex justify-content-center w-100 py-3';
+        divListFriends.textContent = 'Friends list';
         nav.appendChild(divListFriends);
 
-        const divLogout = document.createElement('div');
-        divLogout.className = 'divLogout';
-        nav.appendChild(divLogout);
+        // Bouton de déconnexion
+        // const divLogout = document.createElement('div');
+        // divLogout.className = 'divLogout position-absolute bottom-0 w-100 d-flex justify-content-center p-3';
+        // nav.appendChild(divLogout);
+
+        const buttonLogOut = document.createElement('button');
+        buttonLogOut.className = 'buttonLogOut btn btn-danger shadow-lg mt-auto';
+        buttonLogOut.textContent = 'Logout'
+        nav.appendChild(buttonLogOut);
+
+        // const svgLogOut = document.createElement('svg');
+        // svgLogOut.className = 'svgLogOut bi bi-box-arrow-right d-flex justify-content-center text-center';
+        // svgLogOut.setAttribute('xmlns', "http://www.w3.org/2000/svg");
+        // svgLogOut.setAttribute('width', '16');
+        // svgLogOut.setAttribute('height', '16');
+        // svgLogOut.setAttribute('fill', 'currentColor');
+        // svgLogOut.setAttribute('viewBox', '0 0 16 16');
+        // buttonLogOut.appendChild(svgLogOut);
+
+        // Événement de changement de couleur au clic
+        buttonLogOut.addEventListener('mousedown', () => {
+            buttonLogOut.classList.add('c82333'); // Change à une couleur plus sombre au clic
+        });
+
+        buttonLogOut.addEventListener('mouseup', () => {
+            buttonLogOut.classList.remove('btn-dark'); // Reviens à la couleur initiale après le clic
+        });
+        ///////////////////
+        // Modal-Param
+        const modalParam = document.createElement('div');
+        modalParam.className = 'modal fade';
+        modalParam.setAttribute('tabindex', '-1');
+        // modalParam.id = 'modalParam';
+        //modalParam.style.display = 'none'; // Cachée par défaut
+        modalParam.setAttribute('aria-labelledby', 'modalParamLabel');
+        modalParam.setAttribute('aria-hidden', 'true');
+        container.appendChild(modalParam);
+
+        const modalParamDialog = document.createElement('div');
+        modalParamDialog.classList.add('modal-dialog');
+        modalParam.appendChild(modalParamDialog);
+
+        // Créer le contenu de la modale
+        const modalParamContent = document.createElement('div');
+        modalParamContent.className = 'modal-content';
+        // modalParamContent.id = 'modalParamContent';
+        modalParamDialog.appendChild(modalParamContent);
+
+        const modalParamHeader = document.createElement('div');
+        modalParamHeader.className = 'modal-header border-bottom border-custom-color pb-2';
+        // modalParamHeader.id = 'modalParamHeader';
+        modalParamContent.appendChild(modalParamHeader);
+
+        // Titre du Modal
+        const modalParamTitle = document.createElement('h2');
+        modalParamTitle.textContent = 'Settings';
+        modalParamTitle.className = 'modal-title';
+        // modalParamTitle.id = 'modalParamTitle';/////
+        modalParamHeader.appendChild(modalParamTitle);
+
+        // Bouton pour fermer la modale
+        const closeButtonParam = document.createElement('span');
+        // closeButtonParam.className = 'btn-close';
+        closeButtonParam.id = 'close-button-Param';
+        closeButtonParam.setAttribute('data-bs-dismiss', 'modal');
+        closeButtonParam.setAttribute('aria-label', 'Close');
+        closeButtonParam.textContent = '×'; // Symbole de fermeture
+        modalParamHeader.appendChild(closeButtonParam);
+
+
+        // Ajout de l'événement pour ouvrir la modal avec animation
+        document.querySelector('.TitleNickname').addEventListener('click', () => {
+            // Utilisation de l'API Bootstrap pour afficher la modal
+            const bootstrapModal = new bootstrap.Modal(modalParam);
+
+            // Positionnement de la modale à côté de la barre de navigation
+            const navBar = document.querySelector('.nav'); // Sélectionner la barre de navigation
+            const rect = navBar.getBoundingClientRect(); // Récupérer les dimensions et position
+
+            modalParam.style.position = 'absolute'; // Positionnement absolu
+            modalParam.style.top = `${rect.top}px`; // Aligner avec la barre de navigation
+            modalParam.style.left = `${rect.right + 10}px`; // La modal apparaît à droite de la barre, avec un écart de 20px
+
+            modalParam.style.margin = '0';  // Supprimer les marges par défaut
+            modalParam.style.transform = 'none';  // Désactiver les centrer automatiquement
+            modalParam.style.maxWidth = 'none';  // Permet à la modal de s'étendre sans limitation de largeur
+            bootstrapModal.show(); // Afficher la modal
+        });
+
+        // TitleNickname.addEventListener('click', () => {
+        //     modalParam.style.display = 'flex'; // Changer l'affichage à flex pour centrer
+        //     setTimeout(() => {
+        //         modalParam.classList.add('modalParam-show'); // Ajouter la classe d'animation
+        //     }, 10); // Petit délai pour activer la transition après l'affichage
+        // });
+
+        // Événement pour fermer la modale PARAM avec animation
+        closeButtonParam.addEventListener('click', () => {
+            modalParam.classList.remove('modalParam-show'); // Retirer la classe d'animation
+            setTimeout(() => {
+                modalParam.style.display = 'none'; // Cacher la modale après l'animation
+            }, 500); // Délai correspondant à la durée de l'animation CSS
+        });
+
+        const ModalParamBody = document.createElement('div');
+        ModalParamBody.className = 'modal-body';
+        // ModalParamBody.id = 'ModalParamBody';
+        modalParamContent.appendChild(ModalParamBody);
+
+        const SvgModify = document.createElement('li');
+        SvgModify.className = 'SvgModify bi bi-pencil-fill d-flex justify-content-end text-center';
+        SvgModify.setAttribute('xmlns', "http://www.w3.org/2000/svg");
+        SvgModify.setAttribute('width', '16');
+        SvgModify.setAttribute('height', '16');
+        SvgModify.setAttribute('fill', 'currentColor');
+        SvgModify.setAttribute('viewBox', '0 0 16 16');
+        ModalParamBody.appendChild(SvgModify);
+
+        const ModalUsernameElem = document.createElement('div');
+        ModalUsernameElem.className = 'ModalUsernameElem';
+        ModalUsernameElem.textContent = `Username : ${userData.username}`;
+        ModalParamBody.appendChild(ModalUsernameElem);
+
+        const ModalNicknameElem = document.createElement('div');
+        ModalNicknameElem.className = 'ModalNicknameElem';
+        ModalNicknameElem.textContent = `Nickname : ${userData.nickname}`;
+        ModalParamBody.appendChild(ModalNicknameElem);
+
+        const ModalEmailElem = document.createElement('div');
+        ModalEmailElem.className = 'ModalEmailElem';
+        ModalEmailElem.textContent = `Email : ${userData.email}`;
+        ModalParamBody.appendChild(ModalEmailElem);
+
+        const ModalMDPElem = document.createElement('div');
+        ModalMDPElem.className = 'ModalMDPElem';
+        ModalMDPElem.textContent = `Password : **********`; // IMITATION
+        ModalParamBody.appendChild(ModalMDPElem);
+
+        const ModalLanguageElem = document.createElement('div');
+        ModalLanguageElem.className = 'ModalLanguageElem';
+        ModalLanguageElem.textContent = `Language : ${userData.language}`;
+        ModalParamBody.appendChild(ModalLanguageElem);
+
+        const ModalPoliceElem = document.createElement('div');
+        ModalPoliceElem.className = 'ModalPoliceElem';
+        ModalPoliceElem.textContent = `Font size : ${userData.font_size}`;
+        ModalParamBody.appendChild(ModalPoliceElem);
+
+        const ModalModeElem = document.createElement('div');
+        ModalModeElem.className = 'ModalModeElem';
+        ModalModeElem.textContent = `Dark Mode : ${userData.theme}`;
+        ModalParamBody.appendChild(ModalModeElem);
+        /////////////////////////////////////////////////
+
+
+
+        //MODAL PARAMCHANGE
+        const modalParamModify = document.createElement('div');
+        modalParamModify.className = 'modal fade';
+        modalParamModify.setAttribute('tabindex', '-1');
+        // modalParamModify.id = 'modalParam';
+        //modalParamModify.style.display = 'none'; // Cachée par défaut
+        modalParamModify.setAttribute('aria-labelledby', 'modalParamLabel');
+        modalParamModify.setAttribute('aria-hidden', 'true');
+        container.appendChild(modalParamModify);
+
+        const modalParamModifyDialog = document.createElement('div');
+        modalParamModifyDialog.classList.add('modal-dialog');
+        modalParamModify.appendChild(modalParamModifyDialog);
+
+        // Créer le contenu de la modale
+        const modalParamModifyContent = document.createElement('div');
+        modalParamModifyContent.className = 'modal-content';
+        // modalParamModifyContent.id = 'modalParamContent';
+        modalParamModifyDialog.appendChild(modalParamModifyContent);
+
+        const modalParamModifyHeader = document.createElement('div');
+        modalParamModifyHeader.className = 'modal-header border-bottom border-custom-color pb-2';
+        // modalParamModifyHeader.id = 'modalParamModifyHeader';
+        modalParamModifyContent.appendChild(modalParamModifyHeader);
+
+        // Titre du Modal
+        const modalParamModifyTitle = document.createElement('h2');
+        modalParamModifyTitle.textContent = 'Modify Settings';
+        modalParamModifyTitle.className = 'modal-title';
+        // modalParamModifyTitle.id = 'modalParamModifyTitle';/////
+        modalParamModifyHeader.appendChild(modalParamModifyTitle);
+
+        // Bouton pour fermer la modale
+        const closeButtonModify = document.createElement('span');
+        // closeButtonModify.className = 'btn-close';
+        closeButtonModify.id = 'close-button-Modify';
+        closeButtonModify.setAttribute('data-bs-dismiss', 'modal');
+        closeButtonModify.setAttribute('aria-label', 'Close');
+        closeButtonModify.textContent = '×'; // Symbole de fermeture
+        modalParamModifyHeader.appendChild(closeButtonModify);
+
+
+        // Ajout de l'événement pour ouvrir la modal avec animation
+        document.querySelector('.SvgModify').addEventListener('click', () => {
+            // Utilisation de l'API Bootstrap pour afficher la modal
+            const bootstrapModalModify = new bootstrap.Modal(modalParamModify);
+
+            // Positionnement de la modale à côté de la barre de navigation
+            const navBar = document.querySelector('.nav'); // Sélectionner la barre de navigation
+            const rect = navBar.getBoundingClientRect(); // Récupérer les dimensions et position
+
+            modalParamModify.style.position = 'absolute'; // Positionnement absolu
+            modalParamModify.style.top = `${rect.top}px`; // Aligner avec la barre de navigation
+            modalParamModify.style.left = `${rect.right + 10}px`; // La modal apparaît à droite de la barre, avec un écart de 20px
+
+            modalParamModify.style.margin = '0';  // Supprimer les marges par défaut
+            modalParamModify.style.transform = 'none';  // Désactiver les centrer automatiquement
+            modalParamModify.style.maxWidth = 'none';  // Permet à la modal de s'étendre sans limitation de largeur
+            bootstrapModalModify.show(); // Afficher la modal
+        });
+
+        // TitleNickname.addEventListener('click', () => {
+        //     modalParam.style.display = 'flex'; // Changer l'affichage à flex pour centrer
+        //     setTimeout(() => {
+        //         modalParam.classList.add('modalParam-show'); // Ajouter la classe d'animation
+        //     }, 10); // Petit délai pour activer la transition après l'affichage
+        // });
+
+        // Événement pour fermer la modale PARAM avec animation
+        closeButtonModify.addEventListener('click', () => {
+            modalParamModify.classList.remove(' modalParamModify-show'); // Retirer la classe d'animation
+            setTimeout(() => {
+                modalParamModify.style.display = 'none'; // Cacher la modale après l'animation
+            }, 500); // Délai correspondant à la durée de l'animation CSS
+        });
+
+        const modalParamModifyBody = document.createElement('div');
+        modalParamModifyBody.className = 'modal-body';
+        // ModalParamBody.id = 'ModalParamBody';
+        modalParamModifyContent.appendChild(modalParamModifyBody);
+
+        // Formulaire de modification des paramètres
+        const formModify1 = document.createElement('form');
+        formModify1.className = 'w-100';
+        modalParamModifyBody.appendChild(formModify1);
+
+
+        // Creation du label pour le nickname
+        // const newNicknameLabel = document.createElement('label');
+        // newNicknameLabel.className = 'form-label';
+        // newNicknameLabel.htmlFor = 'nickname';
+        // newNicknameLabel.textContent = 'Nickname';
+
+        // Creation du champ de saisie pour le nickname
+        const newNicknameModify = document.createElement('input');
+        newNicknameModify.type = 'text';
+        newNicknameModify.id = 'nickname';
+        newNicknameModify.name = 'newNicknameModify';
+        newNicknameModify.className = 'form-control mb-4';
+        newNicknameModify.placeholder = 'New nickname';
+        formModify1.appendChild(newNicknameModify);
+
+        // Creation du label pour l'email
+        // const newEmailLabel = document.createElement('label');
+        // newEmailLabel.className = 'form-label';
+        // newEmailLabel.htmlFor = 'email';
+        // newEmailLabel.textContent = 'Email';
+
+        // Creation du champ de saisie pour l'email
+        const newEmailModify = document.createElement('input');
+        newEmailModify.type = 'email';
+        newEmailModify.id = 'email';
+        newEmailModify.name = 'newEmailModify';
+        newEmailModify.className = 'form-control mb-4';
+        newEmailModify.placeholder = 'New email';
+        formModify1.appendChild(newEmailModify);
+
+        // Bouton de soumission
+        const submitButtonModify1 = document.createElement('button');
+        submitButtonModify1.type = 'submit';
+        submitButtonModify1.className = 'btn btn-primary w-100';
+        submitButtonModify1.textContent = 'Submit';
+        formModify1.appendChild(submitButtonModify1);
+
+        // Gestion de la soumission du formulaire
+        formModify1.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Empêche la soumission par défaut du formulaire
+
+            // Suppression des messages précédents
+            const errorMessages = avatarForm.querySelectorAll('.text-danger');
+            errorMessages.forEach(message => message.remove());
+            const successMessages = AccessibilityForm.querySelectorAll('.text-success');
+            successMessages.forEach(message => message.remove());
+
+            // Récupération des données du formulaire
+            const data = new FormData(formModify1);
+            const nickname = data.get('newNicknameModify');
+            const email = data.get('newEmailModify');
+
+            // Envoi des données au serveur
+            const response = await fetch('/api/updateSettings/', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify({ nickname, email })
+            });
+            if (response.ok) {
+                formModify1.innerHTML = '';
+                // const successMessage = document.createElement('p');
+                // successMessage.className = 'text-success';
+                // successMessage.textContent = 'Paramètres modifiés avec succès';
+                // formModify1.appendChild(successMessage);
+                navigateTo('/settings');
+            } else {
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'Modification error';
+                formModify1.insertBefore(errorMessage, submitButtonModify1);
+            }
+        })
+
+        // Formulaire de modification de l'accessibilité
+        const formModify2 = document.createElement('form');
+        formModify2.className = 'w-100';
+        modalParamModifyBody.appendChild(formModify2);
+
+
+        // Champ de la taille de la police
+        const labelFontSize = document.createElement('label');
+        labelFontSize.className = 'form-label';
+        // labelFontSize.htmlFor = 'font-size';
+        labelFontSize.textContent = 'Font size';
+        formModify2.appendChild(labelFontSize);
+
+        // const PoliceContenerSettings = document.createElement('div');
+        // PoliceContenerSettings.className = 'LanguageContenerSettings';
+
+        // accessibilityBody.appendChild(LanguageContenerSettings);
+        const fontSize = document.createElement('input');
+        fontSize.type = 'range';
+        fontSize.id = 'font-size';
+        fontSize.name = 'font-size';
+        fontSize.className = 'form-control-range mb-4 cursor';
+        fontSize.min = 1;
+        fontSize.max = 3;
+        fontSize.value = userData.font_size;
+        formModify2.appendChild(fontSize);
+
+
+        // const exampleElement = document.createElement('p');
+        // exampleElement.id = 'example-font-size';
+        // exampleElement.textContent = 'Aa';
+        // exampleElement.style.fontFamily = "'Quicksand', sans-serif";
+        // exampleElement.style.fontSize = `${userData.font_size}rem`;
+        // // exampleElement.style.fontSize = '2rem'; // Default value, to be changed by the user's choice later
+        // fontSize.addEventListener('input', () => {
+        //     exampleElement.style.fontSize = `${fontSize.value}rem`;
+        // });
+        // formModify2.appendChild(exampleElement);
+
+
+//     const LanguageContenerSettings = document.createElement('div');
+//     LanguageContenerSettings.className = 'LanguageContenerSettings';
+
+//     accessibilityBody.appendChild(LanguageContenerSettings);
+//     // Champ de la langue
+//     const labelLanguage = document.createElement('label');
+//     labelLanguage.className = 'form-label labelLanguageSettings';
+//     labelLanguage.htmlFor = 'language';
+//     labelLanguage.textContent = 'Langue';
+
+//     const language = document.createElement('select');
+//     language.name = 'language';
+//     language.id = 'language';
+//     language.className = 'form-select selectLanguageSettings';
+
+//     const option1 = document.createElement('option');
+//     option1.value = 'fr';
+//     option1.textContent = 'Français';
+//     language.appendChild(option1);
+
+//     const option2 = document.createElement('option');
+//     option2.value = 'en';
+//     option2.textContent = 'English';
+//     language.appendChild(option2);
+
+//     const option3 = document.createElement('option');
+//     option3.value = 'sp';
+//     option3.textContent = 'Spanish';
+//     language.appendChild(option3);
+
+//     language.value = userData.language;
+
+//     // Champ du mode sombre
+//     const DarkModeContenerSettings = document.createElement('div');
+//     DarkModeContenerSettings.className = 'DarkModeContenerSettings';
+
+//     accessibilityBody.appendChild(DarkModeContenerSettings);
+//     const labelDarkMode = document.createElement('label');
+//     labelDarkMode.className = 'form-label';
+//     labelDarkMode.htmlFor = 'dark-mode';
+//     labelDarkMode.textContent = 'Mode sombre';
+
+//     const darkMode = document.createElement('input');
+//     darkMode.type = 'checkbox';
+//     darkMode.id = 'dark-mode';
+//     darkMode.name = 'dark-mode';
+//     darkMode.className = 'form-check-input mb-4';
+//     darkMode.checked = userData.theme;
+
+//     // Bouton de validation
+//     const accessSubmitButton = document.createElement('button');
+//     accessSubmitButton.type = 'submit';
+//     accessSubmitButton.className = 'btn btn-primary w-100 Buttonselem';
+//     accessSubmitButton.textContent = 'Enregistrer les modifications';
+
+//     // Gestion de la soumission du formulaire
+    accessSubmitButton.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        // Suppression des messages précédents
+        const errorMessages = AccessibilityForm.querySelectorAll('.text-danger');
+        errorMessages.forEach(message => message.remove());
+        // const successMessages = AccessibilityForm.querySelectorAll('.text-success');
+        // successMessages.forEach(message => message.remove());
+
+        // Récupération des données du formulaire
+        const data = new FormData(AccessibilityForm);
+        const font_size = data.get('font-size');
+        const language = data.get('language');
+        const dark_mode = data.get('dark-mode');
+
+        // Envoi des données au serveur
+        const response = await fetch('/api/updateAccessibility/', {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ font_size, language, dark_mode })
+        })
+        .catch((error) => {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Erreur lors de la modification des paramètres';
+            AccessibilityForm.insertBefore(errorMessage, accessSubmitButton);
+            // console.error('Error:', error);
+        });
+        if (response.ok) {
+            event.preventDefault();
+            navigateTo('/settings');
+        }
+    })
+
     });
 }
 

@@ -6,7 +6,7 @@ export function homeView(container) {
     container.innerHTML = '';
 
     const base = document.createElement('div');
-    base.className = 'base';
+    base.className = 'base navbarr';
     container.appendChild(base);
 
     const HomeTitle = document.createElement('h5');
@@ -30,7 +30,7 @@ export function homeView(container) {
 
     ///////////////////////////////////////////////////////////////
 
-    //Modal-Login
+    // Modal-Login
     const modal = document.createElement('div');
     modal.className = 'modal ModalLoginBase';
     modal.style.display = 'none'; // Cachée par défaut
