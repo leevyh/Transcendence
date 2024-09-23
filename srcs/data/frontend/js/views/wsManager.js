@@ -1,4 +1,5 @@
-import {isAuthenticated} from "./utils.js";
+import { isAuthenticated} from "./utils.js";
+import { DEBUG } from "../app.js";
 
 class WebSocketManager {
     constructor(url) {
@@ -15,30 +16,31 @@ class WebSocketManager {
             //Check token validity with backend
             const status_token = await isAuthenticated();
             if (!status_token) {
-                console.error('Invalid token');
+                if (DEBUG) {console.error('Invalid token');}
                 return;
             }
             try {
                 this.socket = new WebSocket(this.url);
             } catch (error) {
-                console.error('WebSocket connection error:', error);
+                if (DEBUG) {console.error('WebSocket connection error:', error);}
                 return;
             }
             this.socket.onopen = () => {
-                console.log('WebSocket connection established');
+                if (DEBUG) {console.log('WebSocket connection established');}
                 this.isConnected = true;
             };
 
             this.socket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                console.log('Received notification:', data);
+                if (DEBUG) {console.log('Received notification:', data);}
+
 
                 if (data.type === 'new_message') {
-                    console.log('You received a new message from', data.from_nickname);
+                    if (DEBUG) {console.log('You received a new message from', data.from_nickname);}
                     // TODO: Handle new message notification
                 }
                 if (data.type === 'friend_request') {
-                    console.log('You received a friend request from', data.from_nickname);
+                    if (DEBUG) {console.log('You received a friend request from', data.from_nickname);}
                     // TODO: Handle friend request notification
                 }
 
@@ -46,24 +48,24 @@ class WebSocketManager {
             };
 
             this.socket.onclose = () => {
-                // console.log('WebSocket connection closed:');
+                if (DEBUG) {console.log('WebSocket connection closed');}
                 this.isConnected = false;
                 setTimeout(() => this.connect(), 5000);
             };
             this.socket.onerror = error => {
-                // console.error('WebSocket error:', error);
+                if (DEBUG) {console.error('WebSocket error:', error);}
             };
         } else {
-            console.error('No token found');
+            if (DEBUG) {console.error('No token found');}
         }
     }
 
     send(data){
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-            console.log("Sending data: ", data);
+            if (DEBUG) {console.log("Sending data: ", data);}
             this.socket.send(JSON.stringify(data));
         } else {
-            console.error('WebSocket is not connected');
+            if (DEBUG) {console.error('WebSocket is not connected');}
         }
     }
 

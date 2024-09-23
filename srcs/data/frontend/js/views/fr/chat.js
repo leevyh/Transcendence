@@ -1,6 +1,7 @@
 import { getCookie } from '../utils.js';
 import { navigationBar } from './navigation.js';
 import { createGlobalContainer, createUserCard } from './chat_utils.js';
+import { DEBUG } from '../../app.js';
 
 export async function chatView(container) {
     container.innerHTML = '';
@@ -14,14 +15,14 @@ export async function chatView(container) {
 
     // Onopen event
     statusSocket.onopen = function(event) {
-        // console.log('Status socket opened');          // DEBUG
+        if (DEBUG) {console.log('Status socket opened');}
     };
 
     // On message received from the server (status of a user)
     statusSocket.onmessage = function(event) {
         // FIXME: Handle the message properly, if I'm the one who sent the message, don't send an error
         const data = JSON.parse(event.data);
-        console.log('Message received:', data);          // DEBUG
+        if (DEBUG) {console.log('Message received:', data);}
         // Update the user list with the new status
         const userList = document.getElementById('user-list');
         createUserCard(data, userList);
@@ -29,7 +30,7 @@ export async function chatView(container) {
 
     // Onclose event
     statusSocket.onclose = function(event) {
-        console.error('Status socket closed', event);         // DEBUG
+        if (DEBUG) {console.error('Status socket closed', event);}
     };
 
     const userList = document.getElementById('user-list');
@@ -50,5 +51,7 @@ export async function chatView(container) {
             createUserCard(user, userList);
         });
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        if (DEBUG) {console.error('Error:', error);}
+    });
 }

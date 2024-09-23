@@ -1,4 +1,5 @@
 import { getCookie } from '../utils.js';
+import { DEBUG, navigateTo } from '../../app.js';
 
 export let ChatWS = null;
 
@@ -12,7 +13,6 @@ export async function createGlobalContainer() {
 
     const chatContainer = await createChatContainer();
     globalContainer.appendChild(chatContainer);
-
     return globalContainer;
 }
 
@@ -57,7 +57,6 @@ export function createUserCard(user, userList) {
 
         const dot = document.createElement('span');
         dot.className = 'dot dot-status';
-
 
         // Create div for block/unblock buttons
         const blockUnblockDiv = document.createElement('div');
@@ -216,11 +215,7 @@ function createChatHeaderButtons() {
 
 // USER PROFILE BUTTON
     const viewProfileButton = document.createElement('button');
-    viewProfileButton.className = 'btn btn-light';
-    viewProfileButton.addEventListener('click', (event) => {
-        console.log('User profile opened (TODO)');
-        // TODO: Implement link to user profile
-    });
+    viewProfileButton.className = 'btn btn-light view-profile-button';
 
     const svgUPlink = "http://www.w3.org/2000/svg";
     const svgUP = document.createElementNS(svgUPlink, "svg");
@@ -340,7 +335,7 @@ export function handleMessage(message) {
         };
         ChatWS.send(JSON.stringify(messageData)); 
     } else {
-        console.error('WebSocket is not open.');        // DEBUG
+        if (DEBUG) {console.error('WebSocket is not open.');}
     }
 }
 
@@ -349,10 +344,16 @@ export async function openConversation(conversationID, otherUser) {
     // Fermer l'ancienne connexion WebSocket, si elle existe
     if (ChatWS) {ChatWS.close();}
 
+    // Ajouter le lien du profile
+    const viewProfileButton = document.querySelector('.view-profile-button');
+    viewProfileButton.addEventListener('click', () => {
+        navigateTo(`/profile/${otherUser}`);
+    });
+
     ChatWS = new WebSocket('ws://' + window.location.host + `/ws/${conversationID}/messages/`);
 
     ChatWS.onopen = function() {
-        console.log('WebSocket OPEN - conversationID:', conversationID);         // DEBUG
+        if (DEBUG) {console.log('WebSocket OPEN - conversationID:', conversationID);}
     }
 
     ChatWS.onmessage = function(event) {
@@ -417,11 +418,11 @@ export async function openConversation(conversationID, otherUser) {
     }
 
     ChatWS.onclose = function() {
-        console.log('WebSocket CLOSE - conversationID:', conversationID);
+        if (DEBUG) {console.log('WebSocket CLOSE - conversationID:', conversationID);}
     }
 
     ChatWS.onerror = function(event) {
-        console.error('WebSocket error:', event);
+        if (DEBUG) {console.error('WebSocket ERROR:', event);}
     }
 }
 

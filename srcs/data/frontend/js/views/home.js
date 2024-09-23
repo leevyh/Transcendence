@@ -44,7 +44,8 @@ export function homeView(container) {
     buttonLogin.textContent = 'Login'; // Ou 'Sign in'
     buttonLogin.addEventListener('click', (event) => {
         event.preventDefault();
-        navigateTo('/' + choiceLanguage + '/login');
+        // navigateTo('/' + choiceLanguage + '/login');
+        navigateTo('/login');
     });
     liLogin.appendChild(buttonLogin);
 
@@ -58,7 +59,8 @@ export function homeView(container) {
     buttonRegister.textContent = 'Register'; // Ou 'Sign up'
     buttonRegister.addEventListener('click', (event) => {
         event.preventDefault();
-        navigateTo('/' + choiceLanguage + '/register');
+        // navigateTo('/' + choiceLanguage + '/register');
+        navigateTo('/register');
     });
     liRegister.appendChild(buttonRegister);
 

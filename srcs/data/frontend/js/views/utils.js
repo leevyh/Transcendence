@@ -1,4 +1,4 @@
-import { navigateTo } from '../app.js';
+import { DEBUG, navigateTo } from '../app.js';
 import wsManager from './wsManager.js';
 
 // Helper function to get CSRF token from cookies
@@ -87,7 +87,7 @@ export function changeLanguage(lang) {
 
 wsManager.AddNotificationListener((data) => {
     if (data.type === 'friend_request') {
-        console.log('New friend request received from ', data.from_nickname);
+        if (DEBUG) {console.log('New friend request received from ', data.from_nickname);}
         displayFriendRequestNotification(data.from_nickname);
     }
 })
@@ -186,7 +186,7 @@ export async function isAuthenticated() {
             return false;
         }
     } catch (error) {
-        console.error('Error checking authentication:', error);
+        if (DEBUG) {console.error('Error checking authentication:', error);}
         return false;
     }
 }
@@ -228,7 +228,7 @@ export async function getAccessibility() {
             throw new Error('Something went wrong');
         }
     } catch (error) {
-        console.error('Error fetching accessibility settings:', error); // A enlever plus tard
+        if (DEBUG) {console.error('Error fetching accessibility settings:', error);}
         return null;
     }
 }
