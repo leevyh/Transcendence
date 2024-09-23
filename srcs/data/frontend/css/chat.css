@@ -2,18 +2,21 @@
 .container-chat {
     position: relative;
     display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    /* background-color: yellow; */
+
 }
 
 .users-container {
-    position: absolute;
     width: 30%;
-    /* height: 100%; */
     top: -250px;
-    /* background-color: red; */
     overflow-y: auto;
     flex-direction: column;
-    left: 0px;
+    background-color: red;
 }
+
 .user-card {
     width: 100%;
 }
@@ -39,11 +42,13 @@
     height: 400px;
     overflow-y: scroll;
 }
+
+
 .chat-container {
-    /* background-color: blue; */
-    position: absolute;
-    left: 30%;
-    top: -250px;
+    background-color: blue;
+    /* position: absolute; */
+    /* left: 30%; */
+    /* top: -250px; */
 }
 .chat-header {
     display: flex;

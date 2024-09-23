@@ -1,14 +1,21 @@
 import { getCookie } from '../utils.js';
-import { navigationBar } from './navigation.js';
 import { createGlobalContainer, createUserCard } from './chat_utils.js';
 import { DEBUG } from '../../app.js';
+import { navBar } from './nav.js';
 
 export async function chatView(container) {
     container.innerHTML = '';
-    navigationBar(container); // Add navigation bar
+
+    // Creation big div for the chat and the navigation bar
+    const div = document.createElement('div');
+    div.className= 'big-div';
+    container.appendChild(div);
+
+    const nav = navBar(container);
+    div.appendChild(nav);
 
     const globalContainer = await createGlobalContainer();
-    container.appendChild(globalContainer);
+    div.appendChild(globalContainer);
 
     // Create the WebSocket for user status
     const statusSocket = new WebSocket('ws://' + window.location.host + '/ws/status/');

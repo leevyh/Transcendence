@@ -56,7 +56,8 @@ class WebSocketManager {
                 if (DEBUG) {console.error('WebSocket error:', error);}
             };
         } else {
-            if (DEBUG) {console.error('No token found');}
+            console.log('No token found');
+            // if (DEBUG) {console.error('No token found');}
         }
     }
 

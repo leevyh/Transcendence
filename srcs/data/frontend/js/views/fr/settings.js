@@ -48,14 +48,14 @@ export function settingsView(container) {
         };
 
         // Créer la structure de profil avec Bootstrap
-        const baseProfil = document.createElement('div');
-        baseProfil.className = 'baseProfil w-100 h-100 d-flex flex-column';  // Utilisation des classes Bootstrap ici
-        container.appendChild(baseProfil);
+        const ProfileBase = document.createElement('div');
+        ProfileBase.className = 'ProfileBase w-100 h-100 d-flex flex-column';  // Utilisation des classes Bootstrap ici
+        container.appendChild(ProfileBase);
 
         const nav = document.createElement('nav');
         nav.className = 'nav d-flex flex-column justify-content-start align-items-center shadow-lg'; // Transition vers Bootstrap
         nav.style.backgroundColor = '#435574';  // Couleur personnalisée, Bootstrap ne fournit pas cette couleur directement
-        baseProfil.appendChild(nav);
+        ProfileBase.appendChild(nav);
 
         const divProfil = document.createElement('div');
         divProfil.className = 'divProfil w-50 text-center';  // Bootstrap padding et text-align
@@ -145,6 +145,7 @@ export function settingsView(container) {
         buttonLogOut.addEventListener('mouseup', () => {
             buttonLogOut.classList.remove('btn-dark'); // Reviens à la couleur initiale après le clic
         });
+
         ///////////////////
         // Modal-Param
         const modalParam = document.createElement('div');

@@ -2,33 +2,60 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    /*display: flex;
-     justify-content: center; */
-    /* align-items: center; */ /*a remettre*/
 }
 
-.navbarr {
-    display: flex;
-    justify-content: center;
+.page-with-nav {
+    padding-left: 225px; /* Ajuste selon la hauteur de la barre de navigation */
+}
 
-} /*NEWWWWW*/
+main {
+    height: 100%;
+    width: 100%;
+}
+
+.navBarr {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 1000;
+}
+
+@media screen and (max-width: 600px) {
+    .navBarr {
+        opacity: 0;
+    }
+}
 
 body {
     display: flex;
-    /* position: relative; */
     font-family: 'Public Pixel', sans-serif;
     font-size: 16px;
     background-image: linear-gradient(to bottom, black, #012970);
 }
+.big-div { /* The Big Div on every view */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+.PongDiv{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
 
 .base {
-
     display: flex;
     justify-content: center;
     /* align-items: center; */
     flex-direction: column;
     /* background-color: aqua; */
-    width: 100%; /*100vh*////////////////////////////////////////////////////////////////////////////////////
+    width: 100%; /*100vh*/
     height: 100%;
 }
 
