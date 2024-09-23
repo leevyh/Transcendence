@@ -1,3 +1,5 @@
+import { navigationBar } from './fr/navigation.js'; // Importation de la navigation bar
+
 import {
     play,
     stop,
@@ -27,8 +29,9 @@ export let canvas = 'null'
 
 
 export function pongView(container) {
+    container.innerHTML = '';
+    navigationBar(container); // Add navigation bar
 
-	container.innerHTML = '';// Vider le contenu précédent
 	loadPongCSS();  // CSS
 
     // HTML

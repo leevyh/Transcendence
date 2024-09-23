@@ -2,20 +2,23 @@
 import { isAuthenticated } from './utils.js';
 import { getCookie } from './utils.js';
 import wsManager  from './wsManager.js';
+import { navigationBar } from './fr/navigation.js';
+import { DEBUG } from '../app.js';
 
 export async function friendsView(container) {
     container.innerHTML = '';
-    const url = window.location.href.split('/').pop();
+    navigationBar(container); // Add navigation bar
 
+    const url = window.location.href.split('/').pop();
 
     const statusSocket = new WebSocket('ws://' + window.location.host + '/ws/status/');
 
     statusSocket.onopen = function (event) {
-        console.log('Status socket opened');
+        if (DEBUG) {console.log('Status socket opened');}
     }
 
     statusSocket.onmessage = function (event) {
-        console.log('Message reçu:', event.data);  // Ajoutez ceci pour déboguer
+        if (DEBUG) {console.log('Message received:', event.data);}
         const data = JSON.parse(event.data);
         //Update status of user in the card
         //Get the card with the nickname
@@ -28,7 +31,7 @@ export async function friendsView(container) {
     };
 
     statusSocket.onclose = function (event) {
-        console.error('Status socket closed', event);
+        if (DEBUG) {console.error('Status socket closed', event);}
     }
 
 
@@ -96,7 +99,7 @@ export async function friendsView(container) {
                 });
             });
     } else {
-        console.log("ELSE");
+        if (DEBUG) {console.log("ELSE");}
     }
 
     function sendFriendRequest(nickname) {
@@ -126,7 +129,7 @@ export async function friendsView(container) {
                 url: url,
             });
         } else {
-            console.log("Websocket is not open friend request cannot be sent");
+            if (DEBUG) {console.log("Websocket is not open friend request cannot be sent");}
         }
     }
 }

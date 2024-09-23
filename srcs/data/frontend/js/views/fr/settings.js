@@ -1,5 +1,5 @@
 import { getCookie } from '../utils.js';
-import { navigateTo } from '../../app.js';
+import { DEBUG, navigateTo } from '../../app.js';
 import { navigationBar } from './navigation.js';
 
 export function settingsView(container) {
@@ -53,11 +53,13 @@ export function settingsView(container) {
             navigateTo('/login');
             return null;
         } else {
-            throw new Error('Something went wrong');
+            if (DEBUG) {console.error('Error:', response);}
+            // throw new Error('Something went wrong');
         }
     })
     .then(data => {
         if (!data) {
+            if (DEBUG) {console.error('No data received');}
             return;
         }
         const userData = {
@@ -369,7 +371,7 @@ export function settingsView(container) {
         
     //TODO: ADD BUTTON TO REMOVE AVATAR WITH THIS ROUTE /api/deleteAvatar/
 
-        // Ajout des éléments au DOM
+    // Ajout des éléments au DOM
     avatarDiv.appendChild(avatarHeader);
     avatarDiv.appendChild(avatarBody);
     avatarBody.appendChild(avatarForm);
@@ -499,11 +501,11 @@ export function settingsView(container) {
                 body: JSON.stringify({ font_size, language, dark_mode })
             })
             .catch((error) => {
+                if (DEBUG) {console.error('Error:', error);}
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'Erreur lors de la modification des paramètres';
                 accessibilityForm.insertBefore(errorMessage, accessSubmitButton);
-                // console.error('Error:', error);
             });
             if (response.ok) {
                 // const successMessage = document.createElement('p');
@@ -571,6 +573,7 @@ export function settingsView(container) {
             })
             .then(response => response.json())
             .then(data => {
+                if (DEBUG) {console.log('Logout | data:', data);}
                 localStorage.removeItem('token');
                 event.preventDefault();
                 navigateTo('/login');
