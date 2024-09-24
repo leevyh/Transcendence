@@ -19,22 +19,20 @@ class PongConsumer(AsyncWebsocketConsumer):
         # Ajouter le joueur dans la liste d'attente pour le matchmaking
         player = self.scope['user']  # On récupère l'utilisateur connecté
         if player.is_authenticated:
-            waiting_players.append(player)
+            waiting_players.append((player, self.channel_name))
 
             # Si deux joueurs sont en attente, créer une partie
             if len(waiting_players) >= 2:
 
-                player_1 = waiting_players.pop(0)
-                player_2 = waiting_players.pop(0)
+                (player_1, channel_name_1) = waiting_players.pop(0)
+                (player_2, channel_name_2) = waiting_players.pop(0)
 
                 # Créer la partie dans la base de données
                 print(f"Creating game between {player_1.username} and {player_2.username}")
                 game = await create_game(player_1, player_2)
 
-                # Envoyer le message aux deux joueurs pour commencer la partie
-                await self.channel_layer.group_add(
-                    f"game_{game.id}", self.channel_name
-                )
+                await self.channel_layer.group_add(f"game_{game.id}", channel_name_1)
+                await self.channel_layer.group_add(f"game_{game.id}", channel_name_2)
 
                 await self.channel_layer.group_send(
                     f"game_{game.id}",
@@ -70,11 +68,28 @@ class PongConsumer(AsyncWebsocketConsumer):
             'player_2': player_2
         }))
 
-    # Traitement des messages reçus du client
-    async def receive(self, text_data):
-        data = json.loads(text_data)
-        action_type = data.get('action_type')
+async def receive(self, text_data):
+    data = json.loads(text_data)
+    action_type = data.get('action_type')
 
-        if action_type == 'move_paddle':
-            # On peut envoyer les mouvements de paddle ici (à implémenter)
-            pass
+    # if action_type == 'update_position':
+    #     player_position = data.get('player_position')
+        
+    #     # Envoyer la nouvelle position à l'autre joueur
+    #     await self.channel_layer.group_send(
+    #         f"game_{self.game_id}",
+    #         {
+    #             'type': 'update_opponent_position',
+    #             'player_position': player_position
+    #         }
+    #     )
+
+# Fonction pour envoyer la position de l'autre joueur
+# async def update_opponent_position(self, event):
+#     player_position = event['player_position']
+
+#     # Envoyer la position à l'adversaire
+#     await self.send(text_data=json.dumps({
+#         'action_type': 'update_opponent_position',
+#         'player_position': player_position
+#     }))

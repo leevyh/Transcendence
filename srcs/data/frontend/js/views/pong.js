@@ -50,12 +50,6 @@ export async function pongView(container) {
     const ul = document.createElement('ul');
     ul.className = 'd-flex justify-content-center';
 
-    const startButtonLi = document.createElement('li');
-    const startButton = document.createElement('button');
-    startButton.className = 'btn btn-outline-success';
-    startButton.id = 'start-game';
-    startButton.textContent = 'Start';
-    startButtonLi.appendChild(startButton);
 
     const stopButtonLi = document.createElement('li');
     const stopButton = document.createElement('button');
@@ -64,7 +58,6 @@ export async function pongView(container) {
     stopButton.textContent = 'Stop';
     stopButtonLi.appendChild(stopButton);
 
-    ul.appendChild(startButtonLi);
     ul.appendChild(stopButtonLi);
 
     const canvasElement = document.createElement('canvas');
@@ -107,32 +100,33 @@ export async function pongView(container) {
     socket.onopen = () => {
         console.log("WebSocket connected");
     };
-
+    
     socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-
+        
         if (data.action_type === 'start_game') {
-            startGame(startButton, stopButton);
+            startGame(stopButton);
         }
-    };
-
-    socket.onclose = () => {
-        console.log("WebSocket disconnected");
-    };
-    // Quand le joueur appuie sur "Start", il entre dans la file d'attente
-    startButton.addEventListener('click', () => {
-        socket.send(JSON.stringify({ action_type: 'join_queue' }));
-        startButton.disabled = true; // Désactiver le bouton Start pendant l'attente
-        alert('En attente d\'un autre joueur...');
-    });
-
-    document.addEventListener('keydown', (event) => handleKeyDown(event, startButton, stopButton));
-    document.addEventListener('keyup', handleKeyUp);
-
-    const startGameButton = document.querySelector('#start-game');
-    const stopGameButton = document.querySelector('#stop-game');
-
-    // startGameButton.addEventListener('click', () => {
+        // if (data.action_type === 'update_opponent_position') {
+            //     if (data.player !== 'self') {
+                //         game.computer.y = data.player_position;
+                //     }
+                //     updateOpponentPosition(data.player_position);
+                //     game.ball.x = data.ball_position.x;
+                //     game.ball.y = data.ball_position.y;
+                // }
+            };
+            
+            socket.onclose = () => {
+                console.log("WebSocket disconnected");
+            };
+            
+            document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton));
+            document.addEventListener('keyup', handleKeyUp);
+            
+            const stopGameButton = document.querySelector('#stop-game');
+            
+            // startGameButton.addEventListener('click', () => {
     //     if (!GameOn) {
     //         play();
     //         startGameButton.disabled = true; // Désactiver le bouton Start
@@ -143,7 +137,6 @@ export async function pongView(container) {
     stopGameButton.addEventListener('click', () => {
         if (GameOn) {
             stop();
-            startGameButton.disabled = false; // Réactiver le bouton Start
             stopGameButton.disabled = true; // Désactiver le bouton Stop
         }
     });
@@ -154,12 +147,53 @@ export async function pongView(container) {
     div.appendChild(notifications_div);
 }
 
+// Fonction pour démarrer le décompte
+function startCountdown() {
+    console.log("startCountdown");
+    let countdownValue = 3; // Décompte de 3 secondes
+
+    // Créer dynamiquement un élément pour afficher le décompte
+    let countdownElement = document.createElement('div');
+    countdownElement.id = 'countdown';
+    countdownElement.style.position = 'absolute';
+    countdownElement.style.top = '50%';
+    countdownElement.style.left = '50%';
+    countdownElement.style.transform = 'translate(-50%, -50%)';
+    countdownElement.style.fontSize = '48px';
+    countdownElement.style.color = 'white';
+    countdownElement.style.textAlign = 'center';
+    countdownElement.style.zIndex = '1000';
+    countdownElement.innerText = countdownValue;
+
+    // Ajouter l'élément à la page
+    document.body.appendChild(countdownElement);
+
+    // Commencer le décompte
+    let countdownInterval = setInterval(() => {
+        countdownValue--; // Décrémente la valeur du décompte
+        countdownElement.innerText = countdownValue;
+
+        if (countdownValue <= 0) {
+            clearInterval(countdownInterval); // Arrête le décompte quand il atteint 0
+            countdownElement.innerText = "Go!"; // Affiche "Go!" avant de lancer le jeu
+
+            // Supprimer le décompte après un court délai
+            setTimeout(() => {
+                countdownElement.remove();
+                // Lancer le jeu après le décompte
+                play(); // Appelle la fonction `play` pour démarrer le jeu
+            }, 1000); // Affiche "Go!" pendant 1 seconde avant de l'enlever
+        }
+    }, 1000); // Intervalle de 1 seconde
+}
+
 // Fonction pour démarrer le jeu lorsque le serveur jumelle deux joueurs
-function startGame(startButton, stopButton) {
+function startGame(stopButton)
+{
     if (!GameOn) {
-        play(); // Démarrer le jeu
-        startButton.disabled = true; // Désactiver le bouton Start
-        stopButton.disabled = false; // Activer le bouton Stop
+        console.log("GameOn");
+    startCountdown(); // Démarrer le décompte avant de lancer le jeu
+    stopButton.disabled = false; // Activer le bouton Stop
     }
 }
 

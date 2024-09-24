@@ -75,7 +75,8 @@ export function movePlayerWithKeyboard() {
     } else if (game.player.y > canvas.height - PLAYER_HEIGHT) {
         game.player.y = canvas.height - PLAYER_HEIGHT;
     }
-    // // Envoi des données au serveur via WebSocket
+
+   // // Envoi des données au serveur via WebSocket
     // if (socket && socket.readyState === WebSocket.OPEN) {
     //     socket.send(JSON.stringify({
     //         action_type: 'update_position',
@@ -87,6 +88,11 @@ export function movePlayerWithKeyboard() {
     //     }));
     // }
 }
+
+// // Fonction pour mettre à jour la position du paddle de l'autre joueur
+// export function updateOpponentPosition(opponentPosition) {
+//     game.computer.y = opponentPosition;  // Met à jour la position de l'adversaire
+// }
 
 export function computerMove() {
     game.computer.y += game.ball.speed.y * game.computer.speedRatio;
@@ -105,6 +111,13 @@ export function collide(player) {
             game.player.score++;
             document.querySelector('#player-score').textContent = game.player.score;
         }
+   ///////     // Envoi des données au serveur via WebSocket
+        // if (socket && socket.readyState === WebSocket.OPEN) {
+        //     socket.send(JSON.stringify({
+        //         action_type: 'update_score',
+        //         player: player == game.player ? 'computer' : 'player'
+        //     }));
+        //
     } else {
         // Change direction
         game.ball.speed.x *= -1;
@@ -131,6 +144,18 @@ export function ballMove() {
 
     game.ball.x += game.ball.speed.x;
     game.ball.y += game.ball.speed.y;
+
+    // // Envoi des données au serveur via WebSocket
+    // if (socket && socket.readyState === WebSocket.OPEN) {
+    //     socket.send(JSON.stringify({
+    //         action_type: 'update_ball_position',
+    //         ball_position: {
+    //             x: game.ball.x,
+    //             y: game.ball.y
+    //         }
+    //     }));
+    // }
+
 }
 
 export function play() {
@@ -174,8 +199,8 @@ export function stop() {
 }
 
 // Key Down
-export function handleKeyDown(event, startButton, stopButton) {
-
+export function handleKeyDown(event, stopButton) {
+    
 	if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W')
 		playerMovingUp = true;
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
@@ -184,7 +209,6 @@ export function handleKeyDown(event, startButton, stopButton) {
         console.log("key down gamone = ", GameOn);
         play();
         spaceDown = true;
-        startButton.disabled = true;
         stopButton.disabled = false;
         GameOn = true;
     }
