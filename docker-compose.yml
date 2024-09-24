@@ -58,6 +58,7 @@ services:
     build: ./srcs/services/backend_logstash
     volumes:
       - backend-logstash:/usr/share/logstash/data/
+      - backend-django-logs:/usr/share/logstash/logs/
       - backend-elk-certs:/usr/share/logstash/config/certs/
     networks:
       - default
@@ -99,6 +100,7 @@ services:
     build: ./srcs/services/backend_django
     volumes:
       - backend-django:/var/app/ft_transcendence/
+      - backend-django-logs:/var/log/django/
       - backend-elk-certs:/usr/share/elasticsearch/config/certs/
     networks:
       - default
@@ -115,15 +117,13 @@ services:
     depends_on:
       backend-postgresql:
           condition: service_healthy
-      backend-logstash:
-        condition: service_started
     restart: on-failure
 
   backend-postgresql:
     container_name: backend-postgresql
     build: ./srcs/services/backend_postgresql
     volumes:
-#      - backend-postgresql:/var/lib/postgresql/
+      - backend-postgresql:/var/lib/postgresql/
       - backend-elk-certs:/usr/share/elastic-agent/config/certs/
     networks:
       - default
@@ -132,7 +132,7 @@ services:
     env_file:
       - ./env/fleet.env
       - ./env/postgresql.env
-      - ./srcs/services/backend_postgresql/conf/elastic-agent.env
+#      - ./srcs/services/backend_postgresql/conf/elastic-agent.env
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -140,7 +140,7 @@ services:
       retries: 120
     depends_on:
       backend-logstash:
-        condition: service_started
+        condition: service_healthy
     restart: on-failure
 
   frontend-nginx:
@@ -223,61 +223,73 @@ volumes:
     driver: local
     driver_opts:
         type: none
-        device: ./srcs/data/elastic
+        device: ./srcs/data/elastic/elastic
         o: bind
   backend-kibana:
     driver: local
     driver_opts:
         type: none
-        device: ./srcs/data/kibana
+        device: ./srcs/data/elastic/kibana
         o: bind
   backend-logstash:
     driver: local
     driver_opts:
         type: none
-        device: ./srcs/data/logstash
+        device: ./srcs/data/elastic/logstash
         o: bind
   backend-fleet:
     driver: local
     driver_opts:
       type: none
-      device: ./srcs/data/fleet
+      device: ./srcs/data/elastic/fleet
       o: bind
   backend-django:
     driver: local
     driver_opts:
       type: none
-      device: ./srcs/data/backend
+      device: ./srcs/data/backend/
+      o: bind
+  backend-django-logs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/backend_/logs
       o: bind
   backend-postgresql:
     driver: local
     driver_opts:
       type: none
-      device: ./srcs/data/database
+      device: ./srcs/data/database/data
+      o: bind
+  backend-postgresql-logs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/database/logs
       o: bind
   backend-elk-certs:
     driver: local
     driver_opts:
       type: none
-      device: ./srcs/data/certs
+      device: ./srcs/data/elastic/certs
       o: bind
   backend-elk-logs:
     driver: local
     driver_opts:
       type: none
-      device: ./srcs/data/logs
+      device: ./srcs/data/elastic/logs
       o: bind
   ea-proxy-nginx:
       driver: local
       driver_opts:
           type: none
-          device: ./srcs/data/ea/proxy-nginx
+          device: ./srcs/data/elastic/ea/proxy-nginx
           o: bind
   ea-frontend-nginx:
     driver: local
     driver_opts:
       type: none
-      device: ./srcs/data/ea/frontend-nginx
+      device: ./srcs/data/elastic/ea/frontend-nginx
       o: bind
 
 networks:

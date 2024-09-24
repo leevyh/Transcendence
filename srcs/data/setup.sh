@@ -1,3 +1,3 @@
 #!/bin/bash
 
-mkdir -p ./frontend ./elastic ./kibana ./logstash ./fleet ./backend ./database ./certs ./logs ./ea ./ea/proxy-nginx ./ea/frontend-nginx
+mkdir -p ./frontend ./database ./backend ./backend_/logs ./elastic ./elastic/ea ./elastic/elastic ./elastic/kibana ./elastic/logstash ./elastic/fleet ./elastic/certs ./elastic/logs ./elastic/ea/proxy-nginx ./elastic/ea/frontend-nginx
