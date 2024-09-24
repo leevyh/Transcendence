@@ -308,16 +308,11 @@ export function navBar(container) {
 
             // Positionnement de la modale à côté de la barre de navigation
             const navBar = document.querySelector('.nav'); // Sélectionner la barre de navigation
-            const modalInfo = document.querySelector('.modalInfo');
-
             const rect = navBar.getBoundingClientRect(); // Récupérer les dimensions et position
-            console.log(rect);
-            const rect2 = modalInfo.getBoundingClientRect();
-            console.log(rect2);
 
             modalSettings.style.position = 'absolute'; // Positionnement absolu
-            modalSettings.style.top = `${rect.top} + ${rect2.top}px`; // Aligner avec la barre de navigation
-            modalSettings.style.left = `${rect.right + 10}+ ${rect2.right + 10}px`; // La modal apparaît à droite de la barre, avec un écart de 20px
+            modalSettings.style.top = `${rect.top}px`; // Aligner avec la barre de navigation
+            modalSettings.style.left = `${rect.right + 10}px`; // La modal apparaît à droite de la barre, avec un écart de 20px
 
             modalSettings.style.margin = '0';  // Supprimer les marges par défaut
             modalSettings.style.transform = 'none';  // Désactiver les centrer automatiquement
@@ -483,7 +478,6 @@ export function navBar(container) {
             const font_size = data.get('font-size');
             const language = data.get('language');
             const dark_mode = data.get('dark-mode');
-            console.log(font_size, language, dark_mode);
 
             // Envoi des données au serveur
             const response = await fetch('/api/updateAccessibility/', {

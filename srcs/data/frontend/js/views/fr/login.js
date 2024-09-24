@@ -174,8 +174,7 @@ export function loginView(container) {
     document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
-        console.log(code);
-        localStorage.setItem('code', code);
+        if (DEBUG) {console.log('Code:', code);}
         if (code) {
             fetch('/api/token/', {
                 method: 'POST',
@@ -189,7 +188,7 @@ export function loginView(container) {
             .then(data => {
                 if (data) {
                     if (DEBUG) {console.log(data);}
-                    navigateTo('/settings');
+                    navigateTo('/');
                 }
                 else {
                     if (DEBUG) {console.log('No data');}

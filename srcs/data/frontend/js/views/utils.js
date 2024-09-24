@@ -168,7 +168,6 @@ function displayFriendRequestNotification(nickname) {
     friendRequestNotificationModal.style.display = 'block';
 }
 
-
 // Récupérer le token CSRF depuis les cookies et vérifier si l'utilisateur est authentifié
 export async function isAuthenticated() {
     try {
@@ -176,7 +175,7 @@ export async function isAuthenticated() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
+                'X-CSRFToken': getCookie('csrftoken'),
             },
         });
         if (response.ok) {
@@ -185,7 +184,8 @@ export async function isAuthenticated() {
         } else {
             return false;
         }
-    } catch (error) {
+    }
+    catch (error) {
         if (DEBUG) {console.error('Error checking authentication:', error);}
         return false;
     }

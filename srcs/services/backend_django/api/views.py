@@ -25,7 +25,7 @@ def check_auth(request):
         return JsonResponse({'value': value}, status=200)
     else:
         value = False
-        return JsonResponse({'value': value}, status=401)
+        return JsonResponse({'value': value}, status=200)
 
 @csrf_exempt
 def register(request):
@@ -440,7 +440,7 @@ def check_user42(login):
     except User_site.DoesNotExist:
         return False
 
-def create_user42(response):
+def create_user42(response, code):
     data = response.json()
     access_token = data['access_token']
     expires_in = data['expires_in'] + data['created_at']
@@ -464,24 +464,31 @@ def create_user42(response):
         avatar = f'media/{username}.jpg' #TODO change this to the path of the image
         if not check_user42(username):
             user = User_site(username=username, email=email, nickname=nickname, avatar=avatar)
+            user.set_password(code) #J espere que ca marche
             user.save()
             settings = Accessibility(user=user)
             settings.save()
             stats = Stats_user(user=user)
             stats.save()
-        user = User_site.objects.get(nickname=nickname)
-        user.status = User_site.Status.ONLINE
-        user.save()
+        else:
+            user = User_site.objects.get(nickname=nickname)
+            user.set_password(code)
+            user.status = User_site.Status.ONLINE
+            user.save()
+        return user
     else:
-        return JsonResponse({'error': 'Invalid request'}, status=400)
+        return 401
 
+@csrf_exempt
 def token_42(request):
     if request.method == 'POST':
+        print('request:', request.body)         # DEBUG
         client_id = os.getenv('CLIENT_ID')
         client_secret = os.getenv('CLIENT_SECRET')
         redirect_uri = os.getenv('REDIRECT_URI')
         data = json.loads(request.body)
         code = data['code']
+        print(f"code: {code}")         # DEBUG
         # print(f"code: {code}")         # DEBUG
         # print(f"client_id: {client_id}")         # DEBUG
         # print(f"client_secret: {client_secret}")         # DEBUG
@@ -489,8 +496,19 @@ def token_42(request):
         r = requests.post(url)
         if r.status_code == 200:
             # print('OKI MA GUEULE')         # DEBUG
-            create_user42(r)
-            encoded_jwt = jwt.encode({'username': data['login'], 'exp': time.time + 3600}, 'secret', algorithm='HS256')
-            return JsonResponse({'message': 'Token created successfully', 'token': encoded_jwt}, status=200)
+            user = create_user42(r, code)
+            if user != 401:
+                
+                #authenticate user
+                print('username: ', user.username)         # DEBUG
+                user = authenticate(request, username=user.username, password=code)
+                if user is not None:
+                    login(request, user)
+                    encoded_jwt = jwt.encode({'username': user.username, 'exp': time.time() + 3600}, 'secret', algorithm='HS256')
+                    return JsonResponse({'message': 'Token created successfully', 'token': encoded_jwt}, status=200)
+                else:
+                    return JsonResponse({'error': 'Invalid credentials'}, status=401)
+            else: 
+                return JsonResponse({'error': 'User not created'}, status=401)
         else:
             return JsonResponse({'error': 'Invalid request'}, status=400)

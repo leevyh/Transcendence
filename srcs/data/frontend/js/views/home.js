@@ -1,8 +1,7 @@
 import { DEBUG, navigateTo } from '../app.js';
-import { changeLanguage, getCookie } from './utils.js';
+import { getCookie } from './utils.js';
 
 export function homeView(container) {
-
     container.innerHTML = '';
 
     const base = document.createElement('div');
@@ -281,9 +280,49 @@ export function homeView(container) {
     // });
 
 
-    //////////////////////////////////////////////////////////
 
-    //////MODAL REGISTER///////////////////
+    // Connection with 42
+    const buttonLogin42 = document.createElement('button');
+    buttonLogin42.className = 'btn btn-dark w-100 ButtonLogin42';
+    buttonLogin42.textContent = 'Se connecter avec 42';
+    formLogin.appendChild(buttonLogin42);
+    buttonLogin42.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        // Suppression des messages d'erreur précédents
+        const errorMessages = formLogin.querySelectorAll('.text-danger');
+        errorMessages.forEach(message => message.remove());
+
+        fetch('/api/auth/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.url) {
+                window.location.href = data.url; // Rediriger vers l'URL de connexion 42
+            } else if (data.error) {
+                if (DEBUG) {console.error('Error:', data.error);}
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
+                formLogin.insertBefore(errorMessage, submitButton);
+            }
+        })
+        .catch(error => {
+            if (DEBUG) {console.error('Error:', error);}
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
+            formLogin.insertBefore(errorMessage, submitButton);
+        });
+    });
+
+//////////////////////////////////////////////////////////
+
     // Modal-Register
     const modalRegister = document.createElement('div');
     modalRegister.className = 'modal ModalLoginBase';
@@ -350,7 +389,7 @@ export function homeView(container) {
         event.preventDefault();
 
         // Suppression des messages d'erreur précédents
-        const errorMessages = form.querySelectorAll('.text-danger');
+        const errorMessages = formRegister.querySelectorAll('.text-danger');
         errorMessages.forEach(message => message.remove());
 
         // Récupérer les valeurs des champs ajoutés dans le formulaire
@@ -437,8 +476,7 @@ export function homeView(container) {
 
     modalRegisterContent.appendChild(formRegister);
 
-
-    ///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
     // Événement pour afficher la modale LOGIN avec animation
     ButtonLoginHome.addEventListener('click', () => {
