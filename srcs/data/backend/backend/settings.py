@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "backend-django"]
 
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8888', 'http://localhost:8888'] # Ajoute pour se connecter sur un autre poste 42
+
 # Application definition
 AUTH_USER_MODEL = 'api.User_site'
 
@@ -126,18 +128,6 @@ SESSION_COOKIE_HTTPONLY = True
 # SESSION_ENGINE = 'django.contrib.sessions.backends.file'
 # SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -173,15 +163,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static') #
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-MEDIA_URL = '/media/' #
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') #
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Database
+# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
 	'default': {

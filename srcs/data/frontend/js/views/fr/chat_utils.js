@@ -1,310 +1,479 @@
 import { getCookie } from '../utils.js';
+import { DEBUG, navigateTo } from '../../app.js';
 
-let conversationData = {};
-let ws = null;
+export let ChatWS = null;
 
-// Fonction pour la liste des utilisateurs connectés
+// Function for global container creation
+export async function createGlobalContainer() {
+    const globalContainer = document.createElement('div');
+    globalContainer.className = 'container-fluid container-chat';
+
+    const usersContainer = await createUsersContainer();
+    globalContainer.appendChild(usersContainer);
+
+    const chatContainer = await createChatContainer();
+    globalContainer.appendChild(chatContainer);
+    return globalContainer;
+}
+
+// Function for users container creation
+async function createUsersContainer() {
+    const usersContainer = document.createElement('div');
+    usersContainer.className = 'col-md-4 users-container';
+
+    const usersTitle = document.createElement('h5');
+    usersTitle.setAttribute('data-i18n', 'onlineUsers'); // TODO: For multilingual support
+    usersTitle.textContent = 'Online Users:';
+
+    const usersList = document.createElement('ul');
+    usersList.className = 'list-group';
+    usersList.id = 'user-list';
+
+    usersContainer.appendChild(usersTitle);
+    usersContainer.appendChild(usersList);
+
+    return usersContainer;
+}
+
+// Function for user card creation
 export function createUserCard(user, userList) {
     let userCard = document.getElementById(user.nickname);
 
-    // Si la carte utilisateur n'existe pas, on la crée
+    // If the user card does not exist, create it
     if (!userCard) {
         userCard = document.createElement('div');
-        userCard.className = 'card';
-        userCard.style = 'width: 50%;';
+        userCard.className = 'card user-card';
         userCard.id = user.nickname; // ID = nickname
 
         const userCardBody = document.createElement('div');
         userCardBody.className = 'card-body user-connected';
 
+        const userNicknameDiv = document.createElement('div');
+        userNicknameDiv.className = 'user-nickname';
         const userNickname = document.createElement('h5');
         userNickname.className = 'card-title';
         userNickname.textContent = user.nickname;
+        userNicknameDiv.appendChild(userNickname);
 
         const dot = document.createElement('span');
-        dot.className = 'dot';
-        dot.style = 'width: 10px; height: 10px; border-radius: 50%; margin-right: 5px;';
-        userCardBody.appendChild(dot);
-        userCardBody.appendChild(userNickname);
-        userCard.appendChild(userCardBody);
+        dot.className = 'dot dot-status';
 
-        // Ajout de l'event listener pour ouvrir le chat
-        userCard.addEventListener('click', () => {
-            openChat(user.nickname);
+        // Create div for block/unblock buttons
+        const blockUnblockDiv = document.createElement('div');
+        blockUnblockDiv.className = 'block-unblock';
+        blockUnblockDiv.id = 'user.nickname';
+        blockUnblockDiv.style.display = 'none'; // Initially hidden
+
+        // Create Block Button
+        const blockUserButton = document.createElement('button');
+        blockUserButton.className = 'btn btn-danger block-button';
+        blockUserButton.id = 'user.nickname';
+        blockUserButton.textContent = 'Bloquer';
+        blockUserButton.addEventListener('click', () => {
+            blockUser(user.nickname);
         });
 
-        // Ajouter la carte utilisateur à la liste
+        // Create Unblock Button
+        const unblockUserButton = document.createElement('button');
+        unblockUserButton.className = 'btn btn-success unblock-button';
+        unblockUserButton.id = 'user.nickname';
+        unblockUserButton.textContent = 'Débloquer';
+        unblockUserButton.style.display = 'none'; // Initially hidden
+        unblockUserButton.addEventListener('click', () => {
+            unblockUser(user.nickname);
+        });
+
+        userCardBody.appendChild(dot);
+        userCardBody.appendChild(userNicknameDiv);
+        blockUnblockDiv.appendChild(blockUserButton);
+        blockUnblockDiv.appendChild(unblockUserButton);
+        userCardBody.appendChild(blockUnblockDiv);
+        userCard.appendChild(userCardBody);
+
+        // Add click event to open chat
+        userNicknameDiv.addEventListener('click', () => {
+            const isChatOpen = document.getElementById('chat-window');
+            // If the chat is already open for this user, close it. Else, open it.
+            if (isChatOpen.style.display === 'block' && isChatOpen.querySelector('.chat-title').textContent.includes(user.nickname)) {
+                const chatBody = document.querySelector('.chat-body');
+                chatBody.innerHTML = ''; // Clear chat body
+                isChatOpen.style.display = 'none';
+            } else {
+                const chatBody = document.querySelector('.chat-body');
+                chatBody.innerHTML = ''; // Clear chat body
+                openChat(user.nickname);
+                isChatOpen.style.display = 'block';
+            }
+        });
         userList.appendChild(userCard);
     }
 
-    // Mettre à jour la couleur du point en fonction du statut
+    // Update the user's status
     const dot = userCard.querySelector('.dot');
     if (user.status === 'online') {
         dot.style.backgroundColor = 'green';
-    } else if (user.status === 'offline') {
-        userCard.remove();
-        // dot.style.backgroundColor = 'red';
     } else if (user.status === 'in game') {
         dot.style.backgroundColor = 'orange';
+    } else if (user.status === 'offline') {
+        dot.style.backgroundColor = 'red';
     }
+    return userCard;
 }
 
-// Fonction pour créer la fenêtre de chat
-export function createChatWindow() {
-    const col2 = document.createElement('div');
-    col2.style.display = 'none'; // Masqué par défaut
-    col2.classList.add('col-md-8', 'col-lg-6', 'col-xl-4');
+// Function for chat container creation
+async function createChatContainer() {
+    const chatContainer = document.createElement('div');
+    chatContainer.className = 'col-md-8 chat-container';
+    chatContainer.classList.add('col-md-8', 'col-lg-6', 'col-xl-4');
 
-    // Création de la carte (card)
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.id = 'chat1';
-    card.style.borderRadius = '15px';
+    const chatWindow = document.createElement('div');
+    chatWindow.className = 'chat-window';
+    chatWindow.id = 'chat-window';
+    chatWindow.style.display = 'none'; // Initially hidden
 
-    // Création de l'en-tête de la carte (card-header)
-    const cardHeader = document.createElement('div');
-    cardHeader.id = 'chat-header';
-    cardHeader.classList.add('card-header', 'd-flex', 'justify-content-between', 'align-items-center', 'p-3', 'bg-info', 'text-white', 'border-bottom-0');
-    cardHeader.style.borderTopLeftRadius = '15px';
-    cardHeader.style.borderTopRightRadius = '15px';
+    const chatHeader = await createChatHeader();
+    chatWindow.appendChild(chatHeader);
 
-    // Création du corps de la carte (card-body)
-    const cardBody = document.createElement('div');
-    cardBody.className = 'card-body';
-    cardBody.id = 'chat-body';
-    cardBody.style.height = '400px';
-    cardBody.style.overflowY = 'scroll';
+    const chatBody = document.createElement('div');
+    chatBody.className = 'chat-body';
 
-    // Création du pied de carte (card-footer)
-    const cardFooter = document.createElement('div');
-    cardFooter.className = 'card-footer';
+    const chatFooter = document.createElement('div');
+    chatFooter.className = 'chat-footer';
 
-    // Création de l'input group pour le message
-    const inputGroup = document.createElement('div');
-    inputGroup.className = 'input-group';
+    const chatInputGroup = document.createElement('div');
+    chatInputGroup.className = 'input-group';
 
-    // Champ de texte pour écrire un message
     const chatInput = document.createElement('input');
     chatInput.type = 'text';
     chatInput.id = 'chat-input';
     chatInput.className = 'form-control';
-    chatInput.placeholder = 'Écrire un message...';
-
-    // Bouton d'envoi
-    const sendButton = document.createElement('button');
-    sendButton.className = 'btn btn-primary';
-    sendButton.id = 'send-message';
-    sendButton.textContent = 'Envoyer';
-    sendButton.addEventListener('click', () => {
-        const message = chatInput.value;
-        handleMessages(message);
+    chatInput.placeholder = 'Type your message here...';
+    chatInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter' && chatInput.value !== '') {
+            chatSendButton.click();
+        }
     });
 
-    // Ajout du champ texte et du bouton dans l'input group
-    inputGroup.appendChild(chatInput);
-    inputGroup.appendChild(sendButton);
+    const chatSendButton = document.createElement('button');
+    chatSendButton.className = 'btn btn-primary chat-send-button';
+    chatSendButton.textContent = 'Send';
+    chatSendButton.addEventListener('click', () => {
+        const message = chatInput.value;
+        if (message !== '') {
+            handleMessage(message);
+            chatInput.value = '';
+        }
+    });
 
-    // Ajout de l'input group dans le pied de carte
-    cardFooter.appendChild(inputGroup);
+    chatInputGroup.appendChild(chatInput);
+    chatInputGroup.appendChild(chatSendButton);
+    chatFooter.appendChild(chatInputGroup);
+    chatWindow.appendChild(chatBody);
+    chatWindow.appendChild(chatFooter);
+    chatContainer.appendChild(chatWindow);
 
-    // Ajout de l'en-tête, du corps et du pied dans la carte
-    card.appendChild(cardHeader);
-    card.appendChild(cardBody);
-    card.appendChild(cardFooter);
-
-    // Ajout de la carte dans la deuxième colonne
-    col2.appendChild(card);
-
-    return col2;
+    return chatContainer;
 }
 
-// Fonction pour ouvrir un chat
-function openChat(nickname) {
-    // Afficher la deuxième colonne (col-md-8)
-    const col2 = document.querySelector('.col-md-8');
-    col2.style.display = 'block';
+// Function for chat header creation
+async function createChatHeader() {
+    const chatHeader = document.createElement('div');
+    chatHeader.className = 'chat-header';
 
-    // Mettre à jour le titre de la fenêtre de chat
-    const chatHeader = document.getElementById('chat-header');
-    chatHeader.innerHTML = `Discussion avec <a href="/profile/${nickname}/">${nickname}</a>`;
+    const chatTitle = document.createElement('h5');
+    chatTitle.className = 'chat-title';
 
-    // Vérifier si une conversation avec ces utilisateurs existe déjà, et recupérer l'ID
-    checkConversationID(nickname).then(conversationID => {
-        openConversation(conversationID);
+    const buttonContainer = createChatHeaderButtons();
+
+    chatHeader.appendChild(chatTitle);
+    chatHeader.appendChild(buttonContainer);
+
+    return chatHeader;
+}
+
+// Function for chat header buttons
+function createChatHeaderButtons() {
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
+    
+// INVITE GAME BUTTON
+    const inviteGameButton = document.createElement('button');
+    inviteGameButton.className = 'btn btn-primary invite-game-button';
+    inviteGameButton.textContent = 'Invite to Game';
+    inviteGameButton.addEventListener('click', (event) => {
+        console.log('User invited to play Pong (TODO)');
+        // TODO: Implement invite to game
+
+        // creer un message de confirmation
+        // const chatBody = document.querySelector('.chat-body');
+        // const confirmationMessage = document.createElement('div');
+        // confirmationMessage.className = 'alert alert-success';
+        // confirmationMessage.textContent = 'User invited to play Pong!';
+        // chatBody.appendChild(confirmationMessage);
+        // chatBody.scrollTop = chatBody.scrollHeight;
     });
 
-    // Fonction pour vérifier si une conversation avec ces utilisateurs existe déjà
-    async function checkConversationID(nickname) {
-        const response = await fetch(`/api_chat/conversationID/${nickname}/`, {
+// USER PROFILE BUTTON
+    const viewProfileButton = document.createElement('button');
+    viewProfileButton.className = 'btn btn-light view-profile-button';
+
+    const svgUPlink = "http://www.w3.org/2000/svg";
+    const svgUP = document.createElementNS(svgUPlink, "svg");
+    svgUP.setAttribute("xmlns", svgUPlink);
+    svgUP.setAttribute("width", "16");
+    svgUP.setAttribute("height", "16");
+    svgUP.setAttribute("fill", "currentColor");
+    svgUP.setAttribute("class", "bi bi-person-lines-fill");
+    svgUP.setAttribute("viewBox", "0 0 16 16");
+
+    const pathUP = document.createElementNS(svgUPlink, "path");
+    pathUP.setAttribute("d", "M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z");
+
+    svgUP.appendChild(pathUP);
+    viewProfileButton.appendChild(svgUP);
+
+    buttonContainer.appendChild(viewProfileButton);
+    buttonContainer.appendChild(inviteGameButton);
+
+    return buttonContainer;
+}
+
+function openChat(user) {
+    const chatTitle = document.querySelector('.chat-title');
+    chatTitle.textContent = `Chat with ${user}`;
+
+    checkConversationID(user).then(conversationID => {
+        openConversation(conversationID, user);
+    });
+
+    // Function to check if a conversation ID exists for the users, if not create one
+    async function checkConversationID(user) {
+        let response = null;
+        await fetch(`/api_chat/conversationID/${user}/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken'),
             },
-        });
-        const data = await response.json();
-        conversationData = data;  // Mettre à jour la variable globale
-        return conversationData.id;  // Retourne l'ID de la conversation
-    }
-
-    // Fonction pour ouvrir une conversation via WebSocket
-    async function openConversation(conversationID) {
-        if (ws) {
-            ws.close(); // Fermer l'ancienne connexion WebSocket, si elle existe
-        }
-
-        ws = new WebSocket(`ws://localhost:8888/ws/${conversationID}/messages/`);
-
-        ws.onopen = function() {
-            console.log('WebSocket connection opened for messages in conversation', conversationID);         // DEBUG
-        }
-
-        ws.onmessage = function(event) {
-            const receivedMessage = JSON.parse(event.data);
-            if (receivedMessage.sender === nickname) {
-                displayMessage(receivedMessage, 'received-message');
+        })
+        .then(response => {
+            if (response.status === 200) {
+                return response.json();
             }
-        }
-
-        ws.onclose = function() {
-            console.log('WebSocket connection closed');         // DEBUG
-        }
-
-        ws.onerror = function(event) {
-            console.error('WebSocket error:', event);         // DEBUG
-        }
+            else if (response.status === 307) {
+                localStorage.removeItem('token');
+                fetch('/api/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                }).then(r => r.json())
+                navigateTo('/login');
+                return null;
+            } else {
+                throw new Error('Something went wrong');
+            }
+        })
+        .then(data => {
+            response = data.id;
+        })
+        return response;  // Return the conversation ID
     }
 }
 
-// Fonction pour gérer les messages
-function handleMessages(message) {
-    const chatHeader = document.getElementById('chat-header');
-    const receiver = chatHeader.textContent.split(' ')[2];
 
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        const messageData = {
-            type: 'chat_message',
-            message: message,
-            sender: conversationData.members[0].username === receiver ? conversationData.members[1].username : conversationData.members[0].username,
-            timestamp: new Date().toISOString()
-        };
-        ws.send(JSON.stringify(messageData)); 
-        displayMessage(messageData, 'sent-message');
-        document.getElementById('chat-input').value = '';
-    } else {
-        console.error('WebSocket is not open.');        // DEBUG
-    }
-}
+// Function to display a message in the chat
+function displayMessage(messageData) {
+    const chatBody = document.querySelector('.chat-body');
+    const messageElement = document.createElement('div');
+    const imgAvatar = document.createElement('img');
+    imgAvatar.className = 'avatar';
+    const messageDiv = document.createElement('div');
+    const messageContent = document.createElement('p');
+    messageContent.className = 'message-content';
 
-// Fonction pour afficher les messages
-function displayMessage(messageData, messageID) {
-    const chatBody = document.getElementById('chat-body');
-
-    ws = new WebSocket('wss://' + window.location.host + '/wss/${conversationID}/messages/');
-
-    if (messageID === 'sent-message') {
-        // Si l'utilisateur est le sender, on affiche le message à droite
-        const messageElement = document.createElement('div');
-        messageElement.className = messageData.sender === localStorage.getItem('nickname') ? 'sent-message' : 'received-message';
-        messageElement.classList.add('d-flex', 'flex-row', 'justify-content-start', 'mb-4');
-
-        // Créer l'image
-        const Avatar = conversationData.members[0].username === messageData.sender ? conversationData.members[0].avatar : conversationData.members[1].avatar;
-        const img = document.createElement('img');
-        img.src = `data:image/png;base64, ${Avatar}`;
-        img.alt = 'avatar 1';
-        img.style.width = '45px';
-        img.style.height = '100%';
-
-
-        // Créer la div du message
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('p-3', 'ms-3');
-        messageDiv.style.borderRadius = '15px';
-        messageDiv.style.backgroundColor = 'rgba(57, 192, 237, 0.2)';
-
-        // Créer le paragraphe contenant le texte
-        const paragraph = document.createElement('p');
-        paragraph.classList.add('small', 'mb-0');
-        paragraph.textContent = 'Hello and thank you for visiting MDBootstrap. Please click the video below.';
-        paragraph.innerHTML = `
-            <strong>${messageData.sender}:</strong> ${messageData.message} <br>
+    if (messageData.sender.nickname === messageData.user) { // Means that the sender is the user
+        messageElement.className = 'message sent-message';
+        const Avatar = messageData.sender.avatar;
+        imgAvatar.alt = 'Your avatar';
+        imgAvatar.src = `data:image/png;base64, ${Avatar}`;
+        messageDiv.className = 'message-div';
+        messageContent.innerHTML = `
+            <strong>${messageData.sender.nickname}:</strong> ${messageData.message} <br>
             <small>${new Date(messageData.timestamp).toLocaleTimeString()}</small>
         `;
-
-        // Ajouter le paragraphe à la div du message
-        messageDiv.appendChild(paragraph);
-        // Ajouter l'image et la div du message à la div principale
-        messageElement.appendChild(img);
+        messageDiv.appendChild(messageContent);
         messageElement.appendChild(messageDiv);
-
-        chatBody.appendChild(messageElement);
-
-    } else if (messageID === 'received-message') {
-        // Si l'utilisateur est le receiver, on affiche le message à gauche
-        const messageElement = document.createElement('div');
-        messageElement.className = messageData.sender === localStorage.getItem('nickname') ? 'sent-message' : 'received-message';
-        messageElement.classList.add('d-flex', 'flex-row', 'justify-content-end', 'mb-4');
-
-        // Créer l'image
-        const Avatar = conversationData.members[0].username === messageData.receiver ? conversationData.members[0].avatar : conversationData.members[1].avatar;
-        const img = document.createElement('img');
-        img.src = `data:image/png;base64, ${Avatar}`;
-        img.alt = 'avatar 1';
-        img.style.width = '45px';
-        img.style.height = '100%';
-
-        // Créer la div du message
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('p-3', 'ms-3', 'border', 'bg-body-tertiary');
-        messageDiv.style.borderRadius = '15px';
-
-        // Créer le paragraphe contenant le texte
-        const paragraph = document.createElement('p');
-        paragraph.classList.add('small', 'mb-0');
-        paragraph.textContent = 'Hello and thank you for visiting MDBootstrap. Please click the video below.';
-        paragraph.innerHTML = `
-            <strong>${messageData.sender}:</strong> ${messageData.message} <br>
+        messageElement.appendChild(imgAvatar);
+    } else { // Means that the sender is the other user
+        messageElement.className = 'message received-message';
+        const Avatar = messageData.sender.avatar;
+        imgAvatar.alt = 'Other user avatar';
+        imgAvatar.src = `data:image/png;base64, ${Avatar}`;
+        messageDiv.className = 'message-div-received';
+        messageContent.innerHTML = `
+            <strong>${messageData.sender.nickname}:</strong> ${messageData.message} <br>
             <small>${new Date(messageData.timestamp).toLocaleTimeString()}</small>
         `;
-        // Ajouter le paragraphe à la div du message
-        messageDiv.appendChild(paragraph);
+        messageDiv.appendChild(messageContent);
+        messageElement.appendChild(imgAvatar);
         messageElement.appendChild(messageDiv);
-        messageElement.appendChild(img);
-        chatBody.appendChild(messageElement);
     }
+    chatBody.appendChild(messageElement);
     chatBody.scrollTop = chatBody.scrollHeight;
 }
 
-// // Créer une div principale
-// const mainDiv = document.createElement('div');
-// mainDiv.classList.add('d-flex', 'flex-row', 'justify-content-start', 'mb-4');
+// Function to send a message
+export function handleMessage(message) {
+    if (ChatWS && ChatWS.readyState === WebSocket.OPEN) {
+        const messageData = {
+            type: 'chat_message',
+            message: message,
+            timestamp: new Date().toISOString()
+        };
+        ChatWS.send(JSON.stringify(messageData)); 
+    } else {
+        if (DEBUG) {console.error('WebSocket is not open.');}
+    }
+}
 
-// // Créer l'image
-// const img = document.createElement('img');
-// img.src = 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp';
-// img.alt = 'avatar 1';
-// img.style.width = '45px';
-// img.style.height = '100%';
+// Function to initialize the chat
+export async function openConversation(conversationID, otherUser) {
+    // Fermer l'ancienne connexion WebSocket, si elle existe
+    if (ChatWS) {ChatWS.close();}
 
-// // Créer la div du message
-// const messageDiv = document.createElement('div');
-// messageDiv.classList.add('p-3', 'ms-3');
-// messageDiv.style.borderRadius = '15px';
-// messageDiv.style.backgroundColor = 'rgba(57, 192, 237, 0.2)';
+    // Ajouter le lien du profile
+    const viewProfileButton = document.querySelector('.view-profile-button');
+    viewProfileButton.addEventListener('click', () => {
+        navigateTo(`/profile/${otherUser}`);
+    });
 
-// // Créer le paragraphe contenant le texte
-// const paragraph = document.createElement('p');
-// paragraph.classList.add('small', 'mb-0');
-// paragraph.textContent = 'Hello and thank you for visiting MDBootstrap. Please click the video below.';
+    ChatWS = new WebSocket('ws://' + window.location.host + `/ws/${conversationID}/messages/`);
 
-// // Ajouter le paragraphe à la div du message
-// messageDiv.appendChild(paragraph);
+    ChatWS.onopen = function() {
+        if (DEBUG) {console.log('WebSocket OPEN - conversationID:', conversationID);}
+    }
 
-// // Ajouter l'image et la div du message à la div principale
-// mainDiv.appendChild(img);
-// mainDiv.appendChild(messageDiv);
+    ChatWS.onmessage = function(event) {
+        // Handle incoming messages
+        const receivedMessage = JSON.parse(event.data);
 
-// // Ajouter le tout à l'élément parent (par exemple, body ou une autre div)
-// document.body.appendChild(mainDiv);  // ou utiliser une autre div spécifique si nécessaire
+        if (receivedMessage.type === 'chat_history') {
+            if (receivedMessage.messages.length > 0) {
+                receivedMessage.messages.forEach(message => {
+                    displayMessage(message);
+                });
+            }
+            if (receivedMessage.block.blocked_user === false) {
+                enableChat();
+                const blockUnblockDiv = document.getElementById(otherUser).querySelector('.block-unblock')
+                blockUnblockDiv.style.display = 'block';
+            } else {
+                disableChat();
+                if (receivedMessage.block.blocked === receivedMessage.block.user) {
+                    const blockUnblockDiv = document.getElementById(receivedMessage.block.blocked).querySelector('.block-unblock')
+                    blockUnblockDiv.style.display = 'none';
+                } else if (receivedMessage.block.blocker === receivedMessage.block.user) {
+                    const blockUnblockDiv = document.getElementById(receivedMessage.block.blocked).querySelector('.block-unblock')
+                    blockUnblockDiv.style.display = 'block';
+                    const blockUserButton = document.getElementById(receivedMessage.block.blocked).querySelector('.block-button')
+                    blockUserButton.style.display = 'none';
+                    const unblockUserButton = document.getElementById(receivedMessage.block.blocked).querySelector('.unblock-button')
+                    unblockUserButton.style.display = 'block';
+                }
+            }
+        } else if (receivedMessage.type === 'chat_message') {
+            const messageData = {
+                sender: receivedMessage.sender,
+                message: receivedMessage.message,
+                timestamp: receivedMessage.timestamp,
+                user: receivedMessage.user
+            };
+            displayMessage(messageData);
+        } else if (receivedMessage.type === 'user_blocked') {
+            disableChat();
+            if (receivedMessage.blocked === receivedMessage.user) {
+                const blockUnblockDiv = document.getElementById(receivedMessage.blocker).querySelector('.block-unblock')
+                blockUnblockDiv.style.display = 'none';
+            } else if (receivedMessage.blocked !== receivedMessage.user) {
+                const blockUserButton = document.getElementById(receivedMessage.blocked).querySelector('.block-button')
+                blockUserButton.style.display = 'none';
+                const unblockUserButton = document.getElementById(receivedMessage.blocked).querySelector('.unblock-button')
+                unblockUserButton.style.display = 'block';
+            }
+        } else if (receivedMessage.type === 'user_unblocked') {
+            enableChat();
+            if (receivedMessage.blocked === receivedMessage.user) {
+                const blockUnblockDiv = document.getElementById(receivedMessage.blocker).querySelector('.block-unblock')
+                blockUnblockDiv.style.display = 'block';
+            } else if (receivedMessage.blocked !== receivedMessage.user) {
+                const blockUserButton = document.getElementById(receivedMessage.blocked).querySelector('.block-button')
+                blockUserButton.style.display = 'block';
+                const unblockUserButton = document.getElementById(receivedMessage.blocked).querySelector('.unblock-button')
+                unblockUserButton.style.display = 'none';
+            }
+        }
+    }
+
+    ChatWS.onclose = function() {
+        if (DEBUG) {console.log('WebSocket CLOSE - conversationID:', conversationID);}
+    }
+
+    ChatWS.onerror = function(event) {
+        if (DEBUG) {console.error('WebSocket ERROR:', event);}
+    }
+}
+
+
+
+//                  BLOCK/UNBLOCK USER FUNCTIONALITIES                  //
+
+// Function to block a user
+function blockUser(blockedUser) {
+    if (ChatWS && ChatWS.readyState === WebSocket.OPEN) {
+        const messageData = {
+            type: 'block_user',
+            blocked: blockedUser
+        };
+        ChatWS.send(JSON.stringify(messageData));
+    }
+}
+
+// Function to unblock a user
+function unblockUser(blockedUser) {
+    if (ChatWS && ChatWS.readyState === WebSocket.OPEN) {
+        const messageData = {
+            type: 'unblock_user',
+            blocked: blockedUser
+        };
+        ChatWS.send(JSON.stringify(messageData));
+    }
+}
+
+function disableChat() {
+    const chatInput = document.getElementById('chat-input');
+    const chatSendButton = document.querySelector('.chat-send-button');
+    const inviteGameButton = document.querySelector('.invite-game-button');
+    
+    if (chatInput && chatSendButton) {
+        chatInput.disabled = true;
+        chatSendButton.disabled = true;
+        inviteGameButton.disabled = true;
+    }
+}
+
+function enableChat() {
+    const chatInput = document.getElementById('chat-input');
+    const chatSendButton = document.querySelector('.chat-send-button');
+    const inviteGameButton = document.querySelector('.invite-game-button');
+    
+    if (chatInput && chatSendButton) {
+        chatInput.disabled = false;
+        chatSendButton.disabled = false;
+        inviteGameButton.disabled = false;
+    }
+}
+
+//                  BLOCK/UNBLOCK USER FUNCTIONALITIES                  //

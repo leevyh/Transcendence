@@ -13,7 +13,7 @@ class User_site(AbstractUser):
     nickname = models.CharField(max_length=255, unique=True)
     created_at = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=255, default=Status.OFFLINE, choices=Status.choices)
-    avatar = models.ImageField(upload_to='avatar/', default='default.jpg')
+    avatar = models.ImageField(upload_to='avatar/', default='media/default.jpg')
 
     def __str__(self):
         return self.username
@@ -107,6 +107,13 @@ class Friendship(models.Model):
     def __str__(self):
         return f"Friendship between {self.user1} and {self.user2}"
 
+
+class MatchHistory(models.Model):
+    player1 = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='player1')
+    opponent = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='player2')
+    player_1_score = models.IntegerField()
+    player_2_score = models.IntegerField()
+    created_at = models.DateTimeField(default=timezone.now)
 
 # class PrivateGameInvite(model.Model):
 

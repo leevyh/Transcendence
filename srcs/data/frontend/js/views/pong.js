@@ -1,3 +1,5 @@
+import { navBar } from './fr/nav.js';
+
 import {
     play,
     stop,
@@ -27,13 +29,23 @@ export let canvas = 'null'
 
 
 export function pongView(container) {
+    container.innerHTML = '';
+    document.body.classList.add('page-with-nav'); // Ajout de la classe pour la navigation bar (padding)
 
-	container.innerHTML = '';// Vider le contenu précédent
+    // Creation une grosse div pour le pong et la navigation bar
+    const div = document.createElement('div');
+    div.className = 'big-div';
+    container.appendChild(div);
+
+    // navigationBar(container); // Add navigation bar
+    const navBarr = navBar(container);
+    div.appendChild(navBarr);
+
 	loadPongCSS();  // CSS
 
     // HTML
-    const main = document.createElement('main');
-    main.setAttribute('role', 'main');
+    const main = document.createElement('div');
+    main.className = 'PongDiv';
 
     const ul = document.createElement('ul');
     ul.className = 'd-flex justify-content-center';
@@ -69,7 +81,7 @@ export function pongView(container) {
     main.appendChild(canvasElement);
     main.appendChild(scoreP);
 
-    container.appendChild(main);
+    div.appendChild(main);
 
     canvas = document.getElementById('canvas');
 

@@ -2,194 +2,149 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    /* display: flex;
-    justify-content: center;
-    align-items: center; */
 }
 
-body {
-    font-family: 'Quicksand', sans-serif;
-    font-size: 16px;
-    background: #cdd0d491;
+.page-with-nav {
+    padding-left: 225px; /* Ajuste selon la hauteur de la barre de navigation */
 }
 
-body.small-font {
-    font-size: 12px;
-}
-
-body.large-font {
-    font-size: 20px;
-}
-
-/* Pour le mode sombre */
-body.dark-mode {
-    background-color: #121212;
-    color: #ffffff;
-}
-
-#app {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-   /* flex-direction: column;  new navbar*/
+main {
     height: 100%;
     width: 100%;
-    box-sizing: border-box;
-    padding: 20px; /* Ajoute un padding autour de tout le contenu */
 }
 
-#language-selector {
 
-    background: white;
-    border-radius: 10px;
+body {
+    display: flex;
+    font-family: 'Public Pixel', sans-serif;
+    font-size: 16px;
+    background-image: linear-gradient(to bottom, black, #012970);
+}
+
+.big-div { /* The Big Div on every view */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+.PongDiv{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
 }
 
 .base {
     display: flex;
     justify-content: center;
+    /* align-items: center; */
     flex-direction: column;
-    width: 100%;
-    max-width: 1200px; /* Augmente la taille maximale de .base pour plus d'espace */
-    margin: 0 auto;
-    padding: 20px;
-    box-sizing: border-box;
+    /* background-color: aqua; */
+    width: 100%; /*100vh*/
+    height: 100%;
 }
 
-.contener {
+.cardHomeTitle {
+    color: #F4ED37;
+}
+
+.ButtonsHome {
+    padding: 5px;
+    background-color: #435574;
+    border: none;
+    box-shadow: #6f87b1 0px 4px 12px;
+
+}
+
+.ButtonsHome:hover {
+    background-color: #6f87b1;
+    box-shadow: #435574 0px 4px 12px;
+}
+
+
+/* =======================MODAL-LOGIN===========================*/
+.ModalLoginBase {
+
     display: flex;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    /* background-color: rgba(167, 167, 167, 0.5); */
     justify-content: center;
-    align-items: stretch;
-    width: 100%;
-    max-width: 1000px; /* Augmente la taille maximale de .contener */
-    box-sizing: border-box;
-}
-
-.twodivWelcome {
-    flex: 1;
-    width: 100%; /* Assure que chaque div occupe toute la largeur disponible */
-    max-width: 48%; /* Limite la taille de chaque div à 48% pour laisser de l'espace autour */
-    box-sizing: border-box;
-    margin: 10px; /* Ajoute un espacement entre les divs */
-}
-
-.welcome{
-    padding: 20px;
-    background-color: white;
-    display: flex;
-    justify-content: space-evenly;
-    flex-direction: column;
-}
-
-.titleWelcome {
-    color: #012970;
-    font-weight: 600;
-    font-size: 100px;
-}
-
-.paragraphWelcome {
-    display: flex;
-    justify-content: center;
-    color: #a19e9e91;
-
-    font-weight: 200;
-    font-size: 20px;
-}
-
-.listButton {
-    display: flex;
-    justify-content: space-evenly;
-    padding: 0;
-}
-
-.listElemWelcome {
-    list-style-type: none;
-}
-
-.imgPong {
-    height: auto;
-    object-fit: cover;
-    border: 1px solid #ccc;
-}
-
-.Buttonselem {
-    background-color: #012970;
-    color: white;
-    margin: 5px;
-}
-
-.Buttonselem {
-    background-color: #012970;
-    color: white;
-    margin: 5px;
-}
-
-.Buttonselem:hover {
-    background-color: #2759af;
-}
-
-#language {
-    display: flex;
-    justify-content: flex-end;
-    margin-right: 9px;
-}
-
-.languageLabel {
-    color: #012970;
-}
-
-/*NAVBAR*/
-
-.navbar-brand {
-    /* padding: 5px;
-    width: 10px; */
-    color: #012970;
-}
-/* .notification {
-    color: #ff0202;
-} */
-
-.redNotification {
-    border-radius: 100%;
-    color: white;
-    background-color: #dc3545;
-    text-align: center;
-    font-weight: bold;
-    height: 15px;
-    width: 15px;
-    margin-left: -10px;
-    align-content: center;
-    font-size: 10px;
-    display: inline-block;
-    position: absolute;
-}
-
-.nav-icon {
-    width: 50%;
-    display: flex;
-    justify-content: space-evenly;
     align-items: center;
-    color: #012970;
+    transition: opacity 0.5s ease;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
 }
 
-/* .nav-icon:hover {
-    color: #2759af;
-} */
+.ModalLoginBase-show {
+    opacity: 1;
+}
+
+.ModalLogin {
+    /* background-color: rgba(167, 167, 167, 0.5); */
+    background-color: rgba(255, 234, 234, 0.5);
+    backdrop-filter: blur(10px);
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%;
+    border-radius: 10px;
+    position: relative;
+    transition: transform 0.5s ease, opacity 0.5s ease ;
+    transform: translateY(-1000px); /* Départ de l'animation, hors écran */
+}
+
+.modalLoginTitle {
+    color : #F4ED37;
+    cursor: pointer;
+
+}
+
+.ModalLoginBase-show .ModalLogin {
+    transform: translateY(0px); /* L'animation ramène la modale au centre */
+    opacity: 1;
+}
+
+.close-button {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ButtonLogin {
+    padding: 5px;
+    background-color: #3a4250;
+    border: none;
+    box-shadow: #6f87b1 0px 4px 12px;
+}
+
+
+.ButtonLogin:hover,
+.ButtonLogin:focus {
+    background-color: #000;
+    box-shadow: #435574 0px 4px 12px;
+}
 
 /*Livia */
 
 #error404 {
 	width: 50%;
 	height: 50%;
-}
-
-.user-connected {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    /* padding: 20px; */
-    box-sizing: 0;
 }

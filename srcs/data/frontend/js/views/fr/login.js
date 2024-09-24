@@ -1,5 +1,5 @@
 import { getCookie } from '../utils.js';
-import { navigateTo } from '../../app.js';
+import { DEBUG, navigateTo } from '../../app.js';
 
 export function loginView(container) {
     container.innerHTML = '';
@@ -30,8 +30,6 @@ export function loginView(container) {
     svgHome.addEventListener('click', () => {
         navigateTo('/');
     });
-
-
 
     const h1 = document.createElement('h1');
     h1.textContent = 'Connexion';
@@ -153,6 +151,7 @@ export function loginView(container) {
             }
         })
         .catch(error => {
+            if (DEBUG) {console.error('Error:', error);}
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
@@ -175,6 +174,7 @@ export function loginView(container) {
     document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
+        if (DEBUG) {console.log('Code:', code);}
         if (code) {
             fetch('/api/token/', {
                 method: 'POST',
@@ -187,14 +187,15 @@ export function loginView(container) {
             .then(response => response.json())
             .then(data => {
                 if (data) {
-                    // console.log(data);
-                    navigateTo('/settings');
+                    if (DEBUG) {console.log(data);}
+                    navigateTo('/');
                 }
                 else {
-                    // console.log('No data');
+                    if (DEBUG) {console.log('No data');}
                 }
             })
             .catch(error => {
+                if (DEBUG) {console.error('Error:', error);}
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
@@ -228,11 +229,11 @@ export function loginView(container) {
         })
         .then(response => response.json())
         .then(data => {
-            // console.log(data);
+            if (DEBUG) {console.log(data);}
             if (data.url) {
-                // console.log(data.url);
                 window.location.href = data.url;
             } else if (data.error) {
+                if (DEBUG) {console.error('Error:', data.error);}
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
@@ -240,6 +241,7 @@ export function loginView(container) {
             }
         })
         .catch(error => {
+            if (DEBUG) {console.error('Error:', error);}
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';

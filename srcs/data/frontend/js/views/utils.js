@@ -1,4 +1,4 @@
-import { navigateTo } from '../app.js';
+import { DEBUG, navigateTo } from '../app.js';
 import wsManager from './wsManager.js';
 
 // Helper function to get CSRF token from cookies
@@ -63,7 +63,7 @@ export function changeLanguage(lang) {
 	});
 }
 // if check_auth open websocket
-// const friendRequestSocket = new WebSocket('wss://localhost:8888/wss/friend_request/');
+// const friendRequestSocket = new WebSocket('ws://' + window.location.host + '/ws/friend_request/');
 //
 // friendRequestSocket.onopen = function() {
 // 	console.log('Friend request socket opened');
@@ -87,7 +87,7 @@ export function changeLanguage(lang) {
 
 wsManager.AddNotificationListener((data) => {
     if (data.type === 'friend_request') {
-        console.log('New friend request received from ', data.from_nickname);
+        if (DEBUG) {console.log('New friend request received from ', data.from_nickname);}
         displayFriendRequestNotification(data.from_nickname);
     }
 })
@@ -168,7 +168,6 @@ function displayFriendRequestNotification(nickname) {
     friendRequestNotificationModal.style.display = 'block';
 }
 
-
 // Récupérer le token CSRF depuis les cookies et vérifier si l'utilisateur est authentifié
 export async function isAuthenticated() {
     try {
@@ -176,7 +175,7 @@ export async function isAuthenticated() {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
+                'X-CSRFToken': getCookie('csrftoken'),
             },
         });
         if (response.ok) {
@@ -185,8 +184,9 @@ export async function isAuthenticated() {
         } else {
             return false;
         }
-    } catch (error) {
-        console.error('Error checking authentication:', error);
+    }
+    catch (error) {
+        if (DEBUG) {console.error('Error checking authentication:', error);}
         return false;
     }
 }
@@ -228,7 +228,7 @@ export async function getAccessibility() {
             throw new Error('Something went wrong');
         }
     } catch (error) {
-        console.error('Error fetching accessibility settings:', error); // A enlever plus tard
+        if (DEBUG) {console.error('Error fetching accessibility settings:', error);}
         return null;
     }
 }

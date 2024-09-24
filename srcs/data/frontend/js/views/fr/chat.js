@@ -1,63 +1,48 @@
 import { getCookie } from '../utils.js';
-import { createUserCard, createChatWindow } from './chat_utils.js';
+import { createGlobalContainer, createUserCard } from './chat_utils.js';
+import { DEBUG } from '../../app.js';
+import { navBar } from './nav.js';
 
-export function chatView(container) {
+export async function chatView(container) {
     container.innerHTML = '';
 
-    // Création du WebSocket pour le statut des utilisateurs
-    const statusSocket = new WebSocket('wss://' + window.location.host + '/wss/status/');
+    // Creation big div for the chat and the navigation bar
+    const div = document.createElement('div');
+    div.className= 'big-div';
+    container.appendChild(div);
+
+    const nav = navBar(container);
+    div.appendChild(nav);
+
+    const globalContainer = await createGlobalContainer();
+    div.appendChild(globalContainer);
+
+    // Create the WebSocket for user status
+    const statusSocket = new WebSocket('ws://' + window.location.host + '/ws/status/');
 
     // Onopen event
     statusSocket.onopen = function(event) {
-        console.log('Status socket opened');          // DEBUG
+        if (DEBUG) {console.log('Status socket opened');}
     };
 
     // On message received from the server (status of a user)
     statusSocket.onmessage = function(event) {
+        // FIXME: Handle the message properly, if I'm the one who sent the message, don't send an error
         const data = JSON.parse(event.data);
-
-        // Mettre à jour ou créer la carte utilisateur avec les données reçues
+        if (DEBUG) {console.log('Message received:', data);}
+        // Update the user list with the new status
         const userList = document.getElementById('user-list');
         createUserCard(data, userList);
     };
 
     // Onclose event
     statusSocket.onclose = function(event) {
-        console.error('Status socket closed', event);         // DEBUG
+        if (DEBUG) {console.error('Status socket closed', event);}
     };
 
-    // Création du conteneur principal (container-fluid)
-    const containerFluid = document.createElement('div');
-    containerFluid.className = 'container-fluid';
+    const userList = document.getElementById('user-list');
 
-    // Création de la première rangée (row)
-    const row = document.createElement('div');
-    row.className = 'row';
-
-    // Création de la première colonne (col-md-4)
-    const col1 = document.createElement('div');
-    col1.className = 'col-md-4';
-
-    // CONNECTED USERS
-    const h5 = document.createElement('h5');
-    h5.textContent = 'Joueurs connectés';
-
-    // Liste des joueurs connectés (ul)
-    const userList = document.createElement('ul');
-    userList.className = 'list-group';
-    userList.id = 'user-list';
-
-    col1.appendChild(h5);
-    col1.appendChild(userList);
-    row.appendChild(col1);
-
-    const col2 = createChatWindow();
-    row.appendChild(col2);
-
-    containerFluid.appendChild(row);
-    container.appendChild(containerFluid);
-
-    // Appeler l'API pour récupérer tous les utilisateurs
+    // Call API to get the list of users
     fetch('/api/users/', {
         method: 'GET',
         headers: {
@@ -68,10 +53,12 @@ export function chatView(container) {
     })
     .then(response => response.json())
     .then(data => {
-        // Pour chaque utilisateur, créer une carte
+        // For each user, create a user card
         data.forEach(user => {
             createUserCard(user, userList);
         });
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        if (DEBUG) {console.error('Error:', error);}
+    });
 }
