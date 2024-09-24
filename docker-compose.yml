@@ -66,6 +66,12 @@ services:
       - 5959
     env_file:
       - ./env/elastic.env
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -s localhost:9600/_node/pipelines?pretty | grep '\"status\" : \"green\"'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
     depends_on:
       backend-kibana:
         condition: service_healthy
