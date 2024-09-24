@@ -34,93 +34,66 @@ export function homeView(container) {
 
     ///////////////////////////////////////////////////////////////
 
-    // Modal-Login (adaptée à Bootstrap)
+    // Modal-Login
     const modal = document.createElement('div');
-    modal.className = 'modal fade'; // Bootstrap classes for modal
-    modal.tabIndex = -1;
-    modal.setAttribute('role', 'dialog'); // Role for accessibility
+    modal.className = 'modal ModalLoginBase';
+    modal.style.display = 'none'; // Cachée par défaut
     container.appendChild(modal);
 
-    // Modal-dialogue div
-    const modalDialog = document.createElement('div');
-    modalDialog.className = 'modal-dialog'; // Bootstrap class for modal dialog
-    modalDialog.setAttribute('role', 'document'); // Role for accessibility
-    modal.appendChild(modalDialog);
-
-    // Modal content
+    // Créer le contenu de la modale
     const modalContent = document.createElement('div');
-    modalContent.className = 'modal-content'; // Bootstrap class for modal content
-    modalDialog.appendChild(modalContent);
-
-    // Modal header
-    const modalHeader = document.createElement('div');
-    modalHeader.className = 'modal-header'; // Bootstrap class for modal header
-    modalContent.appendChild(modalHeader);
-
-    // Titre de la modal
-    const modalTitle = document.createElement('h5');
-    modalTitle.className = 'modal-title';
-    modalTitle.textContent = 'Login';
-    modalHeader.appendChild(modalTitle);
+    modalContent.className = 'modal-content ModalLogin';
+    modal.appendChild(modalContent);
 
     // Bouton pour fermer la modale
-    const closeButton = document.createElement('button');
-    closeButton.className = 'btn-close';
-    closeButton.setAttribute('type', 'button');
-    closeButton.setAttribute('data-bs-dismiss', 'modal');
-    closeButton.setAttribute('aria-label', 'Close'); // For accessibility
-    modalHeader.appendChild(closeButton);
+    const closeButton = document.createElement('span');
+    closeButton.className = 'close-button';
+    closeButton.textContent = '×'; // Symbole de fermeture
+    modalContent.appendChild(closeButton);
 
-    // Modal body
-    const modalBody = document.createElement('div');
-    modalBody.className = 'modal-body'; // Bootstrap class for modal body
-    modalContent.appendChild(modalBody);
+    // Titre du formulaire
+    const modalTitle = document.createElement('h2');
+    modalTitle.textContent = 'Login';
+    modalTitle.className = 'modalLoginTitle'
+    modalContent.appendChild(modalTitle);
 
-    // Créer le formulaire dans le modal-body
+    // Créer le formulaire
     const formLogin = document.createElement('form');
 
     // Champs du formulaire
     const fields = [
-    { label: 'Nom d\'utilisateur', type: 'username', id: 'username', placeholder: 'Entrez votre nom d\'utilisateur' },
-    { label: 'Mot de passe', type: 'password', id: 'password', placeholder: 'Entrez votre mot de passe' },
+      { label: 'Nom d\'utilisateur', type: 'username', id: 'username', placeholder: 'Entrez votre nom d\'utilisateur' },
+      { label: 'Mot de passe', type: 'password', id: 'password', placeholder: 'Entrez votre mot de passe' },
     ];
 
     fields.forEach(field => {
-    const formGroup = document.createElement('div');
-    formGroup.className = 'mb-3'; // Bootstrap class for margin-bottom
+      const formGroup = document.createElement('div');
+      formGroup.className = 'mb-3';
 
-    const label = document.createElement('label');
-    label.className = 'form-label'; // Bootstrap class for form label
-    label.htmlFor = field.id;
-    label.textContent = field.label;
+      const label = document.createElement('label');
+      label.className = 'form-label titleLabelRegister';
+      label.htmlFor = field.id;
+      label.textContent = field.label;
 
-    const input = document.createElement('input');
-    input.type = field.type;
-    input.className = 'form-control'; // Bootstrap class for form control
-    input.id = field.id;
-    input.placeholder = field.placeholder;
+      const input = document.createElement('input');
+      input.type = field.type;
+      input.className = 'form-control FormChamp';
+      input.id = field.id;
+      input.placeholder = field.placeholder;
 
-    formGroup.appendChild(label);
-    formGroup.appendChild(input);
-    formLogin.appendChild(formGroup);
+      formGroup.appendChild(label);
+      formGroup.appendChild(input);
+      formLogin.appendChild(formGroup);
     });
+    modalContent.appendChild(formLogin);
 
-    // Ajouter le formulaire dans le modal-body
-    modalBody.appendChild(formLogin);
-
-    // Modal footer
-    const modalFooter = document.createElement('div');
-    modalFooter.className = 'modal-footer'; // Bootstrap class for modal footer
-    modalContent.appendChild(modalFooter);
-
-    // Bouton de soumission (dans le footer)
+    // Bouton de soumission
     const submitLoginButton = document.createElement('button');
     submitLoginButton.type = 'submit';
-    submitLoginButton.className = 'btn btn-primary w-100'; // Bootstrap class for primary button and full width
+    submitLoginButton.className = 'btn btn-primary w-100 ButtonLogin';
     submitLoginButton.textContent = 'Se connecter';
-    modalFooter.appendChild(submitLoginButton);
+    formLogin.appendChild(submitLoginButton);
 
-    // Ajouter le formulaire au modal body
     formLogin.addEventListener('submit', (event) => {
         event.preventDefault();
 
@@ -138,8 +111,6 @@ export function homeView(container) {
             formLogin.insertBefore(errorMessage, submitLoginButton);
             return;
         }
-
-        // Requête pour authentifier l'utilisateur
         fetch('/api/login/', {
             method: 'POST',
             headers: {
@@ -152,9 +123,13 @@ export function homeView(container) {
         .then(data => {
             if (data.message === 'User logged in successfully') {
                 localStorage.setItem('token', data.token);
-                const bootstrapModal = bootstrap.Modal.getInstance(modal);
-                bootstrapModal.hide(); // Fermer la modale avec Bootstrap
+                modal.classList.remove('ModalLoginBase-show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 500); // Même délai pour l'animation de fermeture
+                // Ou redirection vers une autre page
             } else if (data.error) {
+                if (DEBUG) {console.error('Erreur lors de la connexion', data.error);}
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'Mauvais mot de passe ou nom d\'utilisateur, veuillez réessayer';
@@ -162,122 +137,13 @@ export function homeView(container) {
             }
         })
         .catch(error => {
+            if (DEBUG) {console.error('Erreur lors de la connexion', error);}
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
             formLogin.insertBefore(errorMessage, submitLoginButton);
         });
     });
-    // // Modal-Login
-    // const modal = document.createElement('div');
-    // modal.className = 'modal ModalLoginBase';
-    // modal.style.display = 'none'; // Cachée par défaut
-    // container.appendChild(modal);
-
-    // // Créer le contenu de la modale
-    // const modalContent = document.createElement('div');
-    // modalContent.className = 'modal-content ModalLogin';
-    // modal.appendChild(modalContent);
-
-    // // Bouton pour fermer la modale
-    // const closeButton = document.createElement('span');
-    // closeButton.className = 'close-button';
-    // closeButton.textContent = '×'; // Symbole de fermeture
-    // modalContent.appendChild(closeButton);
-
-    // // Titre du formulaire
-    // const modalTitle = document.createElement('h2');
-    // modalTitle.textContent = 'Login';
-    // modalTitle.className = 'modalLoginTitle'
-    // modalContent.appendChild(modalTitle);
-
-    // // Créer le formulaire
-    // const formLogin = document.createElement('form');
-
-    // // Champs du formulaire
-    // const fields = [
-    //   { label: 'Nom d\'utilisateur', type: 'username', id: 'username', placeholder: 'Entrez votre nom d\'utilisateur' },
-    //   { label: 'Mot de passe', type: 'password', id: 'password', placeholder: 'Entrez votre mot de passe' },
-    // ];
-
-    // fields.forEach(field => {
-    //   const formGroup = document.createElement('div');
-    //   formGroup.className = 'mb-3';
-
-    //   const label = document.createElement('label');
-    //   label.className = 'form-label titleLabelRegister';
-    //   label.htmlFor = field.id;
-    //   label.textContent = field.label;
-
-    //   const input = document.createElement('input');
-    //   input.type = field.type;
-    //   input.className = 'form-control FormChamp';
-    //   input.id = field.id;
-    //   input.placeholder = field.placeholder;
-
-    //   formGroup.appendChild(label);
-    //   formGroup.appendChild(input);
-    //   formLogin.appendChild(formGroup);
-    // });
-    // modalContent.appendChild(formLogin);
-
-    // // Bouton de soumission
-    // const submitLoginButton = document.createElement('button');
-    // submitLoginButton.type = 'submit';
-    // submitLoginButton.className = 'btn btn-primary w-100 ButtonLogin';
-    // submitLoginButton.textContent = 'Se connecter';
-    // formLogin.appendChild(submitLoginButton);
-
-    // formLogin.addEventListener('submit', (event) => {
-    //     event.preventDefault();
-
-    //     // Suppression des messages d'erreur précédents
-    //     const errorMessages = formLogin.querySelectorAll('.text-danger');
-    //     errorMessages.forEach(message => message.remove());
-
-    //     const username = document.getElementById('username').value;
-    //     const password = document.getElementById('password').value;
-
-    //     if (!username || !password) {
-    //         const errorMessage = document.createElement('p');
-    //         errorMessage.className = 'text-danger';
-    //         errorMessage.textContent = 'Tous les champs sont obligatoires';
-    //         formLogin.insertBefore(errorMessage, submitLoginButton);
-    //         return;
-    //     }
-    //     fetch('/api/login/', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'X-CSRFToken': getCookie('csrftoken')
-    //         },
-    //         body: JSON.stringify({ username: username, password: password })
-    //     })
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         if (data.message === 'User logged in successfully') {
-    //             localStorage.setItem('token', data.token);
-    //             modal.classList.remove('ModalLoginBase-show');
-    //             setTimeout(() => {
-    //                 modal.style.display = 'none';
-    //             }, 500); // Même délai pour l'animation de fermeture
-    //             // Ou redirection vers une autre page
-    //         } else if (data.error) {
-    //             if (DEBUG) {console.error('Erreur lors de la connexion', data.error);}
-    //             const errorMessage = document.createElement('p');
-    //             errorMessage.className = 'text-danger';
-    //             errorMessage.textContent = 'Mauvais mot de passe ou nom d\'utilisateur, veuillez réessayer';
-    //             formLogin.insertBefore(errorMessage, submitLoginButton);
-    //         }
-    //     })
-    //     .catch(error => {
-    //         if (DEBUG) {console.error('Erreur lors de la connexion', error);}
-    //         const errorMessage = document.createElement('p');
-    //         errorMessage.className = 'text-danger';
-    //         errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
-    //         formLogin.insertBefore(errorMessage, submitLoginButton);
-    //     });
-    // });
 
 
 
