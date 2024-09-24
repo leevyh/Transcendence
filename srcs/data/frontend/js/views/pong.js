@@ -30,7 +30,7 @@ export let canvas = 'null'
 
 export function pongView(container) {
     container.innerHTML = '';
-    document.body.classList.add('page-with-nav');
+    document.body.classList.add('page-with-nav'); // Ajout de la classe pour la navigation bar (padding)
 
     // Creation une grosse div pour le pong et la navigation bar
     const div = document.createElement('div');

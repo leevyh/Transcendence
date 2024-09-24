@@ -13,19 +13,6 @@ main {
     width: 100%;
 }
 
-.navBarr {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    z-index: 1000;
-}
-
-@media screen and (max-width: 600px) {
-    .navBarr {
-        opacity: 0;
-    }
-}
 
 body {
     display: flex;

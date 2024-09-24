@@ -32,8 +32,8 @@ def register(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            print(data)
-            language = data.pop('language', None)
+            # print(data)
+            # language = data.pop('language', None)
             form = UserRegistrationForm(data)
             if form.is_valid():
                 user = form.save(commit=False)
@@ -41,9 +41,9 @@ def register(request):
                 user.username = form.cleaned_data.get('username', None)
                 user.save()
                 settings = Accessibility(user=user)
-                settings.language = language
-                if settings.language is None:
-                    settings.language = 'fr'
+                # settings.language = language
+                # if settings.language is None:
+                #     settings.language = 'fr'
                 settings.save()
                 stats = Stats_user(user=user)
                 stats.save()
@@ -61,7 +61,7 @@ def loginView(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            user = authenticate(request, username=data['login'], password=data['password'])
+            user = authenticate(request, username=data['username'], password=data['password'])
             if user is not None:
                 login(request, user)
                 user.status = User_site.Status.ONLINE
@@ -309,7 +309,7 @@ def updateAccessibility(request):
             token_user = request.headers.get('Authorization').split(' ')[1]
             payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
             data = json.loads(request.body)
-            # print(f'data: {data}')         # DEBUG
+            print(f'data: {data}')         # DEBUG
             username = payload['username']
             user_id = User_site.objects.get(username=username).id
             accessibility_id = Accessibility.objects.get(user=user_id)

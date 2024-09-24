@@ -2,8 +2,8 @@ import { navigateTo } from '../../app.js';
 import { getCookie } from '../utils.js';
 
 export function navBar(container) {
-    const ProfileBase = document.createElement('div');
-    ProfileBase.className = 'navBarr d-flex flex-column';  // Utilisation des classes Bootstrap ici
+    const div = document.createElement('div');
+    div.className = 'navigationBarDiv h-100 d-flex flex-column';  // Utilisation des classes Bootstrap ici
     
     // Get user data from backend
     fetch(`/api/settings/`, {
@@ -47,22 +47,19 @@ export function navBar(container) {
             avatar: data.avatar,
         };
 
-        // const ProfileBase = document.createElement('div');
-        // ProfileBase.className = 'ProfileBase w-100 h-100 d-flex flex-column';  // Utilisation des classes Bootstrap ici
-        // container.appendChild(ProfileBase);
-
+        // Création de la barre de navigation
         const nav = document.createElement('nav');
         nav.className = 'nav d-flex flex-column justify-content-start align-items-center shadow-lg'; // Transition vers Bootstrap
         nav.style.backgroundColor = '#435574';  // Couleur personnalisée, Bootstrap ne fournit pas cette couleur directement
-        ProfileBase.appendChild(nav);
+        div.appendChild(nav);
 
-        const divProfil = document.createElement('div');
-        divProfil.className = 'divProfil w-50 text-center';  // Bootstrap padding et text-align
-        nav.appendChild(divProfil);
+        const divProfile = document.createElement('div');
+        divProfile.className = 'divProfile w-50 text-center';  // Bootstrap padding et text-align
+        nav.appendChild(divProfile);
 
         const avatarItem = document.createElement('div');
         avatarItem.className = 'avatarItem rounded-circle overflow-hidden shadow-sm';  // Bootstrap arrondi et ombre
-        divProfil.appendChild(avatarItem);
+        divProfile.appendChild(avatarItem);
 
         const avatarImage = document.createElement('img');
         avatarImage.src = `data:image/png;base64, ${userData.avatar}`;
@@ -80,7 +77,7 @@ export function navBar(container) {
         const TitleNickname = document.createElement('h4');
         TitleNickname.className = 'TitleNickname mt-2 pb-4';  // Bootstrap pour couleur et marge
         TitleNickname.textContent = `${userData.nickname}`;
-        divProfil.appendChild(TitleNickname);
+        divProfile.appendChild(TitleNickname);
 
         // Navigation list
         const divNav = document.createElement('div');
@@ -148,14 +145,14 @@ export function navBar(container) {
             });
         });
 
-        // Modal for personal informations
+// Modal for personal informations
         const modalInfo = document.createElement('div');
-        modalInfo.className = 'modal fade';
+        modalInfo.className = 'modal fade modalInfo';
         modalInfo.setAttribute('tabindex', '-1');
         //modalInfo.style.display = 'none'; // Cachée par défaut
         modalInfo.setAttribute('aria-labelledby', 'modalInfoLabel');
         modalInfo.setAttribute('aria-hidden', 'true');
-        container.appendChild(modalInfo);
+        container.appendChild(modalInfo); // Directement dans le container pour éviter les problèmes de positionnement
 
         const modalInfoDialog = document.createElement('div');
         modalInfoDialog.classList.add('modal-dialog');
@@ -164,28 +161,24 @@ export function navBar(container) {
         // Créer le contenu de la modale
         const modalInfoContent = document.createElement('div');
         modalInfoContent.className = 'modal-content';
-        // modalInfoContent.id = 'modalInfoContent';
         modalInfoDialog.appendChild(modalInfoContent);
 
         const modalInfoHeader = document.createElement('div');
         modalInfoHeader.className = 'modal-header border-bottom border-custom-color pb-2';
-        // modalInfoHeader.id = 'modalInfoHeader';
         modalInfoContent.appendChild(modalInfoHeader);
 
         // Titre du Modal
         const modalInfoTitle = document.createElement('h2');
         modalInfoTitle.textContent = 'Settings';
         modalInfoTitle.className = 'modal-title';
-        // modalInfoTitle.id = 'modalInfoTitle';/////
         modalInfoHeader.appendChild(modalInfoTitle);
 
         // Bouton pour fermer la modale
         const modalInfoCloseButton = document.createElement('span');
-        // closeButtonParam.className = 'btn-close';
-        modalInfoCloseButton.id = 'close-button-Param';
+        modalInfoCloseButton.id = 'closeButtonInfos';
         modalInfoCloseButton.setAttribute('data-bs-dismiss', 'modal');
         modalInfoCloseButton.setAttribute('aria-label', 'Close');
-        modalInfoCloseButton.textContent = '×'; // Symbole de fermeture
+        modalInfoCloseButton.textContent = '×';
         modalInfoHeader.appendChild(modalInfoCloseButton);
 
         modalInfoCloseButton.addEventListener('click', () => {
@@ -264,15 +257,14 @@ export function navBar(container) {
             bootstrapModal.show(); // Afficher la modal
         });
 
-    
 // Modal for settings, password and accessibility
         const modalSettings = document.createElement('div');
-        modalSettings.className = 'modal fade';
+        modalSettings.className = 'modal fade modalSettings';
         modalSettings.setAttribute('tabindex', '-1');
         //modalSettings.style.display = 'none'; // Cachée par défaut
         modalSettings.setAttribute('aria-labelledby', 'modalParamLabel');
         modalSettings.setAttribute('aria-hidden', 'true');
-        container.appendChild(modalSettings);
+        container.appendChild(modalSettings); // Directement dans le container pour éviter les problèmes de positionnement
 
         const modalSettingsDialog = document.createElement('div');
         modalSettingsDialog.classList.add('modal-dialog');
@@ -295,25 +287,18 @@ export function navBar(container) {
 
         // Bouton pour fermer la modale
         const modalSettingsCloseButton = document.createElement('span');
-        // closeButtonModify.className = 'btn-close';
-        modalSettingsCloseButton.id = 'close-button-Modify';
+        modalSettingsCloseButton.id = 'closeButtonParam';
         modalSettingsCloseButton.setAttribute('data-bs-dismiss', 'modal');
         modalSettingsCloseButton.setAttribute('aria-label', 'Close');
-        modalSettingsCloseButton.textContent = '×'; // Symbole de fermeture
+        modalSettingsCloseButton.textContent = '×';
         modalSettingsHeader.appendChild(modalSettingsCloseButton);
 
         modalSettingsCloseButton.addEventListener('click', () => {
-            modalSettings.classList.remove(' modalSettings-show'); // Retirer la classe d'animation
+            modalSettings.classList.remove('modalSettings-show'); // Retirer la classe d'animation
             setTimeout(() => {
                 modalSettings.style.display = 'none'; // Cacher la modale après l'animation
             }, 500); // Délai correspondant à la durée de l'animation CSS
         });
-
-
-
-
-
-
 
 // SI TU CLIQUES SUR LE CRAYON, TU PEUX MODIFIER LES INFOS
         // Ajout de l'événement pour ouvrir la modal avec animation
@@ -323,11 +308,16 @@ export function navBar(container) {
 
             // Positionnement de la modale à côté de la barre de navigation
             const navBar = document.querySelector('.nav'); // Sélectionner la barre de navigation
+            const modalInfo = document.querySelector('.modalInfo');
+
             const rect = navBar.getBoundingClientRect(); // Récupérer les dimensions et position
+            console.log(rect);
+            const rect2 = modalInfo.getBoundingClientRect();
+            console.log(rect2);
 
             modalSettings.style.position = 'absolute'; // Positionnement absolu
-            modalSettings.style.top = `${rect.top}px`; // Aligner avec la barre de navigation
-            modalSettings.style.left = `${rect.right + 10}px`; // La modal apparaît à droite de la barre, avec un écart de 20px
+            modalSettings.style.top = `${rect.top} + ${rect2.top}px`; // Aligner avec la barre de navigation
+            modalSettings.style.left = `${rect.right + 10}+ ${rect2.right + 10}px`; // La modal apparaît à droite de la barre, avec un écart de 20px
 
             modalSettings.style.margin = '0';  // Supprimer les marges par défaut
             modalSettings.style.transform = 'none';  // Désactiver les centrer automatiquement
@@ -335,25 +325,14 @@ export function navBar(container) {
             bootstrapModalModify.show(); // Afficher la modal
         });
 
-
-
-
         const modalSettingsBody = document.createElement('div');
         modalSettingsBody.className = 'modal-body';
-        // ModalParamBody.id = 'ModalParamBody';
         modalSettingsContent.appendChild(modalSettingsBody);
 
         // Formulaire de modification des paramètres {nickname, email} = settingsForm
         const settingsForm = document.createElement('form');
         settingsForm.className = 'w-100';
         modalSettingsBody.appendChild(settingsForm);
-
-
-        // Creation du label pour le nickname
-        // const newNicknameLabel = document.createElement('label');
-        // newNicknameLabel.className = 'form-label';
-        // newNicknameLabel.htmlFor = 'nickname';
-        // newNicknameLabel.textContent = 'Nickname';
 
         // Creation du champ de saisie pour le nickname
         const newNicknameModify = document.createElement('input');
@@ -363,12 +342,6 @@ export function navBar(container) {
         newNicknameModify.className = 'form-control mb-4';
         newNicknameModify.placeholder = 'New nickname';
         settingsForm.appendChild(newNicknameModify);
-
-        // Creation du label pour l'email
-        // const newEmailLabel = document.createElement('label');
-        // newEmailLabel.className = 'form-label';
-        // newEmailLabel.htmlFor = 'email';
-        // newEmailLabel.textContent = 'Email';
 
         // Creation du champ de saisie pour l'email
         const newEmailModify = document.createElement('input');
@@ -391,9 +364,9 @@ export function navBar(container) {
             event.preventDefault(); // Empêche la soumission par défaut du formulaire
 
             // Suppression des messages précédents
-            const errorMessages = avatarForm.querySelectorAll('.text-danger');
+            const errorMessages = settingsForm.querySelectorAll('.text-danger');
             errorMessages.forEach(message => message.remove());
-            const successMessages = AccessibilityForm.querySelectorAll('.text-success');
+            const successMessages = settingsForm.querySelectorAll('.text-success');
             successMessages.forEach(message => message.remove());
 
             // Récupération des données du formulaire
@@ -416,8 +389,7 @@ export function navBar(container) {
                 // const successMessage = document.createElement('p');
                 // successMessage.className = 'text-success';
                 // successMessage.textContent = 'Paramètres modifiés avec succès';
-                // formModify1.appendChild(successMessage);
-                navigateTo('/settings');
+                // settingsForm.appendChild(successMessage);
             } else {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
@@ -426,34 +398,68 @@ export function navBar(container) {
             }
         })
 
-
-
         // Formulaire de modification des paramètres {font_size, language, dark_mode}
         const accessibilityForm = document.createElement('form');
         accessibilityForm.className = 'w-100';
         modalSettingsBody.appendChild(accessibilityForm);
 
-
         // Champ de la taille de la police
         const labelFontSize = document.createElement('label');
         labelFontSize.className = 'form-label';
-        // labelFontSize.htmlFor = 'font-size';
         labelFontSize.textContent = 'Font size';
         accessibilityForm.appendChild(labelFontSize);
 
-        // const PoliceContenerSettings = document.createElement('div');
-        // PoliceContenerSettings.className = 'LanguageContenerSettings';
-
-        // accessibilityBody.appendChild(LanguageContenerSettings);
         const fontSize = document.createElement('input');
+        fontSize.name = 'font-size';
         fontSize.type = 'range';
         fontSize.id = 'font-size';
-        fontSize.name = 'font-size';
         fontSize.className = 'form-control-range mb-4 cursor';
         fontSize.min = 1;
         fontSize.max = 3;
         fontSize.value = userData.font_size;
         accessibilityForm.appendChild(fontSize);
+
+        // Champ de la langue
+        const labelLanguage = document.createElement('label');
+        labelLanguage.className = 'form-label';
+        labelLanguage.textContent = 'Language';
+        accessibilityForm.appendChild(labelLanguage);
+
+        const language = document.createElement('select');
+        language.name = 'language';
+        language.id = 'language';
+        language.className = 'form-select mb-4';
+        language.value = userData.language;
+        accessibilityForm.appendChild(language);
+
+        const optionEn = document.createElement('option');
+        optionEn.value = 'en';
+        optionEn.textContent = 'English';
+        language.appendChild(optionEn);
+
+        const optionFr = document.createElement('option');
+        optionFr.value = 'fr';
+        optionFr.textContent = 'Français';
+        language.appendChild(optionFr);
+
+        const optionEs = document.createElement('option');
+        optionEs.value = 'es';
+        optionEs.textContent = 'Español';
+        language.appendChild(optionEs);
+
+        // Champ du mode sombre
+        const labelDarkMode = document.createElement('label');
+        labelDarkMode.className = 'form-label';
+        labelDarkMode.textContent = 'Dark mode';
+        accessibilityForm.appendChild(labelDarkMode);
+
+        const darkMode = document.createElement('input');
+        darkMode.type = 'checkbox';
+        darkMode.id = 'dark-mode';
+        darkMode.name = 'dark-mode';
+        darkMode.className = 'form-check-input mb-4';
+        darkMode.value = userData.theme;
+        accessibilityForm.appendChild(darkMode);
 
         // Bouton de soumission
         const accessSubmitButton = document.createElement('button');
@@ -463,20 +469,21 @@ export function navBar(container) {
         accessibilityForm.appendChild(accessSubmitButton);
 
         // Gestion de la soumission du formulaire
-        accessSubmitButton.addEventListener('submit', async (event) => {
+        accessibilityForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
             // Suppression des messages précédents
             const errorMessages = accessibilityForm.querySelectorAll('.text-danger');
             errorMessages.forEach(message => message.remove());
-            // const successMessages = accessibilityForm.querySelectorAll('.text-success');
-            // successMessages.forEach(message => message.remove());
+            const successMessages = accessibilityForm.querySelectorAll('.text-success');
+            successMessages.forEach(message => message.remove());
 
             // Récupération des données du formulaire
             const data = new FormData(accessibilityForm);
             const font_size = data.get('font-size');
             const language = data.get('language');
             const dark_mode = data.get('dark-mode');
+            console.log(font_size, language, dark_mode);
 
             // Envoi des données au serveur
             const response = await fetch('/api/updateAccessibility/', {
@@ -487,19 +494,20 @@ export function navBar(container) {
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
                 body: JSON.stringify({ font_size, language, dark_mode })
-            })
-            .catch((error) => {
+            });
+            if (response.ok) {
+                accessibilityForm.innerHTML = '';
+                const successMessage = document.createElement('p');
+                successMessage.className = 'text-success';
+                successMessage.textContent = 'Paramètres modifiés avec succès';
+                accessibilityForm.appendChild(successMessage);
+            } else {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'Erreur lors de la modification des paramètres';
                 accessibilityForm.insertBefore(errorMessage, accessSubmitButton);
-                // console.error('Error:', error);
-            });
-            if (response.ok) {
-                event.preventDefault();
-                navigateTo('/settings');
             }
         })
     });
-    return ProfileBase;
+    return div;
 }

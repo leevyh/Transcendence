@@ -921,7 +921,7 @@ const removeAvatarButton = document.createElement('button');
 // // *************** Fin de modification de l'avatar ***************
 
 // // *************** Modification de l'accessibilité ***************
-    //     const accessibilityDiv = document.createElement('div');
+//     const accessibilityDiv = document.createElement('div');
 //     accessibilityDiv.className = 'card mb-4';
 
 //     const accessibilityHeader = document.createElement('div');

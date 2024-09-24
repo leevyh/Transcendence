@@ -1,3 +1,17 @@
+.navigationBarDiv {
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100%;
+	z-index: 1000;
+}
+
+@media screen and (max-width: 600px) {
+	.navigationBarDiv {
+		opacity: 0;
+	}
+}
+
 .nav {
 	padding: 15px;
 	/* width: min-content; */
@@ -16,7 +30,6 @@
 .avatarImage {
 	border-radius: 50%;
 }
-
 
 .TitleNickname {
 	display: flex;
@@ -89,6 +102,24 @@ button.buttonLogOut:active {
 	max-width: 400px !important; /* Limiter la largeur à 400px ou à une taille adaptée */
     width: auto !important;  /* Permettre à la modal de s'adapter automatiquement au contenu étendre sans restriction de largeur */
 }
+
+#closeButtonInfos {
+	color: #aaa;
+	position: absolute;
+	top: 10px;
+	right: 20px;
+	font-size: 28px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+#closeButtonInfos:hover,
+#closeButtonInfos:focus {
+	color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 
 #closeButtonParam {
 	color: #aaa;

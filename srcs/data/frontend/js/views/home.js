@@ -1,4 +1,4 @@
-import { navigateTo } from '../app.js';
+import { DEBUG, navigateTo } from '../app.js';
 import { changeLanguage, getCookie } from './utils.js';
 
 export function homeView(container) {
@@ -54,7 +54,7 @@ export function homeView(container) {
     modalContent.appendChild(modalTitle);
 
     // Créer le formulaire
-    const form = document.createElement('form');
+    const formLogin = document.createElement('form');
 
     // Champs du formulaire
     const fields = [
@@ -79,22 +79,22 @@ export function homeView(container) {
 
       formGroup.appendChild(label);
       formGroup.appendChild(input);
-      form.appendChild(formGroup);
+      formLogin.appendChild(formGroup);
     });
-    modalContent.appendChild(form);
+    modalContent.appendChild(formLogin);
 
     // Bouton de soumission
-    const submitButton = document.createElement('button');
-    submitButton.type = 'submit';
-    submitButton.className = 'btn btn-primary w-100 ButtonLogin';
-    submitButton.textContent = 'Se connecter';
-    form.appendChild(submitButton);
+    const submitLoginButton = document.createElement('button');
+    submitLoginButton.type = 'submit';
+    submitLoginButton.className = 'btn btn-primary w-100 ButtonLogin';
+    submitLoginButton.textContent = 'Se connecter';
+    formLogin.appendChild(submitLoginButton);
 
-    form.addEventListener('submit', (event) => {
+    formLogin.addEventListener('submit', (event) => {
         event.preventDefault();
 
         // Suppression des messages d'erreur précédents
-        const errorMessages = form.querySelectorAll('.text-danger');
+        const errorMessages = formLogin.querySelectorAll('.text-danger');
         errorMessages.forEach(message => message.remove());
 
         const username = document.getElementById('username').value;
@@ -104,7 +104,7 @@ export function homeView(container) {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Tous les champs sont obligatoires';
-            form.insertBefore(errorMessage, submitButton);
+            formLogin.insertBefore(errorMessage, submitLoginButton);
             return;
         }
         fetch('/api/login/', {
@@ -113,32 +113,37 @@ export function homeView(container) {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken')
             },
-            body: JSON.stringify({ login: username, password: password })
+            body: JSON.stringify({ username: username, password: password })
         })
         .then(response => response.json())
         .then(data => {
             if (data.message === 'User logged in successfully') {
                 localStorage.setItem('token', data.token);
-                event.preventDefault();
-                navigateTo('/settings'); //dashboard
+                modal.classList.remove('ModalLoginBase-show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 500); // Même délai pour l'animation de fermeture
+                // Ou redirection vers une autre page
             } else if (data.error) {
+                if (DEBUG) {console.error('Erreur lors de la connexion', data.error);}
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'Mauvais mot de passe ou nom d\'utilisateur, veuillez réessayer';
-                form.insertBefore(errorMessage, submitButton);
+                formLogin.insertBefore(errorMessage, submitLoginButton);
             }
         })
         .catch(error => {
+            if (DEBUG) {console.error('Erreur lors de la connexion', error);}
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
-            form.insertBefore(errorMessage, submitButton);
+            formLogin.insertBefore(errorMessage, submitLoginButton);
         });
     });
     //////////////////////////////////////////////////////////
 
     //////MODAL REGISTER///////////////////
-     //Modal-Register
+    // Modal-Register
     const modalRegister = document.createElement('div');
     modalRegister.className = 'modal ModalLoginBase';
     modalRegister.style.display = 'none'; // Cachée par défaut
@@ -241,15 +246,6 @@ export function homeView(container) {
         // }
 
 
-        // Si la langue est deja dans l'url, on la recupere
-        let url = window.location.pathname;
-        let language = null;
-        const splitPath = url.split('/');
-        if (splitPath.length > 2) {
-            url = `/${splitPath[2]}`;
-            language = splitPath[1];
-        }
-
         // Envoi des données du formulaire
         fetch('/api/register/', {
             method: 'POST',
@@ -263,27 +259,38 @@ export function homeView(container) {
                     password: passwordRe,
                     nickname: nicknameRe,
                     email: emailRe,
-                    language: 'en'
+                    // language: 'en'
                 }
             )
         })
-            .then(response => {
-                if (!response.ok) {
-                    const errorMessage = document.createElement('p');
-                    errorMessage.className = 'text-danger';
-                    errorMessage.textContent = 'Erreur lors de l\'inscription, veuillez réessayer';
-                    formRegister.insertBefore(errorMessage, submitRegisterButton);
-                }
-                else {
-                    event.preventDefault();
-                    // navigateTo('/login');
-                }
-            })
-            .catch(error => {
+        .then(response => {
+            if (!response.ok) {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'Erreur lors de l\'inscription, veuillez réessayer';
                 formRegister.insertBefore(errorMessage, submitRegisterButton);
+            }
+            else {
+                // Si l'inscription est réussie, on ferme la modale et on ouvre la modale de connexion
+                modalRegister.classList.remove('ModalLoginBase-show');
+                setTimeout(() => {
+                    modalRegister.style.display = 'none';
+                }, 500); // Même délai pour l'animation de fermeture
+                modal.classList.add('ModalLoginBase-show');
+                setTimeout(() => {
+                    modal.style.display = 'flex';
+                }, 10); // Petit délai pour activer la transition après l'affichage
+
+                // event.preventDefault();
+                // navigateTo('/login');
+            }
+        })
+        .catch(error => {
+            if (DEBUG) {console.error('Erreur lors de l\'inscription', error);}
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Erreur lors de l\'inscription, veuillez réessayer';
+            formRegister.insertBefore(errorMessage, submitRegisterButton);
             });
     });
 
@@ -326,23 +333,11 @@ export function homeView(container) {
 
     // Fermer la modale si on clique à l'extérieur du contenu
     window.addEventListener('click', (event) => {
-        // if (event.target === modal) {
-        //     modal.classList.remove('ModalLoginBase-show');
-        //     setTimeout(() => {
-        //         modal.style.display = 'none';
-        //     }, 500); // Même délai pour l'animation de fermeture
-        // }
         closeModal(event, modal)
     });
 
     // Fermer la modale si on clique à l'extérieur du contenu
     window.addEventListener('click', (event) => {
-        // if (event.target === modalRegister) {
-        //     modalRegister.classList.remove('ModalLoginBase-show');
-        //     setTimeout(() => {
-        //         modalRegister.style.display = 'none';
-        //     }, 500); // Même délai pour l'animation de fermeture
-        // }
         closeModal(event, modalRegister)
     });
 }
