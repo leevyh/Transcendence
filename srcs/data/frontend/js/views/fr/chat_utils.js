@@ -350,7 +350,7 @@ export async function openConversation(conversationID, otherUser) {
         navigateTo(`/profile/${otherUser}`);
     });
 
-    ChatWS = new WebSocket('ws://' + window.location.host + `/ws/${conversationID}/messages/`);
+    ChatWS = new WebSocket('wss://' + window.location.host + `/wss/${conversationID}/messages/`);
 
     ChatWS.onopen = function() {
         if (DEBUG) {console.log('WebSocket OPEN - conversationID:', conversationID);}
