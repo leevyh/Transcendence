@@ -194,33 +194,89 @@ DATABASES = {
 	}
 }
 
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'logstash': {
+#             'level': 'INFO',
+#             'class': 'logstash.LogstashHandler',
+#             'host': 'backend-logstash',
+#             'port': 5959,
+#             'version': 1,
+#             'message_type': 'django',
+#             'fqdn': False,
+#             'tags': ['django'],
+#         },
+#         'console': {
+#             'level': 'INFO',
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'backend': {
+#             'handlers': ['logstash', 'console'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#         'django': {
+#             'handlers': ['logstash', 'console'],
+#             'level': 'INFO',
+#             'propagate': True,
+#         },
+#     },
+# }
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'gelf_error': {
+#             'class': 'graypy.GELFUDPHandler',
+#             'host': 'backend-logstash',
+#             'port': 5959,
+#             'level': 'ERROR',
+#         },
+#         'gelf_info': {
+#             'class': 'graypy.GELFUDPHandler',
+#             'host': 'backend-logstash',
+#             'port': 5959,
+#             'level': 'INFO',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['gelf_error', 'gelf_info'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#     },
+# }
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'handlers': {
-        'logstash': {
-            'level': 'INFO',
-            'class': 'logstash.LogstashHandler',
-            'host': 'backend-logstash',
-            'port': 5959,
-            'version': 1,
-            'message_type': 'django',
-            'fqdn': False,
-            'tags': ['django'],
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
         },
-        'console': {
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
             'level': 'INFO',
-            'class': 'logging.StreamHandler',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/django/django.log',
+            'formatter': 'verbose',
         },
     },
     'loggers': {
-        'backend': {
-            'handlers': ['logstash', 'console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
         'django': {
-            'handlers': ['logstash', 'console'],
+            'handlers': ['file'],
             'level': 'INFO',
             'propagate': True,
         },
