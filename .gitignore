@@ -1,1 +1,8 @@
-*.env
+/env/*.env
+/srcs/data/elastic
+/srcs/data/backend_/logs
+/srcs/data/database/logs
+/venv
+/.idea
+/.vscode
+

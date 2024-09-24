@@ -1,0 +1,108 @@
+# Server configuration
+server:
+  name: "backend-kibana"
+  host: 0.0.0.0
+  port: 5601
+
+  ssl:
+    enabled: true
+    certificate: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt
+    key: /usr/share/kibana/config/certs/backend-kibana/backend-kibana.key
+    certificateAuthorities: "/usr/share/kibana/config/certs/ca/ca.crt"
+
+telemetry.optIn: false
+
+# Elasticsearch connection configuration
+elasticsearch:
+  hosts: ["https://backend-elastic:9200"]
+  username: "kibana_system"
+  password: "${KIBANA_PASSWORD}"
+
+  ssl:
+      verificationMode: certificate
+      certificate: "/usr/share/kibana/config/certs/backend-kibana/backend-kibana.crt"
+      key: "/usr/share/kibana/config/certs/backend-kibana/backend-kibana.key"
+      certificateAuthorities: "/usr/share/kibana/config/certs/ca/ca.crt"
+
+# Kibana configuration
+xpack:
+  security.encryptionKey: "du?IN8LVA0anAV9F9Rthkm#wPIrLC2@Z"
+  encryptedSavedObjects.encryptionKey: "du?IN8LVA0anAV9F9Rthkm#wPIrLC2@Z"
+  reporting.encryptionKey: "du?IN8LVA0anAV9F9Rthkm#wPIrLC2@Z"
+
+  fleet:
+    packages:
+        - name: fleet_server
+          version: latest
+        - name: system
+          version: latest
+        - name: elastic_agent
+          version: latest
+        - name: logstash
+          version: latest
+        - name: nginx
+          version: latest
+        - name: postgresql
+          version: latest
+    agentPolicies:
+        - name: Fleet Server Policy
+          id: fleet-server-policy
+          namespace: default
+          package_policies:
+              - name: Fleet Server Integration
+                package:
+                  name: fleet_server
+        - name: System Policy
+          id: system-policy
+          namespace: default
+          is_default: true
+          package_policies:
+            - name: System Integration
+              package:
+                name: system
+        - name: Agent Nginx Policy
+          id: agent-nginx-policy
+          namespace: default
+          package_policies:
+              - name: Elastic Agent Integration
+                package:
+                  name: elastic_agent
+              - name: Nginx Integration
+                package:
+                  name: nginx
+        - name: Agent Logstash Policy
+          id: agent-logstash-policy
+          namespace: default
+          package_policies:
+            - name: Elastic Agent Integration
+              package:
+                name: elastic_agent
+            - name: Logstash Integration
+              package:
+                name: logstash
+        - name: Agent Postgresql Policy
+          id: agent-postgresql-policy
+          namespace: default
+          package_policies:
+              - name: Elastic Agent Integration
+                package:
+                  name: elastic_agent
+              - name: Postgresql Integration
+                package:
+                  name: postgresql
+    fleetServerHosts:
+      - id: fleet-server
+        name: Fleet Server
+        host_urls: ["https://backend-fleet:8220"]
+        is_default: true
+    outputs:
+      - id: elastic-output
+        name: Elasticsearch Output
+        type: elasticsearch
+        hosts:
+          - "https://backend-elastic:9200"
+        is_default: true
+        is_default_monitoring: true
+        ssl:
+          verification_mode: certificate
+          certificate_authorities: ["/usr/share/elastic-agent/config/certs/ca/ca.crt"]

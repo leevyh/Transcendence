@@ -17,7 +17,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -27,9 +26,9 @@ SECRET_KEY = 'django-insecure-a4=7pox#i*0jn++(jt$dj+wrjp6+xucis%dy&pukjdj7qxan+4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.25.139.193", "made-f0cr6s4"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "backend-django"]
 
-CSRF_TRUSTED_ORIGINS = ['http://made-f0cr11s4:8888', 'http://localhost:8888'] # Ajoute pour se connecter sur un autre poste 42
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8888', 'http://localhost:8888'] # Ajoute pour se connecter sur un autre poste 42
 
 # Application definition
 AUTH_USER_MODEL = 'api.User_site'
@@ -64,8 +63,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'api.middleware.AuthenticationMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -89,18 +89,27 @@ TEMPLATES = [
 # Ajouter ces paramètres pour autoriser les requêtes depuis votre SPA
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8888",
+    "https://localhost:8888",
 ]
 
 # Autoriser les requêtes API
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8888",
+    "https://localhost:8888",
 ]
+
+#CSRF_COOKIE_SECURE = True
+
+#SECURE_SSL_REDIRECT = True
+#SECURE_HSTS_SECONDS = 3600
+#SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+#SECURE_HSTS_PRELOAD = True
 
 LOGIN_URL = '/api/login'
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-
 ASGI_APPLICATION = 'backend.asgi.application'
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
@@ -111,7 +120,7 @@ CHANNEL_LAYERS = {
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Utilisation de la base de données pour stocker les sessions
 SESSION_COOKIE_NAME = 'sessionid'  # Nom du cookie de session
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = False  # True si HTTPS
+# SESSION_COOKIE_SECURE = True
 
 # Autres backends possibles
 # SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
@@ -173,7 +182,96 @@ DATABASES = {
 		'NAME': 'transcendence',
 		'USER': 'postgres',
 		'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-		'HOST': 'postgresql',
+		'HOST': 'backend-postgresql',
 		'PORT': 5432,
 	}
+}
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'logstash': {
+#             'level': 'INFO',
+#             'class': 'logstash.LogstashHandler',
+#             'host': 'backend-logstash',
+#             'port': 5959,
+#             'version': 1,
+#             'message_type': 'django',
+#             'fqdn': False,
+#             'tags': ['django'],
+#         },
+#         'console': {
+#             'level': 'INFO',
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'backend': {
+#             'handlers': ['logstash', 'console'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#         'django': {
+#             'handlers': ['logstash', 'console'],
+#             'level': 'INFO',
+#             'propagate': True,
+#         },
+#     },
+# }
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'gelf_error': {
+#             'class': 'graypy.GELFUDPHandler',
+#             'host': 'backend-logstash',
+#             'port': 5959,
+#             'level': 'ERROR',
+#         },
+#         'gelf_info': {
+#             'class': 'graypy.GELFUDPHandler',
+#             'host': 'backend-logstash',
+#             'port': 5959,
+#             'level': 'INFO',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['gelf_error', 'gelf_info'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#     },
+# }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/django/django.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
 }
