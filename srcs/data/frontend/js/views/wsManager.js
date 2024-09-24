@@ -15,6 +15,7 @@ class WebSocketManager {
         if (this.token) {
             //Check token validity with backend
             const status_token = await isAuthenticated();
+            if (DEBUG) {console.log('Token status:', status_token);}
             if (!status_token) {
                 if (DEBUG) {console.error('Invalid token');}
                 return;

@@ -12,6 +12,7 @@ import { chatView } from './views/fr/chat.js';
 import { friendsView } from './views/friends.js';
 import { pongView } from './views/pong.js';
 import { profileView } from './views/profile.js';
+import { callback42 } from './views/fr/callback42.js';
 
 const appDiv = document.getElementById('app');
 
@@ -51,6 +52,10 @@ const routes = {
     '/pong': {
         title: 'Pong',
         view: pongView,
+    },
+    '/callback42': {
+        title: 'Authentification 42',
+        view: callback42,
     },
 };
 
