@@ -20,6 +20,7 @@ body {
     font-size: 16px;
     background-image: linear-gradient(to bottom, black, #012970);
 }
+
 .big-div { /* The Big Div on every view */
     display: flex;
     justify-content: center;
@@ -46,23 +47,8 @@ body {
     height: 100%;
 }
 
-.cardHome {
-    display: flex;
-    justify-content: space-evenly;
-    /* align-items: center; */
-    flex-direction: column;
-    /* background-color: pink; */
-    /* height: 100%; */
-
-}
-
-.HomeTitle {
-    display: flex;
-    height: 35%;
-    align-items: center;
-    color: aliceblue;
-    font-size: 25px;
-
+.cardHomeTitle {
+    color: #F4ED37;
 }
 
 .ButtonsHome {
@@ -70,6 +56,7 @@ body {
     background-color: #435574;
     border: none;
     box-shadow: #6f87b1 0px 4px 12px;
+
 }
 
 .ButtonsHome:hover {
