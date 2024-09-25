@@ -1,4 +1,5 @@
 import { navigationBar } from './navigation.js';
+import { PongWebSocketManager } from './wsPongManager.js';
 import { notifications } from './notifications.js';
 
 import {
@@ -8,6 +9,7 @@ import {
     handleKeyDown,
     handleKeyUp,
     draw,
+    game,
 } from './pong_game.js'; // Importation des fonctions et variables du jeu Pong
 
 
@@ -68,7 +70,7 @@ export async function pongView(container) {
 
     const scoreP = document.createElement('p');
     scoreP.className = 'd-flex justify-content-center';
-    scoreP.innerHTML = 'Joueur 1 : <em id="player-score">0</em> - Joueur 2 : <em id="computer-score">0</em>';
+    scoreP.innerHTML = 'Joueur 1 : <em id="player1-score">0</em> - Joueur 2 : <em id="player2-score">0</em>';
 
     // const buttonGameSettingsContainer = document.createElement('div');
     // buttonGameSettingsContainer.className = "buttonGameSettingsContainer";
@@ -95,44 +97,42 @@ export async function pongView(container) {
     draw();
     console.log("coucou");
 
-    const socket = new WebSocket('ws://localhost:8888/ws/pong/');
+    // WebSocket
+    const wsUrl = 'ws://localhost:8888/ws/pong/';
+    PongWebSocketManager.init(wsUrl);
 
-    socket.onopen = () => {
-        console.log("WebSocket connected");
-    };
-    
-    socket.onmessage = (event) => {
+    PongWebSocketManager.socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         
         if (data.action_type === 'start_game') {
+            var currentPlayer = data.current_player;
+            if (currentPlayer === 'player_1') {
+                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, game.player1));
+                document.addEventListener('keyup', (event) => handleKeyUp(event, game.player1));
+            } else if (currentPlayer === 'player_2') {
+                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, game.player2));
+                document.addEventListener('keyup', (event) => handleKeyUp(event, game.player2));
+            }
             startGame(stopButton);
         }
-        // if (data.action_type === 'update_opponent_position') {
-            //     if (data.player !== 'self') {
-                //         game.computer.y = data.player_position;
-                //     }
-                //     updateOpponentPosition(data.player_position);
-                //     game.ball.x = data.ball_position.x;
-                //     game.ball.y = data.ball_position.y;
-                // }
-            };
-            
-            socket.onclose = () => {
-                console.log("WebSocket disconnected");
-            };
-            
-            document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton));
-            document.addEventListener('keyup', handleKeyUp);
-            
-            const stopGameButton = document.querySelector('#stop-game');
-            
-            // startGameButton.addEventListener('click', () => {
-    //     if (!GameOn) {
-    //         play();
-    //         startGameButton.disabled = true; // Désactiver le bouton Start
-    //         stopGameButton.disabled = false; // Activer le bouton Stop
-    //     }
-    // });
+
+        // Autres types de messages à gérer
+        if (data.action_type === 'update_position') {
+            // Mettez à jour la position de l'adversaire
+            PongWebSocketManager.updateOpponentPosition(data.player_position);
+        }
+        if (data.action_type === 'update_ball_position') {
+            PongWebSocketManager.updateBallPosition(data.ball_position);
+        }
+        if (data.action_type === 'update_score') {
+            PongWebSocketManager.updateScore(data.scores);
+        }
+    };
+
+    PongWebSocketManager.socket.onclose = () => {
+        console.log("WebSocket disconnected");
+    };
+    const stopGameButton = document.querySelector('#stop-game');
 
     stopGameButton.addEventListener('click', () => {
         if (GameOn) {

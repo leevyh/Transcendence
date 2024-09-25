@@ -31,11 +31,13 @@ class PongConsumer(AsyncWebsocketConsumer):
                 print(f"Creating game between {player_1.username} and {player_2.username}")
                 game = await create_game(player_1, player_2)
 
+                self.game_id = game.id
+
                 await self.channel_layer.group_add(f"game_{game.id}", channel_name_1)
                 await self.channel_layer.group_add(f"game_{game.id}", channel_name_2)
 
                 await self.channel_layer.group_send(
-                    f"game_{game.id}",
+                    f"game_{self.game_id}",
                     {
                         'type': 'start_game',
                         'game_id': game.id,
@@ -52,6 +54,8 @@ class PongConsumer(AsyncWebsocketConsumer):
         if player in waiting_players:
             waiting_players.remove(player)
 
+        if hasattr(self, 'game_id'):
+            await self.channel_layer.group_discard(f"game_{self.game_id}", self.channel_name)
         await self.close()
 
     # Fonction pour démarrer le jeu
@@ -59,37 +63,40 @@ class PongConsumer(AsyncWebsocketConsumer):
         game_id = event['game_id']
         player_1 = event['player_1']
         player_2 = event['player_2']
+        current_player = 'player_1' if self.scope['user'].username == player_1 else 'player_2'
 
         # Envoie du message aux deux joueurs pour démarrer le jeu
         await self.send(text_data=json.dumps({
             'action_type': 'start_game',
             'game_id': game_id,
             'player_1': player_1,
-            'player_2': player_2
+            'player_2': player_2,
+            'current_player': current_player
         }))
 
-async def receive(self, text_data):
-    data = json.loads(text_data)
-    action_type = data.get('action_type')
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        action_type = data.get('action_type')
 
-    # if action_type == 'update_position':
-    #     player_position = data.get('player_position')
-        
-    #     # Envoyer la nouvelle position à l'autre joueur
-    #     await self.channel_layer.group_send(
-    #         f"game_{self.game_id}",
-    #         {
-    #             'type': 'update_opponent_position',
-    #             'player_position': player_position
-    #         }
-    #     )
+        if action_type == 'update_position':
+            player_position = data.get('player_position')
+            
+            # Envoie la nouvelle position à l'autre joueur
+            if hasattr(self, 'game_id'):
+                await self.channel_layer.group_send(
+                    f"game_{self.game_id}",
+                    {
+                        'type': 'update_opponent_position',
+                        'player_position': player_position
+                    }
+                )
 
-# Fonction pour envoyer la position de l'autre joueur
-# async def update_opponent_position(self, event):
-#     player_position = event['player_position']
+    # Fonction pour envoyer la position de l'autre joueur
+    async def update_opponent_position(self, event):
+        player_position = event['player_position']
 
-#     # Envoyer la position à l'adversaire
-#     await self.send(text_data=json.dumps({
-#         'action_type': 'update_opponent_position',
-#         'player_position': player_position
-#     }))
+        # Envoyer la position à l'adversaire
+        await self.send(text_data=json.dumps({
+            'action_type': 'update_opponent_position',
+            'player_position': player_position
+        }))

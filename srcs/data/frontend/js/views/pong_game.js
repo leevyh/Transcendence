@@ -1,19 +1,24 @@
 export { canvas } from './pong.js'; // space game
 // export var game; // statut game
+import { PongWebSocketManager } from './wsPongManager.js';
 export var anim;
 
-var game = {
-	player: {
-		score: 0
-	},
-	computer: {
-		score: 0,
-		speedRatio: 0.75
-	},
-	ball: {
-		r: 5,
-		speed: {}
-	}
+export var game = {
+    player1: {
+        score: 0,
+        movingDown : false,
+        movingUp : false
+    },
+    player2: {
+        score: 0,
+        speedRatio: 0.75,
+        movingDown : false,
+        movingUp : false
+    },
+    ball: {
+        r: 5,
+        speed: {}
+    }
 };
 
 const PLAYER_HEIGHT = 100;
@@ -21,8 +26,10 @@ const PLAYER_WIDTH = 5;
 const MAX_SPEED = 10;
 const PLAYER_SPEED = 9;
 
-var playerMovingUp = false;
-var playerMovingDown = false;
+// var player1MovingUp = false;
+// var player1MovingDown = false;
+// var player2MovingUp = false;
+// var player2MovingDown = false;
 var escapeDown = false;
 export let GameOn = false;
 var spaceDown = false;
@@ -41,10 +48,10 @@ export function draw() {
     context.lineTo(canvas.width / 2, canvas.height);
     context.stroke();
 
-    // draw player
+    // draw players
     context.fillStyle = 'white';
-    context.fillRect(0, game.player.y, PLAYER_WIDTH, PLAYER_HEIGHT);
-    context.fillRect(canvas.width - PLAYER_WIDTH, game.computer.y, PLAYER_WIDTH, PLAYER_HEIGHT);
+    context.fillRect(0, game.player1.y, PLAYER_WIDTH, PLAYER_HEIGHT);
+    context.fillRect(canvas.width - PLAYER_WIDTH, game.player2.y, PLAYER_WIDTH, PLAYER_HEIGHT);
 
     // Draw ball
     context.beginPath();
@@ -53,75 +60,61 @@ export function draw() {
     context.fill();
 }
 
-export function changeDirection(playerPosition) {
-    var impact = game.ball.y - playerPosition - PLAYER_HEIGHT / 2;
+export function changeDirection(currentPlayer) {
+    var impact = game.ball.y - currentPlayer.y - PLAYER_HEIGHT / 2;
     var ratio = 100 / (PLAYER_HEIGHT / 2);
 
     // get value 0 and 10
     game.ball.speed.y = Math.round(impact * ratio / 10);
 }
 
-export function movePlayerWithKeyboard() {
-    if (playerMovingUp) {
-        game.player.y -= PLAYER_SPEED;
+export function movePlayerWithKeyboard(currentPlayer) {
+    if (currentPlayer.movingUp) {
+        currentPlayer.y -= PLAYER_SPEED;
     }
-    if (playerMovingDown) {
-        game.player.y += PLAYER_SPEED;
+    if (currentPlayer.movingDown) {
+        currentPlayer.y += PLAYER_SPEED;
     }
 
     // player don't exit of canva
-    if (game.player.y < 0) {
-        game.player.y = 0;
-    } else if (game.player.y > canvas.height - PLAYER_HEIGHT) {
-        game.player.y = canvas.height - PLAYER_HEIGHT;
+    if (currentPlayer.y < 0) {
+        currentPlayer.y = 0;
+    } else if (currentPlayer.y > canvas.height - PLAYER_HEIGHT) {
+        currentPlayer.y = canvas.height - PLAYER_HEIGHT;
     }
-
-   // // Envoi des données au serveur via WebSocket
-    // if (socket && socket.readyState === WebSocket.OPEN) {
-    //     socket.send(JSON.stringify({
-    //         action_type: 'update_position',
-    //         player_position: game.player.y,
-    //         ball_position: {
-    //             x: game.ball.x,
-    //             y: game.ball.y
-    //         }
-    //     }));
-    // }
+    //PongWebSocketManager.sendPlayerPosition(currentPlayer.y);
 }
 
-// // Fonction pour mettre à jour la position du paddle de l'autre joueur
-// export function updateOpponentPosition(opponentPosition) {
-//     game.computer.y = opponentPosition;  // Met à jour la position de l'adversaire
+// Fonction pour mettre à jour la position du paddle de l'autre joueur
+export function updateOpponentPosition(opponentPosition) {
+    //game.player.y = opponentPosition;  // Met à jour la position de l'adversaire
+}
+
+// export function computerMove() {
+//     game.computer.y += game.ball.speed.y * game.computer.speedRatio;
 // }
 
-export function computerMove() {
-    game.computer.y += game.ball.speed.y * game.computer.speedRatio;
-}
-
-export function collide(player) {
+export function collide(currentPlayer) {
     // The player does not hit the ball
-    if (game.ball.y < player.y || game.ball.y > player.y + PLAYER_HEIGHT) {
+    if (game.ball.y < currentPlayer.y || game.ball.y > currentPlayer.y + PLAYER_HEIGHT) {
         reset();
 
         // Update score
-        if (player == game.player) {
-            game.computer.score++;
-            document.querySelector('#computer-score').textContent = game.computer.score;
+        if (currentPlayer == game.player2) {
+            game.player2.score++;
+            document.querySelector('#player2-score').textContent = game.player2.score;
         } else {
-            game.player.score++;
-            document.querySelector('#player-score').textContent = game.player.score;
+            game.player1.score++;
+            document.querySelector('#player1-score').textContent = game.player1.score;
         }
-   ///////     // Envoi des données au serveur via WebSocket
-        // if (socket && socket.readyState === WebSocket.OPEN) {
-        //     socket.send(JSON.stringify({
-        //         action_type: 'update_score',
-        //         player: player == game.player ? 'computer' : 'player'
-        //     }));
-        //
+        // PongWebSocketManager.sendScore({
+        //     player1: game.player1.score,
+        //     player2: game.player2.score
+        // });
     } else {
         // Change direction
         game.ball.speed.x *= -1;
-        changeDirection(player.y);
+        changeDirection(currentPlayer.y);
 
         // Increase speed if it has not reached max speed
         if (Math.abs(game.ball.speed.x) < MAX_SPEED) {
@@ -137,25 +130,15 @@ export function ballMove() {
     }
 
     if (game.ball.x > canvas.width - PLAYER_WIDTH) {
-        collide(game.computer);
+        collide(game.player2);
     } else if (game.ball.x < PLAYER_WIDTH) {
-        collide(game.player);
+        collide(game.player1);
     }
 
     game.ball.x += game.ball.speed.x;
     game.ball.y += game.ball.speed.y;
 
-    // // Envoi des données au serveur via WebSocket
-    // if (socket && socket.readyState === WebSocket.OPEN) {
-    //     socket.send(JSON.stringify({
-    //         action_type: 'update_ball_position',
-    //         ball_position: {
-    //             x: game.ball.x,
-    //             y: game.ball.y
-    //         }
-    //     }));
-    // }
-
+   // PongWebSocketManager.sendBallPosition({ x: game.ball.x, y: game.ball.y });
 }
 
 export function play() {
@@ -163,8 +146,10 @@ export function play() {
     if (GameOn == false)
         GameOn = true;
     draw();
-    movePlayerWithKeyboard();
-    computerMove();
+    //reset();
+    movePlayerWithKeyboard(game.player1);
+    movePlayerWithKeyboard(game.player2);
+    //computerMove();
     ballMove();
     anim = requestAnimationFrame(play);
 }
@@ -173,8 +158,8 @@ export function reset() {
     // Set ball and players to the center
     game.ball.x = canvas.width / 2;
     game.ball.y = canvas.height / 2;
-    game.player.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
-    game.computer.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
+    game.player1.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
+    game.player2.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
 
     // Reset speed
     game.ball.speed.x = 3;
@@ -188,25 +173,23 @@ export function stop() {
     reset();
 
     // Init score
-    game.computer.score = 0;
-    game.player.score = 0;
+    game.player1.score = 0;
+    game.player2.score = 0;
 
-    document.querySelector('#computer-score').textContent = game.computer.score;
-    document.querySelector('#player-score').textContent = game.player.score;
+    document.querySelector('#player1-score').textContent = game.player1.score;
+    document.querySelector('#player2-score').textContent = game.player2.score;
 
     draw();
     GameOn = false;
 }
 
 // Key Down
-export function handleKeyDown(event, stopButton) {
-    
+export function handleKeyDown(event, stopButton, currentPlayer) {
 	if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W')
-		playerMovingUp = true;
+		currentPlayer.movingUp = true;
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
-		playerMovingDown = true;
+		currentPlayer.movingDown = true;
     if (event.key === ' ' && GameOn == false) {
-        console.log("key down gamone = ", GameOn);
         play();
         spaceDown = true;
         stopButton.disabled = false;
@@ -235,12 +218,11 @@ export function handleKeyDown(event, stopButton) {
 }
 
 // Key Up
-export function handleKeyUp(event) {
-
+export function handleKeyUp(event, currentPlayer) {
 	if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W')
-		playerMovingUp = false;
+		currentPlayer.movingUp = false;
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
-		playerMovingDown = false;
+		currentPlayer.movingDown = false;
     if (event.key === "Escape")
         escapeDown = false;
     if (event.key === ' ')
