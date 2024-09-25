@@ -4,36 +4,36 @@ import { DEBUG, navigateTo } from '../../app.js';
 export let ChatWS = null;
 
 // Function for global container creation
-export async function createGlobalContainer() {
-    const globalContainer = document.createElement('div');
-    globalContainer.className = 'container-fluid container-chat';
+// export async function createGlobalContainer() {
+//     const globalContainer = document.createElement('div');
+//     globalContainer.className = 'container-fluid container-chat';
 
-    const usersContainer = await createUsersContainer();
-    globalContainer.appendChild(usersContainer);
+//     const usersContainer = await createUsersContainer();
+//     globalContainer.appendChild(usersContainer);
 
-    const chatContainer = await createChatContainer();
-    globalContainer.appendChild(chatContainer);
-    return globalContainer;
-}
+//     const chatContainer = await createChatContainer();
+//     globalContainer.appendChild(chatContainer);
+//     return globalContainer;
+// }
 
 // Function for users container creation
-async function createUsersContainer() {
-    const usersContainer = document.createElement('div');
-    usersContainer.className = 'col-md-4 users-container';
+// async function createUsersContainer() {
+//     const usersContainer = document.createElement('div');
+//     usersContainer.className = 'col-md-4 users-container';
 
-    const usersTitle = document.createElement('h5');
-    usersTitle.setAttribute('data-i18n', 'onlineUsers'); // TODO: For multilingual support
-    usersTitle.textContent = 'Online Users:';
+//     const usersTitle = document.createElement('h5');
+//     usersTitle.setAttribute('data-i18n', 'onlineUsers'); // TODO: For multilingual support
+//     usersTitle.textContent = 'Online Users:';
 
-    const usersList = document.createElement('ul');
-    usersList.className = 'list-group';
-    usersList.id = 'user-list';
+//     const usersList = document.createElement('ul');
+//     usersList.className = 'list-group';
+//     usersList.id = 'user-list';
 
-    usersContainer.appendChild(usersTitle);
-    usersContainer.appendChild(usersList);
+//     usersContainer.appendChild(usersTitle);
+//     usersContainer.appendChild(usersList);
 
-    return usersContainer;
-}
+//     return usersContainer;
+// }
 
 // Function for user card creation
 export function createUserCard(user, userList) {

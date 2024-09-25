@@ -17,9 +17,9 @@
     background-color: red;
 }
 
-.user-card {
+/* .user-card {
     width: 100%;
-}
+} */
 .user-connected {
     display: flex;
     flex-direction: row;
@@ -45,7 +45,7 @@
 
 
 .chat-container {
-    background-color: blue;
+    /* background-color: blue; */
     /* position: absolute; */
     /* left: 30%; */
     /* top: -250px; */

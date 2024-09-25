@@ -8,11 +8,13 @@ import { loginView } from './views/fr/login.js';
 import { registerView } from './views/fr/register.js';
 import { settingsView } from './views/fr/settings.js';
 import { passwordView } from './views/fr/password.js';
-import { chatView } from './views/fr/chat.js';
+// import { chatView } from './views/fr/chat.js';
 import { friendsView } from './views/friends.js';
 import { pongView } from './views/pong.js';
 import { profileView } from './views/profile.js';
 import { callback42 } from './views/fr/callback42.js';
+import { chatView } from './views/fr/chat.js';
+
 
 const appDiv = document.getElementById('app');
 
