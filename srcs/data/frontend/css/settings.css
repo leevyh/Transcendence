@@ -1,16 +1,16 @@
-.navigationBarDiv {
-	position: fixed;
-	top: 0;
-	left: 0;
-	height: 100%;
-	z-index: 1000;
-}
+/*.navigationBarDiv {*/
+/*	position: fixed;*/
+/*	top: 0;*/
+/*	left: 0;*/
+/*	height: 100%;*/
+/*	z-index: 1000;*/
+/*}*/
 
-@media screen and (max-width: 600px) {
-	.navigationBarDiv {
-		opacity: 0;
-	}
-}
+/*@media screen and (max-width: 600px) {*/
+/*	.navigationBarDiv {*/
+/*		opacity: 0;*/
+/*	}*/
+/*}*/
 
 .nav {
 	padding: 15px;
