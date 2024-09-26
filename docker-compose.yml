@@ -58,7 +58,8 @@ services:
     build: ./srcs/services/backend_logstash
     volumes:
       - backend-logstash:/usr/share/logstash/data/
-      - backend-django-logs:/usr/share/logstash/logs/
+      - backend-django-logs:/var/log/logstash/django/
+      - backend-postgresql-logs:/var/log/logstash/postgresql/
       - backend-elk-certs:/usr/share/logstash/config/certs/
     networks:
       - default
@@ -130,6 +131,7 @@ services:
     build: ./srcs/services/backend_postgresql
     volumes:
       - backend-postgresql:/var/lib/postgresql/
+      - backend-postgresql-logs:/var/log/postgresql/
       - backend-elk-certs:/usr/share/elastic-agent/config/certs/
     networks:
       - default
@@ -192,7 +194,7 @@ services:
         timeout: 10s
         retries: 120
     depends_on:
-      backend-fleet:
+      frontend-nginx:
         condition: service_healthy
     restart: on-failure
 

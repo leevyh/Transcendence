@@ -12,7 +12,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os, sys
 from pathlib import Path
+from pythonjsonlogger import jsonlogger
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -187,89 +190,32 @@ DATABASES = {
 	}
 }
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'logstash': {
-#             'level': 'INFO',
-#             'class': 'logstash.LogstashHandler',
-#             'host': 'backend-logstash',
-#             'port': 5959,
-#             'version': 1,
-#             'message_type': 'django',
-#             'fqdn': False,
-#             'tags': ['django'],
-#         },
-#         'console': {
-#             'level': 'INFO',
-#             'class': 'logging.StreamHandler',
-#         },
-#     },
-#     'loggers': {
-#         'backend': {
-#             'handlers': ['logstash', 'console'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#         'django': {
-#             'handlers': ['logstash', 'console'],
-#             'level': 'INFO',
-#             'propagate': True,
-#         },
-#     },
-# }
-
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'gelf_error': {
-#             'class': 'graypy.GELFUDPHandler',
-#             'host': 'backend-logstash',
-#             'port': 5959,
-#             'level': 'ERROR',
-#         },
-#         'gelf_info': {
-#             'class': 'graypy.GELFUDPHandler',
-#             'host': 'backend-logstash',
-#             'port': 5959,
-#             'level': 'INFO',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['gelf_error', 'gelf_info'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#     },
-# }
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
+	'formatters': {
+		'json': {
+			'()': jsonlogger.JsonFormatter,
+			'format': '%(levelname)s %(asctime)s %(module)s %(message)s',
         },
     },
     'handlers': {
-        'file': {
+        'logstash': {
+            'level': 'DEBUG',
+            'class': 'logstash.LogstashHandler',
+            'host': 'backend-logstash',
+            'port': 5959,
+            'version': 1,
+        },
+        'console': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': '/var/log/django/django.log',
-            'formatter': 'verbose',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['logstash', 'console'],
             'level': 'INFO',
             'propagate': True,
         },
