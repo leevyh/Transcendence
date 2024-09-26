@@ -1,7 +1,7 @@
 # views.py
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.utils.decorators import method_decorator
 from django.contrib.auth.hashers import make_password, check_password
 
@@ -77,6 +77,7 @@ def loginView(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+@csrf_protect
 def get_profile(request, nickname):
     if request.method == 'GET':
         try:
@@ -139,6 +140,7 @@ def get_friend_request(request, nickname):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+
 def get_Stats(request):
     if request.method == 'GET':
         try:
@@ -154,7 +156,6 @@ def get_Stats(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-# TODO: Create a filter to divide the users infos and settings
 @login_required(login_url='/api/login')
 def get_settings(request):
     if request.method == 'GET':
@@ -228,6 +229,7 @@ def all_users(request):
             return JsonResponse({'error': 'User not found'}, status=404)
 
 @login_required(login_url='/api/login')
+@csrf_protect
 def updateSettings(request):
     if request.method == 'PUT':
         try:
@@ -254,6 +256,8 @@ def updateSettings(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+@login_required(login_url='/api/login')
+@csrf_protect
 def updateAvatar(request):
     if request.method == 'PUT':
         try:
@@ -279,6 +283,8 @@ def updateAvatar(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+@login_required(login_url='/api/login')
+@csrf_protect
 def deleteAvatar(request):
     if request.method == 'DELETE':
         try:
@@ -303,6 +309,7 @@ def deleteAvatar(request):
 
 
 @login_required(login_url='/api/login')
+@csrf_protect
 def updateAccessibility(request):
     if request.method == 'PUT':
         try:
@@ -327,6 +334,7 @@ def updateAccessibility(request):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
+@csrf_protect
 def updatePassword(request):
     if request.method == 'PUT':
         try:
@@ -353,6 +361,7 @@ def updatePassword(request):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login') # TODO CHANGE THIS ROUTE TO GO
+@csrf_protect
 def update_Stats(request): #TODO without form and with json.loads. Need to changed if we use a view in python or views in js
     if request.method == 'POST':
         try:
@@ -393,7 +402,6 @@ def update_Stats(request): #TODO without form and with json.loads. Need to chang
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
-@csrf_exempt
 def logoutView(request):
     if request.method == 'POST':
         username = request.user.username
@@ -479,7 +487,7 @@ def create_user42(response, code):
     else:
         return 401
 
-@csrf_exempt
+@csrf_exempt #TODO: CHECK IF THIS IS THE RIGHT DECORATOR
 def token_42(request):
     if request.method == 'POST':
         print('request:', request.body)         # DEBUG
