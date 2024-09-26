@@ -10,7 +10,7 @@ class User_site(AbstractUser):
         OFFLINE = "offline"
         INGAME = "ingame"
 
-    nickname = models.CharField(max_length=255, unique=True)
+    nickname = models.CharField(max_length=10, unique=True)
     created_at = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=255, default=Status.OFFLINE, choices=Status.choices)
     avatar = models.ImageField(upload_to='avatar/', default='media/default.jpg')
