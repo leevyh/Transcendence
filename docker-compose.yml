@@ -102,6 +102,18 @@ services:
         condition: service_healthy
     restart: on-failure
 
+  backend-prometheus:
+    container_name: backend-prometheus
+    build: ./srcs/services/backend_prometheus
+    networks:
+      - default
+    ports:
+      - 9090:9090
+    depends_on:
+      backend-kibana:
+        condition: service_healthy
+    restart: on-failure
+
   backend-django:
     container_name: backend-django
     build: ./srcs/services/backend_django
@@ -140,7 +152,6 @@ services:
     env_file:
       - ./env/fleet.env
       - ./env/postgresql.env
-#      - ./srcs/services/backend_postgresql/conf/elastic-agent.env
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
