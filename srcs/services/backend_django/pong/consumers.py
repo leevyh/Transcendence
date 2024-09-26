@@ -19,7 +19,9 @@ class PongConsumer(AsyncWebsocketConsumer):
         # Ajouter le joueur dans la liste d'attente pour le matchmaking
         player = self.scope['user']  # On récupère l'utilisateur connecté
         if player.is_authenticated:
-            waiting_players.append((player, self.channel_name))
+            if player not in waiting_players:
+                print(f"Adding {player.username} to the waiting list")
+                waiting_players.append((player, self.channel_name))
 
             # Si deux joueurs sont en attente, créer une partie
             if len(waiting_players) >= 2:
@@ -88,6 +90,27 @@ class PongConsumer(AsyncWebsocketConsumer):
                     {
                         'type': 'update_opponent_position',
                         'player_position': player_position
+                    }
+                )
+        if action_type == 'update_score':
+            player_score = data.get('player_score')
+            if hasattr(self, 'game_id'):
+                await self.channel_layer.group_send(
+                    f"game_{self.game_id}",
+                    {
+                        'type': 'update_opponent_score',
+                        'player_score': player_score
+                    }
+                )
+        if action_type == 'update_ball_position':
+            ball_position = data.get('ball_position')
+            console.log(ball_position)
+            if hasattr(self, 'game_id'):
+                await self.channel_layer.group_send(
+                    f"game_{self.game_id}",
+                    {
+                        'type': 'update_ball_position',
+                        'ball_position': ball_position
                     }
                 )
 

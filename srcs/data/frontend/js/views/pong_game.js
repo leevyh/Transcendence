@@ -82,17 +82,13 @@ export function movePlayerWithKeyboard(currentPlayer) {
     } else if (currentPlayer.y > canvas.height - PLAYER_HEIGHT) {
         currentPlayer.y = canvas.height - PLAYER_HEIGHT;
     }
-    //PongWebSocketManager.sendPlayerPosition(currentPlayer.y);
+    PongWebSocketManager.sendPlayerPosition(currentPlayer.y);
 }
 
 // Fonction pour mettre à jour la position du paddle de l'autre joueur
 export function updateOpponentPosition(opponentPosition) {
     //game.player.y = opponentPosition;  // Met à jour la position de l'adversaire
 }
-
-// export function computerMove() {
-//     game.computer.y += game.ball.speed.y * game.computer.speedRatio;
-// }
 
 export function collide(currentPlayer) {
     // The player does not hit the ball
@@ -107,14 +103,14 @@ export function collide(currentPlayer) {
             game.player1.score++;
             document.querySelector('#player1-score').textContent = game.player1.score;
         }
-        // PongWebSocketManager.sendScore({
-        //     player1: game.player1.score,
-        //     player2: game.player2.score
-        // });
+        PongWebSocketManager.sendScore({
+            player1: game.player1.score,
+            player2: game.player2.score
+        });
     } else {
         // Change direction
         game.ball.speed.x *= -1;
-        changeDirection(currentPlayer.y);
+        changeDirection(currentPlayer);
 
         // Increase speed if it has not reached max speed
         if (Math.abs(game.ball.speed.x) < MAX_SPEED) {
@@ -138,7 +134,8 @@ export function ballMove() {
     game.ball.x += game.ball.speed.x;
     game.ball.y += game.ball.speed.y;
 
-   // PongWebSocketManager.sendBallPosition({ x: game.ball.x, y: game.ball.y });
+    
+    PongWebSocketManager.sendBallPosition({ x: game.ball.x, y: game.ball.y });
 }
 
 export function play() {
@@ -168,7 +165,7 @@ export function reset() {
 
 export function stop() {
 
-    console.log("start of stop");
+    console.log("stop game");
     cancelAnimationFrame(anim);
     reset();
 
@@ -200,7 +197,6 @@ export function handleKeyDown(event, stopButton, currentPlayer) {
         spaceDown = true;
         stop();
         console.log("ESPACE key down gamone = ", GameOn);
-        startButton.disabled = false;
         stopButton.disabled = true;
     }
     if (event.key === "Escape")
@@ -208,7 +204,6 @@ export function handleKeyDown(event, stopButton, currentPlayer) {
         escapeDown = true;
         stop();
         console.log("ECHAP key down gamone = ", GameOn);
-        startButton.disabled = false;
         stopButton.disabled = true;
     }
     if (event.key === ' ' && !GameOn) {

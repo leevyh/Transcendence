@@ -149,7 +149,6 @@ export async function pongView(container) {
 
 // Fonction pour démarrer le décompte
 function startCountdown() {
-    console.log("startCountdown");
     let countdownValue = 3; // Décompte de 3 secondes
 
     // Créer dynamiquement un élément pour afficher le décompte

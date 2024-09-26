@@ -51,6 +51,7 @@ export const PongWebSocketManager = {
                 action_type: 'update_ball_position',
                 ball_position: ballPosition
             };
+            console.log('Sending ball position:', data);
             this.socket.send(JSON.stringify(data));
         }
     },
@@ -81,7 +82,7 @@ export const PongWebSocketManager = {
     // Fonction appelée pour mettre à jour le score
     updateScore(scores) {
         console.log('Updating scores:', scores);
-        document.querySelector('#player-score').textContent = scores.player;
-        document.querySelector('#computer-score').textContent = scores.computer;
+        document.querySelector('#player1-score').textContent = scores.player;
+        document.querySelector('#player2-score').textContent = scores.computer;
     }
 };
