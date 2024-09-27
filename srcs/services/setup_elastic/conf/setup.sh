@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ "x$ELASTIC_PASSWORD" = "x" ]; then
   echo "ELASTIC_PASSWORD environment variable not set";
