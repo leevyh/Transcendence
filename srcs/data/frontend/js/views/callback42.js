@@ -1,4 +1,4 @@
-import { DEBUG, navigateTo } from '../../app.js';
+import { DEBUG, navigateTo } from '../app.js';
 
 export function callback42(container) {
     container.innerHTML = '';

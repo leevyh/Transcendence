@@ -1,4 +1,4 @@
-import { navBar } from './fr/nav.js';
+import { navigationBar } from './navigation.js';
 
 import {
     play,
@@ -37,14 +37,14 @@ export function pongView(container) {
     div.className = 'd-flex h-100';
     container.appendChild(div);
 
-    const navigationBar = navBar(container);
-    div.appendChild(navigationBar);
+    const navBarContainer = navigationBar(container);
+    div.appendChild(navBarContainer);
 
 	loadPongCSS();  // CSS
 
     // HTML
-    const main = document.createElement('div');
-    main.className = 'PongDiv';
+    const viewContainer = document.createElement('div');
+    viewContainer.className = 'PongDiv';
 
     const ul = document.createElement('ul');
     ul.className = 'd-flex justify-content-center';
@@ -76,11 +76,11 @@ export function pongView(container) {
     scoreP.className = 'd-flex justify-content-center';
     scoreP.innerHTML = 'Joueur 1 : <em id="player-score">0</em> - Joueur 2 : <em id="computer-score">0</em>';
 
-    main.appendChild(ul);
-    main.appendChild(canvasElement);
-    main.appendChild(scoreP);
+    viewContainer.appendChild(ul);
+    viewContainer.appendChild(canvasElement);
+    viewContainer.appendChild(scoreP);
 
-    div.appendChild(main);
+    div.appendChild(viewContainer);
 
     canvas = document.getElementById('canvas');
 

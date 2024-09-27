@@ -1,5 +1,5 @@
-import { DEBUG, navigateTo } from '../../app.js';
-import { getCookie } from '../utils.js';
+import { DEBUG, navigateTo } from '../app.js';
+import { getCookie } from './utils.js';
 export let chatWS = null;
 
 
@@ -340,7 +340,7 @@ export async function openConversation(conversationID, otherUser) {
     const profileButton = document.getElementById('view-profile-button');
     profileButton.style.display = 'block';
     profileButton.addEventListener('click', () => {
-        navigateTo(`/profile/${otherUser}`);
+        navigateTo(`/user/${otherUser}`);
     });
 
     const inviteGameButton = document.querySelector('.invite-game-button');
