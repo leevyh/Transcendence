@@ -67,7 +67,13 @@ body {
     width: 100%;
     height: 100%;
     opacity: 0;
+    position: fixed; /* La modal sera fixée sur la page */
+    top: 0;
+    left: 0;
+    z-index: 1050; /* Assure qu'elle reste au-dessus des autres éléments */
+    backdrop-filter: blur(10px); /* Adjust blur level */
 }
+
 
 .ModalLoginBase-show {
     opacity: 1;
@@ -84,21 +90,24 @@ body {
     border-radius: 10px;
     position: relative;
     transition: transform 0.5s ease, opacity 0.5s ease ;
-    transform: translateY(-1000px);
+    transform: translateY(-100vh);
+    opacity: 0;
 }
 
+.modalRegisterBody {
+    display: none;
+}
 .modalLoginTitle {
     color : #F4ED37;
-    cursor: pointer;
-
 }
 
 .modalLoginContent{
+    width: auto;
     background-color: rgba(255, 234, 234, 0.5);
 }
 
-.ModalLoginBase-show .ModalLogin {
-    transform: translateY(0px);
+.ModalLoginBase-show .ModalLogin .ModalRegister{
+    transform: translateY(0);
     opacity: 1;
 }
 
@@ -117,12 +126,22 @@ body {
     justify-content: space-between;
 
 }
-.close-button:hover,
-.close-button:focus {
+
+.modalLoginDialog {
+    width: auto; /* Permet à la modal de s'adapter au contenu */
+}
+
+.closeButtonLogin {
+    cursor: crosshair;
+}
+
+.closeButtonLogin:hover,
+.closeButtonLogin:focus {
     color: #000;
     text-decoration: none;
     cursor: pointer;
 }
+
 
 .ButtonLogin {
     padding: 5px;
@@ -138,6 +157,77 @@ body {
     box-shadow: #435574 0px 4px 12px;
 }
 
+/*=====================Modal-Register========*/
+.ModalRegisterBase {
+
+    backdrop-filter: blur(10px);
+    margin: auto;
+    padding: 20px;
+    width: 100%;
+    opacity: 96%;
+
+}
+
+.modalRegisterDialog {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+}
+.ModalRegisterContent{
+
+    opacity: 0; /* Commence par être invisible */
+    transform: translateY(-20px); /* Décale légèrement vers le haut */
+    transition: opacity 0.5s ease, transform 0.5s ease; /* Durée de l'animation */
+    background-color: rgba(255, 234, 234, 0.5) !important;
+    padding: 5px;
+    width: auto;
+}
+
+.modalRegisterBase-show .ModalRegisterContent {
+    opacity: 1; /* Rendre visible */
+    transform: translateY(0); /* Remet à sa position d'origine */
+}
+
+
+.modalRegister {
+    background-color: rgba(255, 234, 234, 0.5) !important;
+    backdrop-filter: blur(10px);
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%;
+    border-radius: 10px;
+    position: relative;
+    transition: transform 0.5s ease, opacity 0.5s ease ;
+    transform: translateY(-100vh);
+    opacity: 0;
+}
+
+
+.formRegister {
+    padding: 15px;
+}
+
+.ButtonRegisterSubmit {
+    padding: 10px;
+}
+
+.closeRegisterButton {
+    color: #000;
+    position: absolute;
+    top: 30px;
+    right: 20px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.closeRegisterButton:hover,
+.closeRegisterButton:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
 /*Livia */
 
 #error404 {

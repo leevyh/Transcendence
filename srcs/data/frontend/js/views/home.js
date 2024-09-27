@@ -43,7 +43,7 @@ export function homeView(container) {
     container.appendChild(modalLogin);
 
     const modalLoginDialog = document.createElement('div');
-    modalLoginDialog.className = 'modal-dialog modalLoginDialog';
+    modalLoginDialog.className = 'modal-dialog-centered d-flex justify-content-center align-items-center modalLoginDialog';
     modalLogin.appendChild(modalLoginDialog);
 
     const modalLoginContent = document.createElement('div');
@@ -51,7 +51,7 @@ export function homeView(container) {
     modalLoginDialog.appendChild(modalLoginContent);
 
     const modalLoginHeader = document.createElement('div');
-    modalLoginHeader.className = 'modal-header border-bottom border-custom-color pb-2 modalLoginHeader';
+    modalLoginHeader.className = 'modal-header pb-2 border border-0 modalLoginHeader';
     modalLoginContent.appendChild(modalLoginHeader);
 
     const modalLoginTitle = document.createElement('h2');
@@ -81,8 +81,8 @@ export function homeView(container) {
     const formLogin = document.createElement('form');
 
     const fields = [
-        { label: "Username", type: 'text', id: 'username', placeholder: "Username" },
-        { label: 'Password', type: 'password', id: 'password', placeholder: 'Entrez votre mot de passe' },
+        { label: "Username", type: 'text', id: 'username', placeholder: "Your Username" },
+        { label: 'Password', type: 'password', id: 'password', placeholder: 'Your Password' },
     ];
 
     fields.forEach(field => {
@@ -108,8 +108,8 @@ export function homeView(container) {
 
     const submitLoginButton = document.createElement('button');
     submitLoginButton.type = 'submit';
-    submitLoginButton.className = 'btn btn-primary w-100 ButtonLogin';
-    submitLoginButton.textContent = 'Se connecter';
+    submitLoginButton.className = 'btn btn-primary w-100 ButtonLogin mb-3';
+    submitLoginButton.textContent = 'Sign in';
     formLogin.appendChild(submitLoginButton);
 
     formLogin.addEventListener('submit', (event) => {
@@ -124,7 +124,7 @@ export function homeView(container) {
         if (!username || !password) {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
-            errorMessage.textContent = 'Tous les champs sont obligatoires';
+            errorMessage.textContent = 'All fields are required';
             formLogin.insertBefore(errorMessage, submitLoginButton);
             return;
         }
@@ -149,14 +149,14 @@ export function homeView(container) {
                 } else if (data.error) {
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'text-danger';
-                    errorMessage.textContent = 'Mauvais mot de passe ou nom d\'utilisateur';
+                    errorMessage.textContent = 'Bad password or Username';
                     formLogin.insertBefore(errorMessage, submitLoginButton);
                 }
             })
             .catch(error => {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
+                errorMessage.textContent = 'An error has occurred. Please try again.';
                 formLogin.insertBefore(errorMessage, submitLoginButton);
             });
     });
@@ -164,7 +164,7 @@ export function homeView(container) {
     // Connection avec 42
     const buttonLogin42 = document.createElement('button');
     buttonLogin42.className = 'btn btn-dark w-100 ButtonLogin42';
-    buttonLogin42.textContent = 'Se connecter avec 42';
+    buttonLogin42.textContent = 'Sign in with 42';
     formLogin.appendChild(buttonLogin42);
 
     buttonLogin42.addEventListener('click', (event) => {
@@ -184,16 +184,11 @@ export function homeView(container) {
             .catch(error => {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
+                errorMessage.textContent = 'An error has occurred. Please try again.';
                 formLogin.appendChild(errorMessage);
             });
     });
-
-    /////////////////////////////////////////////////////////////////
-    // Modal-Register (similaire à modalLogin, à adapter)
-    /////////////////////////////////////////////////////////////////
-
-    // Ajout de l'événement pour afficher la modal
+    // // Ajout de l'événement pour afficher la modal
     ButtonLoginHome.addEventListener('click', () => {
         modalLogin.style.display = 'block'; // Affiche la modal
         setTimeout(() => {
@@ -201,161 +196,191 @@ export function homeView(container) {
         }, 10); // Légère temporisation pour l'effet d'animation
     });
 
-    // Gestion de la fermeture avec un clic en dehors de la modal
-    window.addEventListener('click', (event) => {
-        if (event.target === modalLogin) {
-            modalLogin.classList.remove('ModalLoginBase-show');
-            setTimeout(() => {
-                modalLogin.style.display = 'none';
-            }, 500);
+    /////////////////////////////////////////////////////////////////
+
+    // Modal-Register
+    const modalRegister = document.createElement('div');
+    modalRegister.className = 'modal ModalRegisterBase';
+    modalRegister.style.display = 'none'; // Cachée par défaut
+    container.appendChild(modalRegister);
+
+    const modalRegisterDialog = document.createElement('div');
+    modalRegisterDialog.className = 'modal-dialog-centered d-flex justify-content-center align-items-center modal-md modalRegisterDialog';
+    modalRegister.appendChild(modalRegisterDialog);
+
+    // Créer le contenu de la modale
+    const modalRegisterContent = document.createElement('div');
+    modalRegisterContent.className = 'modal-content text-body w-auto ModalRegisterContent';
+    modalRegisterDialog.appendChild(modalRegisterContent);
+
+    const modalRegisterHeader = document.createElement('div');
+    modalRegisterHeader.className = 'modal-header pb-2 border border-0 modalLoginHeader';
+    modalRegisterContent.appendChild(modalRegisterHeader);
+
+        // Titre du formulaire
+    const modalRegisterTitle = document.createElement('h2');
+    modalRegisterTitle.textContent = 'Register';
+    modalRegisterTitle.className = 'modalLoginTitle'
+    modalRegisterHeader.appendChild(modalRegisterTitle);
+
+    // Bouton pour fermer la modale
+    const closeRegisterButton = document.createElement('span');
+    closeRegisterButton.className = 'closeRegisterButton';
+    closeRegisterButton.textContent = '×'; // Symbole de fermeture
+    modalRegisterHeader.appendChild(closeRegisterButton);
+
+    closeRegisterButton.addEventListener('click', () => {
+        modalRegister.classList.remove('modalRegisterBase-show');
+        setTimeout(() => {
+            modalRegister.style.display = 'none';
+        }, 50);
+    });
+
+    const modalRegisterBody = document.createElement('div');
+    modalRegisterBody.className = 'modal-body modalRegisterBody';
+    modalRegisterContent.appendChild(modalRegisterBody);
+
+    // Créer le formulaire
+    const formRegister = document.createElement('form');
+    formRegister.className = 'formRegister';
+    modalRegisterBody.appendChild(formRegister);
+    // Champs du formulaire
+    const fieldsRegister = [
+        { label: 'Username' , type: 'text', id: 'usernameRe', placeholder: 'Your username' },
+        { label: 'Nickname', type: 'text', id: 'nicknameRe', placeholder: 'Your nickname' },
+        { label: 'Mail address', type: 'email', id: 'emailRe', placeholder: 'Your mail address' },
+        { label: 'Password', type: 'password', id: 'passwordRe', placeholder: 'Your password' },
+        { label: 'Confirm password ', type: 'password', id: 'confirmpasswordRe', placeholder: 'Your password' },
+    ];
+
+    fieldsRegister.forEach(fieldRegister => {
+        const formGroup = document.createElement('div');
+        formGroup.className = 'mb-3';
+        formRegister.appendChild(formGroup);
+
+        const label = document.createElement('label');
+        label.className = 'form-label titleLabelRegister';
+        label.htmlFor = fieldRegister.id;
+        label.textContent = fieldRegister.label;
+        formGroup.appendChild(label);
+
+        const input = document.createElement('input');
+        input.type = fieldRegister.type;
+        input.className = 'form-control FormChamp';
+        input.id = fieldRegister.id;
+        input.placeholder = fieldRegister.placeholder;
+
+        formGroup.appendChild(input);
+
+    });
+
+
+    // Bouton de soumission
+    const submitRegisterButton = document.createElement('button');
+    submitRegisterButton.setAttribute('type', 'submit');
+    submitRegisterButton.className = 'btn btn-primary w-100 submit ButtonLogin ButtonRegisterSubmit';
+    submitRegisterButton.textContent = "Register";
+    formRegister.appendChild(submitRegisterButton);
+
+    formRegister.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        // Suppression des messages d'erreur précédents
+        const errorMessages = formRegister.querySelectorAll('.text-danger');
+        errorMessages.forEach(message => message.remove());
+
+        // Récupérer les valeurs des champs ajoutés dans le formulaire
+        const usernameRe = document.getElementById('usernameRe').value;
+        const nicknameRe = document.getElementById('nicknameRe').value;
+        const emailRe = document.getElementById('emailRe').value;
+        const passwordRe = document.getElementById('passwordRe').value;
+        const confirmPasswordRe = document.getElementById('confirmpasswordRe').value;
+
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,12}$/;
+        // Si un champ est vide
+        if (!usernameRe || !nicknameRe || !emailRe || !passwordRe || !confirmPasswordRe) {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'All fields are required';
+            formRegister.insertBefore(errorMessage, submitRegisterButton);
+            return;
         }
+        // Si les mots de passe ne correspondent pas
+        else if (passwordRe !== confirmPasswordRe) {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Les mots de passe ne correspondent pas';
+            formRegister.insertBefore(errorMessage, submitRegisterButton);
+            return;
+        }
+        // Si le nouveau mot de passe a la bonne forme
+        // else if (!passwordRegex.test(password)) {
+        //     const errorMessage = document.createElement('p');
+        //     errorMessage.className = 'text-danger';
+        //     errorMessage.textContent = 'Le mot de passe doit contenir entre 8 et 12 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre';
+        //     formRegister.insertBefore(errorMessage, submitRegisterButton);
+        //     return;
+        // }
+
+
+        // Envoi des données du formulaire
+        fetch('/api/register/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(
+                {
+                    username: usernameRe,
+                    password: passwordRe,
+                    nickname: nicknameRe,
+                    email: emailRe,
+                    // language: 'en'
+                }
+            )
+        })
+        .then(response => {
+            if (!response.ok) {
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'Erreur lors de l\'inscription, veuillez réessayer';
+                formRegister.insertBefore(errorMessage, submitRegisterButton);
+            }
+            else {
+                // Si l'inscription est réussie, on ferme la modale et on ouvre la modale de connexion
+                modalRegister.classList.remove('ModalLoginBase-show');
+                setTimeout(() => {
+                    modalRegister.style.display = 'none';
+                }, 500); // Même délai pour l'animation de fermeture
+                modalRegister.classList.add('ModalLoginBase-show');
+                setTimeout(() => {
+                    modalRegister.style.display = 'flex';
+                }, 10); // Petit délai pour activer la transition après l'affichage
+
+                // event.preventDefault();
+                // navigateTo('/login');
+            }
+        })
+        .catch(error => {
+            if (DEBUG) {console.error('Erreur lors de l\'inscription', error);}
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Erreur lors de l\'inscription, veuillez réessayer';
+            formRegister.insertBefore(errorMessage, submitRegisterButton);
+            });
+    });
+    modalRegisterBody.appendChild(formRegister);
+
+    modalRegisterContent.appendChild(formRegister);
+
+    ButtonRegisterHome.addEventListener('click', () => {
+        // Affiche la modal
+        modalRegister.style.display = 'block';
+        setTimeout(() => {
+            modalRegister.classList.add('modalRegisterBase-show'); // Ajoute la classe pour l'animation
+        }, 10); // Légère temporisation pour l'effet d'animation
+
     });
 
 }
-// Connection with 42
-    // const buttonLogin42 = document.createElement('button');
-    // buttonLogin42.className = 'btn btn-dark w-100 ButtonLogin42';
-    // buttonLogin42.textContent = 'Se connecter avec 42';
-    // formLogin.appendChild(buttonLogin42);
-
-    // buttonLogin42.addEventListener('click', (event) => {
-    //     event.preventDefault();
-    //     fetch('/api/auth/', {
-    //         method: 'GET',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //         },
-    //     })
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             if (data.url) {
-    //                 window.location.href = data.url;
-    //             }
-    //         })
-    //         .catch(error => {
-    //             const errorMessage = document.createElement('p');
-    //             errorMessage.className = 'text-danger';
-    //             errorMessage.textContent = 'Une erreur s\'est produite. Veuillez réessayer.';
-    //             formLogin.appendChild(errorMessage);
-    //         });
-
-
-
-
-// function closeModal(event, modal) {
-//     if (event.target === modal) {
-//         modal.classList.remove('ModalLoginBase-show');
-//         setTimeout(() => {
-//             modal.style.display = 'none';
-//         }, 500);
-//     }
-// }
-
-
-// export function homeView(container) {
-//     container.innerHTML = '';
-
-//     // Creation d'un div base
-//     const base = document.createElement('div');
-//     base.className = 'base';
-//     container.appendChild(base);
-
-//     const h5 = document.createElement('h5');
-//     h5.className = 'titleWelcome';
-//     h5.setAttribute('data-i18n', 'home');
-//     h5.textContent = 'Welcome';
-//     base.appendChild(h5);
-
-//     const divContener = document.createElement('div');
-//     divContener.className = 'contener';
-//     base.appendChild(divContener);
-
-//     const divCardBody = document.createElement('div');
-//     divCardBody.className = 'card-body twodivWelcome welcome';
-//     divContener.appendChild(divCardBody);
-
-//     const p = document.createElement('p');
-//     p.className = 'paragraphWelcome';
-//     p.setAttribute('data-i18n', 'homeText');
-//     p.textContent = 'This is our transcendence homepage. This project involves creating a website for the mighty Pong competition! We hope you enjoy your visit to our site.';
-//     divCardBody.appendChild(p);
-
-//     // Creation d'une liste de boutons
-//     const ul = document.createElement('ul');
-//     ul.className = 'listButton';
-//     divCardBody.appendChild(ul);
-
-//     const liLogin = document.createElement('li');
-//     liLogin.className = 'listElemWelcome';
-//     ul.appendChild(liLogin);
-
-//     const buttonLogin = document.createElement('button');
-//     buttonLogin.className = 'btn btn-primary Buttonselem';
-//     buttonLogin.setAttribute('data-i18n', 'login');
-//     buttonLogin.textContent = 'Login'; // Ou 'Sign in'
-//     buttonLogin.addEventListener('click', (event) => {
-//         event.preventDefault();
-//         navigateTo('/' + choiceLanguage + '/login');
-//     });
-//     liLogin.appendChild(buttonLogin);
-
-//     const liRegister = document.createElement('li');
-//     liRegister.className = 'listElemWelcome';
-//     ul.appendChild(liRegister);
-
-//     const buttonRegister = document.createElement('button');
-//     buttonRegister.className = 'btn btn-primary Buttonselem';
-//     buttonRegister.setAttribute('data-i18n', 'register');
-//     buttonRegister.textContent = 'Register'; // Ou 'Sign up'
-//     buttonRegister.addEventListener('click', (event) => {
-//         event.preventDefault();
-//         navigateTo('/' + choiceLanguage + '/register');
-//     });
-//     liRegister.appendChild(buttonRegister);
-
-//     // Image de pong
-//     const img = document.createElement('img');
-//     img.setAttribute('src', '/assets/pong.png');
-//     img.setAttribute('alt', 'Pong');
-
-//     img.className = 'object-fit-fill border rounded twodivWelcome imgLogin';
-//     divContener.appendChild(img);
-
-//     // SELECTEUR DE LANGUE
-//     const languageDiv = document.createElement('div');
-//     languageDiv.id = 'language';
-
-//     const languageLabel = document.createElement('label');
-//     languageLabel.htmlFor = 'language-selector';
-//     languageLabel.setAttribute('data-i18n', 'language_selector');
-//     languageLabel.textContent = 'Language: ';
-//     languageLabel.className = 'languageLabel';
-//     languageDiv.appendChild(languageLabel);
-
-//     const languageSelector = document.createElement('select');
-//     languageSelector.id = 'language-selector';
-
-//     const optionEn = document.createElement('option');
-//     optionEn.value = 'en';
-//     optionEn.innerHTML = '🇬🇧';
-
-//     const optionFr = document.createElement('option');
-//     optionFr.value = 'fr';
-//     optionFr.innerHTML = '🇫🇷';
-
-//     const optionEs = document.createElement('option');
-//     optionEs.value = 'sp';
-//     optionEs.innerHTML = '🇪🇸';
-
-//     languageSelector.appendChild(optionEn);
-//     languageSelector.appendChild(optionFr);
-//     languageSelector.appendChild(optionEs);
-//     languageDiv.appendChild(languageSelector);
-//     base.appendChild(languageDiv);
-
-//     let choiceLanguage = 'en';
-//     document.querySelector("#language-selector").addEventListener("change", function() {
-//         choiceLanguage = this.value;
-//         changeLanguage(choiceLanguage);
-//     });
-// }
