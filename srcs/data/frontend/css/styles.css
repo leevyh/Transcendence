@@ -61,13 +61,6 @@ body {
 
 /* =======================MODAL-LOGIN===========================*/
 .ModalLoginBase {
-
-    display: flex;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    /* background-color: rgba(167, 167, 167, 0.5); */
     justify-content: center;
     align-items: center;
     transition: opacity 0.5s ease;
@@ -81,7 +74,7 @@ body {
 }
 
 .ModalLogin {
-    /* background-color: rgba(167, 167, 167, 0.5); */
+
     background-color: rgba(255, 234, 234, 0.5);
     backdrop-filter: blur(10px);
     margin: auto;
@@ -91,7 +84,7 @@ body {
     border-radius: 10px;
     position: relative;
     transition: transform 0.5s ease, opacity 0.5s ease ;
-    transform: translateY(-1000px); /* Départ de l'animation, hors écran */
+    transform: translateY(-1000px);
 }
 
 .modalLoginTitle {
@@ -100,8 +93,12 @@ body {
 
 }
 
+.modalLoginContent{
+    background-color: rgba(255, 234, 234, 0.5);
+}
+
 .ModalLoginBase-show .ModalLogin {
-    transform: translateY(0px); /* L'animation ramène la modale au centre */
+    transform: translateY(0px);
     opacity: 1;
 }
 
@@ -115,6 +112,11 @@ body {
     cursor: pointer;
 }
 
+.modalLoginHeader{
+    display: flex;
+    justify-content: space-between;
+
+}
 .close-button:hover,
 .close-button:focus {
     color: #000;

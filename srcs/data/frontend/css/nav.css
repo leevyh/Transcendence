@@ -1,4 +1,4 @@
-/* .navigationBarDiv {
+.navigationBarDiv {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -6,13 +6,15 @@
 	z-index: 1000;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 600px) {
 	.navigationBarDiv {
 		opacity: 0;
 	}
-} */
+}
 
-/* .nav {
+.nav {
+	padding: 15px;
+	/* width: min-content; */
     height: 100%;
 	background-color: #435574;
 	border-top-right-radius: 35px;
@@ -49,8 +51,9 @@
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 }
+
 .border-custom-color {
-    border-color: #000000 !important;
+    border-color: #000000 !important;  /* Exemple avec une couleur orange */
 }
 
 .divListFriends {
@@ -66,36 +69,40 @@ button.buttonLogOut {
 }
 
 button.buttonLogOut:active {
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Ombre plus forte au clic */
 }
 
-.modal-content {
+
+/*MODAL*/
+.modalInfoContent {
 	background-color: rgba(255, 234, 234, 0.5);
-	transition: transform 0.5s ease, opacity 0.5s ease;
-	transform: translateX(-100vw);
-	opacity: 0 ;
+	transition: transform 0.5s ease, opacity 0.5s ease; /* S'assurer que la transition est appliquée */
+	transform: translateX(-100vw); /* Part de la gauche en dehors de l'écran */
+	opacity: 0 ; /* Initialement invisible */
+	/* transition: transform 0.5s ease, opacity 0.5s ease ; */
+	/* transform: translateY(-1000px); Départ de l'animation, hors écran */
 }
 
-.modal.fade.show .modal-content {
-	transform: translateX(0);
-	opacity: 1 ;
+.modalInfo.fade.show .modalInfoContent {
+	transform: translateX(0); /* Ramener à la position d'origine */
+	opacity: 1 ; /* Rendre visible */
 }
 
-.modal-header {
+.modalInfoHeader {
 	justify-content: space-between;
 }
 
-.modal-title {
+.modalInfoTitle {
 	color : #F4ED37;
 }
 
-.modal-dialog {
+.modalInfoDialog {
 	position: relative;
-    margin: 0 !important;
-    top: auto;
-    left: auto;
-	max-width: 400px !important;
-    width: auto !important;
+    margin: 0 !important;  /* Désactiver la marge centrale par défaut */
+    top: auto;  /* Désactiver la position centrale verticale par défaut */
+    left: auto; /* Désactiver la position centrale horizontale par défaut */
+	max-width: 400px !important; /* Limiter la largeur à 400px ou à une taille adaptée */
+    width: auto !important;  /* Permettre à la modal de s'adapter automatiquement au contenu étendre sans restriction de largeur */
 }
 
 #closeButtonInfos {
@@ -131,5 +138,4 @@ button.buttonLogOut:active {
 	color: #000;
     text-decoration: none;
     cursor: pointer;
-} */
-
+}
