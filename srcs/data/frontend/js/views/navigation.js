@@ -25,7 +25,7 @@ export function navigationBar(container) {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
-            }).then(() => navigateTo('/login'));
+            }).then(() => navigateTo('/'));
             return null;
         } else {
             if (DEBUG) {console.error('Error:', response);}

@@ -1,0 +1,202 @@
+/* general */
+.card {
+    border-bottom: 0 !important;
+}
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+    border-bottom: 0 !important;
+}
+.card-footer {
+    border-radius: 0 0 15px 15px !important;
+    border-top: 0 !important;
+}
+
+@media screen and (max-width: 560px) {
+    .container-fluid {
+        flex-direction: column;
+    }
+}
+
+/* NAVIGATION BAR */
+.navigationBarDiv {
+    width: 250px; /* Taille fixe de la navigation */
+}
+
+/* VIEW CHAT */
+.user-img {
+    height: 40px;
+    width: 40px;
+}
+
+/* CONTACTS-DIV */
+.contacts {
+    flex: 2; /* La colonne des contacts occupe l'espace restant */
+}
+
+/* CONTACTS-CARD */
+.contacts-card {
+    border-radius: 15px !important;
+    background-color: rgb(67, 85, 116);
+}
+
+.status-icon {
+    height: 10px;
+    width: 10px;
+}
+
+.user-info span {
+    font-size: 15px;
+    color: white;
+    cursor: pointer;
+}
+
+.user-info p {
+    font-size: 8px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.block-button {
+    background-color: rgb(67, 85, 116);
+}
+
+/* CONTACTS-BODY */
+.contacts-body {
+    padding: 0.75rem 0 !important;
+    white-space: nowrap;
+}
+
+.contacts-body::-webkit-scrollbar {
+    width: 10px;
+}
+
+.contacts-body::-webkit-scrollbar-thumb {
+    background-color: #435574;
+    border-radius: 10px;
+}
+
+.contacts-body::-webkit-scrollbar-track {
+    background-color: #1d2d45;
+    border-radius: 10px;
+}
+
+/* CONTACTS-HEADER */
+.search {
+    font-size: 10px;
+    border-radius: 15px 0 0 15px !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.search::placeholder {
+    color: white;
+}
+
+.search:focus {
+    color:white;
+    box-shadow: none !important;
+    outline: 0px !important;
+}
+
+.search-btn {
+    border-radius: 0 15px 15px 0 !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* CHAT-DIV */
+.chat {
+    flex: 6; /* La colonne de chat occupe l'espace restant */
+    min-width: 200px; /* Empêche les colonnes de devenir trop petites */
+}
+
+.chat-window {
+    border-radius: 15px !important;
+    background-color: rgb(67, 85, 116);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* CHAT HEADER */
+.chat-header {
+    min-height: 56px;
+    background-color: rgb(56, 70, 94);
+}
+
+.chat-title {
+    margin-left: 15px;
+}
+
+/* CHAT BODY */
+.chat-body {
+    max-height: 588px;
+}
+
+.chat-body::-webkit-scrollbar {
+    width: 10px;
+}
+
+.chat-body::-webkit-scrollbar-thumb {
+    background-color: #435574;
+    border-radius: 10px;
+}
+
+.chat-body::-webkit-scrollbar-track {
+    background-color: #1d2d45;
+    border-radius: 10px;
+}
+
+/* MESSAGES */
+.avatar {
+    width: 45px;
+}
+
+.chat-msg {
+    padding: 10px;
+    font-size: 10px;
+    border-radius: 25px;
+    min-width: 15%;
+    max-width: 80%;
+}
+
+.received-msg {
+    margin-left: 10px;
+    background-color: #82ccdd;
+}
+
+.sent-msg {
+    margin-right: 10px;
+    background-color: white;
+    color: black;
+}
+
+.msg-time {
+    bottom: -15px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75em;
+}
+
+/* CHAT FOOTER */
+.chat-input {
+    border-radius: 15px 0 0 15px !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.chat-input::placeholder {
+    color: white;
+    font-size: small;
+}
+
+.chat-input:focus {
+    color:white;
+    box-shadow: none !important;
+    outline: 0px !important;
+}
+
+.send-btn {
+    border-radius: 0 15px 15px 0 !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* MEDIA QUERIES */
+@media (max-width: 576px) {
+    .contacts, .chat {
+        margin-bottom: 15px !important;
+    }
+}

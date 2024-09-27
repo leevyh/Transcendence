@@ -4,7 +4,7 @@ import { getCookie } from './utils.js';
 import wsManager  from './wsManager.js';
 // import { navigationBar } from './fr/navigation.js';
 import { DEBUG } from '../app.js';
-import { navBar } from './fr/nav.js';
+import { navigationBar } from './navigation.js';
 
 function createUserRow(user_list_row, data) {
     let user_card_nickname = document.getElementById(data.nickname);
@@ -113,7 +113,7 @@ export async function friendsView(container) {
     global_div.className= 'd-flex justify-content-start align-item-center w-100 h-100';
     container.appendChild(global_div);
 
-    const nav = navBar(container);
+    const nav = navigationBar(container);
     global_div.appendChild(nav);
 
     const user_list = document.createElement('div');

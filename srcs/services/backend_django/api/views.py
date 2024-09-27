@@ -513,7 +513,7 @@ def token_42(request):
                 if user is not None:
                     login(request, user)
                     encoded_jwt = jwt.encode({'username': user.username, 'exp': time.time() + 3600}, 'secret', algorithm='HS256')
-                    return JsonResponse({'message': 'Token created successfully', 'token': encoded_jwt}, status=200)
+                    return JsonResponse({'message': 'Token created successfully', 'token': encoded_jwt, 'user': user.nickname}, status=200)
                 else:
                     return JsonResponse({'error': 'Invalid credentials'}, status=401)
             else: 
