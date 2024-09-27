@@ -46,9 +46,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if message_type == 'block_user':
             blocked = data.get('blocked')
             await self.handle_block_user(blocked)
-        elif message_type == 'unblock_user':
-            blocked = data.get('blocked')
-            await self.handle_unblock_user(blocked)
+        # elif message_type == 'unblock_user':
+        #     blocked = data.get('blocked')
+        #     await self.handle_unblock_user(blocked)
         else:
             message = {
                 'message': data['message'],
@@ -66,27 +66,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Get the current conversation and the members
         conversation = await database_sync_to_async(Conversation.objects.get)(id=self.conversation_id)
         members = await database_sync_to_async(list)(conversation.members.all())
-
-        # Check if the user is blocked by any member, or if the user has blocked any member
-        blocked_user = False
-        blocked = None
-        blocker = None
-        for member in members:
-            # Check if the user is blocked by the member
-            is_blocked = await database_sync_to_async(lambda: UserBlock.objects.filter(blocker=member, blocked=user).exists())()
-            if is_blocked:
-                blocked = user.nickname
-                blocker = member.nickname
-                blocked_user = True
-                break
-            # Check if the user has blocked the member
-            is_blocked = await database_sync_to_async(lambda: UserBlock.objects.filter(blocker=user, blocked=member).exists())()
-            if is_blocked:
-                blocked = member.nickname
-                blocker = user.nickname
-                blocked_user = True
-                break
-        
+     
         # Get chat history
         messages = await database_sync_to_async(list)(
             Message.objects.filter(conversation=conversation).order_by('timestamp').values('content', 'sender__nickname', 'timestamp')
@@ -97,9 +77,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
             sender = await database_sync_to_async(User.objects.get)(nickname=message['sender__nickname'])
             message['sender__avatar'] = encode_avatar(sender)
 
+
+        # Get information about the other user in the conversation (only 2 members)
+        other = [member for member in members if member.nickname != user.nickname][0]
+
         # Send chat history to WebSocket
         await self.send(text_data=json.dumps({
             'type': 'chat_history',
+            'conversation': {   
+                'me': {
+                    'nickname': user.nickname,
+                    'avatar': encode_avatar(user),
+                    'blocked': await database_sync_to_async(lambda: UserBlock.objects.filter(blocked=user).exists())(),
+                },
+                'other': {
+                    'nickname': other.nickname,
+                    'avatar': encode_avatar(other),
+                    'blocked': await database_sync_to_async(lambda: UserBlock.objects.filter(blocked=other).exists())(),
+                },
+            },
             'messages': [
                 {
                     'message': message['content'],
@@ -111,12 +107,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'timestamp': str(message['timestamp'])
                 } for message in messages
             ],
-            'block': {
-                'blocked_user': blocked_user,
-                'blocked': blocked,
-                'blocker': blocker,
-                'user': user.nickname   # Who am I
-            }
         }))
         
 
@@ -222,27 +212,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
         blocker = self.scope['user']
         blocked_user = await database_sync_to_async(User.objects.get)(nickname=blocked)
 
-        # Check if a UserBlock entry already exists : 
-        # 1/ The user I want to block is already blocked
-        # 2/ I am already blocked by the user I want to block
-        if await database_sync_to_async(UserBlock.objects.filter(blocker=blocker, blocked=blocked_user).exists)():
-            return
-        if await database_sync_to_async(UserBlock.objects.filter(blocker=blocked_user, blocked=blocker).exists)():
+        # If the UserBlock entry does not exist, create it
+        if not await database_sync_to_async(UserBlock.objects.filter(blocker=blocker, blocked=blocked_user).exists)():
+            await database_sync_to_async(UserBlock.objects.create)(blocker=blocker, blocked=blocked_user)
+            await self.channel_layer.group_send(
+                self.conversation_group_name,
+                {
+                    'type': 'block_user',
+                    'blocked': blocked_user.nickname,
+                    'blocker': blocker.nickname,
+                }
+            )
             return
         
-        # Create a UserBlock entry
-        await database_sync_to_async(UserBlock.objects.create)(blocker=blocker, blocked=blocked_user)
-
-        # Send message to blocked user
-        await self.channel_layer.group_send(
-            self.conversation_group_name,
-            {
-                'type': 'block_user',
-                'blocked': blocked_user.nickname,
-                'blocker': blocker.nickname,
-            }
-        )
-
+        # If the UserBlock entry exists, delete it
+        if await database_sync_to_async(UserBlock.objects.filter(blocker=blocker, blocked=blocked_user).exists)():
+            await database_sync_to_async(UserBlock.objects.filter(blocker=blocker, blocked=blocked_user).delete)()
+            await self.channel_layer.group_send(
+                self.conversation_group_name,
+                {
+                    'type': 'unblock_user',
+                    'blocked': blocked_user.nickname,
+                    'blocker': blocker.nickname
+                }
+            )
+            return
 
     # Receive information about blocked users
     async def block_user(self, event):
@@ -252,33 +246,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'blocker': event['blocker'],
             'user': self.scope['user'].nickname # Who am I
         }))
-
-
-    # Save unblock in the database
-    async def handle_unblock_user(self, blocked):
-        from chat.models import UserBlock
-        from api.models import User_site as User
-
-        blocker = self.scope['user']
-        blocked_user = await database_sync_to_async(User.objects.get)(nickname=blocked)
-
-        # Check if the UserBlock entry exists
-        if not await database_sync_to_async(UserBlock.objects.filter(blocker=blocker, blocked=blocked_user).exists)():
-            return
-        
-        # Delete the UserBlock entry
-        await database_sync_to_async(UserBlock.objects.filter(blocker=blocker, blocked=blocked_user).delete)()
-
-        # Send message to unblocked user
-        await self.channel_layer.group_send(
-            self.conversation_group_name,
-            {
-                'type': 'unblock_user',
-                'blocked': blocked_user.nickname,
-                'blocker': blocker.nickname
-            }
-        )
-
 
     # Receive information about unblocked users
     async def unblock_user(self, event):

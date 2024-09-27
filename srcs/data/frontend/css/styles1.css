@@ -1,0 +1,242 @@
+/* general */
+.card {
+    border-bottom: 0 !important;
+}
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+    border-bottom: 0 !important;
+}
+.card-footer {
+    border-radius: 0 0 15px 15px !important;
+    border-top: 0 !important;
+}
+
+
+/* NAVIGATION BAR */
+.navigationBarDiv {
+    width: 250px; /* Taille fixe de la navigation */
+    /* color: white; */
+}
+
+/* TODO: text-truncate pour le pseudo | check pour photo rectangulaire */
+
+@media screen and (max-width: 560px) {
+    .container-fluid {
+        flex-direction: column;
+    }
+
+}
+
+/* CONTACTS */
+.contacts {
+    flex: 2; /* La colonne des contacts occupe l'espace restant */
+}
+
+.contacts-card {
+    border-radius: 15px !important;
+    background-color: rgba(2, 109, 177, 0.4) !important;
+}
+
+.contacts-body {
+    padding: 0.75rem 0 !important;
+    /* overflow-y: auto; */
+    white-space: nowrap;
+    /* height: 100%;
+    width: 100%; */
+}
+
+/* CONTACTS-HEADER */
+.search {
+    font-size: 10px;
+    color: white;
+    border-radius: 15px 0 0 15px !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.search::placeholder {
+    color: white;
+}
+
+.search:focus {
+    color:white;
+    box-shadow: none !important;
+    outline: 0px !important;
+}
+
+.search-btn {
+    border-radius: 0 15px 15px 0 !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    color: white !important;
+}
+
+/* CONTACTS-CARD */
+.user-card {
+    width: 100%;
+}
+
+.status-icon {
+    height: 10px;
+    width: 10px;
+}
+
+.user-img {
+    height: 40px;
+    width: 40px;
+}
+
+.user-info {
+    margin-top: auto;
+    margin-bottom: auto;
+    /* margin-left: 15px; */
+    cursor: pointer;
+}
+
+.user-info span {
+    font-size: 15px;
+    color: white;
+    cursor: pointer;
+}
+
+.user-info p {
+    font-size: 8px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.active {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.block-button {
+    background-color: rgba(0, 0, 0, 0) !important;
+    border: 0 !important;
+    cursor: pointer;
+}
+
+
+/* CHAT */
+.chat {
+    flex: 6; /* La colonne de chat occupe l'espace restant */
+    min-width: 200px; /* Empêche les colonnes de devenir trop petites */
+}
+
+.chat-card {
+    border-radius: 15px !important;
+    background-color: rgba(2, 109, 177, 0.4) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* CHAT HEADER */
+.chat-header {
+    min-height: 56px;
+}
+.user-img-chat {
+    height: 40px;
+    width: 40px;
+}
+
+.chat-title {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 15px;
+    color: white;
+}
+
+.chat-title span {
+    font-size: 15px;
+    color: white;
+}
+
+.chat-title p {
+    font-size: 8px;
+    color: rgba(255, 255, 255, 0.6);
+    /* color: white; */
+}
+.user-buttons {
+    flex: 2;
+}
+
+.profile-button {
+    border-radius: 50% !important;
+    background-color: rgba(0, 0, 0, 0.466) !important;
+    color: white !important;
+}
+
+/* CHAT BODY */
+.chat-body {
+    overflow-y: auto; /* TODO: Check if its necessary */
+    /* min-height: 588px; */
+    max-height: 588px;
+}
+
+/* MESSAGES */
+.avatar {
+    width: 45px;
+    height: 100%;
+}
+
+.received-msg {
+    margin-left: 10px;
+    border-radius: 25px;
+    background-color: #82ccdd;
+    padding: 10px;
+    font-size: 10px;
+    position: relative;
+}
+
+.received-msg-time {
+    position: absolute;
+    left: 0;
+    bottom: -15px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 10px;
+}
+
+.sent-msg {
+    margin-right: 10px;
+    border-radius: 25px;
+    font-size: 10px;
+    background-color: #78e08f;
+    padding: 10px;
+    position: relative;
+}
+
+.sent-msg-time {
+    position: absolute;
+    right: 0;
+    bottom: -15px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 10px;
+}
+
+/* CHAT FOOTER */
+.chat-input{
+    color: white !important;
+    border-radius: 15px 0 0 15px !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.chat-input::placeholder {
+    color: white;
+    font-size: small;
+}
+
+.chat-input:focus {
+    color:white;
+    box-shadow: none !important;
+    outline: 0px !important;
+}
+
+.send-btn {
+    border-radius: 0 15px 15px 0 !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    color: white !important;  
+}
+
+
+
+/* MEDIA QUERIES */
+@media (max-width: 576px) {
+    .contacts, .chat {
+        margin-bottom: 15px !important;
+    }
+}

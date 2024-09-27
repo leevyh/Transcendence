@@ -1,6 +1,5 @@
 import { getCookie } from '../utils.js';
 import { DEBUG, navigateTo } from '../../app.js';
-import { navigationBar } from './navigation.js';
 
 export function settingsView(container) {
     container.innerHTML = '';

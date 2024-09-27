@@ -1,18 +1,20 @@
 export const DEBUG = true;
 
-import { ChatWS } from './views/fr/chat_utils.js';
+import { chatWS } from './views/chat_utils.js';
 
 import { homeView } from './views/home.js';
 import { notFoundView } from './views/404.js';
-import { loginView } from './views/fr/login.js';
-import { registerView } from './views/fr/register.js';
-import { settingsView } from './views/fr/settings.js';
-import { passwordView } from './views/fr/password.js';
-import { chatView } from './views/fr/chat.js';
+// import { loginView } from './views/fr/login.js';
+// import { registerView } from './views/fr/register.js';
+// import { settingsView } from './views/fr/settings.js';
+// import { passwordView } from './views/fr/password.js';
+// import { chatView } from './views/fr/chat.js';
 import { friendsView } from './views/users.js';
 import { pongView } from './views/pong.js';
 import { profileView } from './views/profile.js';
-import { callback42 } from './views/fr/callback42.js';
+import { callback42 } from './views/callback42.js';
+import { chatView } from './views/chat.js';
+
 
 const appDiv = document.getElementById('app');
 
@@ -25,22 +27,22 @@ const routes = {
         title: '404',
         view: notFoundView,
     },
-    '/register': {
-        title: 'Register',
-        view: registerView,
-    },
-    '/login': {
-        title: 'Login',
-        view: loginView,
-    },
-    '/settings': {
-        title: 'Settings',
-        view: settingsView,
-    },
-    '/password': {
-        title: 'Password',
-        view: passwordView,
-    },
+    // '/register': {
+    //     title: 'Register',
+    //     view: registerView,
+    // },
+    // '/login': {
+    //     title: 'Login',
+    //     view: loginView,
+    // },
+    // '/settings': {
+    //     title: 'Settings',
+    //     view: settingsView,
+    // },
+    // '/password': {
+    //     title: 'Password',
+    //     view: passwordView,
+    // },
     '/chat': {
         title: 'Chat',
         view: chatView,
@@ -63,7 +65,7 @@ async function router() {
     const pageTitle = "Transcendence";
     let path = location.pathname;
     
-    if (ChatWS) {ChatWS.close();}
+    if (chatWS) {chatWS.close();}
 
     // Vérifier si l'URL correspond au modèle /user/:nickname
     const userProfileRegex = /^\/user\/([a-zA-Z0-9_-]+)$/;
