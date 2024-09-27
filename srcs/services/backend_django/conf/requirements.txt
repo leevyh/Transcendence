@@ -20,3 +20,4 @@ twisted[tls]==24.7.0
 twisted[http2]==24.7.0
 graypy==2.1.0
 python-json-logger==2.0.7
+django-prometheus==2.3.1

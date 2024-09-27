@@ -20,4 +20,5 @@ from django.urls import include, path
 urlpatterns = [
     path('api/', include('api.urls')),
     path('api_chat/', include('chat.urls')),
+    path('', include('django_prometheus.urls')),
 ]
