@@ -1,4 +1,3 @@
-## Services ##
 services:
   proxy-nginx:
     container_name: proxy-nginx
@@ -14,7 +13,7 @@ services:
       - ./env/fleet.env
       - ./srcs/services/proxy_nginx/conf/elastic-agent.env
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://proxy-nginx:80/nginx_status | grep -q 'Active connections'" ]
+      test: ["CMD-SHELL", "curl -f http://proxy-nginx:80/nginx_status | grep -q 'Active connections'"]
       interval: 10s
       timeout: 10s
       retries: 120
@@ -22,7 +21,6 @@ services:
       frontend-nginx:
         condition: service_healthy
     restart: on-failure
-
   frontend-nginx:
     container_name: frontend-nginx
     build: ./srcs/services/frontend_nginx
@@ -38,7 +36,7 @@ services:
       - ./env/fleet.env
       - ./srcs/services/frontend_nginx/conf/elastic-agent.env
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://frontend-nginx:80/nginx_status | grep -q 'Active connections'" ]
+      test: ["CMD-SHELL", "curl -f http://frontend-nginx:80/nginx_status | grep -q 'Active connections'"]
       interval: 10s
       timeout: 10s
       retries: 120
@@ -46,7 +44,6 @@ services:
       backend-fleet:
         condition: service_healthy
     restart: on-failure
-
   backend-django:
     container_name: backend-django
     build: ./srcs/services/backend_django
@@ -62,7 +59,7 @@ services:
       - ./env/42api.env
       - ./env/postgresql.env
     healthcheck:
-      test: [ "CMD-SHELL", "curl -IL http://backend-django:8000/api/django_status | grep -q 'HTTP/1.1 200 OK'" ]
+      test: ["CMD-SHELL", "curl -IL http://backend-django:8000/api/django_status | grep -q 'HTTP/1.1 200 OK'"]
       interval: 10s
       timeout: 10s
       retries: 120
@@ -70,7 +67,6 @@ services:
       backend-postgresql:
         condition: service_healthy
     restart: on-failure
-
   backend-postgresql:
     container_name: backend-postgresql
     build: ./srcs/services/backend_postgresql
@@ -86,7 +82,7 @@ services:
       - ./env/fleet.env
       - ./env/postgresql.env
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 10s
       retries: 120
@@ -94,7 +90,6 @@ services:
       backend-logstash:
         condition: service_healthy
     restart: on-failure
-
   setup-elastic:
     container_name: setup-elastic
     build: ./srcs/services/setup_elastic/
@@ -111,7 +106,7 @@ services:
       - ./env/elastic.env
       - ./env/kibana.env
     healthcheck:
-      test: [ "CMD-SHELL", "[ -f /usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt ]" ]
+      test: ["CMD-SHELL", "[-f /usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt]"]
       interval: 10s
       timeout: 10s
       retries: 120
@@ -140,7 +135,6 @@ services:
       setup-elastic:
         condition: service_healthy
     restart: on-failure
-
   backend-kibana:
     container_name: backend-kibana
     depends_on:
@@ -165,7 +159,6 @@ services:
       timeout: 10s
       retries: 120
     restart: on-failure
-
   backend-logstash:
     container_name: backend-logstash
     build: ./srcs/services/backend_logstash
@@ -190,7 +183,6 @@ services:
       backend-kibana:
         condition: service_healthy
     restart: on-failure
-
   backend-fleet:
     container_name: backend-fleet
     build: ./srcs/services/backend_fleet
@@ -214,33 +206,58 @@ services:
       backend-kibana:
         condition: service_healthy
     restart: on-failure
-
+  setup-prometheus:
+    container_name: setup-prometheus
+    build: ./srcs/services/setup_prometheus
+    user: "0"
+    command: /config/setup.sh
+    volumes:
+      - backend-pga-certs:/certs/
+    healthcheck:
+      test: ["CMD-SHELL", "[-f /certs/ssl.crt] && [-f /certs/ssl.key]"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
   backend-prometheus:
     container_name: backend-prometheus
     build: ./srcs/services/backend_prometheus
     volumes:
       - backend-prometheus:/etc/prometheus/
+      - backend-pga-certs:/etc/prometheus/certs/
     networks:
       - default
     ports:
       - 9090:9090
-#    depends_on:
-#      setup-prometheus:
-#        condition: service_healthy
+    depends_on:
+      setup-prometheus:
+        condition: service_healthy
     restart: on-failure
-
   backend-grafana:
     container_name: backend-grafana
     build: ./srcs/services/backend_grafana
     volumes:
       - backend-grafana:/var/lib/grafana/
+      - backend-pga-certs:/var/lib/grafana/certs/
     networks:
       - default
     ports:
       - 3000:3000
-#    depends_on:
-#      setup-prometheus:
-#        condition: service_healthy
+    depends_on:
+      setup-prometheus:
+        condition: service_healthy
+    restart: on-failure
+  backend-alertmanager:
+    container_name: backend-alertmanager
+    build: ./srcs/services/backend_alertmanager
+    volumes:
+      - backend-alertmanager:/etc/alertmanager/
+      - backend-pga-certs:/etc/alertmanager/certs/
+    networks:
+      - default
+    ports:
+      - 9093:9093
+    env_file:
+      - ./env/alertmanager.env
     restart: on-failure
 
 ## Volumes ##
@@ -256,7 +273,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ./srcs/data/backend/
+      device: ./srcs/data/backend/data/
       o: bind
 
   backend-django-logs:
@@ -340,7 +357,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ./srcs/data/prometheus/
+      device: ./srcs/data/prometheus/data/
       o: bind
 
   backend-grafana:
@@ -348,6 +365,20 @@ volumes:
     driver_opts:
       type: none
       device: ./srcs/data/grafana/
+      o: bind
+
+  backend-alertmanager:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/alertmanager/
+      o: bind
+
+  backend-pga-certs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/prometheus/certs/
       o: bind
 
 ## Networks ##
