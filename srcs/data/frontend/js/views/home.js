@@ -82,7 +82,7 @@ export function homeView(container) {
 
     const fields = [
         { label: "Username", type: 'text', id: 'username', placeholder: "Username" },
-        { label: 'Mot de passe', type: 'password', id: 'password', placeholder: 'Entrez votre mot de passe' },
+        { label: 'Password', type: 'password', id: 'password', placeholder: 'Entrez votre mot de passe' },
     ];
 
     fields.forEach(field => {
