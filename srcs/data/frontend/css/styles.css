@@ -21,13 +21,7 @@ body {
     background-image: linear-gradient(to bottom, black, #012970);
 }
 
-.big-div { /* The Big Div on every view */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-}
+
 .PongDiv{
     display: flex;
     justify-content: center;

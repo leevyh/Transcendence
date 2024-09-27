@@ -1,4 +1,4 @@
-import { navBar } from './fr/nav.js';
+import { navigationBar } from './navigation.js';
 
 import {
     play,
@@ -30,22 +30,21 @@ export let canvas = 'null'
 
 export function pongView(container) {
     container.innerHTML = '';
-    document.body.classList.add('page-with-nav'); // Ajout de la classe pour la navigation bar (padding)
+    // document.body.classList.add('page-with-nav'); // Ajout de la classe pour la navigation bar (padding)
 
     // Creation une grosse div pour le pong et la navigation bar
     const div = document.createElement('div');
-    div.className = 'big-div';
+    div.className = 'd-flex h-100';
     container.appendChild(div);
 
-    // navigationBar(container); // Add navigation bar
-    const navBarr = navBar(container);
-    div.appendChild(navBarr);
+    const navBarContainer = navigationBar(container);
+    div.appendChild(navBarContainer);
 
 	loadPongCSS();  // CSS
 
     // HTML
-    const main = document.createElement('div');
-    main.className = 'PongDiv';
+    const viewContainer = document.createElement('div');
+    viewContainer.className = 'PongDiv';
 
     const ul = document.createElement('ul');
     ul.className = 'd-flex justify-content-center';
@@ -77,11 +76,11 @@ export function pongView(container) {
     scoreP.className = 'd-flex justify-content-center';
     scoreP.innerHTML = 'Joueur 1 : <em id="player-score">0</em> - Joueur 2 : <em id="computer-score">0</em>';
 
-    main.appendChild(ul);
-    main.appendChild(canvasElement);
-    main.appendChild(scoreP);
+    viewContainer.appendChild(ul);
+    viewContainer.appendChild(canvasElement);
+    viewContainer.appendChild(scoreP);
 
-    div.appendChild(main);
+    div.appendChild(viewContainer);
 
     canvas = document.getElementById('canvas');
 

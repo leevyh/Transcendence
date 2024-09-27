@@ -2,7 +2,6 @@
 import { isAuthenticated } from './utils.js';
 import { getCookie } from './utils.js';
 import wsManager  from './wsManager.js';
-import { navigationBar } from './fr/navigation.js';
 import { DEBUG } from '../app.js';
 
 export async function friendsView(container) {

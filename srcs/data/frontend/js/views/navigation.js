@@ -1,9 +1,9 @@
-import { navigateTo } from '../../app.js';
-import { getCookie } from '../utils.js';
+import { navigateTo } from '../app.js';
+import { getCookie } from './utils.js';
 
-export function navBar(container) {
+export function navigationBar(container) {
     const div = document.createElement('div');
-    div.className = 'navigationBarDiv h-100 d-flex flex-column';  // Utilisation des classes Bootstrap ici
+    div.className = 'navigationBarDiv h-100 d-flex flex-column text-white';  // Utilisation des classes Bootstrap ici
     
     // Get user data from backend
     fetch(`/api/settings/`, {
