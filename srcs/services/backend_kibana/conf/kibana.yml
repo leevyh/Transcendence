@@ -16,7 +16,7 @@ telemetry.optIn: false
 elasticsearch:
   hosts: ["https://backend-elastic:9200"]
   username: "kibana_system"
-  password: "${KIBANA_PASSWORD}"
+  password: "KIBANA_PASSWORD"
 
   ssl:
       verificationMode: certificate
