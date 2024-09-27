@@ -3,8 +3,7 @@ FROM elastic/elastic-agent:8.15.0
 USER root
 ENV NON_INTERACTIVE=true
 
-RUN apt update -y && apt upgrade -y
-RUN apt install -y nginx openssl
+RUN apt update -y && apt upgrade -y && apt install -y nginx openssl
 
 RUN mkdir -p /etc/nginx/ssl
 RUN apt install -y openssl --no-install-suggests --no-install-recommends
