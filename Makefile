@@ -11,16 +11,32 @@
 # **************************************************************************** #
 
 NAME	= ft_transcendence
+
 COMPOSE	= ./docker-compose.yml
 
+DATA	= ./srcs/data
+ENVV	= ./env
+
+DSTP	= ./srcs/setup/dir_setup.sh
+DCLP	= ./srcs/setup/dir_cleanup.sh
+DCPF	= ./srcs/setup/dir_cleanup_force.sh
+
+ECHK	= ./srcs/setup/env_check.sh
+
 all:
+	@${ECHK} ${ENVV}
+	@${DSTP} ${DATA}
 	docker compose -f ${COMPOSE} up -d --build
 
-debug:
-	docker compose -f ${COMPOSE} up --build
-
 down:
+	docker compose -f ${COMPOSE} down
+
+clean:
 	docker compose -f ${COMPOSE} down --rmi all
+	@${DCPF} ${DATA}
+
+force:
+	@${DCPF} ${DATA}
 
 logs:
 	docker compose logs -f
@@ -31,8 +47,7 @@ status:
 prune:
 	docker system prune -af
 
-re: down
-	$(MAKE) all
+re: down all
 
-.PHONY: all debug clean folder prune re
-.SILENT: all debug clean folder prune re
+.PHONY: all down clean force logs status prune re
+.SILENT: all down clean force logs status prune re
