@@ -7,7 +7,7 @@ rule_files:
 
 alerting:
   alertmanagers:
-    - scheme: http
+    - scheme: https
       static_configs:
         - targets:
           - backend-alertmanager:9093
