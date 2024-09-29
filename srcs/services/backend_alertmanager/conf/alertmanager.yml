@@ -11,4 +11,4 @@ receivers:
         smarthost: 'smtp.gmail.com:587'
         auth_username: 'ALERT_EMAIL'
         auth_identity: 'ALERT_EMAIL'
-        auth_password: 'ALERT_EMAIL_PASSWORD'
+        auth_password: 'ALERT_PASSWORD'
