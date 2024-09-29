@@ -50,7 +50,6 @@ services:
     volumes:
       - backend-django:/var/app/ft_transcendence/
       - backend-django-logs:/var/log/django/
-      - backend-elk-certs:/usr/share/elasticsearch/config/certs/
     networks:
       - default
     expose:
@@ -73,7 +72,6 @@ services:
     volumes:
       - backend-postgresql:/var/lib/postgresql/
       - backend-postgresql-logs:/var/log/postgresql/
-      - backend-elk-certs:/usr/share/elastic-agent/config/certs/
     networks:
       - default
     expose:
@@ -106,7 +104,7 @@ services:
       - ./env/elastic.env
       - ./env/kibana.env
     healthcheck:
-      test: ["CMD-SHELL", "[-f /usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt]"]
+      test: ["CMD-SHELL", "[ -f /usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt ]"]
       interval: 10s
       timeout: 10s
       retries: 120
@@ -175,7 +173,7 @@ services:
       - ./env/elastic.env
     healthcheck:
       test:
-        ["CMD-SHELL", "curl -s localhost:9600/_node/pipelines?pretty | grep '\"status\" : \"green\"'"]
+        ["CMD-SHELL", "curl -s http://localhost:9600/_node/pipelines?pretty | grep '\"status\" : \"green\"'"]
       interval: 10s
       timeout: 10s
       retries: 120
@@ -212,9 +210,9 @@ services:
     user: "0"
     command: /config/setup.sh
     volumes:
-      - backend-pga-certs:/certs/
+      - backend-pga-certs:/pga/certs/
     healthcheck:
-      test: ["CMD-SHELL", "[-f /certs/ssl.crt] && [-f /certs/ssl.key]"]
+      test: ["CMD-SHELL", "[ -f /pga/certs/ssl.crt ] && [ -f /pga/certs/ssl.key ]"]
       interval: 10s
       timeout: 10s
       retries: 120
@@ -223,25 +221,16 @@ services:
     build: ./srcs/services/backend_prometheus
     volumes:
       - backend-prometheus:/etc/prometheus/
-      - backend-pga-certs:/etc/prometheus/certs/
+      - backend-pga-certs:/pga/certs/
     networks:
       - default
     ports:
       - 9090:9090
-    depends_on:
-      setup-prometheus:
-        condition: service_healthy
-    restart: on-failure
-  backend-grafana:
-    container_name: backend-grafana
-    build: ./srcs/services/backend_grafana
-    volumes:
-      - backend-grafana:/var/lib/grafana/
-      - backend-pga-certs:/var/lib/grafana/certs/
-    networks:
-      - default
-    ports:
-      - 3000:3000
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9090/-/healthy | grep -q 'Prometheus Server is Healthy.'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
     depends_on:
       setup-prometheus:
         condition: service_healthy
@@ -251,16 +240,43 @@ services:
     build: ./srcs/services/backend_alertmanager
     volumes:
       - backend-alertmanager:/etc/alertmanager/
-      - backend-pga-certs:/etc/alertmanager/certs/
+      - backend-pga-certs:/pga/certs/
     networks:
       - default
     ports:
       - 9093:9093
     env_file:
       - ./env/alertmanager.env
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9093/-/healthy | grep -q 'OK'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    depends_on:
+      backend-prometheus:
+        condition: service_healthy
+    restart: on-failure
+  backend-grafana:
+    container_name: backend-grafana
+    build: ./srcs/services/backend_grafana
+    volumes:
+      - backend-grafana:/var/lib/grafana/
+      - backend-pga-certs:/pga/certs/
+    networks:
+      - default
+    ports:
+      - 3000:3000
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:3000/api/health | grep -q '\"database\": \"ok\"'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    depends_on:
+      backend-prometheus:
+        condition: service_healthy
     restart: on-failure
 
-## Volumes ##
+
 volumes:
   frontend:
     driver: local
@@ -268,112 +284,96 @@ volumes:
       type: none
       device: ./srcs/data/frontend/
       o: bind
-
   backend-django:
     driver: local
     driver_opts:
       type: none
       device: ./srcs/data/backend/data/
       o: bind
-
   backend-django-logs:
     driver: local
     driver_opts:
       type: none
       device: ./srcs/data/backend/logs/
       o: bind
-
   backend-postgresql:
     driver: local
     driver_opts:
       type: none
       device: ./srcs/data/database/data/
       o: bind
-
   backend-postgresql-logs:
     driver: local
     driver_opts:
       type: none
       device: ./srcs/data/database/logs/
       o: bind
-
   backend-elastic:
     driver: local
     driver_opts:
-        type: none
-        device: ./srcs/data/elastic/elastic/
-        o: bind
-
+      type: none
+      device: ./srcs/data/elastic/elastic/
+      o: bind
   backend-kibana:
     driver: local
     driver_opts:
-        type: none
-        device: ./srcs/data/elastic/kibana/
-        o: bind
-
+      type: none
+      device: ./srcs/data/elastic/kibana/
+      o: bind
   backend-logstash:
     driver: local
     driver_opts:
-        type: none
-        device: ./srcs/data/elastic/logstash/
-        o: bind
-
+      type: none
+      device: ./srcs/data/elastic/logstash/
+      o: bind
   backend-fleet:
     driver: local
     driver_opts:
       type: none
       device: ./srcs/data/elastic/fleet/
       o: bind
-
   backend-elk-certs:
     driver: local
     driver_opts:
       type: none
       device: ./srcs/data/elastic/certs/
       o: bind
-
   backend-elk-logs:
     driver: local
     driver_opts:
       type: none
       device: ./srcs/data/elastic/logs/
       o: bind
-
   backend-elk-ea-proxy-nginx:
-      driver: local
-      driver_opts:
-          type: none
-          device: ./srcs/data/elastic/ea/proxy-nginx/
-          o: bind
-
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/elastic/ea/proxy-nginx/
+      o: bind
   backend-elk-ea-frontend-nginx:
     driver: local
     driver_opts:
       type: none
       device: ./srcs/data/elastic/ea/frontend-nginx/
       o: bind
-
   backend-prometheus:
     driver: local
     driver_opts:
       type: none
       device: ./srcs/data/prometheus/data/
       o: bind
-
   backend-grafana:
     driver: local
     driver_opts:
       type: none
       device: ./srcs/data/grafana/
       o: bind
-
   backend-alertmanager:
     driver: local
     driver_opts:
       type: none
       device: ./srcs/data/alertmanager/
       o: bind
-
   backend-pga-certs:
     driver: local
     driver_opts:
@@ -381,7 +381,7 @@ volumes:
       device: ./srcs/data/prometheus/certs/
       o: bind
 
-## Networks ##
+
 networks:
     default:
         driver: bridge
