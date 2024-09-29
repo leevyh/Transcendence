@@ -1,8 +1,11 @@
-/env/*.env
-/srcs/data/elastic
-/srcs/data/backend_/logs
-/srcs/data/database/logs
-/venv
-/.idea
-/.vscode
+/.idea/
+/.vscode/
 
+/env/
+
+/srcs/data/alertmanager/
+/srcs/data/backend/logs/
+/srcs/data/database/logs/
+/srcs/data/elastic/
+/srcs/data/grafana/
+/srcs/data/prometheus/
