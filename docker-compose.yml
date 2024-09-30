@@ -267,7 +267,7 @@ services:
     ports:
       - 3000:3000
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:3000/api/health | grep -q '\"database\": \"ok\"'"]
+      test: ["CMD-SHELL", "curl --cacert /pga/certs/grafana.crt https://localhost:3000/api/health | grep -q '\"database\": \"ok\"'"]
       interval: 10s
       timeout: 10s
       retries: 120
