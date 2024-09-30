@@ -1,6 +1,6 @@
 export const DEBUG = true;
 
-import { chatWS } from './views/chat_utils.js';
+import { chatWS } from './component/chat/functions.js';
 
 import { homeView } from './views/home.js';
 import { notFoundView } from './views/404.js';
@@ -8,7 +8,6 @@ import { notFoundView } from './views/404.js';
 // import { registerView } from './views/fr/register.js';
 // import { settingsView } from './views/fr/settings.js';
 // import { passwordView } from './views/fr/password.js';
-// import { chatView } from './views/fr/chat.js';
 import { friendsView } from './views/users.js';
 import { pongView } from './views/pong.js';
 import { profileView } from './views/profile.js';

@@ -1,7 +1,7 @@
 import { getCookie } from './utils.js';
 import { DEBUG } from '../app.js';
 import { navigationBar } from './navigation.js';
-import { createGlobalContainer, createUserCard } from './chat_utils.js';
+import { createGlobalContainer, createUserCard } from '../component/chat/visual.js';
 
 export async function chatView(container) {
     container.innerHTML = '';
