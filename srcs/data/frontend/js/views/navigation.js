@@ -4,7 +4,7 @@ import { getCookie } from './utils.js';
 export function navigationBar(container) {
     const div = document.createElement('div');
     div.className = 'navigationBarDiv h-100 d-flex flex-column text-white';  // Utilisation des classes Bootstrap ici
-    
+
     // Get user data from backend
     fetch(`/api/settings/`, {
         method: 'GET',
@@ -156,21 +156,22 @@ export function navigationBar(container) {
 
         const modalInfoDialog = document.createElement('div');
         modalInfoDialog.classList.add('modal-dialog');
+        modalInfoDialog.className = "modalInfoDialog";
         modalInfo.appendChild(modalInfoDialog);
 
         // Créer le contenu de la modale
         const modalInfoContent = document.createElement('div');
-        modalInfoContent.className = 'modal-content';
+        modalInfoContent.className = 'modal-content modalInfoContent';
         modalInfoDialog.appendChild(modalInfoContent);
 
         const modalInfoHeader = document.createElement('div');
-        modalInfoHeader.className = 'modal-header border-bottom border-custom-color pb-2';
+        modalInfoHeader.className = 'modal-header border-bottom border-custom-color pb-2 modalInfoHeader';
         modalInfoContent.appendChild(modalInfoHeader);
 
         // Titre du Modal
         const modalInfoTitle = document.createElement('h2');
         modalInfoTitle.textContent = 'Settings';
-        modalInfoTitle.className = 'modal-title';
+        modalInfoTitle.className = 'modal-title modalInfoTitle';
         modalInfoHeader.appendChild(modalInfoTitle);
 
         // Bouton pour fermer la modale
@@ -257,6 +258,7 @@ export function navigationBar(container) {
             bootstrapModal.show(); // Afficher la modal
         });
 
+//////////////////////////////////////////////////////////////////
 // Modal for settings, password and accessibility
         const modalSettings = document.createElement('div');
         modalSettings.className = 'modal fade modalSettings';

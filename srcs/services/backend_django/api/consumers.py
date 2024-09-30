@@ -3,6 +3,7 @@ import json
 from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
 from django.db import models
+import base64
 
 
 class StatusConsumer(AsyncJsonWebsocketConsumer):
@@ -17,7 +18,20 @@ class StatusConsumer(AsyncJsonWebsocketConsumer):
         pass  # No need to handle incoming messages for status updates
 
     async def send_status_update(self, event):
-        await self.send_json(event["message"])
+        from .models import User_site
+        message = event["message"]
+        user = await database_sync_to_async(User_site.objects.get)(id=message['user_id'])
+        avatar = user.avatar
+        encoded_avatar = base64.b64encode(avatar.read()).decode('utf-8')
+        await self.send_json({
+            "type": "status_update",
+            "user_id": message['user_id'],
+            "nickname": message['nickname'],
+            "status": message['status'],
+            "avatar": encoded_avatar
+        })
+        # await self.send_json(event["message"])
+
 
 
 class NotificationConsumer(AsyncJsonWebsocketConsumer):
@@ -57,10 +71,6 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
         print(f"Data received: {data}")
         #if type is friend_request -> Save friend request with from_user and to_user, status pending
         if type == 'friend_request':
-            if not data['url'] == 'friends':
-                await self.send_json({"error": "You can only send friend requests from the friends page"})
-                return
-
             nickname = data['nickname']
             friend = await database_sync_to_async(User_site.objects.get)(nickname=nickname)
 

@@ -46,8 +46,8 @@ const routes = {
         title: 'Chat',
         view: chatView,
     },
-    '/friends': {
-        title: 'Friends',
+    '/users': {
+        title: 'Users',
         view: friendsView,
     },
     '/pong': {
