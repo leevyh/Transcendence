@@ -5,7 +5,7 @@ import { notifications } from './notifications.js';
 import {
     play,
     stop,
-    reset,
+    // reset,
     handleKeyDown,
     handleKeyUp,
     draw,
@@ -15,20 +15,6 @@ import {
 
 import { GameOn } from './pong_game.js';
 export let canvas = 'null'
-// const canvas = document.getElementById('canvas');
-// var game = {
-// 	player: {
-// 		score: 0
-// 	},
-// 	computer: {
-// 		score: 0,
-// 		speedRatio: 0.75
-// 	},
-// 	ball: {
-// 		r: 5,
-// 		speed: {}
-// 	}
-// };
 
 
 export async function pongView(container) {
@@ -93,17 +79,21 @@ export async function pongView(container) {
 
     canvas = document.getElementById('canvas');
 
-	reset(); // Init game
     draw();
-    console.log("coucou");
 
     // WebSocket
     const wsUrl = 'ws://localhost:8888/ws/pong/';
     PongWebSocketManager.init(wsUrl);
 
+
+
     PongWebSocketManager.socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        
+
+        // if (data.action_type === 'test') {
+        //     console.log("msg received : ", data.msg);
+        // }
+        // console.log(data);
         if (data.action_type === 'start_game') {
             var currentPlayer = data.current_player;
             if (currentPlayer === 'player_1') {
@@ -115,22 +105,20 @@ export async function pongView(container) {
             }
             startGame(stopButton);
         }
-
-        // Autres types de messages à gérer
-        if (data.action_type === 'update_position') {
-            // Mettez à jour la position de l'adversaire
-            PongWebSocketManager.updateOpponentPosition(data.player_position);
-        }
-        if (data.action_type === 'update_ball_position') {
-            PongWebSocketManager.updateBallPosition(data.ball_position);
-        }
-        if (data.action_type === 'update_score') {
-            PongWebSocketManager.updateScore(data.scores);
+        console.log(data);
+        if (GameOn) {
+            if (data.action_type === 'update_positions') {
+                updatePlayerPositions(data.player1_position, data.player2_position);
+            } else if (data.action_type === 'update_ball_position') {
+                updateBallPosition(data.ball_position);
+            } else if (data.action_type === 'update_score') {
+                updateScores(data.scores);
+            }
         }
     };
 
-    PongWebSocketManager.socket.onclose = () => {
-        console.log("WebSocket disconnected");
+    PongWebSocketManager.socket.onclose = (event) => {
+        console.log("WebSocket disconnected", event);
     };
     const stopGameButton = document.querySelector('#stop-game');
 
@@ -179,7 +167,6 @@ function startCountdown() {
             // Supprimer le décompte après un court délai
             setTimeout(() => {
                 countdownElement.remove();
-                // Lancer le jeu après le décompte
                 play(); // Appelle la fonction `play` pour démarrer le jeu
             }, 1000); // Affiche "Go!" pendant 1 seconde avant de l'enlever
         }
@@ -189,11 +176,27 @@ function startCountdown() {
 // Fonction pour démarrer le jeu lorsque le serveur jumelle deux joueurs
 function startGame(stopButton)
 {
-    if (!GameOn) {
-        console.log("GameOn");
     startCountdown(); // Démarrer le décompte avant de lancer le jeu
     stopButton.disabled = false; // Activer le bouton Stop
-    }
+}
+
+function updatePlayerPositions(player1Y, player2Y) {
+    game.player1.y = player1Y;
+    game.player2.y = player2Y;
+    draw();
+    // play();
+}
+
+function updateBallPosition(ballPosition) {
+    game.ball.x = ballPosition.x;
+    game.ball.y = ballPosition.y;
+    draw();
+    // play();
+}
+
+function updateScores(scores) {
+    document.querySelector('#player1-score').textContent = scores.player1;
+    document.querySelector('#player2-score').textContent = scores.player2;
 }
 
 // CSS Pong
