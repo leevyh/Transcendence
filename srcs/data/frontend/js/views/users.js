@@ -238,7 +238,4 @@ export async function friendsView(container) {
     //         container.appendChild(userCard);
     //     });
     // })
-
-
-
 }
