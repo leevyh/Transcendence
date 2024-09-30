@@ -196,7 +196,7 @@ services:
       - ./env/elastic.env
       - ./srcs/services/backend_fleet/conf/elastic-agent.env
     healthcheck:
-      test: ["CMD-SHELL", "curl -IL http://localhost:6791/liveness | grep -q 'HTTP/1.1 200 OK'"]
+      test: ["CMD-SHELL", "curl -s -IL http://localhost:6791/liveness | grep -q 'HTTP/1.1 200 OK'"]
       interval: 10s
       timeout: 10s
       retries: 240
@@ -212,7 +212,7 @@ services:
     volumes:
       - backend-pga-certs:/pga/certs/
     healthcheck:
-      test: ["CMD-SHELL", "[ -f /pga/certs/ssl.crt ] && [ -f /pga/certs/ssl.key ]"]
+      test: ["CMD-SHELL", "[ -f /pga/certs/ssl.done ]"]
       interval: 10s
       timeout: 10s
       retries: 120
@@ -220,7 +220,7 @@ services:
     container_name: backend-prometheus
     build: ./srcs/services/backend_prometheus
     volumes:
-      - backend-prometheus:/etc/prometheus/
+      - backend-prometheus:/prometheus/
       - backend-pga-certs:/pga/certs/
     networks:
       - default
@@ -239,7 +239,7 @@ services:
     container_name: backend-alertmanager
     build: ./srcs/services/backend_alertmanager
     volumes:
-      - backend-alertmanager:/etc/alertmanager/
+      - backend-alertmanager:/alertmanager/
       - backend-pga-certs:/pga/certs/
     networks:
       - default
@@ -260,7 +260,7 @@ services:
     container_name: backend-grafana
     build: ./srcs/services/backend_grafana
     volumes:
-      - backend-grafana:/var/lib/grafana/
+      - backend-grafana:/usr/share/grafana/
       - backend-pga-certs:/pga/certs/
     networks:
       - default
