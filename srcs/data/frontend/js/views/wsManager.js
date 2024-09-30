@@ -1,5 +1,6 @@
 import { isAuthenticated} from "./utils.js";
 import { DEBUG } from "../app.js";
+import { displayNotification } from "./utils.js";
 
 class WebSocketManager {
     constructor(url) {
@@ -35,6 +36,9 @@ class WebSocketManager {
                 const data = JSON.parse(event.data);
                 if (DEBUG) {console.log('Received notification:', data);}
 
+                displayNotification(data);
+
+
 
                 if (data.type === 'new_message') {
                     if (DEBUG) {console.log('You received a new message from', data.from_nickname);}
@@ -42,7 +46,7 @@ class WebSocketManager {
                 }
                 if (data.type === 'friend_request') {
                     if (DEBUG) {console.log('You received a friend request from', data.from_nickname);}
-                    // TODO: Handle friend request notification
+                    // TODO: Handle friend request notification in little popup on the top right corner
                 }
 
                 this.callbacks.forEach(callback => callback(data));
