@@ -278,6 +278,7 @@ export function navigationBar(container) {
 // Modal for settings, password and accessibility
         const modalSettings = document.createElement('div');
         modalSettings.className = 'modal fade modalSettings';
+        modalSettings.id = 'modalSettings';
         modalSettings.setAttribute('tabindex', '-1');
         //modalSettings.style.display = 'none'; // Cachée par défaut
         modalSettings.setAttribute('aria-labelledby', 'modalSettingsLabel');
@@ -418,14 +419,36 @@ export function navigationBar(container) {
                     // Réinitialiser le formulaire après succès
                     settingsForm.reset();
 
-                    // Effacer le message de succès après 2 secondes
+                    // 1. Temps pour laisser le message visible
                     setTimeout(() => {
-                        successMessage.remove();
-                    }, 2000); // 2 secondes
+                        // 2. Fermeture de la modal avec Bootstrap
+                        const modalElement = document.getElementById('modalSettings');
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                        modalInstance.hide(); // Ferme la modal
 
-                    // Réinitialiser le formulaire après succès
-                   // settingsForm.reset(); // Réinitialise les champs du formulaire aux valeurs par défaut
-                } else {
+                        // 3. Appliquer le flou
+                        document.body.style.filter = 'blur(5px)'; // Applique le flou
+
+                        // 4. Recharger la page rapidement
+                        let location = window.location.href;
+                        const str_split = location.split('/');
+                        const length = str_split.length;
+                        const locationFinal = '/' + str_split[length - 1];
+                        navigateTo(locationFinal); // Recharger la page immédiatement
+
+                        // 5. Diminuer le flou progressivement
+                        let blurAmount = 4; // Montant du flou
+                        const interval = setInterval(() => {
+                            blurAmount -= 0.1; // Réduit progressivement le flou
+                            document.body.style.filter = `blur(${Math.max(0, blurAmount)}px)`; // Assure que le flou ne soit pas négatif
+
+                            if (blurAmount <= 0) {
+                                clearInterval(interval); // Arrête l'interval si le flou est à 0
+                            }
+                        }, 25); // Intervalle de temps entre chaque réduction
+                    }, 800); // Temps pour laisser le message visible avant la fermeture de la modal
+                }
+                else {
                     // Gestion des erreurs de réponse serveur
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'text-danger';
@@ -435,10 +458,34 @@ export function navigationBar(container) {
                     // Réinitialiser le formulaire après succès
                     settingsForm.reset();
 
-                    // Effacer le message d'erreur après 2 secondes
+                    // 1. Temps pour laisser le message visible
                     setTimeout(() => {
-                        errorMessage.remove();
-                    }, 2000); // 2 secondes
+                        // 2. Fermeture de la modal avec Bootstrap
+                        const modalElement = document.getElementById('modalSettings');
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                        modalInstance.hide(); // Ferme la modal
+
+                        // 3. Appliquer le flou
+                        document.body.style.filter = 'blur(5px)'; // Applique le flou
+
+                        // 4. Recharger la page rapidement
+                        let location = window.location.href;
+                        const str_split = location.split('/');
+                        const length = str_split.length;
+                        const locationFinal = '/' + str_split[length - 1];
+                        navigateTo(locationFinal); // Recharger la page immédiatement
+
+                        // 5. Diminuer le flou progressivement
+                        let blurAmount = 4; // Montant du flou
+                        const interval = setInterval(() => {
+                            blurAmount -= 0.1; // Réduit progressivement le flou
+                            document.body.style.filter = `blur(${Math.max(0, blurAmount)}px)`; // Assure que le flou ne soit pas négatif
+
+                            if (blurAmount <= 0) {
+                                clearInterval(interval); // Arrête l'interval si le flou est à 0
+                            }
+                        }, 25); // Intervalle de temps entre chaque réduction
+                    }, 800); // Temps pour laisser le message visible avant la fermeture de la modal
                 }
             } catch (error) {
                 // Gestion des erreurs réseau ou autres
@@ -450,10 +497,34 @@ export function navigationBar(container) {
                 // Réinitialiser le formulaire après succès
                 settingsForm.reset();
 
-                // Effacer le message d'erreur après 2 secondes
+                // 1. Temps pour laisser le message visible
                 setTimeout(() => {
-                    errorMessage.remove();
-                }, 2000); // 2 secondes
+                    // 2. Fermeture de la modal avec Bootstrap
+                    const modalElement = document.getElementById('modalSettings');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide(); // Ferme la modal
+
+                    // 3. Appliquer le flou
+                    document.body.style.filter = 'blur(5px)'; // Applique le flou
+
+                    // 4. Recharger la page rapidement
+                    let location = window.location.href;
+                    const str_split = location.split('/');
+                    const length = str_split.length;
+                    const locationFinal = '/' + str_split[length - 1];
+                    navigateTo(locationFinal); // Recharger la page immédiatement
+
+                    // 5. Diminuer le flou progressivement
+                    let blurAmount = 4; // Montant du flou
+                    const interval = setInterval(() => {
+                        blurAmount -= 0.1; // Réduit progressivement le flou
+                        document.body.style.filter = `blur(${Math.max(0, blurAmount)}px)`; // Assure que le flou ne soit pas négatif
+
+                        if (blurAmount <= 0) {
+                            clearInterval(interval); // Arrête l'interval si le flou est à 0
+                        }
+                    }, 25); // Intervalle de temps entre chaque réduction
+                }, 800); // Temps pour laisser le message visible
             }
         });
 
@@ -463,11 +534,22 @@ export function navigationBar(container) {
         accessibilityForm.className = 'w-100 mt-4 accessibilityForm';
         modalSettingsBody.appendChild(accessibilityForm);
 
+        // Tableau des tailles de police correspondant aux valeurs du curseur
+        const fontSizes = {
+            1: '12px',  // Petite police
+            2: '16px',  // Taille actuelle
+            3: '20px'   // Grande police
+        };
+
+        const divFontSize = document.createElement('div');
+        divFontSize.className = 'divFontSize';
+        accessibilityForm.appendChild(divFontSize);
+
         // Champ de la taille de la police
         const labelFontSize = document.createElement('label');
         labelFontSize.className = 'form-label labelFontSize';
         labelFontSize.textContent = 'Font size';
-        accessibilityForm.appendChild(labelFontSize);
+        divFontSize.appendChild(labelFontSize);
 
         const fontSize = document.createElement('input');
         fontSize.name = 'font-size';
@@ -477,7 +559,13 @@ export function navigationBar(container) {
         fontSize.min = 1;
         fontSize.max = 3;
         fontSize.value = userData.font_size;
-        accessibilityForm.appendChild(fontSize);
+        divFontSize.appendChild(fontSize);
+
+        // Écouteur d'événements pour le curseur
+        fontSize.addEventListener('input', (event) => {
+            const sizeValue = event.target.value; // Récupérer la valeur du curseur
+            document.body.style.fontSize = fontSizes[sizeValue]; // Appliquer la nouvelle taille de police
+        });
 
         // Champ de la langue
         const labelLanguage = document.createElement('label');
@@ -563,13 +651,34 @@ export function navigationBar(container) {
                     successMessage.textContent = 'Parameters successfully modified';
                     accessibilityForm.appendChild(successMessage);
 
-                    // Effacer le message de succès après 2 secondes
+                    // 1. Temps pour laisser le message visible
                     setTimeout(() => {
-                        successMessage.remove();
-                    }, 2000); // 2 secondes
-                    let location = window.location.href;
-                    // console.log(location);
-                    // navigateTo(location);
+                        // 2. Fermeture de la modal avec Bootstrap
+                        const modalElement = document.getElementById('modalSettings');
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                        modalInstance.hide(); // Ferme la modal
+
+                        // 3. Appliquer le flou
+                        document.body.style.filter = 'blur(5px)'; // Applique le flou
+
+                        // 4. Recharger la page rapidement
+                        let location = window.location.href;
+                        const str_split = location.split('/');
+                        const length = str_split.length;
+                        const locationFinal = '/' + str_split[length - 1];
+                        navigateTo(locationFinal); // Recharger la page immédiatement
+
+                        // 5. Diminuer le flou progressivement
+                        let blurAmount = 4; // Montant du flou
+                        const interval = setInterval(() => {
+                            blurAmount -= 0.1; // Réduit progressivement le flou
+                            document.body.style.filter = `blur(${Math.max(0, blurAmount)}px)`; // Assure que le flou ne soit pas négatif
+
+                            if (blurAmount <= 0) {
+                                clearInterval(interval); // Arrête l'interval si le flou est à 0
+                            }
+                        }, 25); // Intervalle de temps entre chaque réduction
+                    }, 800); // Temps pour laisser le message visible
 
                 } else {
                     // Affichage du message d'erreur sans vider le formulaire
@@ -578,10 +687,34 @@ export function navigationBar(container) {
                     errorMessage.textContent = 'Error while modifying parameters';
                     accessibilityForm.insertBefore(errorMessage, accessSubmitButton);
 
-                    // Effacer le message d'erreur après 2 secondes
+                    // 1. Temps pour laisser le message visible
                     setTimeout(() => {
-                        errorMessage.remove();
-                    }, 2000); // 2 secondes
+                        // 2. Fermeture de la modal avec Bootstrap
+                        const modalElement = document.getElementById('modalSettings');
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                        modalInstance.hide(); // Ferme la modal
+
+                        // 3. Appliquer le flou
+                        document.body.style.filter = 'blur(5px)'; // Applique le flou
+
+                        // 4. Recharger la page rapidement
+                        let location = window.location.href;
+                        const str_split = location.split('/');
+                        const length = str_split.length;
+                        const locationFinal = '/' + str_split[length - 1];
+                        navigateTo(locationFinal); // Recharger la page immédiatement
+
+                        // 5. Diminuer le flou progressivement
+                        let blurAmount = 4; // Montant du flou
+                        const interval = setInterval(() => {
+                            blurAmount -= 0.1; // Réduit progressivement le flou
+                            document.body.style.filter = `blur(${Math.max(0, blurAmount)}px)`; // Assure que le flou ne soit pas négatif
+
+                            if (blurAmount <= 0) {
+                                clearInterval(interval); // Arrête l'interval si le flou est à 0
+                            }
+                        }, 25); // Intervalle de temps entre chaque réduction
+                    }, 800); // Temps pour laisser le message visible
                 }
             } catch (error) {
                 // Gestion des erreurs réseau ou autres
@@ -590,10 +723,34 @@ export function navigationBar(container) {
                 errorMessage.textContent = 'Network or server error';
                 accessibilityForm.insertBefore(errorMessage, accessSubmitButton);
 
-                // Effacer le message d'erreur après 2 secondes
+                // 1. Temps pour laisser le message visible
                 setTimeout(() => {
-                    errorMessage.remove();
-                }, 2000); // 2 secondes
+                    // 2. Fermeture de la modal avec Bootstrap
+                    const modalElement = document.getElementById('modalSettings');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide(); // Ferme la modal
+
+                    // 3. Appliquer le flou
+                    document.body.style.filter = 'blur(5px)'; // Applique le flou
+
+                    // 4. Recharger la page rapidement
+                    let location = window.location.href;
+                    const str_split = location.split('/');
+                    const length = str_split.length;
+                    const locationFinal = '/' + str_split[length - 1];
+                    navigateTo(locationFinal); // Recharger la page immédiatement
+
+                    // 5. Diminuer le flou progressivement
+                    let blurAmount = 4; // Montant du flou
+                    const interval = setInterval(() => {
+                        blurAmount -= 0.1; // Réduit progressivement le flou
+                        document.body.style.filter = `blur(${Math.max(0, blurAmount)}px)`; // Assure que le flou ne soit pas négatif
+
+                        if (blurAmount <= 0) {
+                            clearInterval(interval); // Arrête l'interval si le flou est à 0
+                        }
+                    }, 25); // Intervalle de temps entre chaque réduction
+                }, 800); // Temps pour laisser le message visible
             }
         });
     });
