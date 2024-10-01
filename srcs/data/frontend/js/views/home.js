@@ -189,7 +189,7 @@ export function homeView(container) {
             });
     });
     // // Ajout de l'événement pour afficher la modal
-    ButtonLoginHome.addEventListener('click', () => {
+    ButtonLoginHome.addEventListener('mousedown', () => {
         modalLogin.style.display = 'block'; // Affiche la modal
         setTimeout(() => {
             modalLogin.classList.add('ModalLoginBase-show'); // Ajoute la classe pour l'animation
@@ -305,11 +305,11 @@ export function homeView(container) {
             formRegister.insertBefore(errorMessage, submitRegisterButton);
             return;
         }
-        // Si les mots de passe ne correspondent pas
+        // Si Passwords don't match
         else if (passwordRe !== confirmPasswordRe) {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
-            errorMessage.textContent = 'Les mots de passe ne correspondent pas';
+            errorMessage.textContent = 'Password do not match';
             formRegister.insertBefore(errorMessage, submitRegisterButton);
             return;
         }
@@ -344,7 +344,7 @@ export function homeView(container) {
             if (!response.ok) {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'Erreur lors de l\'inscription, veuillez réessayer';
+                errorMessage.textContent = 'Error while registering, please try again';
                 formRegister.insertBefore(errorMessage, submitRegisterButton);
             }
             else {
@@ -358,15 +358,21 @@ export function homeView(container) {
                     modalRegister.style.display = 'flex';
                 }, 10); // Petit délai pour activer la transition après l'affichage
 
+                // Afficher la modale de connexion (modalLogin)
+                setTimeout(() => {
+                    modalLogin.classList.add('ModalLoginBase-show');
+                    modalLogin.style.display = 'flex';
+                }, 500); // Délai pour que la modale de connexion apparaisse après la fermeture de la modale d'inscription
+
                 // event.preventDefault();
                 // navigateTo('/login');
             }
         })
         .catch(error => {
-            if (DEBUG) {console.error('Erreur lors de l\'inscription', error);}
+            if (DEBUG) {console.error('Error while registering', error);}
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
-            errorMessage.textContent = 'Erreur lors de l\'inscription, veuillez réessayer';
+            errorMessage.textContent = 'Error while registering, please try again';
             formRegister.insertBefore(errorMessage, submitRegisterButton);
             });
     });
@@ -374,7 +380,7 @@ export function homeView(container) {
 
     modalRegisterContent.appendChild(formRegister);
 
-    ButtonRegisterHome.addEventListener('click', () => {
+    ButtonRegisterHome.addEventListener('mousedown', () => {
         // Affiche la modal
         modalRegister.style.display = 'block';
         setTimeout(() => {

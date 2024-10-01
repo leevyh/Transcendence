@@ -58,7 +58,7 @@ export function navigationBar(container) {
         nav.appendChild(divProfile);
 
         const avatarItem = document.createElement('div');
-        avatarItem.className = 'avatarItem rounded-circle overflow-hidden shadow-sm';  // Bootstrap arrondi et ombre
+        avatarItem.className = 'avatarItem rounded-circle overflow-hidden';  // Bootstrap arrondi et ombre
         divProfile.appendChild(avatarItem);
 
         const avatarImage = document.createElement('img');
@@ -94,7 +94,7 @@ export function navigationBar(container) {
         NavBarList.appendChild(PlayElem);
 
         const ChatElem = document.createElement('li');
-        ChatElem.className = 'ElemListNavBar text-center text-primary py-2';  // Même traitement
+        ChatElem.className = 'ElemListNavBar text-center text-primary cursor py-2';  // Même traitement
         ChatElem.textContent = 'Chat';
         NavBarList.appendChild(ChatElem);
 
@@ -107,6 +107,20 @@ export function navigationBar(container) {
         LeaderboardElem.className = 'ElemListNavBar text-center text-primary py-2';
         LeaderboardElem.textContent = 'Leaderboard';
         NavBarList.appendChild(LeaderboardElem);
+
+        PlayElem.addEventListener('click', () => {
+            navigateTo('/pong');
+        });
+
+        ChatElem.addEventListener('click', () => {
+            navigateTo('/chat');
+        });
+
+        FriendsElem.addEventListener('click', () => {
+            navigateTo('/users');
+        });
+
+
 
         // Friends list
         const divListFriends = document.createElement('div');
@@ -148,6 +162,7 @@ export function navigationBar(container) {
 // Modal for personal informations
         const modalInfo = document.createElement('div');
         modalInfo.className = 'modal fade modalInfo';
+        modalInfo.id = 'modalInfo';
         modalInfo.setAttribute('tabindex', '-1');
         //modalInfo.style.display = 'none'; // Cachée par défaut
         modalInfo.setAttribute('aria-labelledby', 'modalInfoLabel');
@@ -155,8 +170,7 @@ export function navigationBar(container) {
         container.appendChild(modalInfo); // Directement dans le container pour éviter les problèmes de positionnement
 
         const modalInfoDialog = document.createElement('div');
-        modalInfoDialog.classList.add('modal-dialog');
-        modalInfoDialog.className = "modalInfoDialog";
+        modalInfoDialog.className = "modal-dialog modalInfoDialog";
         modalInfo.appendChild(modalInfoDialog);
 
         // Créer le contenu de la modale
@@ -238,11 +252,13 @@ export function navigationBar(container) {
         modalInfoBody.appendChild(ModalModeElem);
 
 
-// SI TU CLIQUES SUR LE NICKNAME, TU AS LES INFOS
+        // SI TU CLIQUES SUR LE NICKNAME, TU AS LES INFOS
         // Ajout de l'événement pour ouvrir la modal avec animation
         document.querySelector('.TitleNickname').addEventListener('click', () => {
+
             // Utilisation de l'API Bootstrap pour afficher la modal
             const bootstrapModal = new bootstrap.Modal(modalInfo);
+
 
             // Positionnement de la modale à côté de la barre de navigation
             const navBar = document.querySelector('.nav'); // Sélectionner la barre de navigation
@@ -264,27 +280,27 @@ export function navigationBar(container) {
         modalSettings.className = 'modal fade modalSettings';
         modalSettings.setAttribute('tabindex', '-1');
         //modalSettings.style.display = 'none'; // Cachée par défaut
-        modalSettings.setAttribute('aria-labelledby', 'modalParamLabel');
+        modalSettings.setAttribute('aria-labelledby', 'modalSettingsLabel');
         modalSettings.setAttribute('aria-hidden', 'true');
         container.appendChild(modalSettings); // Directement dans le container pour éviter les problèmes de positionnement
 
         const modalSettingsDialog = document.createElement('div');
-        modalSettingsDialog.classList.add('modal-dialog');
+        modalSettingsDialog.className = 'modal-dialog modalSettingsDialog';
         modalSettings.appendChild(modalSettingsDialog);
 
         // Créer le contenu de la modale
         const modalSettingsContent = document.createElement('div');
-        modalSettingsContent.className = 'modal-content';
+        modalSettingsContent.className = 'modal-content modalSettingsContent';
         modalSettingsDialog.appendChild(modalSettingsContent);
 
         const modalSettingsHeader = document.createElement('div');
-        modalSettingsHeader.className = 'modal-header border-bottom border-custom-color pb-2';
+        modalSettingsHeader.className = 'modal-header border-bottom border-custom-color pb-2 modalSettingsHeader';
         modalSettingsContent.appendChild(modalSettingsHeader);
 
         // Titre du Modal
         const modalSettingsTitle = document.createElement('h2');
-        modalSettingsTitle.textContent = 'Modify Settings';
-        modalSettingsTitle.className = 'modal-title';
+        modalSettingsTitle.textContent = 'Modify Settings ';
+        modalSettingsTitle.className = 'modal-title modalSettingsTitle';
         modalSettingsHeader.appendChild(modalSettingsTitle);
 
         // Bouton pour fermer la modale
@@ -305,6 +321,14 @@ export function navigationBar(container) {
 // SI TU CLIQUES SUR LE CRAYON, TU PEUX MODIFIER LES INFOS
         // Ajout de l'événement pour ouvrir la modal avec animation
         document.querySelector('.SvgModify').addEventListener('click', () => {
+
+            const modalInfoElement = document.getElementById('modalInfo'); // Assure-toi que l'ID est correct
+            if (modalInfoElement) {
+                const bootstrapModalInfo = bootstrap.Modal.getInstance(modalInfoElement); // Récupère l'instance de la modale "modalInfo"
+                if (bootstrapModalInfo) {
+                    bootstrapModalInfo.hide(); // Ferme "modalInfo"
+                }
+            }
             // Utilisation de l'API Bootstrap pour afficher la modal
             const bootstrapModalModify = new bootstrap.Modal(modalSettings);
 
@@ -319,11 +343,12 @@ export function navigationBar(container) {
             modalSettings.style.margin = '0';  // Supprimer les marges par défaut
             modalSettings.style.transform = 'none';  // Désactiver les centrer automatiquement
             modalSettings.style.maxWidth = 'none';  // Permet à la modal de s'étendre sans limitation de largeur
+
             bootstrapModalModify.show(); // Afficher la modal
         });
 
         const modalSettingsBody = document.createElement('div');
-        modalSettingsBody.className = 'modal-body';
+        modalSettingsBody.className = 'modal-body modalSettingsBody';
         modalSettingsContent.appendChild(modalSettingsBody);
 
         // Formulaire de modification des paramètres {nickname, email} = settingsForm
@@ -352,7 +377,7 @@ export function navigationBar(container) {
         // Bouton de soumission
         const settingsSubmitButton = document.createElement('button');
         settingsSubmitButton.type = 'submit';
-        settingsSubmitButton.className = 'btn btn-primary w-100';
+        settingsSubmitButton.className = 'btn btn-primary w-100 modalSettingsButtonsSubmit';
         settingsSubmitButton.textContent = 'Submit';
         settingsForm.appendChild(settingsSubmitButton);
 
@@ -360,7 +385,7 @@ export function navigationBar(container) {
         settingsForm.addEventListener('submit', async (event) => {
             event.preventDefault(); // Empêche la soumission par défaut du formulaire
 
-            // Suppression des messages précédents
+            // Suppression des messages d'erreur ou de succès précédents
             const errorMessages = settingsForm.querySelectorAll('.text-danger');
             errorMessages.forEach(message => message.remove());
             const successMessages = settingsForm.querySelectorAll('.text-success');
@@ -371,38 +396,76 @@ export function navigationBar(container) {
             const nickname = data.get('newNicknameModify');
             const email = data.get('newEmailModify');
 
-            // Envoi des données au serveur
-            const response = await fetch('/api/updateSettings/', {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                },
-                body: JSON.stringify({ nickname, email })
-            });
-            if (response.ok) {
-                settingsForm.innerHTML = '';
-                // const successMessage = document.createElement('p');
-                // successMessage.className = 'text-success';
-                // successMessage.textContent = 'Paramètres modifiés avec succès';
-                // settingsForm.appendChild(successMessage);
-            } else {
+            try {
+                // Envoi des données au serveur
+                const response = await fetch('/api/updateSettings/', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify({ nickname, email })
+                });
+
+                if (response.ok) {
+                    // Afficher un message de succès sans remplacer tout le contenu
+                    const successMessage = document.createElement('p');
+                    successMessage.className = 'text-success';
+                    successMessage.textContent = 'Parameters successfully modified';
+                    settingsForm.appendChild(successMessage);
+
+                    // Réinitialiser le formulaire après succès
+                    settingsForm.reset();
+
+                    // Effacer le message de succès après 2 secondes
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 2000); // 2 secondes
+
+                    // Réinitialiser le formulaire après succès
+                   // settingsForm.reset(); // Réinitialise les champs du formulaire aux valeurs par défaut
+                } else {
+                    // Gestion des erreurs de réponse serveur
+                    const errorMessage = document.createElement('p');
+                    errorMessage.className = 'text-danger';
+                    errorMessage.textContent = 'Error while modifying parameters';
+                    settingsForm.insertBefore(errorMessage, settingsSubmitButton);
+
+                    // Réinitialiser le formulaire après succès
+                    settingsForm.reset();
+
+                    // Effacer le message d'erreur après 2 secondes
+                    setTimeout(() => {
+                        errorMessage.remove();
+                    }, 2000); // 2 secondes
+                }
+            } catch (error) {
+                // Gestion des erreurs réseau ou autres
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'Modification error';
+                errorMessage.textContent = 'Network or server error';
                 settingsForm.insertBefore(errorMessage, settingsSubmitButton);
+
+                // Réinitialiser le formulaire après succès
+                settingsForm.reset();
+
+                // Effacer le message d'erreur après 2 secondes
+                setTimeout(() => {
+                    errorMessage.remove();
+                }, 2000); // 2 secondes
             }
-        })
+        });
+
 
         // Formulaire de modification des paramètres {font_size, language, dark_mode}
         const accessibilityForm = document.createElement('form');
-        accessibilityForm.className = 'w-100';
+        accessibilityForm.className = 'w-100 mt-4 accessibilityForm';
         modalSettingsBody.appendChild(accessibilityForm);
 
         // Champ de la taille de la police
         const labelFontSize = document.createElement('label');
-        labelFontSize.className = 'form-label';
+        labelFontSize.className = 'form-label labelFontSize';
         labelFontSize.textContent = 'Font size';
         accessibilityForm.appendChild(labelFontSize);
 
@@ -410,7 +473,7 @@ export function navigationBar(container) {
         fontSize.name = 'font-size';
         fontSize.type = 'range';
         fontSize.id = 'font-size';
-        fontSize.className = 'form-control-range mb-4 cursor';
+        fontSize.className = 'form-control-range mb-4 cursor ms-4 fontSizeCursor';
         fontSize.min = 1;
         fontSize.max = 3;
         fontSize.value = userData.font_size;
@@ -436,12 +499,12 @@ export function navigationBar(container) {
 
         const optionFr = document.createElement('option');
         optionFr.value = 'fr';
-        optionFr.textContent = 'Français';
+        optionFr.textContent = 'Frensh';
         language.appendChild(optionFr);
 
         const optionEs = document.createElement('option');
         optionEs.value = 'es';
-        optionEs.textContent = 'Español';
+        optionEs.textContent = 'Spanish';
         language.appendChild(optionEs);
 
         // Champ du mode sombre
@@ -454,14 +517,14 @@ export function navigationBar(container) {
         darkMode.type = 'checkbox';
         darkMode.id = 'dark-mode';
         darkMode.name = 'dark-mode';
-        darkMode.className = 'form-check-input mb-4';
+        darkMode.className = 'form-check-input mb-4 ms-4';
         darkMode.value = userData.theme;
         accessibilityForm.appendChild(darkMode);
 
         // Bouton de soumission
         const accessSubmitButton = document.createElement('button');
         accessSubmitButton.type = 'submit';
-        accessSubmitButton.className = 'btn btn-primary w-100';
+        accessSubmitButton.className = 'btn btn-primary w-100 modalSettingsButtonsSubmit';
         accessSubmitButton.textContent = 'Submit';
         accessibilityForm.appendChild(accessSubmitButton);
 
@@ -481,29 +544,58 @@ export function navigationBar(container) {
             const language = data.get('language');
             const dark_mode = data.get('dark-mode');
 
-            // Envoi des données au serveur
-            const response = await fetch('/api/updateAccessibility/', {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                },
-                body: JSON.stringify({ font_size, language, dark_mode })
-            });
-            if (response.ok) {
-                accessibilityForm.innerHTML = '';
-                const successMessage = document.createElement('p');
-                successMessage.className = 'text-success';
-                successMessage.textContent = 'Paramètres modifiés avec succès';
-                accessibilityForm.appendChild(successMessage);
-            } else {
+            try {
+                // Envoi des données au serveur
+                const response = await fetch('/api/updateAccessibility/', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify({ font_size, language, dark_mode })
+                });
+
+                if (response.ok) {
+                    // Affichage du message de succès sans vider le formulaire
+                    const successMessage = document.createElement('p');
+                    successMessage.className = 'text-success';
+                    successMessage.textContent = 'Parameters successfully modified';
+                    accessibilityForm.appendChild(successMessage);
+
+                    // Effacer le message de succès après 2 secondes
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 2000); // 2 secondes
+                    let location = window.location.href;
+                    // console.log(location);
+                    // navigateTo(location);
+
+                } else {
+                    // Affichage du message d'erreur sans vider le formulaire
+                    const errorMessage = document.createElement('p');
+                    errorMessage.className = 'text-danger';
+                    errorMessage.textContent = 'Error while modifying parameters';
+                    accessibilityForm.insertBefore(errorMessage, accessSubmitButton);
+
+                    // Effacer le message d'erreur après 2 secondes
+                    setTimeout(() => {
+                        errorMessage.remove();
+                    }, 2000); // 2 secondes
+                }
+            } catch (error) {
+                // Gestion des erreurs réseau ou autres
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'Erreur lors de la modification des paramètres';
+                errorMessage.textContent = 'Network or server error';
                 accessibilityForm.insertBefore(errorMessage, accessSubmitButton);
+
+                // Effacer le message d'erreur après 2 secondes
+                setTimeout(() => {
+                    errorMessage.remove();
+                }, 2000); // 2 secondes
             }
-        })
+        });
     });
     return div;
 }
