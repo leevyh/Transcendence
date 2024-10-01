@@ -105,8 +105,9 @@ export function displayNotification(data) {
     toast_header.className = 'toast-header';
 
     const avatar_user_sender = document.createElement('img');
-    avatar_user_sender.className = 'rounded me-2';
-    avatar_user_sender.src = 'https://via.placeholder.com/50';
+    avatar_user_sender.className = 'rounded me-2 user-img';
+    // avatar_user_sender.src = 'https://via.placeholder.com/50';
+    avatar_user_sender.src = `data:image/png;base64, ${data.from_avatar}`;
     avatar_user_sender.alt = 'avatar';
     toast_header.appendChild(avatar_user_sender);
 
@@ -127,10 +128,10 @@ export function displayNotification(data) {
 
     toast.appendChild(toast_header);
 
-    if (data.type === 'chat_message') {
+    if (data.type === 'new_message') {
         const toast_body = document.createElement('div');
         toast_body.className = 'toast-body';
-        toast_body.textContent = data.content;
+        toast_body.textContent = data.message;
         toast.appendChild(toast_body);
     }
     else if (data.type === 'friend_request') {

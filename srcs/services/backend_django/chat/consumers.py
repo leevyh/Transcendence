@@ -171,10 +171,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         {
                             "type": "send_notification",
                             "message": {
-                                "type": "chat_message",
-                                "from_user": sender.nickname,
-                                "from_user_id": sender.id,
-                                "content": "Vous avez un nouveau message dans la conversation.",
+                                "type": "new_message",
+                                "from_user": sender.id,
+                                "from_nickname": sender.nickname,
+                                "from_avatar": encode_avatar(sender),
+                                "message": "Vous avez un nouveau message dans la conversation.",
                             },
                         }
                     )
