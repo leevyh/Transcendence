@@ -2,6 +2,7 @@ import { getCookie } from './utils.js';
 import { DEBUG } from '../app.js';
 import { navigationBar } from './navigation.js';
 import { createGlobalContainer, createUserCard } from '../component/chat/visual.js';
+import { notifications } from "./notifications.js";
 
 export async function chatView(container) {
     container.innerHTML = '';
@@ -10,8 +11,10 @@ export async function chatView(container) {
     div.className = 'd-flex h-100';
     container.appendChild(div);
 
+
     const navBarContainer = navigationBar(container);
     div.appendChild(navBarContainer);
+
 
     const viewContainer = await createGlobalContainer();
     div.appendChild(viewContainer);
@@ -60,4 +63,9 @@ export async function chatView(container) {
     .catch(error => {
         if (DEBUG) {console.error('Error:', error);}
     });
+
+
+    const notification_div = notifications(container);
+    div.appendChild(notification_div);
+
 }

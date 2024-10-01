@@ -5,6 +5,7 @@ import wsManager  from './wsManager.js';
 // import { navigationBar } from './fr/navigation.js';
 import { DEBUG } from '../app.js';
 import { navigationBar } from './navigation.js';
+import { notifications } from './notifications.js';
 
 function sendFriendRequest(nickname) {
     sendFriendRequestToServer(nickname).then(r => {
@@ -237,5 +238,8 @@ export async function friendsView(container) {
     //         userCard.appendChild(userCardBody);
     //         container.appendChild(userCard);
     //     });
-    // })
+    // }
+
+    const notifications_div = notifications();
+    global_div.appendChild(notifications_div);
 }
