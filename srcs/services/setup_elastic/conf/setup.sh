@@ -20,26 +20,31 @@ if [ ! -f config/certs/certs.zip ] && [ ! -f config/certs/ca.zip ]; then
   "  - name: backend-elastic\n"\
   "    dns:\n"\
   "      - backend-elastic\n"\
+  "      - localhost\n"\
   "    ip:\n"\
   "      - 127.0.0.1\n"\
   "  - name: backend-kibana\n"\
   "    dns:\n"\
   "      - backend-kibana\n"\
+  "      - localhost\n"\
   "    ip:\n"\
   "      - 127.0.0.1\n"\
   "  - name: backend-fleet\n"\
   "    dns:\n"\
   "      - backend-fleet\n"\
+  "      - localhost\n"\
   "    ip:\n"\
   "      - 127.0.0.1\n"\
   "  - name: backend-logstash\n"\
   "    dns:\n"\
   "      - backend-logstash\n"\
+  "      - localhost\n"\
   "    ip:\n"\
   "      - 127.0.0.1\n"\
   "  - name: proxy-nginx\n"\
   "    dns:\n"\
   "      - proxy-nginx\n"\
+  "      - localhost\n"\
   "    ip:\n"\
   "      - 127.0.0.1\n"\
   > config/certs/instances.yml;
