@@ -199,7 +199,7 @@ services:
       test: ["CMD-SHELL", "curl -s -IL http://localhost:6791/liveness | grep -q 'HTTP/1.1 200 OK'"]
       interval: 10s
       timeout: 10s
-      retries: 240
+      retries: 120
     depends_on:
       backend-kibana:
         condition: service_healthy
@@ -227,7 +227,7 @@ services:
     ports:
       - 9090:9090
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:9090/-/healthy | grep -q 'Prometheus Server is Healthy.'"]
+      test: ["CMD-SHELL", "[ -f /pga/certs/status/prometheus.done ]"]
       interval: 10s
       timeout: 10s
       retries: 120
@@ -248,7 +248,7 @@ services:
     env_file:
       - ./env/alertmanager.env
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:9093/-/healthy | grep -q 'OK'"]
+      test: ["CMD-SHELL", "[ -f /pga/certs/status/alertmanager.done ]"]
       interval: 10s
       timeout: 10s
       retries: 120
@@ -266,8 +266,10 @@ services:
       - default
     ports:
       - 3000:3000
+    env_file:
+      - ./env/grafana.env
     healthcheck:
-      test: ["CMD-SHELL", "curl --cacert /pga/certs/grafana.crt https://localhost:3000/api/health | grep -q '\"database\": \"ok\"'"]
+      test: ["CMD-SHELL", "[ -f /pga/certs/status/grafana.done ]"]
       interval: 10s
       timeout: 10s
       retries: 120
