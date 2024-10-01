@@ -66,6 +66,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 
     async def handle_notification(self, data):
         from .models import User_site, FriendRequest, Friendship
+        from chat.consumers import encode_avatar
         user = self.scope["user"]
         type = data['type']
         print(f"Data received: {data}")
@@ -98,6 +99,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
                         "type": "friend_request",
                         "from_user": user.id,
                         "from_nickname": user.nickname,
+                        "from_avatar": encode_avatar(user),
                     },
                 },
             )
