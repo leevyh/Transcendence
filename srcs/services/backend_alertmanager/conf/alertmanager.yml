@@ -1,15 +1,9 @@
 route:
-  receiver: 'mail'
+  receiver: 'discord'
   repeat_interval: 4h
   group_by: [ alertname ]
 
 receivers:
-  - name: 'mail'
-    email_configs:
-      - to: 'ALERT_RECV'
-        from: 'ALERT_EMAIL'
-        smarthost: 'smtp.gmail.com:465'
-        auth_username: 'ALERT_EMAIL'
-        auth_identity: 'ALERT_EMAIL'
-        auth_password: 'ALERT_PASSWORD'
-        require_tls: false
+  - name: discord
+    discord_configs:
+    - webhook_url: 'WEBHOOK'

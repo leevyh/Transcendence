@@ -1,7 +1,5 @@
 #!/bin/bash
 
-sed -i "s|ALERT_PASSWORD|$ALERT_PASSWORD|g" /config/alertmanager.yml
-sed -i "s|ALERT_EMAIL|$ALERT_EMAIL|g" /config/alertmanager.yml
-sed -i "s|ALERT_RECV|$ALERT_RECV|g" /config/alertmanager.yml
+sed -i "s|WEBHOOK|$WEBHOOK|g" /etc/alertmanager/alertmanager.yml
 
-/bin/alertmanager --config.file=/config/alertmanager.yml --storage.path=/alertmanager
+/bin/alertmanager --config.file=/etc/alertmanager/alertmanager.yml --web.config.file=/etc/alertmanager/web-config.yml --storage.path=/alertmanager
