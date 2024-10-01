@@ -35,9 +35,6 @@ clean:
 	docker compose -f ${COMPOSE} down --rmi all
 	@${DCPF} ${DATA}
 
-force:
-	@${DCPF} ${DATA}
-
 logs:
 	docker compose logs -f
 
