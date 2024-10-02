@@ -196,12 +196,6 @@ DATABASES = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-	'formatters': {
-		'json': {
-			'()': jsonlogger.JsonFormatter,
-			'format': '%(levelname)s %(asctime)s %(module)s %(message)s',
-        },
-    },
     'handlers': {
         'logstash': {
             'level': 'DEBUG',
