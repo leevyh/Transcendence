@@ -542,7 +542,7 @@ export function navigationBar(container) {
         };
 
         const divFontSize = document.createElement('div');
-        divFontSize.className = 'divFontSize';
+        divFontSize.className = 'divFontSize d-flex flex-column';
         accessibilityForm.appendChild(divFontSize);
 
         // Champ de la taille de la police
@@ -555,7 +555,7 @@ export function navigationBar(container) {
         fontSize.name = 'font-size';
         fontSize.type = 'range';
         fontSize.id = 'font-size';
-        fontSize.className = 'form-control-range mb-4 cursor ms-4 fontSizeCursor';
+        fontSize.className = 'form-control-range mb-2 cursor align-self-center fontSizeCursor';
         fontSize.min = 1;
         fontSize.max = 3;
         fontSize.value = userData.font_size;
