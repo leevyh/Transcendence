@@ -38,8 +38,13 @@
 	cursor: pointer;
 }
 
-.ElemListNavBar {
+.TitleNickname:focus {
+    outline: 2px solid #007bff; /* Contour bleu pour indiquer le focus */
+    outline-offset: 4px; /* Espacement entre le titre et le contour */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Ombre pour rendre le focus plus visible */
+} /* Not working */
 
+.ElemListNavBar {
 	background: linear-gradient(to right, #F4ED37, #cecec3);
 	background-clip: text;
 	-webkit-background-clip: text;
@@ -47,12 +52,17 @@
 	cursor: pointer
 }
 
+.ElemListNavBar button:focus {
+    outline: 2px solid #007bff; /* Ajoute un contour bleu pour indiquer le focus */
+    outline-offset: 2px; /* Espacement entre le bouton et l'outline */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Ajoute une ombre pour rendre le focus plus visible */
+}
+
 .border-custom-color {
     border-color: #000000 !important;  /* Exemple avec une couleur orange */
 }
 
 .divListFriends {
-
 	width: 100%;
 	display: flex;
 	justify-content: center;

@@ -77,6 +77,7 @@ export function navigationBar(container) {
         const TitleNickname = document.createElement('h4');
         TitleNickname.className = 'TitleNickname mt-2 pb-4';  // Bootstrap pour couleur et marge
         TitleNickname.textContent = `${userData.nickname}`;
+        TitleNickname.setAttribute('tabindex', '0');  // Rendre le titre focalisable --> Not working
         divProfile.appendChild(TitleNickname);
 
         // Navigation list
@@ -88,39 +89,10 @@ export function navigationBar(container) {
         NavBarList.className = 'NavBarList list-unstyled d-flex flex-column';  // Flex column via Bootstrap
         divNav.appendChild(NavBarList);
 
-        const PlayElem = document.createElement('li');
-        PlayElem.className = 'ElemListNavBar text-center text-primary py-2';  // Text et padding avec Bootstrap
-        PlayElem.textContent = 'Play';
-        NavBarList.appendChild(PlayElem);
-
-        const ChatElem = document.createElement('li');
-        ChatElem.className = 'ElemListNavBar text-center text-primary cursor py-2 ';  // Même traitement
-        ChatElem.textContent = 'Chat';
-        NavBarList.appendChild(ChatElem);
-
-        const FriendsElem = document.createElement('li');
-        FriendsElem.className = 'ElemListNavBar text-center text-primary py-2';
-        FriendsElem.textContent = 'Friends';
-        NavBarList.appendChild(FriendsElem);
-
-        const LeaderboardElem = document.createElement('li');
-        LeaderboardElem.className = 'ElemListNavBar text-center text-primary py-2';
-        LeaderboardElem.textContent = 'Leaderboard';
-        NavBarList.appendChild(LeaderboardElem);
-
-        PlayElem.addEventListener('click', () => {
-            navigateTo('/pong');
-        });
-
-        ChatElem.addEventListener('click', () => {
-            navigateTo('/chat');
-        });
-
-        FriendsElem.addEventListener('click', () => {
-            navigateTo('/users');
-        });
-
-
+        NavBarList.appendChild(createNavButton('Play', () => navigateTo('/pong')));
+        NavBarList.appendChild(createNavButton('Chat', () => navigateTo('/chat')));
+        NavBarList.appendChild(createNavButton('Friends', () => navigateTo('/users')));
+        NavBarList.appendChild(createNavButton('Leaderboard', () => navigateTo('/leaderboard')));
 
         // Friends list
         const divListFriends = document.createElement('div');
@@ -755,4 +727,30 @@ export function navigationBar(container) {
         });
     });
     return div;
+}
+
+function createNavButton(text, onClick) {
+    const listItem = document.createElement('li');
+    listItem.className = 'ElemListNavBar text-center py-2';
+    
+    const button = document.createElement('button');
+    button.className = 'btn text-primary';
+    button.textContent = text;
+
+    // Add a focus event listener to the button for accessibility
+    button.addEventListener('focus', () => {
+        button.style.outline = '2px solid #007bff';  // Contour bleu lorsqu'il est en focus
+        button.style.outlineOffset = '2px';
+    });
+    
+    // Optional : remove the outline when the button loses focus
+    button.addEventListener('blur', () => {
+        button.style.outline = 'none';
+    });
+
+    listItem.appendChild(button);
+
+    button.addEventListener('click', onClick);
+
+    return listItem;
 }

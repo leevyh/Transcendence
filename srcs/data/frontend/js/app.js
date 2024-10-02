@@ -10,6 +10,7 @@ import { pongView } from './views/pong.js';
 import { profileView } from './views/profile.js';
 import { callback42 } from './views/callback42.js';
 import { chatView } from './views/chat.js';
+import { leaderboardView } from './views/leaderboard.js';
 
 
 const appDiv = document.getElementById('app');
@@ -38,6 +39,10 @@ const routes = {
     '/callback42': {
         title: 'Authentification 42',
         view: callback42,
+    },
+    '/leaderboard': {
+        title: 'Leaderboard',
+        view: leaderboardView,
     },
 };
 

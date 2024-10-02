@@ -234,9 +234,19 @@ body.large-font {
     text-decoration: none;
     cursor: pointer;
 }
-/*Livia */
 
 #error404 {
 	width: 50%;
 	height: 50%;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
 }
