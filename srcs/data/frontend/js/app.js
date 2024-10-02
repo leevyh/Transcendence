@@ -1,13 +1,10 @@
 export const DEBUG = true;
 
 import { chatWS } from './component/chat/functions.js';
+import { getAccessibility, applyAccessibilitySettings } from './views/utils.js';
 
 import { homeView } from './views/home.js';
 import { notFoundView } from './views/404.js';
-// import { loginView } from './views/fr/login.js';
-// import { registerView } from './views/fr/register.js';
-// import { settingsView } from './views/fr/settings.js';
-// import { passwordView } from './views/fr/password.js';
 import { friendsView } from './views/users.js';
 import { pongView } from './views/pong.js';
 import { profileView } from './views/profile.js';
@@ -26,22 +23,6 @@ const routes = {
         title: '404',
         view: notFoundView,
     },
-    // '/register': {
-    //     title: 'Register',
-    //     view: registerView,
-    // },
-    // '/login': {
-    //     title: 'Login',
-    //     view: loginView,
-    // },
-    // '/settings': {
-    //     title: 'Settings',
-    //     view: settingsView,
-    // },
-    // '/password': {
-    //     title: 'Password',
-    //     view: passwordView,
-    // },
     '/chat': {
         title: 'Chat',
         view: chatView,
@@ -69,6 +50,10 @@ async function router() {
     // Vérifier si l'URL correspond au modèle /user/:nickname
     const userProfileRegex = /^\/user\/([a-zA-Z0-9_-]+)$/;
     const match = path.match(userProfileRegex);
+
+    // Récupérer les choix d'accessibilité de l'utilisateur
+    const userSettings = await getAccessibility();
+    applyAccessibilitySettings(userSettings);
 
     if (match) {
         const nickname = match[1]; // Extrait le nom d'utilisateur du chemin

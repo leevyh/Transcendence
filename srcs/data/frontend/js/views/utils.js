@@ -293,6 +293,7 @@ export async function getAccessibility() {
             };
             return userData;
         } else if (response.status === 307) {
+            // Means the token is invalid, so we remove it from localStorage and redirect to the home page
             localStorage.removeItem('token');
 
             const logoutResponse = await fetch('/api/logout/', {
@@ -303,8 +304,8 @@ export async function getAccessibility() {
                 },
             });
 
-            await logoutResponse.json(); // Traiter la réponse de logout si nécessaire
-            navigateTo('/login');
+            await logoutResponse.json();
+            navigateTo('/');
             return null;
         } else {
             throw new Error('Something went wrong');
@@ -316,35 +317,35 @@ export async function getAccessibility() {
 }
 
 export function applyAccessibilitySettings(userSettings) {
-    const rootElement = document.documentElement;
+    const bodyElement = document.documentElement;
     if (!userSettings) {
         document.documentElement.setAttribute('lang', 'fr');
-        rootElement.style.fontSize = '16px';
+        bodyElement.style.fontSize = '16px';
         document.body.classList.remove('dark-mode');
         return;
     }
 
-    // Appliquer le langage
+    // Apply the language
     if (userSettings.language) {
         document.documentElement.setAttribute('lang', userSettings.language);
     }
 
-    // Appliquer la taille de police
+    // Apply the font size
     switch (userSettings.font_size) {
         case 1:
-            rootElement.style.fontSize = '12px';
+            bodyElement.style.fontSize = '12px';
             break;
         case 2:
-            rootElement.style.fontSize = '16px'; // Taille par défaut
+            bodyElement.style.fontSize = '16px';
             break;
         case 3:
-            rootElement.style.fontSize = '20px';
+            bodyElement.style.fontSize = '20px';
             break;
         default:
-            rootElement.style.fontSize = '16px'; // Valeur par défaut
+            bodyElement.style.fontSize = '16px'; // Default value
     }
 
-    // Appliquer le mode sombre
+    // Apply the theme
     if (userSettings.theme) {
         document.body.classList.add('dark-mode');
     } else {

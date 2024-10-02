@@ -38,18 +38,13 @@
 	cursor: pointer;
 }
 
-.PlayElem {
-	background: linear-gradient(to right, #F4ED37, #cecec3);
-	background-clip: text;
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-}
 .ElemListNavBar {
 
 	background: linear-gradient(to right, #F4ED37, #cecec3);
 	background-clip: text;
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
+	cursor: pointer
 }
 
 .border-custom-color {

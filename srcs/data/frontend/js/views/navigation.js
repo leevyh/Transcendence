@@ -89,12 +89,12 @@ export function navigationBar(container) {
         divNav.appendChild(NavBarList);
 
         const PlayElem = document.createElement('li');
-        PlayElem.className = 'PlayElem text-center text-primary py-2';  // Text et padding avec Bootstrap
+        PlayElem.className = 'ElemListNavBar text-center text-primary py-2';  // Text et padding avec Bootstrap
         PlayElem.textContent = 'Play';
         NavBarList.appendChild(PlayElem);
 
         const ChatElem = document.createElement('li');
-        ChatElem.className = 'ElemListNavBar text-center text-primary cursor py-2';  // Même traitement
+        ChatElem.className = 'ElemListNavBar text-center text-primary cursor py-2 ';  // Même traitement
         ChatElem.textContent = 'Chat';
         NavBarList.appendChild(ChatElem);
 
