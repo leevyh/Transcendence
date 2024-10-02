@@ -1,3 +1,2 @@
 node.name: backend-logstash
-path.config: /usr/share/logstash/pipeline/
-monitoring.elasticsearch.hosts: ["http://backend-elastic:9200"]
+monitoring.elasticsearch.hosts: ["https://backend-elastic:9200"]
