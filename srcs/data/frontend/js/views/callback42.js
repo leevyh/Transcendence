@@ -20,7 +20,7 @@ export function callback42(container) {
             if (data) {
                 if (DEBUG) {console.log(data);}
                 localStorage.setItem('token', data.token);
-                // navigateTo(`/user/${data.nickname}`);
+                navigateTo(`/user/${data.nickname}`);
             }
             else {
                 if (DEBUG) {console.log('No data');}
