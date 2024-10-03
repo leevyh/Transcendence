@@ -477,6 +477,7 @@ def create_user42(response, code):
             settings = Accessibility(user=user)
             settings.save()
             stats = Stats_user(user=user)
+            user.status = User_site.Status.ONLINE
             stats.save()
         else:
             user = User_site.objects.get(nickname=nickname)
