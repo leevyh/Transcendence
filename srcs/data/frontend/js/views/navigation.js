@@ -559,12 +559,12 @@ export function navigationBar(container) {
 
         const optionFr = document.createElement('option');
         optionFr.value = 'fr';
-        optionFr.textContent = 'Frensh';
+        optionFr.textContent = 'Francais';
         language.appendChild(optionFr);
 
         const optionEs = document.createElement('option');
         optionEs.value = 'es';
-        optionEs.textContent = 'Spanish';
+        optionEs.textContent = 'Espanol';
         language.appendChild(optionEs);
 
         // Champ du mode sombre

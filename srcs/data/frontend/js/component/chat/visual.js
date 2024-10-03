@@ -204,13 +204,6 @@ function createChatContainerHeader() {
     profileButton.innerHTML = '<i class="bi bi-person-lines-fill"></i>';
     div2.appendChild(profileButton);
 
-    const blockButton = document.createElement('button');
-    blockButton.style.display = 'none'; // Hide the button
-    blockButton.id = 'block-button';
-    blockButton.className = 'btn btn-outline-danger block-button';
-    blockButton.innerHTML = '<i class="bi bi-slash-circle"></i>';
-    div2.appendChild(blockButton);
-
     const inviteGameButton = document.createElement('button');
     inviteGameButton.style.display = 'none'; // Hide the button
     inviteGameButton.id = 'invite-game-button';
