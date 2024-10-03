@@ -26,12 +26,11 @@ export async function chatView(container) {
 
     // On message received from the server (status of a user)
     statusSocket.onmessage = function(event) {
-        // FIXME: Handle the message properly, if I'm the one who sent the message, don't send an error
         const data = JSON.parse(event.data);
         if (DEBUG) {console.log('Message received:', data);}
         // Update the user list with the new status
         const userList = document.getElementById('user-list');
-        createUserCard(data, userList);
+        if (userList) {createUserCard(data, userList);}
     };
 
     // Onclose event

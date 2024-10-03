@@ -262,9 +262,8 @@ export async function isAuthenticated() {
         });
         if (response.ok) {
             const data = await response.json();
-            return data.value;
-        } else {
-            return false;
+            if (data.value === true) {return true;}
+            else {return false;}
         }
     }
     catch (error) {
@@ -275,60 +274,60 @@ export async function isAuthenticated() {
 
 // Récupérer les paramètres d'accessibilité de l'utilisateur
 export async function getAccessibility() {
-    try {
-        const response = await fetch('/api/settings/', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-        });
-        if (response.status === 200) {
-            const data = await response.json();
-            const userData = {
-                language: data.language,
-                font_size: data.font_size,
-                theme: data.dark_mode,
-            };
-            return userData;
-        } else if (response.status === 307) {
-            // Means the token is invalid, so we remove it from localStorage and redirect to the home page
-            localStorage.removeItem('token');
-
-            const logoutResponse = await fetch('/api/logout/', {
-                method: 'POST',
+    if (await isAuthenticated() === true) {
+        console.log('User is authenticated');
+        try {
+            const response = await fetch('/api/settings/', {
+                method: 'GET',
                 headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-CSRFToken': getCookie('csrftoken')
                 },
             });
+            if (response.status === 200) {
+                const data = await response.json();
+                const userData = {
+                    language: data.language,
+                    font_size: data.font_size,
+                    theme: data.dark_mode,
+                };
+                return userData;
+            } else if (response.status === 307) {
+                // Means the token is invalid, so we remove it from localStorage and redirect to the home page
+                localStorage.removeItem('token');
 
-            await logoutResponse.json();
-            navigateTo('/');
+                const logoutResponse = await fetch('/api/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                });
+
+                await logoutResponse.json();
+                navigateTo('/');
+                return null;
+            }
+        } catch (error) {
+            if (DEBUG) {console.error('Error fetching accessibility settings:', error);}
             return null;
-        } else {
-            throw new Error('Something went wrong');
         }
-    } catch (error) {
-        if (DEBUG) {console.error('Error fetching accessibility settings:', error);}
+    } else {
+        if (DEBUG) {console.log('User is not authenticated');}
         return null;
     }
 }
 
 export function applyAccessibilitySettings(userSettings) {
-    const bodyElement = document.documentElement;
+    const bodyElement = document.body;
     if (!userSettings) {
         document.documentElement.setAttribute('lang', 'fr');
         bodyElement.style.fontSize = '16px';
         document.body.classList.remove('dark-mode');
         return;
     }
-
-    // Apply the language
-    if (userSettings.language) {
-        document.documentElement.setAttribute('lang', userSettings.language);
-    }
+    if (DEBUG) {console.log('User settings:', userSettings);}
 
     // Apply the font size
     switch (userSettings.font_size) {
@@ -345,7 +344,12 @@ export function applyAccessibilitySettings(userSettings) {
             bodyElement.style.fontSize = '16px'; // Default value
     }
 
-    // Apply the theme
+    // TODO: Apply the language
+    if (userSettings.language) {
+        document.documentElement.setAttribute('lang', userSettings.language);
+    }
+
+    // TODO: Apply the dark/light theme
     if (userSettings.theme) {
         document.body.classList.add('dark-mode');
     } else {

@@ -47,21 +47,27 @@ const routes = {
 };
 
 async function router() {
+    if (DEBUG) console.log('Router');
     const pageTitle = "Transcendence";
     let path = location.pathname;
     
     if (chatWS) {chatWS.close();}
 
-    // Vérifier si l'URL correspond au modèle /user/:nickname
+    // Check if the URL is a user profile corresponding to /user/:nickname
     const userProfileRegex = /^\/user\/([a-zA-Z0-9_-]+)$/;
     const match = path.match(userProfileRegex);
 
-    // Récupérer les choix d'accessibilité de l'utilisateur
+    // Get user's accessibility settings
     const userSettings = await getAccessibility();
-    applyAccessibilitySettings(userSettings);
+    if (userSettings) {
+        applyAccessibilitySettings(userSettings);
+    }
+    else {
+        if (DEBUG) console.log('No user settings found');
+    }
 
     if (match) {
-        const nickname = match[1]; // Extrait le nom d'utilisateur du chemin
+        const nickname = match[1]; // Extract the nickname from the URL
         document.title = `${pageTitle} | ${nickname}'s profile`;
 
         appDiv.innerHTML = '';
@@ -75,17 +81,20 @@ async function router() {
 }
 
 export function navigateTo(path) {
+    if (DEBUG) console.log('Navigating to', path);
     history.pushState(null, null, path);
     router();
 }
 
 window.addEventListener("popstate", router);
 window.addEventListener("DOMContentLoaded", () => {
+    if (DEBUG) console.log('DOMContentLoaded');
     document.body.addEventListener("click", (e) => {
         if (e.target.matches("[data-link]")) {
             e.preventDefault();
             const href = e.target.getAttribute("href");
             navigateTo(href);
+            return;
         }
     });
     router();

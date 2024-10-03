@@ -1,4 +1,4 @@
-import { navigateTo } from '../app.js';
+import { DEBUG, navigateTo } from '../app.js';
 import { getCookie } from './utils.js';
 
 export function navigationBar(container) {
@@ -89,9 +89,9 @@ export function navigationBar(container) {
         NavBarList.className = 'NavBarList list-unstyled d-flex flex-column';  // Flex column via Bootstrap
         divNav.appendChild(NavBarList);
 
-        NavBarList.appendChild(createNavButton('Play', () => navigateTo('/pong')));
+        NavBarList.appendChild(createNavButton('Pong', () => navigateTo('/pong')));
         NavBarList.appendChild(createNavButton('Chat', () => navigateTo('/chat')));
-        NavBarList.appendChild(createNavButton('Friends', () => navigateTo('/users')));
+        NavBarList.appendChild(createNavButton('Users', () => navigateTo('/users')));
         NavBarList.appendChild(createNavButton('Leaderboard', () => navigateTo('/leaderboard')));
 
         // Friends list
@@ -739,18 +739,24 @@ function createNavButton(text, onClick) {
 
     // Add a focus event listener to the button for accessibility
     button.addEventListener('focus', () => {
-        button.style.outline = '2px solid #007bff';  // Contour bleu lorsqu'il est en focus
+        button.style.outline = '2px solid #1d2d45';  // Blue outline for focus
         button.style.outlineOffset = '2px';
     });
     
-    // Optional : remove the outline when the button loses focus
+    // Remove the outline when the button loses focus
     button.addEventListener('blur', () => {
         button.style.outline = 'none';
     });
 
     listItem.appendChild(button);
 
-    button.addEventListener('click', onClick);
+    button.addEventListener('click', () => {
+        if (DEBUG) {console.log(`Navigating to ${text}`, 'actual:', window.location.pathname);}
+        if (window.location.pathname === `/${text.toLowerCase()}`) {
+            return;
+        }
+        onClick();
+    });
 
     return listItem;
 }

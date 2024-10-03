@@ -45,13 +45,13 @@
 }
 
 .user-info span {
-    font-size: 15px;
+    font-size: large;
     color: white;
     cursor: pointer;
 }
 
 .user-info p {
-    font-size: 8px;
+    font-size: inherit;
     color: rgba(255, 255, 255, 0.6);
 }
 
@@ -81,7 +81,7 @@
 
 /* CONTACTS-HEADER */
 .search {
-    font-size: 10px;
+    font-size: inherit;
     border-radius: 15px 0 0 15px !important;
     background-color: rgba(0, 0, 0, 0.3) !important;
 }
@@ -149,7 +149,7 @@
 
 .chat-msg {
     padding: 10px;
-    font-size: 10px;
+    font-size: inherit;
     border-radius: 25px;
     min-width: 15%;
     max-width: 80%;
@@ -180,7 +180,7 @@
 
 .chat-input::placeholder {
     color: white;
-    font-size: small;
+    font-size: inherit;
 }
 
 .chat-input:focus {

@@ -26,6 +26,10 @@ body.small-font {
 body.large-font {
     font-size: 20px;
 }
+/* For the buttons to inherit the font size */
+.btn {
+    font-size: inherit;
+}
 
 
 .PongDiv{
