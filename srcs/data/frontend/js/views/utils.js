@@ -88,12 +88,13 @@ export function changeLanguage(lang) {
 wsManager.AddNotificationListener((data) => {
     if (data.type === 'friend_request') {
         if (DEBUG) {console.log('New friend request received from ', data.from_nickname);}
-        displayFriendRequestNotification(data.from_nickname);
+        displayNotification(data);
     }
 })
 
 export function displayNotification(data) {
     let toast_container = document.querySelector('.toast-container');
+
 
     // Si le conteneur n'existe pas, le créer
     if (!toast_container) {
@@ -123,6 +124,46 @@ export function displayNotification(data) {
     const toast_header = document.createElement('div');
     toast_header.className = 'toast-header';
 
+    if (data.error)
+    {
+        //Friends request already sent avatar replace by error icon
+        const error_icon = document.createElement('i');
+        error_icon.className = 'bi bi-exclamation-triangle-fill';
+        error_icon.style = 'color: red;';
+        toast_header.appendChild(error_icon);
+
+        const strong = document.createElement('strong');
+        strong.className = 'me-auto';
+        strong.textContent = 'Error';
+
+        toast_header.appendChild(strong);
+
+        const button = document.createElement('button');
+        button.className = 'btn-close';
+        button.setAttribute('data-bs-dismiss', 'toast');
+        button.setAttribute('aria-label', 'Close');
+        button.addEventListener('click', () => {
+            toast.remove();
+        });
+
+        toast_header.appendChild(button);
+
+
+        toast.appendChild(toast_header);
+
+        const toast_body = document.createElement('div');
+        toast_body.className = 'toast-body';
+        toast_body.textContent = data.error;
+
+        toast.appendChild(toast_body);
+
+        toast_container.appendChild(toast);
+
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        return;
+    }
+
     const avatar_user_sender = document.createElement('img');
     avatar_user_sender.className = 'rounded me-2 user-img';
     avatar_user_sender.src = `data:image/png;base64, ${data.from_avatar}`;
@@ -140,6 +181,7 @@ export function displayNotification(data) {
     button.setAttribute('aria-label', 'Close');
     button.addEventListener('click', () => {
         toast.remove();
+        //Set notification as read in the database with websocket
     });
     toast_header.appendChild(button);
 
@@ -170,6 +212,7 @@ export function displayNotification(data) {
                 nickname: data.from_nickname,
             });
             toast.remove();
+            //Set notification as read in the database with websocket
         });
         div_buttons.appendChild(accept_button);
 
@@ -182,6 +225,7 @@ export function displayNotification(data) {
                 nickname: data.from_nickname,
             });
             toast.remove();
+            //Set notification as read in the database with websocket
         });
         div_buttons.appendChild(reject_button);
     }

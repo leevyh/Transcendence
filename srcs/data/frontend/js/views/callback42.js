@@ -20,6 +20,7 @@ export function callback42(container) {
             if (data) {
                 if (DEBUG) {console.log(data);}
                 localStorage.setItem('token', data.token);
+                window.dispatchEvent(new Event('userAuthenticated'));
                 navigateTo(`/user/${data.nickname}`);
             }
             else {
