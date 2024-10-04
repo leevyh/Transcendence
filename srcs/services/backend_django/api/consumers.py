@@ -90,6 +90,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
                 return
 
             await database_sync_to_async(FriendRequest.objects.create)(user=user, friend=friend)
+            # await database_sync_to_async(Notification.objects.create)(user=friend, type='friend_request', from_user=user) TODO IDEE CORRECT NEED TO BE IMPLEMENTED
             print(f"Friend request from {user.nickname} to {friend.nickname} created and saved in database")
             await self.channel_layer.group_send(
                 f"user_{friend.id}",

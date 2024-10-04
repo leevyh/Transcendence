@@ -17,11 +17,6 @@
     }
 }
 
-/* NAVIGATION BAR */
-.navigationBarDiv {
-    width: 250px; /* Taille fixe de la navigation */
-}
-
 /* VIEW CHAT */
 .user-img {
     height: 40px;

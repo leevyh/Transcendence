@@ -477,6 +477,7 @@ def create_user42(response, code):
             settings = Accessibility(user=user)
             settings.save()
             stats = Stats_user(user=user)
+            user.status = User_site.Status.ONLINE
             stats.save()
         else:
             user = User_site.objects.get(nickname=nickname)
@@ -513,7 +514,7 @@ def token_42(request):
                 if user is not None:
                     login(request, user)
                     encoded_jwt = jwt.encode({'username': user.username, 'exp': time.time() + 3600}, 'secret', algorithm='HS256')
-                    return JsonResponse({'message': 'Token created successfully', 'token': encoded_jwt, 'user': user.nickname}, status=200)
+                    return JsonResponse({'message': 'Token created successfully', 'token': encoded_jwt, 'nickname': user.nickname}, status=200)
                 else:
                     return JsonResponse({'error': 'Invalid credentials'}, status=401)
             else: 

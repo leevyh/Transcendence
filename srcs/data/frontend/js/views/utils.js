@@ -95,6 +95,25 @@ wsManager.AddNotificationListener((data) => {
 export function displayNotification(data) {
     let toast_container = document.querySelector('.toast-container');
 
+    // Si le conteneur n'existe pas, le créer
+    if (!toast_container) {
+        toast_container = document.createElement('div');
+        toast_container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        document.body.appendChild(toast_container);
+    }
+
+    // Limite de toasts
+    const maxToasts = 3;
+    const currentToasts = toast_container.querySelectorAll('.toast');
+    console.log(currentToasts.length);
+    
+    // Si le nombre de toasts dépasse la limite, supprimer le plus ancien
+    if (currentToasts.length >= maxToasts) {
+        console.log('Removing oldest toast');
+        currentToasts[0].remove();
+    }
+
+    // Création d'un nouvel élément de toast
     const toast = document.createElement('div');
     toast.className = 'toast';
     toast.setAttribute('role', 'alert');
@@ -106,7 +125,6 @@ export function displayNotification(data) {
 
     const avatar_user_sender = document.createElement('img');
     avatar_user_sender.className = 'rounded me-2 user-img';
-    // avatar_user_sender.src = 'https://via.placeholder.com/50';
     avatar_user_sender.src = `data:image/png;base64, ${data.from_avatar}`;
     avatar_user_sender.alt = 'avatar';
     toast_header.appendChild(avatar_user_sender);
@@ -120,7 +138,6 @@ export function displayNotification(data) {
     button.className = 'btn-close';
     button.setAttribute('data-bs-dismiss', 'toast');
     button.setAttribute('aria-label', 'Close');
-
     button.addEventListener('click', () => {
         toast.remove();
     });
@@ -128,13 +145,13 @@ export function displayNotification(data) {
 
     toast.appendChild(toast_header);
 
+    // Gestion du type de notification
     if (data.type === 'new_message') {
         const toast_body = document.createElement('div');
         toast_body.className = 'toast-body';
         toast_body.textContent = data.message;
         toast.appendChild(toast_body);
-    }
-    else if (data.type === 'friend_request') {
+    } else if (data.type === 'friend_request') {
         const toast_body = document.createElement('div');
         toast_body.className = 'toast-body';
         toast_body.textContent = `${data.from_nickname} sent you a friend request`;
@@ -168,11 +185,15 @@ export function displayNotification(data) {
         });
         div_buttons.appendChild(reject_button);
     }
+
+    // Ajouter le toast au conteneur
     toast_container.appendChild(toast);
-    // Display the toast
-    toast.classList.add('show');
-    document.body.appendChild(toast_container);
+
+    // Activer le toast avec Bootstrap
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
 }
+
 
 
 
