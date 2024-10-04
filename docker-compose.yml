@@ -267,7 +267,9 @@ services:
     ports:
       - 3000:3000
     env_file:
+      - ./env/elastic.env
       - ./env/grafana.env
+      - ./env/postgresql.env
     healthcheck:
       test: ["CMD-SHELL", "[ -f /pga/certs/status/grafana.done ]"]
       interval: 10s

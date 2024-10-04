@@ -42,7 +42,7 @@ datasources:
       tlsAuthWithCACert: false
       database: transcendence
     secureJsonData:
-      password: transcendence
+      password: POSTGRES_PASSWORD
 
   - name: Elastic
     type: elasticsearch
@@ -58,5 +58,5 @@ datasources:
       tlsAuthWithCACert: false
       index: '*'
     secureJsonData:
-      basicAuthPassword: transcendence
+      basicAuthPassword: ELASTIC_PASSWORD
     editable: true
