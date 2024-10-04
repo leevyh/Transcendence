@@ -241,7 +241,7 @@ function createChatContainerFooter() {
         }
     });
 
-    const chatSendButton = document.createElement('span');
+    const chatSendButton = document.createElement('button');
     chatSendButton.className = 'btn send-btn chat-send-button';
     chatSendButton.innerHTML = '<i class="bi bi-chevron-up text-white"></i>';
     inputGroup.appendChild(chatSendButton);

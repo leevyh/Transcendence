@@ -1,17 +1,3 @@
-/* .navigationBarDiv {
-	position: fixed;
-	top: 0;
-	left: 0;
-	height: 100%;
-	z-index: 1000;
-}
-
-@media screen and (max-width: 600px) {
-	.navigationBarDiv {
-		opacity: 0;
-	}
-} */
-
 .nav {
 	padding: 15px;
 	/* width: min-content; */
@@ -53,13 +39,13 @@
 }
 
 .ElemListNavBar button:focus {
-    outline: 2px solid #007bff; /* Ajoute un contour bleu pour indiquer le focus */
-    outline-offset: 2px; /* Espacement entre le bouton et l'outline */
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Ajoute une ombre pour rendre le focus plus visible */
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .border-custom-color {
-    border-color: #000000 !important;  /* Exemple avec une couleur orange */
+    border-color: #000000 !important;		
 }
 
 .divListFriends {
