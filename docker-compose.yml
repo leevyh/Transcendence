@@ -3,6 +3,7 @@ services:
     container_name: proxy-nginx
     build: ./srcs/services/proxy_nginx
     volumes:
+      - backend-django-certs:/etc/nginx/ssl/
       - backend-elk-ea-proxy-nginx:/usr/share/elastic-agent/
       - backend-elk-certs:/usr/share/elastic-agent/config/certs/
     networks:
@@ -49,6 +50,7 @@ services:
     build: ./srcs/services/backend_django
     volumes:
       - backend-django:/var/app/ft_transcendence/
+      - backend-django-certs:/etc/nginx/ssl/
       - backend-django-logs:/var/log/django/
     networks:
       - default
@@ -58,7 +60,7 @@ services:
       - ./env/42api.env
       - ./env/postgresql.env
     healthcheck:
-      test: ["CMD-SHELL", "curl -IL http://backend-django:8000/api/django_status | grep -q 'HTTP/1.1 200 OK'"]
+      test: ["CMD-SHELL", "curl -sk -IL https://backend-django:8000/api/django_status | grep -q 'HTTP/2 200'"]
       interval: 10s
       timeout: 10s
       retries: 120
@@ -293,6 +295,12 @@ volumes:
     driver_opts:
       type: none
       device: ./srcs/data/backend/data/
+      o: bind
+  backend-django-certs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/backend/certs/
       o: bind
   backend-django-logs:
     driver: local
