@@ -273,7 +273,7 @@ def updateAvatar(request):
             #save file in media directory
             with open(f'media/{username}.jpg', 'wb') as f:
                 f.write(data)
-            user.avatar = f'{username}.jpg'
+            user.avatar = f'media/{username}.jpg'
             user.save()
             return JsonResponse({'message': 'Avatar updated successfully'}, status=200)
         except User_site.DoesNotExist:
@@ -296,7 +296,7 @@ def deleteAvatar(request):
             username = payload['username']
             #Delete the avatar of the user and set the default avatar
             user = User_site.objects.get(username=username)
-            user.avatar = 'default.jpg'
+            user.avatar = 'media/default.jpg'
             user.save()
             #delete the file in the media directory
             os.remove(f'media/{username}.jpg')
@@ -507,7 +507,7 @@ def token_42(request):
             # print('OKI MA GUEULE')         # DEBUG
             user = create_user42(r, code)
             if user != 401:
-                
+
                 #authenticate user
                 print('username: ', user.username)         # DEBUG
                 user = authenticate(request, username=user.username, password=code)
@@ -517,7 +517,7 @@ def token_42(request):
                     return JsonResponse({'message': 'Token created successfully', 'token': encoded_jwt, 'nickname': user.nickname}, status=200)
                 else:
                     return JsonResponse({'error': 'Invalid credentials'}, status=401)
-            else: 
+            else:
                 return JsonResponse({'error': 'User not created'}, status=401)
         else:
             return JsonResponse({'error': 'Invalid request'}, status=400)

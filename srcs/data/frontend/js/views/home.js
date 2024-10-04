@@ -145,7 +145,7 @@ export function homeView(container) {
                     setTimeout(() => {
                         modalLogin.style.display = 'none';
                     }, 500);
-                    navigateTo('/pong');
+                    navigateTo('/pong');///////////
                 } else if (data.error) {
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'text-danger';
