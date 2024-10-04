@@ -65,7 +65,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
             await self.handle_notification(content)
 
     async def handle_notification(self, data):
-        from .models import User_site, FriendRequest, Friendship
+        from .models import User_site, FriendRequest, Friendship, Notification
         from chat.consumers import encode_avatar
         user = self.scope["user"]
         type = data['type']
@@ -89,8 +89,16 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
                 await self.send_json({"error": "A friend request is already pending between you and this user"})
                 return
 
-            await database_sync_to_async(FriendRequest.objects.create)(user=user, friend=friend)
-            # await database_sync_to_async(Notification.objects.create)(user=friend, type='friend_request', from_user=user) TODO IDEE CORRECT NEED TO BE IMPLEMENTED
+            friend_request = await database_sync_to_async(FriendRequest.objects.create)(user=user, friend=friend)
+
+            await database_sync_to_async(Notification.objects.create)(
+                user=friend,  # The recipient of the friend request
+                type='friend_request',
+                friend_request=friend_request,
+                status='unread'
+            )
+
+
             print(f"Friend request from {user.nickname} to {friend.nickname} created and saved in database")
             await self.channel_layer.group_send(
                 f"user_{friend.id}",
@@ -104,6 +112,8 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
                     },
                 },
             )
+
+
         elif type == 'accept_friend_request' or type == 'reject_friend_request':
             print(f"data: {data}")
             friend = await database_sync_to_async(User_site.objects.get)(nickname=data['nickname'])
@@ -117,16 +127,13 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
                 await self.send_json({"error": "No friend request found"})
                 return
 
-            # Mise à jour du statut de la demande d'ami
-            friend_request.status = 'accepted' if type == 'accept_friend_request' else 'refused'
-            await database_sync_to_async(friend_request.save)()
-
             # Si la demande est acceptée, créer une relation d'amitié bidirectionnelle
-            if friend_request.status == 'accepted':
-                await database_sync_to_async(Friendship.objects.create)(user1=user, user2=friend)
-                print(f"Friendship created between {user.nickname} and {friend.nickname}")
+            await database_sync_to_async(Friendship.objects.create)(user1=user, user2=friend)
+            print(f"Friendship created between {user.nickname} and {friend.nickname}")
 
             # Supprimer la demande d'ami après traitement (acceptée ou refusée)
+
+            await database_sync_to_async(lambda: Notification.objects.filter(friend_request=friend_request).delete())()
             await database_sync_to_async(friend_request.delete)()
         else:
             await self.close()

@@ -473,11 +473,11 @@ def create_user42(response, code):
         if not check_user42(username):
             user = User_site(username=username, email=email, nickname=nickname, avatar=avatar)
             user.set_password(code) #J espere que ca marche
+            user.status = User_site.Status.ONLINE
             user.save()
             settings = Accessibility(user=user)
             settings.save()
             stats = Stats_user(user=user)
-            user.status = User_site.Status.ONLINE
             stats.save()
         else:
             user = User_site.objects.get(nickname=nickname)

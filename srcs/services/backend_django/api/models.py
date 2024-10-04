@@ -53,17 +53,8 @@ class Stats_user(models.Model):
     nb_point_given = models.IntegerField(default=0)
     win_rate = models.FloatField(default=0.0)
 
-class Notifications(models.Model):
-    TYPE = (
-        ('friend_request', 'friend_request'),
-        ('game_invite', 'game_invite'),
-        ('tournament_invite', 'tournament_invite'),
-    )
 
-    user = models.ForeignKey(User_site, on_delete=models.CASCADE)
-    type = models.CharField(max_length=255, choices=TYPE)
-    message = models.CharField(max_length=255)
-    created_at = models.DateTimeField(default=timezone.now)
+
 
 class FriendRequest(models.Model):
     STATUS = (
@@ -114,6 +105,18 @@ class MatchHistory(models.Model):
     player_1_score = models.IntegerField()
     player_2_score = models.IntegerField()
     created_at = models.DateTimeField(default=timezone.now)
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User_site, on_delete=models.CASCADE)
+    type = models.CharField(max_length=255)
+    status = models.CharField(max_length=255, default='unread', choices=[('unread', 'unread'), ('read', 'read')])
+    friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
+    # game_invite = models.ForeignKey(GameInvite, on_delete=models.CASCADE, null=True)
+    # tournament_invite = models.ForeignKey(TournamentInvite, on_delete=models.CASCADE, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+
 
 # class PrivateGameInvite(model.Model):
 

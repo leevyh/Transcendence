@@ -9,6 +9,12 @@ class WebSocketManager {
         this.callbacks = [];
         this.isConnected = false;
         this.token = localStorage.getItem('token');
+
+        // Ajout d'un listener pour attendre que le token soit disponible
+        window.addEventListener('userAuthenticated', () => {
+            this.token = localStorage.getItem('token');  // Rafraîchir le token
+            this.connect();  // Tenter de se connecter au WebSocket
+        });
     }
 
 
@@ -34,21 +40,6 @@ class WebSocketManager {
 
             this.socket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                if (DEBUG) {console.log('Received notification:', data);}
-
-                displayNotification(data);
-
-
-
-                if (data.type === 'new_message') {
-                    if (DEBUG) {console.log('You received a new message from', data.from_nickname);}
-                    // TODO: Handle new message notification
-                }
-                if (data.type === 'friend_request') {
-                    if (DEBUG) {console.log('You received a friend request from', data.from_nickname);}
-                    // TODO: Handle friend request notification in little popup on the top right corner
-                }
-
                 this.callbacks.forEach(callback => callback(data));
             };
 
@@ -83,7 +74,7 @@ class WebSocketManager {
         this.callbacks = this.callbacks.filter(cb => cb !== callback);
     }
 }
-const wsManager = new WebSocketManager('ws://' + window.location.host + '/ws/friend_request/');
+const wsManager = new WebSocketManager('ws://' + window.location.host + '/ws/notifications/');
 export default wsManager;
 
 wsManager.connect();
