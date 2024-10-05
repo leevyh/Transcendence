@@ -63,7 +63,7 @@ export function changeLanguage(lang) {
 	});
 }
 // if check_auth open websocket
-// const friendRequestSocket = new WebSocket('wss://' + window.location.host + '/wss/friend_request/');
+// const friendRequestSocket = new WebSocket('wss://' + window.location.host + '/ws/friend_request/');
 //
 // friendRequestSocket.onopen = function() {
 // 	console.log('Friend request socket opened');

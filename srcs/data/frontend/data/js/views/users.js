@@ -115,7 +115,7 @@ export async function friendsView(container) {
 
     const url = window.location.href.split('/').pop();
 
-    const statusSocket = new WebSocket('ws://' + window.location.host + '/ws/status/');
+    const statusSocket = new WebSocket('wss://' + window.location.host + '/ws/status/');
 
     statusSocket.onopen = function (event) {
         if (DEBUG) {console.log('Status socket opened');}
