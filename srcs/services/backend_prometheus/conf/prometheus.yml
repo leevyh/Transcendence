@@ -34,11 +34,32 @@ scrape_configs:
     scrape_interval: 10s
     scheme: https
     static_configs:
-      - targets: ['backend-django:8000']
+      - targets: [ 'backend-django:8000' ]
+    tls_config:
+      insecure_skip_verify: true
+
+  - job_name: 'elasticsearch'
+    scrape_interval: 10s
+    scheme: https
+    metrics_path: '/_prometheus/metrics'
+    basic_auth:
+      username: "elastic"
+      password: "transcendence"
+    static_configs:
+      - targets: ['backend-elastic:9200']
     tls_config:
         insecure_skip_verify: true
 
-#  - job_name: 'postgres'
-#    scrape_interval: 10s
-#    static_configs:
-#      - targets: ['backend-postgresql:5432']
+  - job_name: 'frontend'
+    scrape_interval: 10s
+    static_configs:
+    - targets: ['export-frontend:9113']
+    tls_config:
+        insecure_skip_verify: true
+
+  - job_name: 'proxy'
+    scrape_interval: 10s
+    static_configs:
+    - targets: ['export-proxy:9113']
+    tls_config:
+        insecure_skip_verify: true
