@@ -1,8 +1,19 @@
 groups:
-  - name: alert_rules
+  - name: alert_rules-global
     rules:
-      - alert: InstanceDown
+      - alert: Instance(s) Down
         expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance {{ $labels.instance }} down"
+          description: "{{ $labels.instance }} | Job {{ $labels.job }} has been down for more than 1 minute."
+
+  - name: alert_rules-nginx
+    rules:
+      - alert: Instance(s) Down
+        expr: nginx_up == 0
         for: 1m
         labels:
           severity: critical
