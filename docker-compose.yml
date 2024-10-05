@@ -281,6 +281,41 @@ services:
       backend-prometheus:
         condition: service_healthy
     restart: on-failure
+  export_frontend:
+    container_name: export-frontend
+    build: ./srcs/services/export_frontend
+    networks:
+      - default
+    expose:
+      - 9113
+    depends_on:
+      - backend-prometheus
+      - frontend-nginx
+    restart: on-failure
+  export_proxy:
+    container_name: export-proxy
+    build: ./srcs/services/export_proxy
+    networks:
+      - default
+    expose:
+      - 9113
+    depends_on:
+      - backend-prometheus
+      - proxy-nginx
+    restart: on-failure
+  export_elastic:
+    container_name: export-elastic
+    build: ./srcs/services/export_elastic
+    networks:
+      - default
+    expose:
+      - 9114
+    env_file:
+      - ./env/elastic.env
+    depends_on:
+      - backend-prometheus
+      - backend-elastic
+    restart: on-failure
 
 
 volumes:
