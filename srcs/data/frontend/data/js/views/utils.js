@@ -92,81 +92,184 @@ wsManager.AddNotificationListener((data) => {
     }
 })
 
+export function displayNotification(data) {
+    let toast_container = document.querySelector('.toast-container');
 
+    // Si le conteneur n'existe pas, le créer
+    if (!toast_container) {
+        toast_container = document.createElement('div');
+        toast_container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        document.body.appendChild(toast_container);
+    }
 
-function displayFriendRequestNotification(nickname) {
-    const friendRequestNotificationModal = document.createElement('div');
-    friendRequestNotificationModal.className = 'modal';
+    // Limite de toasts
+    const maxToasts = 3;
+    const currentToasts = toast_container.querySelectorAll('.toast');
+    console.log(currentToasts.length);
+    
+    // Si le nombre de toasts dépasse la limite, supprimer le plus ancien
+    if (currentToasts.length >= maxToasts) {
+        console.log('Removing oldest toast');
+        currentToasts[0].remove();
+    }
 
+    // Création d'un nouvel élément de toast
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
 
-    const modalDialog = document.createElement('div');
-    modalDialog.className = 'modal-dialog';
-    friendRequestNotificationModal.appendChild(modalDialog);
+    const toast_header = document.createElement('div');
+    toast_header.className = 'toast-header';
 
-    const modalContent = document.createElement('div');
-    modalContent.className = 'modal-content';
-    friendRequestNotificationModal.appendChild(modalContent);
+    const avatar_user_sender = document.createElement('img');
+    avatar_user_sender.className = 'rounded me-2 user-img';
+    avatar_user_sender.src = `data:image/png;base64, ${data.from_avatar}`;
+    avatar_user_sender.alt = 'avatar';
+    toast_header.appendChild(avatar_user_sender);
 
-    const modalHeader = document.createElement('div');
-    modalHeader.className = 'modal-header';
-    modalContent.appendChild(modalHeader);
+    const strong = document.createElement('strong');
+    strong.className = 'me-auto';
+    strong.textContent = data.from_nickname;
+    toast_header.appendChild(strong);
 
-    const modalTitle = document.createElement('h5');
-    modalTitle.className = 'modal-title';
-    modalTitle.textContent = 'Friend request';
-    modalHeader.appendChild(modalTitle);
+    const button = document.createElement('button');
+    button.className = 'btn-close';
+    button.setAttribute('data-bs-dismiss', 'toast');
+    button.setAttribute('aria-label', 'Close');
+    button.addEventListener('click', () => {
+        toast.remove();
+    });
+    toast_header.appendChild(button);
 
-    const modalBody = document.createElement('div');
-    modalBody.className = 'modal-body';
-    modalBody.textContent = `${nickname} sent you a friend request`;
-    modalContent.appendChild(modalBody);
+    toast.appendChild(toast_header);
 
-    const modalFooter = document.createElement('div');
-    modalFooter.className = 'modal-footer';
-    modalContent.appendChild(modalFooter);
+    // Gestion du type de notification
+    if (data.type === 'new_message') {
+        const toast_body = document.createElement('div');
+        toast_body.className = 'toast-body';
+        toast_body.textContent = data.message;
+        toast.appendChild(toast_body);
+    } else if (data.type === 'friend_request') {
+        const toast_body = document.createElement('div');
+        toast_body.className = 'toast-body';
+        toast_body.textContent = `${data.from_nickname} sent you a friend request`;
+        toast.appendChild(toast_body);
 
+        const div_buttons = document.createElement('div');
+        div_buttons.className = 'd-grid gap-2 d-md-flex justify-content-md-center';
+        toast.appendChild(div_buttons);
 
-    const acceptButton = document.createElement('button');
-    acceptButton.className = 'btn btn-success';
-    acceptButton.textContent = 'Accept';
-    acceptButton.style = 'display: block; margin: 0 auto; width: 50%;';
-    // Add event listener to accept the friend request with websocket, remove the modal
-    acceptButton.addEventListener('click', () => {
-        wsManager.send({
-            type: 'accept_friend_request',
-            nickname: nickname,
+        const accept_button = document.createElement('button');
+        accept_button.className = 'btn btn-success';
+        accept_button.textContent = 'Accept';
+        accept_button.addEventListener('click', () => {
+            wsManager.send({
+                type: 'accept_friend_request',
+                nickname: data.from_nickname,
+            });
+            toast.remove();
         });
-        friendRequestNotificationModal.remove();
-    });
-    modalFooter.appendChild(acceptButton);
+        div_buttons.appendChild(accept_button);
 
-    const rejectButton = document.createElement('button');
-    rejectButton.className = 'btn btn-danger';
-    rejectButton.textContent = 'Reject';
-    rejectButton.style = 'display: block; margin: 0 auto; width: 50%;';
-    rejectButton.addEventListener('click', () => {
-        wsManager.send({
-            type: 'reject_friend_request',
-            nickname: nickname,
+        const reject_button = document.createElement('button');
+        reject_button.className = 'btn btn-danger';
+        reject_button.textContent = 'Reject';
+        reject_button.addEventListener('click', () => {
+            wsManager.send({
+                type: 'reject_friend_request',
+                nickname: data.from_nickname,
+            });
+            toast.remove();
         });
-        friendRequestNotificationModal.remove();
-    });
-    modalFooter.appendChild(rejectButton);
+        div_buttons.appendChild(reject_button);
+    }
 
-    //Add button close to the modal
-    const closeButton = document.createElement('button');
-    closeButton.className = 'btn btn-secondary';
-    closeButton.textContent = 'Close';
-    closeButton.style = 'display: block; margin: 0 auto; width: 50%;';
-    closeButton.addEventListener('click', () => {
-        friendRequestNotificationModal.remove();
-    });
+    // Ajouter le toast au conteneur
+    toast_container.appendChild(toast);
 
-    modalFooter.appendChild(closeButton);
-    // Close the modal when the user clicks on the close button and remove the modal from the DOM
-    document.body.appendChild(friendRequestNotificationModal);
-    friendRequestNotificationModal.style.display = 'block';
+    // Activer le toast avec Bootstrap
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
 }
+
+
+
+
+// function displayFriendRequestNotification(nickname) {
+//     const friendRequestNotificationModal = document.createElement('div');
+//     friendRequestNotificationModal.className = 'modal';
+//
+//
+//     const modalDialog = document.createElement('div');
+//     modalDialog.className = 'modal-dialog';
+//     friendRequestNotificationModal.appendChild(modalDialog);
+//
+//     const modalContent = document.createElement('div');
+//     modalContent.className = 'modal-content';
+//     friendRequestNotificationModal.appendChild(modalContent);
+//
+//     const modalHeader = document.createElement('div');
+//     modalHeader.className = 'modal-header';
+//     modalContent.appendChild(modalHeader);
+//
+//     const modalTitle = document.createElement('h5');
+//     modalTitle.className = 'modal-title';
+//     modalTitle.textContent = 'Friend request';
+//     modalHeader.appendChild(modalTitle);
+//
+//     const modalBody = document.createElement('div');
+//     modalBody.className = 'modal-body';
+//     modalBody.textContent = `${nickname} sent you a friend request`;
+//     modalContent.appendChild(modalBody);
+//
+//     const modalFooter = document.createElement('div');
+//     modalFooter.className = 'modal-footer';
+//     modalContent.appendChild(modalFooter);
+//
+//
+//     const acceptButton = document.createElement('button');
+//     acceptButton.className = 'btn btn-success';
+//     acceptButton.textContent = 'Accept';
+//     acceptButton.style = 'display: block; margin: 0 auto; width: 50%;';
+//     // Add event listener to accept the friend request with websocket, remove the modal
+//     acceptButton.addEventListener('click', () => {
+//         wsManager.send({
+//             type: 'accept_friend_request',
+//             nickname: nickname,
+//         });
+//         friendRequestNotificationModal.remove();
+//     });
+//     modalFooter.appendChild(acceptButton);
+//
+//     const rejectButton = document.createElement('button');
+//     rejectButton.className = 'btn btn-danger';
+//     rejectButton.textContent = 'Reject';
+//     rejectButton.style = 'display: block; margin: 0 auto; width: 50%;';
+//     rejectButton.addEventListener('click', () => {
+//         wsManager.send({
+//             type: 'reject_friend_request',
+//             nickname: nickname,
+//         });
+//         friendRequestNotificationModal.remove();
+//     });
+//     modalFooter.appendChild(rejectButton);
+//
+//     //Add button close to the modal
+//     const closeButton = document.createElement('button');
+//     closeButton.className = 'btn btn-secondary';
+//     closeButton.textContent = 'Close';
+//     closeButton.style = 'display: block; margin: 0 auto; width: 50%;';
+//     closeButton.addEventListener('click', () => {
+//         friendRequestNotificationModal.remove();
+//     });
+//
+//     modalFooter.appendChild(closeButton);
+//     // Close the modal when the user clicks on the close button and remove the modal from the DOM
+//     document.body.appendChild(friendRequestNotificationModal);
+//     friendRequestNotificationModal.style.display = 'block';
+// }
 
 // Récupérer le token CSRF depuis les cookies et vérifier si l'utilisateur est authentifié
 export async function isAuthenticated() {

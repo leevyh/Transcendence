@@ -3,6 +3,7 @@ import json
 from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
 from django.db import models
+import base64
 
 
 class StatusConsumer(AsyncJsonWebsocketConsumer):
@@ -17,7 +18,20 @@ class StatusConsumer(AsyncJsonWebsocketConsumer):
         pass  # No need to handle incoming messages for status updates
 
     async def send_status_update(self, event):
-        await self.send_json(event["message"])
+        from .models import User_site
+        message = event["message"]
+        user = await database_sync_to_async(User_site.objects.get)(id=message['user_id'])
+        avatar = user.avatar
+        encoded_avatar = base64.b64encode(avatar.read()).decode('utf-8')
+        await self.send_json({
+            "type": "status_update",
+            "user_id": message['user_id'],
+            "nickname": message['nickname'],
+            "status": message['status'],
+            "avatar": encoded_avatar
+        })
+        # await self.send_json(event["message"])
+
 
 
 class NotificationConsumer(AsyncJsonWebsocketConsumer):
@@ -52,15 +66,12 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 
     async def handle_notification(self, data):
         from .models import User_site, FriendRequest, Friendship
+        from chat.consumers import encode_avatar
         user = self.scope["user"]
         type = data['type']
         print(f"Data received: {data}")
         #if type is friend_request -> Save friend request with from_user and to_user, status pending
         if type == 'friend_request':
-            if not data['url'] == 'friends':
-                await self.send_json({"error": "You can only send friend requests from the friends page"})
-                return
-
             nickname = data['nickname']
             friend = await database_sync_to_async(User_site.objects.get)(nickname=nickname)
 
@@ -79,6 +90,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
                 return
 
             await database_sync_to_async(FriendRequest.objects.create)(user=user, friend=friend)
+            # await database_sync_to_async(Notification.objects.create)(user=friend, type='friend_request', from_user=user) TODO IDEE CORRECT NEED TO BE IMPLEMENTED
             print(f"Friend request from {user.nickname} to {friend.nickname} created and saved in database")
             await self.channel_layer.group_send(
                 f"user_{friend.id}",
@@ -88,6 +100,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
                         "type": "friend_request",
                         "from_user": user.id,
                         "from_nickname": user.nickname,
+                        "from_avatar": encode_avatar(user),
                     },
                 },
             )
