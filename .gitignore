@@ -1,1 +1,12 @@
-*.env
+/.idea/
+/.vscode/
+
+/env/
+
+/srcs/data/alertmanager/
+/srcs/data/backend/certs/
+/srcs/data/backend/logs/
+/srcs/data/database/logs/
+/srcs/data/elastic/
+/srcs/data/grafana/
+/srcs/data/prometheus/

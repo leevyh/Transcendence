@@ -1,50 +1,399 @@
 services:
-  backend_django:
-    container_name: backend_django
-    build: ./srcs/services/backend_django
-    expose:
-      -  8000
-    env_file:
-        - ./env/postgresql.env
-        - ./env/42app.env
-#    volumes:
-#      - ./srcs/data/backend:/home/app
-    restart: on-failure
-
-  frontend_nginx:
-    container_name: frontend_nginx
-    build: ./srcs/services/frontend_nginx
-    expose:
-      - 9000:80
-    volumes:
-      - ./srcs/data/frontend:/var/www/ft_transcendence
-    depends_on:
-      - backend_django
-    restart: on-failure
-
-  proxy_nginx:
-    container_name: proxy_nginx
+  proxy-nginx:
+    container_name: proxy-nginx
     build: ./srcs/services/proxy_nginx
+    volumes:
+      - backend-django-certs:/etc/nginx/ssl/
+      - backend-elk-ea-proxy-nginx:/usr/share/elastic-agent/
+      - backend-elk-certs:/usr/share/elastic-agent/config/certs/
+    networks:
+      - default
     ports:
-      - 8888:80
+      - 8888:8888
+    env_file:
+      - ./env/fleet.env
+      - ./srcs/services/proxy_nginx/conf/elastic-agent.env
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://proxy-nginx:80/nginx_status | grep -q 'Active connections'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
     depends_on:
-      - frontend_nginx
-      - backend_django
+      frontend-nginx:
+        condition: service_healthy
+    restart: on-failure
+  frontend-nginx:
+    container_name: frontend-nginx
+    build: ./srcs/services/frontend_nginx
+    volumes:
+      - frontend:/var/www/ft_transcendence/
+      - backend-elk-ea-frontend-nginx:/usr/share/elastic-agent/
+      - backend-elk-certs:/usr/share/elastic-agent/config/certs/
+    networks:
+      - default
+    expose:
+      - 443
+    env_file:
+      - ./env/fleet.env
+      - ./srcs/services/frontend_nginx/conf/elastic-agent.env
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://frontend-nginx:80/nginx_status | grep -q 'Active connections'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    depends_on:
+      backend-fleet:
+        condition: service_healthy
+    restart: on-failure
+  backend-django:
+    container_name: backend-django
+    build: ./srcs/services/backend_django
+    volumes:
+      - backend-django:/var/app/ft_transcendence/
+      - backend-django-certs:/etc/nginx/ssl/
+      - backend-django-logs:/var/log/django/
+    networks:
+      - default
+    expose:
+      - 8000
+    env_file:
+      - ./env/42api.env
+      - ./env/postgresql.env
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sk -IL https://backend-django:8000/api/django_status | grep -q 'HTTP/2 200'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    depends_on:
+      backend-postgresql:
+        condition: service_healthy
+    restart: on-failure
+  backend-postgresql:
+    container_name: backend-postgresql
+    build: ./srcs/services/backend_postgresql
+    volumes:
+      - backend-postgresql:/var/lib/postgresql/
+      - backend-postgresql-logs:/var/log/postgresql/
+    networks:
+      - default
+    expose:
+      - 5432
+    env_file:
+      - ./env/fleet.env
+      - ./env/postgresql.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    depends_on:
+      backend-logstash:
+        condition: service_healthy
+    restart: on-failure
+  setup-elastic:
+    container_name: setup-elastic
+    build: ./srcs/services/setup_elastic/
+    user: "0"
+    command: /usr/share/elasticsearch/setup.sh
+    volumes:
+      - backend-kibana:/usr/share/kibana/data/
+      - backend-elastic:/usr/share/elasticsearch/data/
+      - backend-elk-logs:/usr/share/elasticsearch/logs/
+      - backend-elk-certs:/usr/share/elasticsearch/config/certs/
+    networks:
+      - default
+    env_file:
+      - ./env/elastic.env
+      - ./env/kibana.env
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /usr/share/elasticsearch/config/certs/backend-elastic/backend-elastic.crt ]"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    restart: on-failure
+  backend-elastic:
+    container_name: backend-elastic
+    build: ./srcs/services/backend_elastic
+    mem_limit: 1g
+    volumes:
+      - backend-elastic:/usr/share/elasticsearch/data/
+      - backend-elk-logs:/usr/share/elasticsearch/logs/
+      - backend-elk-certs:/usr/share/elasticsearch/config/certs/
+    networks:
+      - default
+    expose:
+      - 9200
+    env_file:
+      - ./env/elastic.env
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -s --cacert /usr/share/elasticsearch/config/certs/ca/ca.crt https://backend-elastic:9200 | grep -q 'missing authentication credentials'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    depends_on:
+      setup-elastic:
+        condition: service_healthy
+    restart: on-failure
+  backend-kibana:
+    container_name: backend-kibana
+    depends_on:
+      backend-elastic:
+        condition: service_healthy
+    build: ./srcs/services/backend_kibana
+    volumes:
+      - backend-kibana:/usr/share/kibana/data/
+      - backend-elk-logs:/usr/share/kibana/logs/
+      - backend-elk-certs:/usr/share/kibana/config/certs/
+    networks:
+      - default
+    ports:
+      - 5601:5601
+    env_file:
+      - ./env/elastic.env
+      - ./env/kibana.env
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -s --cacert /usr/share/kibana/config/certs/ca/ca.crt -IL https://backend-kibana:5601 | grep -q 'HTTP/1.1 200 OK'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    restart: on-failure
+  backend-logstash:
+    container_name: backend-logstash
+    build: ./srcs/services/backend_logstash
+    volumes:
+      - backend-logstash:/usr/share/logstash/data/
+      - backend-django-logs:/var/log/logstash/django/
+      - backend-postgresql-logs:/var/log/logstash/postgresql/
+      - backend-elk-certs:/usr/share/logstash/config/certs/
+    networks:
+      - default
+    expose:
+      - 5959
+    env_file:
+      - ./env/elastic.env
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -s http://localhost:9600/_node/pipelines?pretty | grep '\"status\" : \"green\"'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    depends_on:
+      backend-kibana:
+        condition: service_healthy
+    restart: on-failure
+  backend-fleet:
+    container_name: backend-fleet
+    build: ./srcs/services/backend_fleet
+    volumes:
+      - backend-fleet:/usr/share/elastic-agent/data/
+      - backend-elk-certs:/usr/share/elastic-agent/config/certs/
+    networks:
+      - default
+    expose:
+      - 8220
+    env_file:
+      - ./env/fleet.env
+      - ./env/elastic.env
+      - ./srcs/services/backend_fleet/conf/elastic-agent.env
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -IL http://localhost:6791/liveness | grep -q 'HTTP/1.1 200 OK'"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    depends_on:
+      backend-kibana:
+        condition: service_healthy
+    restart: on-failure
+  setup-prometheus:
+    container_name: setup-prometheus
+    build: ./srcs/services/setup_prometheus
+    user: "0"
+    command: /config/setup.sh
+    volumes:
+      - backend-pga-certs:/pga/certs/
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /pga/certs/ssl.done ]"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+  backend-prometheus:
+    container_name: backend-prometheus
+    build: ./srcs/services/backend_prometheus
+    volumes:
+      - backend-prometheus:/prometheus/
+      - backend-pga-certs:/pga/certs/
+    networks:
+      - default
+    ports:
+      - 9090:9090
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /pga/certs/status/prometheus.done ]"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    depends_on:
+      setup-prometheus:
+        condition: service_healthy
+    restart: on-failure
+  backend-alertmanager:
+    container_name: backend-alertmanager
+    build: ./srcs/services/backend_alertmanager
+    volumes:
+      - backend-alertmanager:/alertmanager/
+      - backend-pga-certs:/pga/certs/
+    networks:
+      - default
+    ports:
+      - 9093:9093
+    env_file:
+      - ./env/alertmanager.env
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /pga/certs/status/alertmanager.done ]"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    depends_on:
+      backend-prometheus:
+        condition: service_healthy
+    restart: on-failure
+  backend-grafana:
+    container_name: backend-grafana
+    build: ./srcs/services/backend_grafana
+    volumes:
+      - backend-grafana:/usr/share/grafana/
+      - backend-pga-certs:/pga/certs/
+    networks:
+      - default
+    ports:
+      - 3000:3000
+    env_file:
+      - ./env/elastic.env
+      - ./env/grafana.env
+      - ./env/postgresql.env
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /pga/certs/status/grafana.done ]"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    depends_on:
+      backend-prometheus:
+        condition: service_healthy
     restart: on-failure
 
-  postgresql:
-    container_name: postgresql
-    build: ./srcs/services/postgresql
-    ports:
-      - 5432:5432
-    env_file:
-      - ./env/postgresql.env
-    restart: on-failure
 
 volumes:
-  data_frontend:
+  frontend:
     driver: local
     driver_opts:
-        o: bind
-        type: none
-        device: ./srcs/data/frontend
+      type: none
+      device: ./srcs/data/frontend/data
+      o: bind
+  backend-django:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/backend/data/
+      o: bind
+  backend-django-certs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/backend/certs/
+      o: bind
+  backend-django-logs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/backend/logs/
+      o: bind
+  backend-postgresql:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/database/data/
+      o: bind
+  backend-postgresql-logs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/database/logs/
+      o: bind
+  backend-elastic:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/elastic/elastic/
+      o: bind
+  backend-kibana:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/elastic/kibana/
+      o: bind
+  backend-logstash:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/elastic/logstash/
+      o: bind
+  backend-fleet:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/elastic/fleet/
+      o: bind
+  backend-elk-certs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/elastic/certs/
+      o: bind
+  backend-elk-logs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/elastic/logs/
+      o: bind
+  backend-elk-ea-proxy-nginx:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/elastic/ea/proxy-nginx/
+      o: bind
+  backend-elk-ea-frontend-nginx:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/elastic/ea/frontend-nginx/
+      o: bind
+  backend-prometheus:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/prometheus/data/
+      o: bind
+  backend-grafana:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/grafana/
+      o: bind
+  backend-alertmanager:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/alertmanager/
+      o: bind
+  backend-pga-certs:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/data/prometheus/certs/
+      o: bind
+
+
+networks:
+    default:
+        driver: bridge
