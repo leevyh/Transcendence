@@ -79,7 +79,9 @@ export function play() {
 export function stop() {
 
     console.log("stop game");
+    PongWebSocketManager.sendStopGame();
     cancelAnimationFrame(anim);
+
     // reset();
 
     // Init score
@@ -100,7 +102,7 @@ export function handleKeyDown(event, stopButton, currentPlayer) {
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
 		PongWebSocketManager.sendPlayerPosition(currentPlayer, 'down');
     if (event.key === ' ' && GameOn == false) {
-        play();
+        //play();
         spaceDown = true;
         stopButton.disabled = false;
         GameOn = true;

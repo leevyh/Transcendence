@@ -94,26 +94,24 @@ export async function pongView(container) {
         //     console.log("msg received : ", data.msg);
         // }
         // console.log(data);
-        if (data.action_type === 'start_game') {
+        if (data.action_type === 'define_player') {
             var currentPlayer = data.current_player;
+            console.log("currentPlayer = ", currentPlayer);
             if (currentPlayer === 'player_1') {
-                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, game.player1));
-                document.addEventListener('keyup', (event) => handleKeyUp(event, game.player1));
+                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_1'));
+                document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_1'));
             } else if (currentPlayer === 'player_2') {
-                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, game.player2));
-                document.addEventListener('keyup', (event) => handleKeyUp(event, game.player2));
+                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_2'));
+                document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_2'));
             }
+        }
+        if (data.action_type === 'start_game') {
             startGame(stopButton);
         }
-        console.log(data);
+        // console.log(data);
         if (GameOn) {
-            if (data.action_type === 'update_positions') {
-                updatePlayerPositions(data.player1_position, data.player2_position);
-            } else if (data.action_type === 'update_ball_position') {
-                updateBallPosition(data.ball_position);
-            } else if (data.action_type === 'update_score') {
-                updateScores(data.scores);
-            }
+            if (data.action_type === 'game_state')
+                updateState(data);
         }
     };
 
@@ -168,6 +166,8 @@ function startCountdown() {
             setTimeout(() => {
                 countdownElement.remove();
                 play(); // Appelle la fonction `play` pour démarrer le jeu
+                // envoyer au back que le jeu commence avec la fonction sendGameStarted() du PongWebSocketManager
+                PongWebSocketManager.sendGameStarted();
             }, 1000); // Affiche "Go!" pendant 1 seconde avant de l'enlever
         }
     }, 1000); // Intervalle de 1 seconde
@@ -180,23 +180,26 @@ function startGame(stopButton)
     stopButton.disabled = false; // Activer le bouton Stop
 }
 
+function updateState(data) {
+    updatePlayerPositions(data.game.player_1_position, data.game.player_2_position);
+    updateBallPosition(data.game.ball_position);
+    updateScores(data.game.player_1_score, data.game.player_2_score);
+    draw();
+}
+
 function updatePlayerPositions(player1Y, player2Y) {
     game.player1.y = player1Y;
     game.player2.y = player2Y;
-    draw();
-    // play();
 }
 
 function updateBallPosition(ballPosition) {
     game.ball.x = ballPosition.x;
     game.ball.y = ballPosition.y;
-    draw();
-    // play();
 }
 
-function updateScores(scores) {
-    document.querySelector('#player1-score').textContent = scores.player1;
-    document.querySelector('#player2-score').textContent = scores.player2;
+function updateScores(player_1_score, player_2_score) {
+    document.querySelector('#player1-score').textContent = player_1_score;
+    document.querySelector('#player2-score').textContent = player_2_score;
 }
 
 // CSS Pong
