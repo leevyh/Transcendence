@@ -57,6 +57,8 @@ datasources:
       tlsAuth: false
       tlsAuthWithCACert: false
       index: '*'
+      interval: null
+      timeField: '@timestamp'
     secureJsonData:
       basicAuthPassword: ELASTIC_PASSWORD
     editable: true
