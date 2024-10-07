@@ -195,12 +195,22 @@ export function navigationBar(container) {
         successMessages.forEach(message => message.remove());
 
         // Récupération du fichier sélectionné
-        const avatarFile = newAvatar.files[0];
+        const data = new FormData(avatarForm);
+        const avatarFile = data.get('newAvatar');
 
-        if (!avatarFile) {
+        if (!avatarFile.size || avatarFile.name === '') {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Select a file';
+            avatarForm.insertBefore(errorMessage, avatarSubmitButton);
+            return;
+        }
+
+        //Check file type
+        if (!avatarFile.type.startsWith('image/')) {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'File type not supported';
             avatarForm.insertBefore(errorMessage, avatarSubmitButton);
             return;
         }
@@ -213,10 +223,6 @@ export function navigationBar(container) {
             return;
         }
 
-        // Envoi du nouvel avatar via FormData
-        const formData = new FormData();
-        formData.append('newAvatar', avatarFile);
-
         try {
             const response = await fetch('/api/updateAvatar/', {
                 method: 'PUT',
@@ -224,7 +230,7 @@ export function navigationBar(container) {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
-                body: formData,
+                body: avatarFile,
             });
 
             if (response.ok) {
