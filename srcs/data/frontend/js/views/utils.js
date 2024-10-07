@@ -283,9 +283,8 @@ export async function isAuthenticated() {
         });
         if (response.ok) {
             const data = await response.json();
-            return data.value;
-        } else {
-            return false;
+            if (data.value === true) {return true;}
+            else {return false;}
         }
     }
     catch (error) {
@@ -296,76 +295,82 @@ export async function isAuthenticated() {
 
 // Récupérer les paramètres d'accessibilité de l'utilisateur
 export async function getAccessibility() {
-    try {
-        const response = await fetch('/api/settings/', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-        });
-        if (response.status === 200) {
-            const data = await response.json();
-            const userData = {
-                language: data.language,
-                font_size: data.font_size,
-                theme: data.dark_mode,
-            };
-            return userData;
-        } else if (response.status === 307) {
-            localStorage.removeItem('token');
-
-            const logoutResponse = await fetch('/api/logout/', {
-                method: 'POST',
+    if (await isAuthenticated() === true) {
+        console.log('User is authenticated');
+        try {
+            const response = await fetch('/api/settings/', {
+                method: 'GET',
                 headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-CSRFToken': getCookie('csrftoken')
                 },
             });
+            if (response.status === 200) {
+                const data = await response.json();
+                const userData = {
+                    language: data.language,
+                    font_size: data.font_size,
+                    theme: data.dark_mode,
+                };
+                return userData;
+            } else if (response.status === 307) {
+                // Means the token is invalid, so we remove it from localStorage and redirect to the home page
+                localStorage.removeItem('token');
 
-            await logoutResponse.json(); // Traiter la réponse de logout si nécessaire
-            navigateTo('/login');
+                const logoutResponse = await fetch('/api/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                });
+
+                await logoutResponse.json();
+                navigateTo('/');
+                return null;
+            }
+        } catch (error) {
+            if (DEBUG) {console.error('Error fetching accessibility settings:', error);}
             return null;
-        } else {
-            throw new Error('Something went wrong');
         }
-    } catch (error) {
-        if (DEBUG) {console.error('Error fetching accessibility settings:', error);}
+    } else {
+        if (DEBUG) {console.log('User is not authenticated');}
         return null;
     }
 }
 
 export function applyAccessibilitySettings(userSettings) {
-    const rootElement = document.documentElement;
+    const bodyElement = document.body;
     if (!userSettings) {
         document.documentElement.setAttribute('lang', 'fr');
-        rootElement.style.fontSize = '16px';
+        bodyElement.style.fontSize = '16px';
         document.body.classList.remove('dark-mode');
         return;
     }
+    if (DEBUG) {console.log('User settings:', userSettings);}
 
-    // Appliquer le langage
+    // Apply the font size
+    switch (userSettings.font_size) {
+        case 1:
+            bodyElement.style.fontSize = '12px';
+            break;
+        case 2:
+            bodyElement.style.fontSize = '16px';
+            break;
+        case 3:
+            bodyElement.style.fontSize = '20px';
+            break;
+        default:
+            bodyElement.style.fontSize = '16px'; // Default value
+    }
+
+    // TODO: Apply the language
     if (userSettings.language) {
         document.documentElement.setAttribute('lang', userSettings.language);
     }
 
-    // Appliquer la taille de police
-    switch (userSettings.font_size) {
-        case 1:
-            rootElement.style.fontSize = '12px';
-            break;
-        case 2:
-            rootElement.style.fontSize = '16px'; // Taille par défaut
-            break;
-        case 3:
-            rootElement.style.fontSize = '20px';
-            break;
-        default:
-            rootElement.style.fontSize = '16px'; // Valeur par défaut
-    }
-
-    // Appliquer le mode sombre
+    // TODO: Apply the dark/light theme
     if (userSettings.theme) {
         document.body.classList.add('dark-mode');
     } else {

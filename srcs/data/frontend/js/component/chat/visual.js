@@ -32,7 +32,14 @@ async function createUsersContainer() {
     inputGroup.className = 'input-group p-2';
     contactsCard.appendChild(inputGroup);
 
+    const searchInputLabel = document.createElement('label');
+    searchInputLabel.setAttribute('for', 'search');
+    searchInputLabel.textContent = 'Search for users...'; // Text for screen readers
+    searchInputLabel.className = 'visually-hidden'; // Hide the label but keep it for screen readers
+    inputGroup.appendChild(searchInputLabel);
+
     const searchInput = document.createElement('input');
+    searchInput.id = 'search';
     searchInput.type = 'text';
     searchInput.placeholder = 'Search...';
     searchInput.className = 'form-control border-0 search';
@@ -126,7 +133,6 @@ export function createUserCard(user, userList) {
         userStatusDot.style.backgroundColor = 'orange';
     }
 
-    // Je veux que les UserCard des utilisateurs soient affichees dans l'ordre alphabetique
     const users = userList.children;
     for (let i = 0; i < users.length; i++) {
         const user = users[i].id;
@@ -198,13 +204,6 @@ function createChatContainerHeader() {
     profileButton.innerHTML = '<i class="bi bi-person-lines-fill"></i>';
     div2.appendChild(profileButton);
 
-    const blockButton = document.createElement('button');
-    blockButton.style.display = 'none'; // Hide the button
-    blockButton.id = 'block-button';
-    blockButton.className = 'btn btn-outline-danger block-button';
-    blockButton.innerHTML = '<i class="bi bi-slash-circle"></i>';
-    div2.appendChild(blockButton);
-
     const inviteGameButton = document.createElement('button');
     inviteGameButton.style.display = 'none'; // Hide the button
     inviteGameButton.id = 'invite-game-button';
@@ -224,9 +223,15 @@ function createChatContainerFooter() {
     inputGroup.className = 'input-group';
     chatFooter.appendChild(inputGroup);
 
+    const chatInputLabel = document.createElement('label');
+    chatInputLabel.setAttribute('for', 'chat-input');
+    chatInputLabel.textContent = 'Type your message...'; // Text for screen readers
+    chatInputLabel.className = 'visually-hidden'; // Hide the label but keep it for screen readers
+    inputGroup.appendChild(chatInputLabel);
+
     const chatInput = document.createElement('input');
-    chatInput.type = 'text';
     chatInput.id = 'chat-input';
+    chatInput.type = 'text';
     chatInput.className = 'form-control border-0 chat-input';
     chatInput.placeholder = 'Type your message...';
     inputGroup.appendChild(chatInput);
@@ -236,7 +241,7 @@ function createChatContainerFooter() {
         }
     });
 
-    const chatSendButton = document.createElement('span');
+    const chatSendButton = document.createElement('button');
     chatSendButton.className = 'btn send-btn chat-send-button';
     chatSendButton.innerHTML = '<i class="bi bi-chevron-up text-white"></i>';
     inputGroup.appendChild(chatSendButton);

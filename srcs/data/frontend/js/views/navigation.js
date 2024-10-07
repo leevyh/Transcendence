@@ -1,4 +1,4 @@
-import { navigateTo } from '../app.js';
+import { DEBUG, navigateTo } from '../app.js';
 import { getCookie } from './utils.js';
 
 export function navigationBar(container) {
@@ -29,7 +29,6 @@ export function navigationBar(container) {
             return null;
         } else {
             if (DEBUG) {console.error('Error:', response);}
-            // throw new Error('Something went wrong');
         }
     })
     .then(data => {
@@ -47,80 +46,55 @@ export function navigationBar(container) {
             avatar: data.avatar,
         };
 
-        // Création de la barre de navigation
+        // Creation of the navigation bar
         const nav = document.createElement('nav');
-        nav.className = 'nav d-flex flex-column justify-content-start align-items-center shadow-lg'; // Transition vers Bootstrap
-        nav.style.backgroundColor = '#435574';  // Couleur personnalisée, Bootstrap ne fournit pas cette couleur directement
+        nav.className = 'nav d-flex flex-column justify-content-start align-items-center shadow-lg';
+        nav.style.backgroundColor = '#435574';
         div.appendChild(nav);
 
         const divProfile = document.createElement('div');
-        divProfile.className = 'divProfile w-50 text-center';  // Bootstrap padding et text-align
+        divProfile.className = 'divProfile w-50 text-center';
         nav.appendChild(divProfile);
 
         const avatarItem = document.createElement('div');
-        avatarItem.className = 'avatarItem rounded-circle overflow-hidden';  // Bootstrap arrondi et ombre
+        avatarItem.className = 'avatarItem rounded-circle overflow-hidden';
         divProfile.appendChild(avatarItem);
 
         const avatarImage = document.createElement('img');
         avatarImage.src = `data:image/png;base64, ${userData.avatar}`;
-        avatarImage.className = 'avatarImage w-100 h-auto pb-2';  // Bootstrap pour la taille
+        avatarImage.className = 'avatarImage w-100 h-auto pb-2';
+        avatarImage.setAttribute('tabindex', '0');
+        avatarImage.setAttribute('role', 'button');
         avatarImage.alt = 'Avatar';
         avatarItem.appendChild(avatarImage);
 
         avatarImage.addEventListener('click', () => {
-            modal.style.display = 'flex';  // Affichage du modal
+            modal.style.display = 'flex';
             setTimeout(() => {
-                modal.classList.add('ModalLoginBase-show');
+                modal.classList.add('ModalLoginBase-show'); // TODO ?
             }, 10);
         });
 
         const TitleNickname = document.createElement('h4');
-        TitleNickname.className = 'TitleNickname mt-2 pb-4';  // Bootstrap pour couleur et marge
+        TitleNickname.className = 'TitleNickname mt-2 pb-4';
         TitleNickname.textContent = `${userData.nickname}`;
+        TitleNickname.setAttribute('tabindex', '0');
+        TitleNickname.setAttribute('role', 'button');
         divProfile.appendChild(TitleNickname);
 
         // Navigation list
         const divNav = document.createElement('div');
-        divNav.className = 'divNav border-top border-2 border-bottom border-custom-color py-3 w-100';  // Utilisation de Bootstrap
+        divNav.className = 'divNav border-top border-2 border-bottom border-custom-color py-3 w-100';
         nav.appendChild(divNav);
 
         const NavBarList = document.createElement('ul');
-        NavBarList.className = 'NavBarList list-unstyled d-flex flex-column';  // Flex column via Bootstrap
+        NavBarList.className = 'NavBarList list-unstyled d-flex flex-column';
         divNav.appendChild(NavBarList);
 
-        const PlayElem = document.createElement('li');
-        PlayElem.className = 'PlayElem text-center text-primary py-2';  // Text et padding avec Bootstrap
-        PlayElem.textContent = 'Play';
-        NavBarList.appendChild(PlayElem);
-
-        const ChatElem = document.createElement('li');
-        ChatElem.className = 'ElemListNavBar text-center text-primary cursor py-2';  // Même traitement
-        ChatElem.textContent = 'Chat';
-        NavBarList.appendChild(ChatElem);
-
-        const FriendsElem = document.createElement('li');
-        FriendsElem.className = 'ElemListNavBar text-center text-primary py-2';
-        FriendsElem.textContent = 'Friends';
-        NavBarList.appendChild(FriendsElem);
-
-        const LeaderboardElem = document.createElement('li');
-        LeaderboardElem.className = 'ElemListNavBar text-center text-primary py-2';
-        LeaderboardElem.textContent = 'Leaderboard';
-        NavBarList.appendChild(LeaderboardElem);
-
-        PlayElem.addEventListener('click', () => {
-            navigateTo('/pong');
-        });
-
-        ChatElem.addEventListener('click', () => {
-            navigateTo('/chat');
-        });
-
-        FriendsElem.addEventListener('click', () => {
-            navigateTo('/users');
-        });
-
-
+        NavBarList.appendChild(createNavButton('Pong', () => navigateTo('/pong')));
+        NavBarList.appendChild(createNavButton('Chat', () => navigateTo('/chat')));
+        NavBarList.appendChild(createNavButton('Users', () => navigateTo('/users')));
+        NavBarList.appendChild(createNavButton('Leaderboard', () => navigateTo('/leaderboard')));
 
         // Friends list
         const divListFriends = document.createElement('div');
@@ -542,7 +516,7 @@ export function navigationBar(container) {
         };
 
         const divFontSize = document.createElement('div');
-        divFontSize.className = 'divFontSize';
+        divFontSize.className = 'divFontSize d-flex flex-column';
         accessibilityForm.appendChild(divFontSize);
 
         // Champ de la taille de la police
@@ -555,7 +529,7 @@ export function navigationBar(container) {
         fontSize.name = 'font-size';
         fontSize.type = 'range';
         fontSize.id = 'font-size';
-        fontSize.className = 'form-control-range mb-4 cursor ms-4 fontSizeCursor';
+        fontSize.className = 'form-control-range mb-2 cursor align-self-center fontSizeCursor';
         fontSize.min = 1;
         fontSize.max = 3;
         fontSize.value = userData.font_size;
@@ -587,12 +561,12 @@ export function navigationBar(container) {
 
         const optionFr = document.createElement('option');
         optionFr.value = 'fr';
-        optionFr.textContent = 'Frensh';
+        optionFr.textContent = 'Francais';
         language.appendChild(optionFr);
 
         const optionEs = document.createElement('option');
         optionEs.value = 'es';
-        optionEs.textContent = 'Spanish';
+        optionEs.textContent = 'Espanol';
         language.appendChild(optionEs);
 
         // Champ du mode sombre
@@ -755,4 +729,30 @@ export function navigationBar(container) {
         });
     });
     return div;
+}
+
+function createNavButton(text, onClick) {
+    const listItem = document.createElement('li');
+    listItem.className = 'ElemListNavBar text-center py-2';
+    
+    const button = document.createElement('button');
+    button.className = 'btn text-primary';
+    button.textContent = text;
+    
+    // Remove the outline when the button loses focus
+    button.addEventListener('blur', () => {
+        button.style.outline = 'none';
+    });
+
+    listItem.appendChild(button);
+
+    button.addEventListener('click', () => {
+        if (DEBUG) {console.log(`Navigating to ${text}`, 'actual:', window.location.pathname);}
+        if (window.location.pathname === `/${text.toLowerCase()}`) {
+            return;
+        }
+        onClick();
+    });
+
+    return listItem;
 }

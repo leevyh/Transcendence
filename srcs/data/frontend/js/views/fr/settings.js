@@ -92,7 +92,7 @@ export function settingsView(container) {
         divNav.appendChild(NavBarList);
 
         const PlayElem = document.createElement('li');
-        PlayElem.className = 'PlayElem text-center text-primary py-2';  // Text et padding avec Bootstrap
+        PlayElem.className = 'ElemListNavBar text-center text-primary py-2';  // Text et padding avec Bootstrap
         PlayElem.textContent = 'Play';
         NavBarList.appendChild(PlayElem);
 

@@ -1,17 +1,3 @@
-/* .navigationBarDiv {
-	position: fixed;
-	top: 0;
-	left: 0;
-	height: 100%;
-	z-index: 1000;
-}
-
-@media screen and (max-width: 600px) {
-	.navigationBarDiv {
-		opacity: 0;
-	}
-} */
-
 .nav {
 	padding: 15px;
 	/* width: min-content; */
@@ -38,26 +24,31 @@
 	cursor: pointer;
 }
 
-.PlayElem {
-	background: linear-gradient(to right, #F4ED37, #cecec3);
-	background-clip: text;
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-}
-.ElemListNavBar {
+.TitleNickname:focus {
+    outline: 2px solid #007bff; /* Contour bleu pour indiquer le focus */
+    outline-offset: 4px; /* Espacement entre le titre et le contour */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Ombre pour rendre le focus plus visible */
+} /* Not working */
 
+.ElemListNavBar {
 	background: linear-gradient(to right, #F4ED37, #cecec3);
 	background-clip: text;
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
+	cursor: pointer
+}
+
+.ElemListNavBar button:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .border-custom-color {
-    border-color: #000000 !important;  /* Exemple avec une couleur orange */
+    border-color: #000000 !important;		
 }
 
 .divListFriends {
-
 	width: 100%;
 	display: flex;
 	justify-content: center;
