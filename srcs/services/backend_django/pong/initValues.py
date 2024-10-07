@@ -12,3 +12,6 @@ PADDLE_SPEED = 10
 # Dimensions des raquettes
 PADDLE_HEIGHT = 80
 
+# Score de victoire
+WINNING_SCORE = 3
+

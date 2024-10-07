@@ -3,8 +3,8 @@ from datetime import datetime
 from time import sleep
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-# from django.db import models
-# from pong.models import Game
+from asgiref.sync import sync_to_async
+from django.db import models
 from . import initValues as iv
 
 list_of_games = []
@@ -34,9 +34,12 @@ class PongGame:
     async def game_loop(self):
         print("game loop")
         if (self.is_active == False):
-            await self.start_game()
+            if(self.status == "ready"):
+                await self.start_game()
+            elif (self.status == "finished"):
+                await self.save_game()
         while self.is_active:
-            self.move_ball()
+            await self.move_ball()
             await self.broadcastState()
             await asyncio.sleep(0.005)
 
@@ -93,7 +96,7 @@ class PongGame:
         self.ball_speed_y = iv.BALL_SPEED_Y
     
     #move the ball
-    def move_ball(self):
+    async def move_ball(self):
         self.ball_position_x += self.ball_speed_x
         self.ball_position_y += self.ball_speed_y
 
@@ -108,6 +111,8 @@ class PongGame:
                 # collide(self.player_1_position)
             else:
                 self.player_2_score += 1
+                if self.player_2_score >= iv.WINNING_SCORE:
+                    await self.stop_game()
                 self.reset_ball()
         elif self.ball_position_x >= iv.GAME_WIDTH:
             if self.ball_position_y > self.player_2_position and self.ball_position_y < self.player_2_position + iv.PADDLE_HEIGHT:
@@ -115,6 +120,8 @@ class PongGame:
                 # collide(self.player_2_position)
             else:
                 self.player_1_score += 1
+                if self.player_1_score >= iv.WINNING_SCORE:
+                    await self.stop_game()
                 self.reset_ball()
         
         #send the new ball position to the players
@@ -126,8 +133,6 @@ class PongGame:
         ratio = 100 / (iv.PADDLE_HEIGHT / 2)
         self.ball_speed_y = round(impact * ratio / 10)
     
-
-
     #move the player
     def move_player(self, player, move):
         if player == 'player_1':
@@ -152,21 +157,40 @@ class PongGame:
     
     #stop the game
     async def stop_game(self):
+        print("stop game")
         self.is_active = False
+        self.status = "finished"
         self.reset_ball()
+        await self.game_loop()
 
-#class for a ball  
-class Ball :
-    def __init__(self, *args, **kwargs):
-        self.position_x = position_x
-        self.position_y = position_y
-        self.speed_x = speed_x
-        self.speed_y = speed_y
+    #save the game in the database
+    async def save_game(self):
+        print("save game")
+        # self.channel_layer = get_channel_layer()
+        # await self.channel_layer.group_send(
+        #     f"game_{self.id}",
+        #     {'type': 'stop_game'}
+        # )
+        from pong.models import Game
+        game_database = await sync_to_async(Game.objects.get, thread_sensitive=True)(id=self.id)
+        game_database.player_1_score = self.player_1_score
+        game_database.player_2_score = self.player_2_score
+        game_database.is_active = False
+        await sync_to_async(game_database.save, thread_sensitive=True)()
+
+
+# #class for a ball  
+# class Ball :
+#     def __init__(self, *args, **kwargs):
+#         self.position_x = position_x
+#         self.position_y = position_y
+#         self.speed_x = speed_x
+#         self.speed_y = speed_y
     
 
-#class for a player
-class Paddle :
-    def __init__(self, player, *args, **kwargs):
-        self.position = 0
-        self.player = player
-        self.speed = 0
+# #class for a player
+# class Paddle :
+#     def __init__(self, player, *args, **kwargs):
+#         self.position = 0
+#         self.player = player
+#         self.speed = 0

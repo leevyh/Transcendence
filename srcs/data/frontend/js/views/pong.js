@@ -113,6 +113,10 @@ export async function pongView(container) {
             if (data.action_type === 'game_state')
                 updateState(data);
         }
+        if (data.action_type === 'stop_game') {
+            stop();
+            stopButton.disabled = true;
+        }
     };
 
     PongWebSocketManager.socket.onclose = (event) => {

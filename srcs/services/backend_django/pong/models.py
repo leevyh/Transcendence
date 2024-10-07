@@ -18,12 +18,6 @@ class Game(models.Model):
     player_2 = models.ForeignKey(User_site, related_name='player_2', blank=True, null=True, on_delete=models.CASCADE)
     player_1_score = models.IntegerField(default=0)
     player_2_score = models.IntegerField(default=0)
-    ball_position_x = models.FloatField(default=GAME_WIDTH // 2)
-    ball_position_y = models.FloatField(default=GAME_HEIGHT // 2)
-    ball_speed_x = models.FloatField(default=BALL_SPEED_X)
-    ball_speed_y = models.FloatField(default=BALL_SPEED_Y)
-    player_1_position = models.FloatField(default=GAME_HEIGHT // 2)
-    player_2_position = models.FloatField(default=GAME_HEIGHT // 2)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
