@@ -1,3 +1,5 @@
+import wsManager from "../../views/wsManager.js";
+
 export function displayFriendRequests(notification, offcanvas_body) {
     const notification_type_div = document.createElement('div');
     notification_type_div.className = `notification_type_notification_${notification.type} d-flex flex-column gap-2`;
@@ -7,7 +9,7 @@ export function displayFriendRequests(notification, offcanvas_body) {
 
     const notification_type_img = document.createElement('img');
     notification_type_img.className = 'rounded-circle img-fluid';
-    notification_type_img.src = `data:image/png;base64,${notification.sender.profile_picture}`;
+    notification_type_img.src = `data:image/png;base64,${notification.from_avatar}`;
     notification_type_img.alt = 'profile_picture';
     notification_type_img.width = '50';
     notification_type_img.height = '50';
@@ -44,7 +46,7 @@ export function displayFriendRequests(notification, offcanvas_body) {
     notification_type_body.className = 'd-flex flex-column justify-content-center align-items-center notif_container';
 
     const notification_type_body_content = document.createElement('span');
-    notification_type_body_content.textContent = `${notification.sender.username} wants to be your friend`;
+    notification_type_body_content.textContent = `${notification.from_nickname} wants to be your friend`;
     notification_type_body_content.className = 'p-1';
     notification_type_body.appendChild(notification_type_body_content);
 
@@ -56,6 +58,10 @@ export function displayFriendRequests(notification, offcanvas_body) {
     notification_type_body_accept_button.textContent = 'Accept';
     notification_type_body_accept_button.onclick = async function() {
         //await acceptFriendRequest(notification.sender.id);
+        wsManager.send({
+            type: 'accept_friend_request',
+            nickname:  notification.from_user,
+        });
         let hr = notification_type_div.nextElementSibling;
         hr.remove();
         notification_type_div.remove();
@@ -67,6 +73,10 @@ export function displayFriendRequests(notification, offcanvas_body) {
     notification_type_body_decline_button.onclick = async function() {
         //await declineFriendRequest(notification.sender.id); //TODO CHECK IF THIS IS THE RIGHT FUNCTION
         //Get the hr element after the notifications
+        wsManager.send({
+            type: 'reject_friend_request',
+            nickname:  notification.from_user,
+        });
         let hr = notification_type_div.nextElementSibling;
         hr.remove();
         notification_type_div.remove();

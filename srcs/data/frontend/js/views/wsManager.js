@@ -1,6 +1,6 @@
 import { isAuthenticated} from "./utils.js";
 import { DEBUG } from "../app.js";
-import { displayNotification } from "./utils.js";
+import { displayToast } from "./utils.js";
 
 class WebSocketManager {
     constructor(url) {

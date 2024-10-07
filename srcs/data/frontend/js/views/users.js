@@ -240,6 +240,6 @@ export async function friendsView(container) {
     //     });
     // }
 
-    const notifications_div = notifications();
+    const notifications_div = await notifications();
     global_div.appendChild(notifications_div);
 }

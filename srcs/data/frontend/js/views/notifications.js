@@ -2,8 +2,32 @@ import { navigateTo } from '../app.js';
 import { getCookie } from './utils.js';
 import { displayFriendRequests } from '../component/notifications/friendRequestNotifications.js';
 import { displayMessages } from '../component/notifications/newMessageNotifications.js';
+// import { getNotifications } from "../component/notifications/getNotifications";
+import wsManager from "./wsManager.js";
 
-export function notifications() {
+
+async function getNotificationsWS() {
+
+    wsManager.AddNotificationListener(
+        function(data) {
+            displayNotifications(data, document.querySelector('.offcanvas-body'));
+            incrementNotificationCount();
+        });
+}
+
+//TODO GET ALL NOTIFICATIONS WHEN THE PAGE IS LOADED + GET NOTIFICATIONS UNREAD WHEN THE PAGE IS LOADED AND DISPLAY NB OF NOTIFICATIONS DON'T READ
+
+function incrementNotificationCount() {
+    const badge = document.querySelector('.badge_notifs');
+    console.log('alo');
+    let count = parseInt(badge.textContent) || 0;
+    count += 1;
+    badge.textContent = count;
+    badge.style.display = 'inline-block';
+}
+
+
+export async function notifications() {
     const notifications_div = document.createElement('div');
     notifications_div.className = 'notifications';
 
@@ -15,40 +39,17 @@ export function notifications() {
     notifications_button.setAttribute('aria-controls', 'offcanvasRight');
 
     //Get Notifications with status and count them. And create a badge only if there are notifications not read
-    // const notifications = await getNotifications();
+    const unread_notification = await getNotificationsWS();
 
-    const notifications = [
-        {
-            id: 1,
-            type: 'friend_request',
-            sender: {
-                id: 1,
-                username: 'test',
-                profile_picture: 'test',
-            },
-            timestamp: '2021-09-01T12:00:00',
-        },
-        {
-            id: 2,
-            type: 'new_message',
-            sender: {
-                id: 1,
-                username: 'test',
-                profile_picture: 'test',
-            },
-            timestamp: '2021-09-01T12:00:00',
-            // content big message to try truncating
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, velit nec auctor tincidunt, elit libero porttitor libero, nec fringilla metus arcu nec nulla',
-        },
-    ]
+    console.log('unread_notification', unread_notification);
+    const notifications_badge = document.createElement('span');
+    notifications_badge.className = 'badge badge_notifs bg-danger position-absolute top-0 end-0';
+    notifications_badge.style.display = 'none';
+    notifications_badge.textContent = '0';
+    notifications_button.appendChild(notifications_badge);
 
-    // const notifications_count = notifications.length;
-    // const notifications_count = notifications.length;
     // if (notifications_count > 0) {
-    //     const notifications_badge = document.createElement('span');
-    //     notifications_badge.className = 'badge badge_notifs bg-danger position-absolute top-0 end-0';
     //     notifications_badge.textContent = notifications_count;
-    //     notifications_button.appendChild(notifications_badge);
     // }
 
     const notifications_icon = document.createElement('i');
@@ -81,8 +82,6 @@ export function notifications() {
     const offcanvas_body = document.createElement('div');
     offcanvas_body.className = 'offcanvas-body d-flex flex-column body_notifications';
 
-    // const notifications = await getNotifications();
-    // Do a notification example to see how it looks
 
     displayNotifications(notifications, offcanvas_body);
 
@@ -93,16 +92,21 @@ export function notifications() {
 }
 
 function displayNotifications(notifications, offcanvas_body) {
-    notifications.forEach(notification => {
+    offcanvas_body.innerHTML = '';
+    console.log(notifications);
+    if (!notifications) {
+        const no_notifications = document.createElement('p');
+        no_notifications.textContent = 'No notifications';
+        offcanvas_body.appendChild(no_notifications);
+        return offcanvas_body;
+    }
+
         //Check if notifications are friend requests or new messages
-        if (notification.type === 'friend_request') {
-            displayFriendRequests(notification, offcanvas_body);
-        } else if (notification.type === 'new_message') {
-            displayMessages(notification, offcanvas_body);
-        }
-    });
-
-
+    if (notifications.type === 'friend_request') {
+        displayFriendRequests(notifications, offcanvas_body);
+    } else if (notifications.type === 'new_message') {
+        displayMessages(notifications, offcanvas_body);
+    }
 
     return offcanvas_body;
 }

@@ -86,13 +86,10 @@ export function changeLanguage(lang) {
 // }
 
 wsManager.AddNotificationListener((data) => {
-    if (data.type === 'friend_request') {
-        if (DEBUG) {console.log('New friend request received from ', data.from_nickname);}
-        displayNotification(data);
-    }
+        displayToast(data);
 })
 
-export function displayNotification(data) {
+export function displayToast(data) {
     let toast_container = document.querySelector('.toast-container');
 
 

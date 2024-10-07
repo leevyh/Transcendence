@@ -126,9 +126,9 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
             except FriendRequest.DoesNotExist:
                 await self.send_json({"error": "No friend request found"})
                 return
-
             # Si la demande est acceptée, créer une relation d'amitié bidirectionnelle
-            await database_sync_to_async(Friendship.objects.create)(user1=user, user2=friend)
+            if (type == 'accept_friend_request'):
+                await database_sync_to_async(Friendship.objects.create)(user1=user, user2=friend)
             print(f"Friendship created between {user.nickname} and {friend.nickname}")
 
             # Supprimer la demande d'ami après traitement (acceptée ou refusée)

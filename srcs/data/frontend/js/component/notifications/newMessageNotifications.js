@@ -7,7 +7,7 @@ export function displayMessages(notification, offcanvas_body) {
 
     const notification_type_img = document.createElement('img');
     notification_type_img.className = 'rounded-circle img-fluid';
-    notification_type_img.src = `data:image/png;base64,${notification.sender.profile_picture}`;
+    notification_type_img.src = `data:image/png;base64,${notification.from_avatar}`;
     notification_type_img.alt = 'profile_picture';
     notification_type_img.width = '50';
     notification_type_img.height = '50';

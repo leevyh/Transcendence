@@ -21,6 +21,7 @@ urlpatterns = [
 	path('auth/', views.auth_42, name='auth'),
 	path('token/', views.token_42, name='token'),
 	path('get_friend_request/<str:nickname>/', views.get_friend_request, name='get_friend_request'),
+	path('notifications/', views.getNotification, name='get_notifications'),
 	# path('request_friend/', views.send_notification, name='friends'),
 	# path('game_invite/', views.send_notification, name='game_invite'),
 	# path('notifications/', views.get_notifications, name='get_notifications'),
