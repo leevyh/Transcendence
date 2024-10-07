@@ -102,13 +102,13 @@ class PongConsumer(AsyncWebsocketConsumer):
         # Update player positions or handle key events
         if data['type'] == 'update_player_position':
             self.game.move_player(data['player'], data['move'])
+        # if data['type'] == 'game_started':
+        #     await self.game.is_active = True
         if data['type'] == 'stop_game' :
             await self.game.stop_game()
 
-    async def stop_game(self, event):
-        print("stop game in consumer")
+    async def end_of_game(self, event):
         await self.send(text_data=json.dumps({
-            'action_type': 'stop_game',
+            'action_type': 'end_of_game',
         }))
-        await self.game.save_game()
 

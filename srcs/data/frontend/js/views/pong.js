@@ -5,6 +5,7 @@ import { notifications } from './notifications.js';
 import {
     play,
     stop,
+    endOfGame,
     // reset,
     handleKeyDown,
     handleKeyUp,
@@ -90,10 +91,6 @@ export async function pongView(container) {
     PongWebSocketManager.socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
 
-        // if (data.action_type === 'test') {
-        //     console.log("msg received : ", data.msg);
-        // }
-        // console.log(data);
         if (data.action_type === 'define_player') {
             var currentPlayer = data.current_player;
             console.log("currentPlayer = ", currentPlayer);
@@ -108,13 +105,12 @@ export async function pongView(container) {
         if (data.action_type === 'start_game') {
             startGame(stopButton);
         }
-        // console.log(data);
         if (GameOn) {
             if (data.action_type === 'game_state')
                 updateState(data);
         }
-        if (data.action_type === 'stop_game') {
-            stop();
+        if (data.action_type === 'end_of_game') {
+            endOfGame(data);
             stopButton.disabled = true;
         }
     };

@@ -3,7 +3,7 @@ export { canvas } from './pong.js'; // space game
 import { PongWebSocketManager } from './wsPongManager.js';
 export var anim;
 
-const PLAYER_HEIGHT = 100;
+const PLAYER_HEIGHT = 80;
 const PLAYER_WIDTH = 5;
 const MAX_SPEED = 10;
 const PLAYER_SPEED = 9;
@@ -60,38 +60,18 @@ export function draw() {
 export function play() {
     if (GameOn == false)
         GameOn = true;
-    // draw();
-    // anim = requestAnimationFrame(play);
 }
-
-// export function reset() {
-//     // Set ball and players to the center
-//     game.ball.x = canvas.width / 2;
-//     game.ball.y = canvas.height / 2;
-//     game.player1.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
-//     game.player2.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
-
-//     // Reset speed
-//     game.ball.speed.x = 3;
-//     game.ball.speed.y = Math.random() * 3;
-// }
 
 export function stop() {
 
     console.log("stop game");
     PongWebSocketManager.sendStopGame();
     cancelAnimationFrame(anim);
+    GameOn = false;
+}
 
-    // reset();
-
-    // Init score
-    // game.player1.score = 0;
-    // game.player2.score = 0;
-
-    // document.querySelector('#player1-score').textContent = game.player1.score;
-    // document.querySelector('#player2-score').textContent = game.player2.score;
-
-    // draw();
+export function endOfGame(data) {
+    cancelAnimationFrame(anim);
     GameOn = false;
 }
 
@@ -130,9 +110,9 @@ export function handleKeyDown(event, stopButton, currentPlayer) {
 // Key Up
 export function handleKeyUp(event, currentPlayer) {
 	if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W')
-		PongWebSocketManager.sendPlayerPosition(currentPlayer, 'stop');
+		PongWebSocketManager.sendPlayerPosition(currentPlayer, 'stop up');
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
-		PongWebSocketManager.sendPlayerPosition(currentPlayer, 'stop');
+		PongWebSocketManager.sendPlayerPosition(currentPlayer, 'stop down');
     if (event.key === "Escape")
         escapeDown = false;
     if (event.key === ' ')
