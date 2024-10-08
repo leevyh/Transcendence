@@ -38,7 +38,7 @@ export async function notifications() {
     notifications_button.setAttribute('data-bs-target', '#offcanvasRight');
     notifications_button.setAttribute('aria-controls', 'offcanvasRight');
 
-    //Get Notifications with status and count them. And create a badge only if there are notifications not read
+    // Get Notifications with status and count them. And create a badge only if there are notifications not read
     const unread_notification = await getNotificationsWS();
 
     console.log('unread_notification', unread_notification);
@@ -48,8 +48,10 @@ export async function notifications() {
     notifications_badge.textContent = '0';
     notifications_button.appendChild(notifications_badge);
 
-    // if (notifications_count > 0) {
-    //     notifications_badge.textContent = notifications_count;
+    // Uncomment and modify this part if you want to display the count of unread notifications
+    // if (unread_notification.count > 0) {
+    //     notifications_badge.textContent = unread_notification.count;
+    //     notifications_badge.style.display = 'block';
     // }
 
     const notifications_icon = document.createElement('i');
@@ -75,21 +77,31 @@ export async function notifications() {
     offcanvas_button.className = 'btn-close text-reset';
     offcanvas_button.setAttribute('data-bs-dismiss', 'offcanvas');
     offcanvas_button.setAttribute('aria-label', 'Close');
-
     offcanvas_header.appendChild(offcanvas_button);
+
     offcanvas.appendChild(offcanvas_header);
 
     const offcanvas_body = document.createElement('div');
     offcanvas_body.className = 'offcanvas-body d-flex flex-column body_notifications';
 
-
-    displayNotifications(notifications, offcanvas_body);
+    // Populate notifications content
+    displayNotifications(unread_notification, offcanvas_body);
 
     offcanvas.appendChild(offcanvas_body);
     notifications_div.appendChild(offcanvas);
 
+    // Add event listeners for showing and hiding the offcanvas
+    offcanvas.addEventListener('show.bs.offcanvas', function () {
+        document.body.classList.add('offcanvas-active'); // Disable horizontal scroll
+    });
+
+    offcanvas.addEventListener('hidden.bs.offcanvas', function () {
+        document.body.classList.remove('offcanvas-active'); // Re-enable scroll when closed
+    });
+
     return notifications_div;
 }
+
 
 function displayNotifications(notifications, offcanvas_body) {
     offcanvas_body.innerHTML = '';

@@ -27,7 +27,7 @@ class StatusConsumer(AsyncJsonWebsocketConsumer):
             "type": "status_update",
             "user_id": message['user_id'],
             "nickname": message['nickname'],
-            "status": message['status'],
+            "status": message['new_status'],
             "avatar": encoded_avatar
         })
         # await self.send_json(event["message"])

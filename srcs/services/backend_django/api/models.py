@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.models import AbstractUser, User
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
+from model_utils import FieldTracker
 
 class User_site(AbstractUser):
     class Status(models.TextChoices):
@@ -19,16 +20,32 @@ class User_site(AbstractUser):
         return self.username
 
     def save(self, *args, **kwargs):
+        # On vérifie si l'objet existe déjà en base de données
+        if self.pk:
+            old_user = User_site.objects.get(pk=self.pk)
+            if old_user.status != self.status:  # Comparer l'ancien et le nouveau statut
+                self.status_update_send_WS(old_status=old_user.status, new_status=self.status)
+
+        # Sauvegarde réelle de l'objet
         super(User_site, self).save(*args, **kwargs)
+
+    def status_update_send_WS(self, old_status, new_status):
         channel_layer = get_channel_layer()
+        if (new_status == User_site.Status.ONLINE):
+            new_status = "online"
+        elif (new_status == User_site.Status.OFFLINE):
+            new_status = "offline"
+        elif (new_status == User_site.Status.INGAME):
+            new_status = "ingame"
         async_to_sync(channel_layer.group_send)(
             "status_updates",
             {
                 "type": "send_status_update",
                 "message": {
-                    "user_id": self.id,  # Ajoutez l'ID de l'utilisateur
+                    "user_id": self.id,
                     "nickname": self.nickname,
-                    "status": self.status,
+                    "old_status": old_status,
+                    "new_status": new_status,
                 },
             },
         )

@@ -63,8 +63,8 @@ def loginView(request):
             data = json.loads(request.body)
             user = authenticate(request, username=data['username'], password=data['password'])
             if user is not None:
-                login(request, user)
                 user.status = User_site.Status.ONLINE
+                login(request, user)
                 user.save()
                 encoded_jwt = jwt.encode({'username': user.username, 'exp': time.time() + 3600}, 'secret', algorithm='HS256')
                 return JsonResponse({'message': 'User logged in successfully', 'token': encoded_jwt}, status=200)
@@ -444,9 +444,8 @@ def getNotification(request):
 def logoutView(request):
     if request.method == 'POST':
         username = request.user.username
-        status = User_site.Status.OFFLINE
         user = User_site.objects.get(id=request.user.id)
-        user.status = status
+        user.status = User_site.Status.OFFLINE
         user.save()
         logout(request)
         return JsonResponse({'message': 'User logged out successfully'}, status=200)

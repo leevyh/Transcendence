@@ -19,6 +19,7 @@ body {
     font-family: 'Public Pixel', sans-serif;
     background-image: linear-gradient(to bottom, black, #012970);
     font-size: 16px;
+    overflow-x: hidden;
 }
 body.small-font {
     font-size: 12px;
