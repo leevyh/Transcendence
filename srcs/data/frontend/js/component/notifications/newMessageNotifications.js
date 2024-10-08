@@ -7,7 +7,7 @@ export function displayMessages(notification, offcanvas_body) {
 
     const notification_type_img = document.createElement('img');
     notification_type_img.className = 'rounded-circle img-fluid';
-    notification_type_img.src = `data:image/png;base64,${notification.sender.profile_picture}`;
+    notification_type_img.src = `data:image/png;base64,${notification.from_avatar}`;
     notification_type_img.alt = 'profile_picture';
     notification_type_img.width = '50';
     notification_type_img.height = '50';
@@ -45,7 +45,7 @@ export function displayMessages(notification, offcanvas_body) {
     notification_type_body.className = 'd-flex flex-column text_truncate_container notif_container';
 
     const notification_type_body_content = document.createElement('span');
-    notification_type_body_content.textContent = `${notification.content}`;
+    notification_type_body_content.textContent = `${notification.message}`;
     notification_type_body_content.className = 'p-1';
     notification_type_body.appendChild(notification_type_body_content);
 

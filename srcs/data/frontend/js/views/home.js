@@ -141,6 +141,7 @@ export function homeView(container) {
             .then(data => {
                 if (data.message === 'User logged in successfully') {
                     localStorage.setItem('token', data.token);
+                    window.dispatchEvent(new Event('userAuthenticated'));
                     modalLogin.classList.remove('ModalLoginBase-show');
                     setTimeout(() => {
                         modalLogin.style.display = 'none';

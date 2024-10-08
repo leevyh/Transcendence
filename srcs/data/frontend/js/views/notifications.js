@@ -2,8 +2,66 @@ import { navigateTo } from '../app.js';
 import { getCookie } from './utils.js';
 import { displayFriendRequests } from '../component/notifications/friendRequestNotifications.js';
 import { displayMessages } from '../component/notifications/newMessageNotifications.js';
+// import { getNotifications } from "../component/notifications/getNotifications";
+import wsManager from "./wsManager.js";
 
-export function notifications() {
+
+async function getNotificationsWS() {
+
+    wsManager.AddNotificationListener(
+        function(data) {
+            displayNotifications(data, document.querySelector('.offcanvas-body'));
+            incrementNotificationCount();
+        });
+}
+
+async function getUnreadNotifications() {
+    const response = await fetch('/api/notifications/unread', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+
+    if (!response.ok) {
+        console.error("Erreur lors de la récupération des notifications non lues");
+        return [];
+    }
+    return await response.json(); // Assurez-vous que le backend renvoie un tableau
+}
+
+
+async function getNotifications() {
+    const response = await fetch('/api/notifications', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+
+    if (!response.ok) {
+        console.error("Erreur lors de la récupération des notifications");
+        return [];
+    }
+    //call displayNotifications function for each notification in the response
+    return await response.json();
+}
+
+
+function incrementNotificationCount() {
+    const badge = document.querySelector('.badge_notifs');
+    let count = parseInt(badge.textContent) || 0;
+    count += 1;
+    badge.textContent = count;
+    badge.style.display = 'inline-block';
+}
+
+
+export async function notifications() {
     const notifications_div = document.createElement('div');
     notifications_div.className = 'notifications';
 
@@ -14,41 +72,24 @@ export function notifications() {
     notifications_button.setAttribute('data-bs-target', '#offcanvasRight');
     notifications_button.setAttribute('aria-controls', 'offcanvasRight');
 
-    //Get Notifications with status and count them. And create a badge only if there are notifications not read
-    // const notifications = await getNotifications();
+    // Get Notifications with status and count them. And create a badge only if there are notifications not read
+    const unread_notification = await getUnreadNotifications();
 
-    const notifications = [
-        {
-            id: 1,
-            type: 'friend_request',
-            sender: {
-                id: 1,
-                username: 'test',
-                profile_picture: 'test',
-            },
-            timestamp: '2021-09-01T12:00:00',
-        },
-        {
-            id: 2,
-            type: 'new_message',
-            sender: {
-                id: 1,
-                username: 'test',
-                profile_picture: 'test',
-            },
-            timestamp: '2021-09-01T12:00:00',
-            // content big message to try truncating
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, velit nec auctor tincidunt, elit libero porttitor libero, nec fringilla metus arcu nec nulla',
-        },
-    ]
 
-    // const notifications_count = notifications.length;
-    // const notifications_count = notifications.length;
-    // if (notifications_count > 0) {
-    //     const notifications_badge = document.createElement('span');
-    //     notifications_badge.className = 'badge badge_notifs bg-danger position-absolute top-0 end-0';
-    //     notifications_badge.textContent = notifications_count;
-    //     notifications_button.appendChild(notifications_badge);
+    const notifications_badge = document.createElement('span');
+    notifications_badge.className = 'badge badge_notifs bg-danger position-absolute top-0 end-0';
+    if (unread_notification.length > 0) {
+        notifications_badge.textContent = unread_notification.length;
+        notifications_badge.style.display = 'inline-block'; // Afficher le badge
+    } else {
+        notifications_badge.style.display = 'none'; // Masquer le badge s'il n'y a pas de notifications
+    }
+    notifications_button.appendChild(notifications_badge);
+
+    // Uncomment and modify this part if you want to display the count of unread notifications
+    // if (unread_notification.count > 0) {
+    //     notifications_badge.textContent = unread_notification.count;
+    //     notifications_badge.style.display = 'block';
     // }
 
     const notifications_icon = document.createElement('i');
@@ -74,35 +115,77 @@ export function notifications() {
     offcanvas_button.className = 'btn-close text-reset';
     offcanvas_button.setAttribute('data-bs-dismiss', 'offcanvas');
     offcanvas_button.setAttribute('aria-label', 'Close');
-
     offcanvas_header.appendChild(offcanvas_button);
+
     offcanvas.appendChild(offcanvas_header);
 
     const offcanvas_body = document.createElement('div');
     offcanvas_body.className = 'offcanvas-body d-flex flex-column body_notifications';
 
-    // const notifications = await getNotifications();
-    // Do a notification example to see how it looks
+    // Populate notifications content
+    let notifications = await getNotifications();
 
-    displayNotifications(notifications, offcanvas_body);
+    notifications.forEach(notification => {
+        displayNotifications(notification, offcanvas_body);
+    });
+    // displayNotifications(unread_notification, offcanvas_body);
 
     offcanvas.appendChild(offcanvas_body);
     notifications_div.appendChild(offcanvas);
 
-    return notifications_div;
-}
+    // Add event listeners for showing and hiding the offcanvas
+    offcanvas.addEventListener('show.bs.offcanvas', async function () {
+        document.body.classList.add('offcanvas-active');
+        await readAllNotifications();
+    });
 
-function displayNotifications(notifications, offcanvas_body) {
-    notifications.forEach(notification => {
-        //Check if notifications are friend requests or new messages
-        if (notification.type === 'friend_request') {
-            displayFriendRequests(notification, offcanvas_body);
-        } else if (notification.type === 'new_message') {
-            displayMessages(notification, offcanvas_body);
-        }
+    offcanvas.addEventListener('hidden.bs.offcanvas', function () {
+        document.body.classList.remove('offcanvas-active');
     });
 
 
+    await getNotificationsWS();
+    return notifications_div;
+}
+
+async function readAllNotifications() {
+    const response = await fetch('/api/notifications/read', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+
+    if (!response.ok) {
+        console.error("Erreur lors de la lecture des notifications");
+    }
+    else
+    {
+        const badge = document.querySelector('.badge_notifs');
+        if (badge) {
+            badge.textContent = 0;
+            badge.style.display = 'none'; // Masquer le badge après avoir réinitialisé à 0
+        }
+    }
+}
+
+function displayNotifications(notifications, offcanvas_body) {
+    // offcanvas_body.innerHTML = '';
+    console.log(notifications);
+    if (!notifications) {
+        const no_notifications = document.createElement('p');
+        no_notifications.textContent = 'No notifications';
+        offcanvas_body.appendChild(no_notifications);
+        return offcanvas_body;
+    }
+
+    if (notifications.type === 'friend_request') {
+        displayFriendRequests(notifications, offcanvas_body);
+    } else if (notifications.type === 'new_message') {
+        displayMessages(notifications, offcanvas_body);
+    }
 
     return offcanvas_body;
 }

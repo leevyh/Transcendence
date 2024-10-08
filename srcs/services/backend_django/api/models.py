@@ -19,14 +19,23 @@ class User_site(AbstractUser):
         return self.username
 
     def save(self, *args, **kwargs):
+        # On vérifie si l'objet existe déjà en base de données
+        if self.pk:
+            old_user = User_site.objects.get(pk=self.pk)
+            if old_user.status != self.status:  # Comparer l'ancien et le nouveau statut
+                self.status_update_send_WS(old_status=old_user.status, new_status=self.status)
+
+        # Sauvegarde réelle de l'objet
         super(User_site, self).save(*args, **kwargs)
+
+    def status_update_send_WS(self):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             "status_updates",
             {
                 "type": "send_status_update",
                 "message": {
-                    "user_id": self.id,  # Ajoutez l'ID de l'utilisateur
+                    "user_id": self.id,
                     "nickname": self.nickname,
                     "status": self.status,
                 },
@@ -53,17 +62,8 @@ class Stats_user(models.Model):
     nb_point_given = models.IntegerField(default=0)
     win_rate = models.FloatField(default=0.0)
 
-class Notifications(models.Model):
-    TYPE = (
-        ('friend_request', 'friend_request'),
-        ('game_invite', 'game_invite'),
-        ('tournament_invite', 'tournament_invite'),
-    )
 
-    user = models.ForeignKey(User_site, on_delete=models.CASCADE)
-    type = models.CharField(max_length=255, choices=TYPE)
-    message = models.CharField(max_length=255)
-    created_at = models.DateTimeField(default=timezone.now)
+
 
 class FriendRequest(models.Model):
     STATUS = (
@@ -114,6 +114,16 @@ class MatchHistory(models.Model):
     player_1_score = models.IntegerField()
     player_2_score = models.IntegerField()
     created_at = models.DateTimeField(default=timezone.now)
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User_site, on_delete=models.CASCADE)
+    type = models.CharField(max_length=255)
+    status = models.CharField(max_length=255, default='unread', choices=[('unread', 'unread'), ('read', 'read')])
+    friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+
 
 # class PrivateGameInvite(model.Model):
 
