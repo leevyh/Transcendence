@@ -45,7 +45,7 @@ export function displayMessages(notification, offcanvas_body) {
     notification_type_body.className = 'd-flex flex-column text_truncate_container notif_container';
 
     const notification_type_body_content = document.createElement('span');
-    notification_type_body_content.textContent = `${notification.content}`;
+    notification_type_body_content.textContent = `${notification.message}`;
     notification_type_body_content.className = 'p-1';
     notification_type_body.appendChild(notification_type_body_content);
 

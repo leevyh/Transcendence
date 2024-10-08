@@ -141,6 +141,96 @@ def get_friend_request(request, nickname):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
+def get_Notification(request):
+    if request.method == 'GET':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            if (token_user == 'null'):
+                return JsonResponse({'error': 'Invalid token'}, status=401)
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            #get the user, the user_id and the notifications and content of notifications inside the good table
+            user = User_site.objects.get(username=username)
+            user_id = user.id
+            notifications = Notification.objects.filter(user=user_id)
+            notifications_list = []
+            #Table of notifications :
+            # class Notification(models.Model):
+            # user = models.ForeignKey(User_site, on_delete=models.CASCADE)
+            # type = models.CharField(max_length=255)
+            # status = models.CharField(max_length=255, default='unread', choices=[('unread', 'unread'), ('read', 'read')])
+            # friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
+            # # game_invite = models.ForeignKey(GameInvite, on_delete=models.CASCADE, null=True)
+            # # tournament_invite = models.ForeignKey(TournamentInvite, on_delete=models.CASCADE, null=True)
+            # created_at = models.DateTimeField(default=timezone.now)
+            for notification in notifications:
+                if notification.type == 'friend_request':
+                    avatar = base64.b64encode(notification.friend_request.user.avatar.read()).decode('utf-8')
+                    notifications_list.append({'type': notification.type,
+                                'from_nickname': notification.friend_request.user.nickname,
+                                'from_avatar': avatar,
+                                'created_at': notification.created_at})
+
+            return JsonResponse(notifications_list, status=200, safe=False)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def get_notificationUnread(request):
+    if request.method == 'GET':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            if (token_user == 'null'):
+                return JsonResponse({'error': 'Invalid token'}, status=401)
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            user = User_site.objects.get(username=username)
+            user_id = user.id
+            notifications = Notification.objects.filter(user=user_id, status='unread')
+            notifications_list = []
+            for notification in notifications:
+                if notification.type == 'friend_request':
+                    avatar = base64.b64encode(notification.friend_request.user.avatar.read()).decode('utf-8')
+                    notifications_list.append({'type': notification.type,
+                                'from_user': notification.friend_request.user.nickname,
+                                'from_avatar': avatar,
+                                'created_at': notification.created_at})
+            return JsonResponse(notifications_list, status=200, safe=False)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def read_All_Notification(request):
+    if request.method == 'PUT':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            if (token_user == 'null'):
+                return JsonResponse({'error': 'Invalid token'}, status=401)
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            user = User_site.objects.get(username=username)
+            user_id = user.id
+            notifications = Notification.objects.filter(user=user_id, status='unread')
+            for notification in notifications:
+                notification.status = 'read'
+                notification.save()
+            return JsonResponse({'message': 'All notifications read successfully'}, status=200)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 def get_Stats(request):
     if request.method == 'GET':
         try:
@@ -398,45 +488,6 @@ def update_Stats(request): #TODO without form and with json.loads. Need to chang
         except Stats_user.DoesNotExist:
 
             return JsonResponse({'error': 'Stats not found'}, status=404)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-def getNotification(request):
-    if request.method == 'GET':
-        try:
-            token_user = request.headers.get('Authorization').split(' ')[1]
-            if (token_user == 'null'):
-                return JsonResponse({'error': 'Invalid token'}, status=401)
-            try:
-                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
-            except jwt.ExpiredSignatureError:
-                return JsonResponse({'error': 'Token expired'}, status=307)
-            username = payload['username']
-            #get the user, the user_id and the notifications and content of notifications inside the good table
-            user = User_site.objects.get(username=username)
-            user_id = user.id
-            notifications = Notification.objects.filter(user=user_id)
-            notifications_list = []
-            #Table of notifications :
-            # class Notification(models.Model):
-            # user = models.ForeignKey(User_site, on_delete=models.CASCADE)
-            # type = models.CharField(max_length=255)
-            # status = models.CharField(max_length=255, default='unread', choices=[('unread', 'unread'), ('read', 'read')])
-            # friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
-            # # game_invite = models.ForeignKey(GameInvite, on_delete=models.CASCADE, null=True)
-            # # tournament_invite = models.ForeignKey(TournamentInvite, on_delete=models.CASCADE, null=True)
-            # created_at = models.DateTimeField(default=timezone.now)
-            for notification in notifications:
-                if notification.type == 'friend_request':
-                    avatar = base64.b64encode(notification.friend_request.user.avatar.read()).decode('utf-8')
-                    notifications_list.append({'type': notification.type,
-                                'from_user': notification.friend_request.user.nickname,
-                                'from_avatar': avatar,
-                                'created_at': notification.created_at})
-
-            return JsonResponse(notifications_list, status=200, safe=False)
-        except User_site.DoesNotExist:
-            return JsonResponse({'error': 'User not found'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 

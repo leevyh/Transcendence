@@ -60,7 +60,7 @@ export function displayFriendRequests(notification, offcanvas_body) {
         //await acceptFriendRequest(notification.sender.id);
         wsManager.send({
             type: 'accept_friend_request',
-            nickname:  notification.from_user,
+            nickname:  notification.from_nickname,
         });
         let hr = notification_type_div.nextElementSibling;
         hr.remove();
@@ -75,7 +75,7 @@ export function displayFriendRequests(notification, offcanvas_body) {
         //Get the hr element after the notifications
         wsManager.send({
             type: 'reject_friend_request',
-            nickname:  notification.from_user,
+            nickname:  notification.from_nickname,
         });
         let hr = notification_type_div.nextElementSibling;
         hr.remove();
