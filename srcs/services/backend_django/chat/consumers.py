@@ -155,11 +155,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         # Notify the other members of the conversation (except the sender)
-        await self.send_message_notifications(sender, members)
+        await self.send_message_notifications(sender, members, message.content)
 
 
     # Send message notifications to the members of the conversation
-    async def send_message_notifications(self, sender, members):
+    async def send_message_notifications(self, sender, members, message):
         for member in members:
             if member.id != sender.id:  # Exclure l'expéditeur
                 # Check if the user is active in the chat, if not -> send a notification
@@ -173,7 +173,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 "from_user": sender.id,
                                 "from_nickname": sender.nickname,
                                 "from_avatar": encode_avatar(sender),
-                                "message": "Vous avez un nouveau message dans la conversation.",
+                                "message": message,
                             },
                         }
                     )
