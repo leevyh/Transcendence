@@ -1,8 +1,6 @@
-import { DEBUG, navigateTo } from '../app.js';
 import { navigationBar } from './navigation.js';
 
-export function profileView(container) {
-
+export async function profileView(container) {
     container.innerHTML = '';
 
     const div = document.createElement('div');

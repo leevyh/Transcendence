@@ -1,5 +1,4 @@
 import { navigationBar } from './navigation.js';
-import { DEBUG } from '../app.js';
 
 
 export async function leaderboardView(container) {

@@ -1,7 +1,7 @@
 export const DEBUG = true;
 
 import { chatWS } from './component/chat/functions.js';
-import { getAccessibility, applyAccessibilitySettings } from './views/utils.js';
+import { getAccessibility, applyAccessibilitySettings, isAuthenticated } from './views/utils.js';
 
 import { homeView } from './views/home.js';
 import { notFoundView } from './views/404.js';
@@ -51,11 +51,19 @@ const routes = {
 };
 
 async function router() {
-    if (DEBUG) console.log('Router');
     const pageTitle = "Transcendence";
     let path = location.pathname;
-
+    if (DEBUG) {console.log(`Navigating to ${path}`);}
+    
     if (chatWS) {chatWS.close();}
+
+    // If the user is not authenticated and tries to access a private route, redirect to the home page
+    const privateRoutes = ['/chat', '/users', '/pong', '/profile', '/leaderboard'];
+    if (privateRoutes.includes(path) && await isAuthenticated() === false) {
+        if (DEBUG) {console.log(`Trying to access ${path} but user is not authenticated`);}
+        history.pushState(null, null, path); // Change the URL without reloading the page
+        path = '/'; // Redirect to the home page
+    }
 
     // Check if the URL is a user profile corresponding to /user/:nickname
     const userProfileRegex = /^\/user\/([a-zA-Z0-9_-]+)$/;
@@ -85,14 +93,12 @@ async function router() {
 }
 
 export function navigateTo(path) {
-    if (DEBUG) console.log('Navigating to', path);
     history.pushState(null, null, path);
     router();
 }
 
 window.addEventListener("popstate", router);
 window.addEventListener("DOMContentLoaded", () => {
-    if (DEBUG) console.log('DOMContentLoaded');
     document.body.addEventListener("click", (e) => {
         if (e.target.matches("[data-link]")) {
             e.preventDefault();
