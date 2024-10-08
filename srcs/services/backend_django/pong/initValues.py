@@ -3,11 +3,11 @@ GAME_WIDTH = 640
 GAME_HEIGHT = 480
 
 # Vitesse de la balle
-BALL_SPEED_X = 0.8
-BALL_SPEED_Y = 0.8
+BALL_SPEED_X = 2
+BALL_SPEED_Y = 2
 
 # Vitesse des raquettes
-PADDLE_SPEED = 2
+PADDLE_SPEED = 5
 
 # Dimensions des raquettes
 PADDLE_HEIGHT = 80

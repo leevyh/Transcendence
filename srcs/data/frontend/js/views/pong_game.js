@@ -3,6 +3,8 @@ export { canvas } from './pong.js'; // space game
 import { PongWebSocketManager } from './wsPongManager.js';
 export var anim;
 
+const GAME_HEIGHT = 240
+const GAME_WIDTH = 640
 const PLAYER_HEIGHT = 80;
 const PLAYER_WIDTH = 5;
 const MAX_SPEED = 10;
@@ -11,12 +13,12 @@ const PLAYER_SPEED = 9;
 export var game = {
     player1: {
         x: PLAYER_WIDTH,
-        y: PLAYER_HEIGHT,
+        y: GAME_HEIGHT,
         dy: PLAYER_SPEED
     },
     player2: {
         x: 640 - PLAYER_WIDTH,
-        y: PLAYER_HEIGHT,
+        y: GAME_HEIGHT,
         dy: PLAYER_SPEED
     },
     ball: {

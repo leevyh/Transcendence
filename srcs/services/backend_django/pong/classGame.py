@@ -46,7 +46,7 @@ class PongGame:
             await self.move_ball()
             await self.move_player_loop()
             await self.broadcastState()
-            await asyncio.sleep(0.005)
+            await asyncio.sleep(0.01)
 
     #start the game
     async def start_game(self):
@@ -135,8 +135,8 @@ class PongGame:
     def inverse_direction(self, paddle_position):
         self.ball_speed_x *= -1
         impact = self.ball_position_y - paddle_position - iv.PADDLE_HEIGHT / 2
-        ratio = 50 / (iv.PADDLE_HEIGHT / 2)
-        self.ball_speed_y = round(impact * ratio / 15)
+        ratio = 30 / (iv.PADDLE_HEIGHT / 2)
+        self.ball_speed_y = round(impact * ratio / 20)
     
     #move the player
     def move_player(self, player, move):
@@ -167,13 +167,13 @@ class PongGame:
             self.player_1_position = max(0, position)
         elif self.move_player_1_down:
             position = self.player_1_position + iv.PADDLE_SPEED
-            self.player_1_position = min(iv.GAME_HEIGHT, position)
+            self.player_1_position = min(iv.GAME_HEIGHT - iv.PADDLE_HEIGHT, position)
         if self.move_player_2_up:
             position = self.player_2_position - iv.PADDLE_SPEED
             self.player_2_position = max(0, position)
         elif self.move_player_2_down:
             position = self.player_2_position + iv.PADDLE_SPEED
-            self.player_2_position = min(iv.GAME_HEIGHT, position)
+            self.player_2_position = min(iv.GAME_HEIGHT - iv.PADDLE_HEIGHT, position)
 
     #stop the game
     async def stop_game(self):

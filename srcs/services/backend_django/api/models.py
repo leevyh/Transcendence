@@ -124,7 +124,7 @@ class Friendship(models.Model):
 
 class MatchHistory(models.Model):
     from pong.models import Game
-    player1 = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='player')
+    player = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='player')
     game = models.ForeignKey('pong.Game', on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
 

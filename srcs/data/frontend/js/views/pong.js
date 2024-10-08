@@ -83,7 +83,7 @@ export async function pongView(container) {
     draw();
 
     // WebSocket
-    const wsUrl = 'ws://localhost:8888/ws/pong/';
+    const wsUrl = 'ws://' + window.location.host + `/ws/pong/`;
     PongWebSocketManager.init(wsUrl);
 
 

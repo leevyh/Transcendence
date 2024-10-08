@@ -30,6 +30,7 @@ DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.25.139.193", "made-f0cr6s4", "10.33.7.4"]
 
 
+
 # Application definition
 AUTH_USER_MODEL = 'api.User_site'
 
