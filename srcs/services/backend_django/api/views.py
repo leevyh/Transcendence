@@ -310,6 +310,7 @@ def all_users(request):
                     avatar_image = user.avatar
                     avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
                     data.append({'nickname': user.nickname,
+                                    'user_id': user.id,
                                     'avatar': avatar,
                                     'status': user.status})
                 return JsonResponse(data, status=200, safe=False)

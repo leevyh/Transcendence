@@ -30,10 +30,12 @@ export async function chatView(container) {
     // On message received from the server (status of a user)
     statusSocket.onmessage = function(event) {
         const data = JSON.parse(event.data);
-        if (DEBUG) {console.log('Message received:', data);}
         // Update the user list with the new status
         const userList = document.getElementById('user-list');
-        if (userList) {createUserCard(data, userList);}
+        if (userList) {
+            if (DEBUG) {console.log('Creating user card via socket');}
+            createUserCard(data, userList);
+        }
     };
 
     // Onclose event
@@ -56,6 +58,7 @@ export async function chatView(container) {
     .then(data => {
         // For each user, create a user card
         data.forEach(user => {
+            if (DEBUG) {console.log('Creating user card via call API');}
             createUserCard(user, userList);
         });
     })

@@ -41,14 +41,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Receive message from WebSocket
         data = json.loads(text_data)
         message_type = data.get('type')
-        # sender = self.scope['user'].nickname
 
         if message_type == 'block_user':
             blocked = data.get('blocked')
             await self.handle_block_user(blocked)
-        # elif message_type == 'unblock_user':
-        #     blocked = data.get('blocked')
-        #     await self.handle_unblock_user(blocked)
         else:
             message = {
                 'message': data['message'],
@@ -87,11 +83,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'conversation': {   
                 'me': {
                     'nickname': user.nickname,
+                    'id': user.id,
                     'avatar': encode_avatar(user),
                     'blocked': await database_sync_to_async(lambda: UserBlock.objects.filter(blocked=user).exists())(),
                 },
                 'other': {
                     'nickname': other.nickname,
+                    'id': other.id,
                     'avatar': encode_avatar(other),
                     'blocked': await database_sync_to_async(lambda: UserBlock.objects.filter(blocked=other).exists())(),
                 },
@@ -125,7 +123,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         for member in members:
             is_blocked = await database_sync_to_async(lambda: UserBlock.objects.filter(blocker=member, blocked=sender).exists())()
             if is_blocked:
-                await self.send(text_data=json.dumps({'type': 'blocked', 'blocker': member.nickname, 'blocked': sender.nickname}))
+                await self.send(text_data=json.dumps({'type': 'blocked', 'blocker': member.id, 'blocked': sender.id}))
                 return
             
         # Proceed with saving the message and broadcasting to the group
@@ -157,11 +155,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         # Notify the other members of the conversation (except the sender)
-        await self.send_message_notifications(sender, members)
+        await self.send_message_notifications(sender, members, message.content)
 
 
     # Send message notifications to the members of the conversation
-    async def send_message_notifications(self, sender, members):
+    async def send_message_notifications(self, sender, members, message):
         for member in members:
             if member.id != sender.id:  # Exclure l'expéditeur
                 # Check if the user is active in the chat, if not -> send a notification
@@ -175,7 +173,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 "from_user": sender.id,
                                 "from_nickname": sender.nickname,
                                 "from_avatar": encode_avatar(sender),
-                                "message": "Vous avez un nouveau message dans la conversation.",
+                                "message": message,
                             },
                         }
                     )
@@ -220,8 +218,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 self.conversation_group_name,
                 {
                     'type': 'block_user',
-                    'blocked': blocked_user.nickname,
-                    'blocker': blocker.nickname,
+                    'blocked': blocked_user.id,
+                    'blocker': blocker.id,
                 }
             )
             return
@@ -233,8 +231,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 self.conversation_group_name,
                 {
                     'type': 'unblock_user',
-                    'blocked': blocked_user.nickname,
-                    'blocker': blocker.nickname
+                    'blocked': blocked_user.id,
+                    'blocker': blocker.id
                 }
             )
             return
