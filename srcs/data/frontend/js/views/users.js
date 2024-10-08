@@ -1,8 +1,5 @@
-//TODO REMOVE THIS
-import { isAuthenticated } from './utils.js';
-import { getCookie } from './utils.js';
 import wsManager  from './wsManager.js';
-// import { navigationBar } from './fr/navigation.js';
+import { getCookie } from './utils.js';
 import { DEBUG } from '../app.js';
 import { navigationBar } from './navigation.js';
 import { notifications } from './notifications.js';
@@ -109,6 +106,7 @@ function createUserRow(user_list_row, data) {
 }
 
 export async function friendsView(container) {
+    container.innerHTML = '';
 
     const token = localStorage.getItem('token');
     console.log(token);

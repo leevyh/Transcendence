@@ -28,7 +28,7 @@ export let canvas = 'null'
 // };
 
 
-export function pongView(container) {
+export async function pongView(container) {
     container.innerHTML = '';
     // document.body.classList.add('page-with-nav'); // Ajout de la classe pour la navigation bar (padding)
 
