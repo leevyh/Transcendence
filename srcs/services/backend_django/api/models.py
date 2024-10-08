@@ -3,7 +3,6 @@ from django.utils import timezone
 from django.contrib.auth.models import AbstractUser, User
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
-from model_utils import FieldTracker
 
 class User_site(AbstractUser):
     class Status(models.TextChoices):
@@ -29,14 +28,8 @@ class User_site(AbstractUser):
         # Sauvegarde réelle de l'objet
         super(User_site, self).save(*args, **kwargs)
 
-    def status_update_send_WS(self, old_status, new_status):
+    def status_update_send_WS(self):
         channel_layer = get_channel_layer()
-        if (new_status == User_site.Status.ONLINE):
-            new_status = "online"
-        elif (new_status == User_site.Status.OFFLINE):
-            new_status = "offline"
-        elif (new_status == User_site.Status.INGAME):
-            new_status = "ingame"
         async_to_sync(channel_layer.group_send)(
             "status_updates",
             {
@@ -44,8 +37,7 @@ class User_site(AbstractUser):
                 "message": {
                     "user_id": self.id,
                     "nickname": self.nickname,
-                    "old_status": old_status,
-                    "new_status": new_status,
+                    "status": self.status,
                 },
             },
         )
