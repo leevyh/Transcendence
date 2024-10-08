@@ -94,10 +94,10 @@ async function openConversation(conversationID, otherUser) {
             }
 
             if (conversation.me.blocked === false && conversation.other.blocked === false) {
-                enableChat(conversation.other.nickname);
+                enableChat(conversation.other.id);
             } else {
                 disableChat();
-                const blockUserButton = document.getElementById(conversation.other.nickname).querySelector('.block-button')
+                const blockUserButton = document.getElementById(conversation.other.id).querySelector('.block-button')
                 if (conversation.me.blocked === true) { // If the current user is blocked
                     blockUserButton.style.display = 'none';
                 } else if (conversation.other.blocked === true) { // If the other user is blocked
@@ -217,6 +217,7 @@ function disableChat() {
 }
 
 function enableChat(otherUser) {
+    if (DEBUG) {console.log('Chat enabled for:', otherUser);}
     const chatInput = document.getElementById('chat-input');
     const chatSendButton = document.querySelector('.chat-send-button');
     const inviteGameButton = document.querySelector('.invite-game-button');

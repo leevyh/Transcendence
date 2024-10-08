@@ -77,13 +77,13 @@ async function createUsersContainer() {
 
 // Function to create a user card
 export function createUserCard(user, userList) {
-    let userCard = document.getElementById(user.nickname);
+    let userCard = document.getElementById(user.user_id);
     if (DEBUG) {console.log('User:', user);}
 
     if (!userCard) {
         userCard = document.createElement('div');
         userCard.className = 'd-flex align-items-center bd-highlight justify-content-between w-100';
-        userCard.id = user.nickname; // ID = nickname
+        userCard.id = user.user_id; // ID = nickname
         userList.appendChild(userCard);
 
         const userStatusDot = document.createElement('span');
@@ -133,6 +133,19 @@ export function createUserCard(user, userList) {
         userStatusDot.style.backgroundColor = 'orange';
     }
 
+    // Update the nickname if the user changed it
+    const userInfo = userCard.querySelector('.user-info');
+    if (userInfo.children[0].textContent !== user.nickname) {
+        userInfo.children[0].textContent = user.nickname;
+        // if the conversation is open with the user, change the chat title
+        const chatTitle = document.querySelector('.chat-title');
+        if (chatTitle.textContent !== `Chat with ${user.nickname}`) {
+            chatTitle.textContent = `Chat with ${user.nickname}`;
+        }
+    }
+
+
+    // Sort the users list
     const users = userList.children;
     for (let i = 0; i < users.length; i++) {
         const user = users[i].id;
