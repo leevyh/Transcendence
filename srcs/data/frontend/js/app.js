@@ -44,13 +44,17 @@ const routes = {
         title: 'Leaderboard',
         view: leaderboardView,
     },
+    '/profile': {
+        title: 'profile',
+        view: profileView,
+    },
 };
 
 async function router() {
     if (DEBUG) console.log('Router');
     const pageTitle = "Transcendence";
     let path = location.pathname;
-    
+
     if (chatWS) {chatWS.close();}
 
     // Check if the URL is a user profile corresponding to /user/:nickname

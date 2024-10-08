@@ -28,12 +28,13 @@ export function navigationBar(container) {
             }).then(() => navigateTo('/'));
             return null;
         } else {
-            if (DEBUG) {console.error('Error:', response);}
+            console.error('Error:', response);
+            // throw new Error('Something went wrong');
         }
     })
     .then(data => {
         if (!data) {
-            if (DEBUG) {console.error('No data received');}
+           console.error('No data received');
             return;
         }
         const userData = {
@@ -58,6 +59,10 @@ export function navigationBar(container) {
 
         const avatarItem = document.createElement('div');
         avatarItem.className = 'avatarItem rounded-circle overflow-hidden';
+        avatarItem.style.display = 'flex';
+        avatarItem.style.alignItems = 'center';
+        avatarItem.style.justifyContent = 'center';
+        avatarItem.style.position = 'relative';
         divProfile.appendChild(avatarItem);
 
         const avatarImage = document.createElement('img');
@@ -68,13 +73,380 @@ export function navigationBar(container) {
         avatarImage.alt = 'Avatar';
         avatarItem.appendChild(avatarImage);
 
-        avatarImage.addEventListener('click', () => {
-            modal.style.display = 'flex';
-            setTimeout(() => {
-                modal.classList.add('ModalLoginBase-show'); // TODO ?
-            }, 10);
+        const SVGModifyAvatar = document.createElement('svg');
+        SVGModifyAvatar.className = 'SVGModifyAvatar bi bi-pencil-fill position-absolute';
+        SVGModifyAvatar.setAttribute('xmlns', "http://www.w3.org/2000/svg");
+        SVGModifyAvatar.setAttribute('width', '32');
+        SVGModifyAvatar.setAttribute('height', '32');
+        SVGModifyAvatar.setAttribute('fill', 'white');
+        SVGModifyAvatar.setAttribute('viewBox', '0 0 16 16');
+        SVGModifyAvatar.style.opacity = '0';
+
+        SVGModifyAvatar.innerHTML = `
+            <path d="M12.146.854a.5.5 0 0 1 .708 0l2.292 2.292a.5.5 0 0 1 0 .708l-9.146 9.146L5 13.5l.5-.5 9.146-9.146zM4 13.5V15h1.5l.146-.146L4 13.5zm-3.5.5a.5.5 0 0 1 0-1H1V12.5H.5a.5.5 0 0 1 0-1H1V11H.5a.5.5 0 0 1 0-1H1V9.5H.5a.5.5 0 0 1 0-1H1V8.5H.5a.5.5 0 0 1 0-1H1V7.5H.5a.5.5 0 0 1 0-1H1V6.5H.5a.5.5 0 0 1 0-1H1V5.5H.5a.5.5 0 0 1 0-1H1V4.5H.5a.5.5 0 0 1 0-1H1V3.5H.5a.5.5 0 0 1 0-1H1V2.5H.5a.5.5 0 0 1 0-1H1V1.5H.5a.5.5 0 0 1 0-1H1V.5H.5a.5.5 0 0 1 0-1H1V0h-.5a.5.5 0 0 1 0 1H1V.5H.5z"/>
+        `;
+
+        avatarItem.appendChild(SVGModifyAvatar);
+
+        avatarImage.addEventListener('mouseover', () => {
+            avatarImage.style.filter = 'blur(5px)';
+            SVGModifyAvatar.style.opacity = '1';
         });
 
+        avatarImage.addEventListener('mouseout', () => {
+            avatarImage.style.filter = 'none';
+            SVGModifyAvatar.style.opacity = '0';
+        });
+
+
+        avatarImage.addEventListener('click', () => {
+
+            const bootstrapModal = new bootstrap.Modal(modalAvatar);
+
+            const navBar = document.querySelector('.nav');
+            const rect = navBar.getBoundingClientRect();
+
+            modalAvatar.style.position = 'absolute';
+            modalAvatar.style.top = `${rect.top}px`;
+            modalAvatar.style.left = `${rect.right + 10}px`;
+
+            modalAvatar.style.margin = '0';
+            modalAvatar.style.transform = 'none';
+            modalAvatar.style.maxWidth = 'none';
+            bootstrapModal.show();
+        });
+
+    //////CREATION MODAL AVATAR TRY///////////////////////////////
+
+    const modalAvatar = document.createElement('div');
+    modalAvatar.className = 'modal fade modalAvatar';
+    modalAvatar.id = 'modalAvatar';
+    modalAvatar.setAttribute('tabindex', '-1');
+    modalAvatar.setAttribute('aria-labelledby', 'modalAvatarLabel');
+    modalAvatar.setAttribute('aria-hidden', 'true');
+    container.appendChild(modalAvatar);
+
+    const modalAvatarDialog = document.createElement('div');
+    modalAvatarDialog.className = "modal-dialog modalAvatarDialog";
+    modalAvatar.appendChild(modalAvatarDialog);
+
+    const modalAvatarContent = document.createElement('div');
+    modalAvatarContent.className = 'modal-content modalAvatarContent';
+    modalAvatarDialog.appendChild(modalAvatarContent);
+
+    const modalAvatarHeader = document.createElement('div');
+    modalAvatarHeader.className = 'modal-header border-bottom border-custom-color pb-2 modalAvatarHeader';
+    modalAvatarContent.appendChild(modalAvatarHeader);
+
+    const modalAvatarTitle = document.createElement('h2');
+    modalAvatarTitle.textContent = 'Avatar';
+    modalAvatarTitle.className = 'modal-title modalAvatarTitle';
+    modalAvatarHeader.appendChild(modalAvatarTitle);
+
+    const modalAvatarCloseButton = document.createElement('span');
+    modalAvatarCloseButton.id = 'closeButtonAvatar';
+    modalAvatarCloseButton.setAttribute('data-bs-dismiss', 'modal');
+    modalAvatarCloseButton.setAttribute('aria-label', 'Close');
+    modalAvatarCloseButton.textContent = '×';
+    modalAvatarHeader.appendChild(modalAvatarCloseButton);
+
+    modalAvatarCloseButton.addEventListener('click', () => {
+        modalAvatar.classList.remove('modalAvatar-show');
+        setTimeout(() => {
+            modalAvatar.style.display = 'none';
+        }, 500);
+    });
+
+    const modalAvatarBody = document.createElement('div');
+    modalAvatarBody.className = 'modal-body';
+    modalAvatarContent.appendChild(modalAvatarBody);
+
+    const avatarForm = document.createElement('form');
+    avatarForm.className = 'w-100';
+    modalAvatarBody.appendChild(avatarForm);
+
+    const newAvatar = document.createElement('input');
+    newAvatar.type = 'file';
+    newAvatar.id = 'avatar';
+    newAvatar.name = 'newAvatar';
+    newAvatar.className = 'form-control mb-4';
+    avatarForm.appendChild(newAvatar);
+
+    const avatarSubmitButton = document.createElement('button');
+    avatarSubmitButton.type = 'submit';
+    avatarSubmitButton.className = 'btn btn-primary w-100 mb-3 d-flex justify-content-center align-items-center';
+    avatarSubmitButton.textContent = 'Save avatar';
+    avatarForm.appendChild(avatarSubmitButton);
+
+    const removeAvatarButton = document.createElement('button');
+    removeAvatarButton.type = 'button';
+    removeAvatarButton.className = 'btn btn-danger w-100';
+    removeAvatarButton.textContent = 'Remove avatar';
+    avatarForm.appendChild(removeAvatarButton);
+
+    // Action du bouton "Save avatar"
+    avatarForm.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Empêche la soumission par défaut du formulaire
+
+        // Suppression des messages précédents
+        const errorMessages = accessibilityForm.querySelectorAll('.text-danger');
+        errorMessages.forEach(message => message.remove());
+        const successMessages = accessibilityForm.querySelectorAll('.text-success');
+        successMessages.forEach(message => message.remove());
+
+        // Récupération du fichier sélectionné
+        const data = new FormData(avatarForm);
+        const avatarFile = data.get('newAvatar');
+
+        if (!avatarFile.size || avatarFile.name === '') {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Select a file';
+            avatarForm.insertBefore(errorMessage, avatarSubmitButton);
+            return;
+        }
+
+        //Check file type
+        if (!avatarFile.type.startsWith('image/')) {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'File type not supported';
+            avatarForm.insertBefore(errorMessage, avatarSubmitButton);
+            return;
+        }
+
+        if (avatarFile.size > 1000000) { // Vérification de la taille (1 MB max)
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'File too large (max 1 MB)';
+            avatarForm.insertBefore(errorMessage, avatarSubmitButton);
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/updateAvatar/', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: avatarFile,
+            });
+
+            if (response.ok) {
+                const result = await response.json(); // Suppose que l'URL de l'avatar est retournée
+
+                // Message de succès
+                const successMessage = document.createElement('p');
+                successMessage.className = 'text-success';
+                successMessage.textContent = 'Avatar successfully modified';
+                avatarForm.appendChild(successMessage);
+
+                setTimeout(() => {
+                    const modalElement = document.getElementById('modalAvatar');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+
+                    document.body.style.filter = 'blur(5px)';
+
+                    let location = window.location.href;
+                    const str_split = location.split('/');
+                    const length = str_split.length;
+                    const locationFinal = '/' + str_split[length - 1];
+                    navigateTo(locationFinal);
+
+                    let blurAmount = 4;
+                    const interval = setInterval(() => {
+                        blurAmount -= 0.1;
+                        document.body.style.filter = `blur(${Math.max(0, blurAmount)}px)`;
+
+                        if (blurAmount <= 0) {
+                            clearInterval(interval);
+                        }
+                    }, 25);
+                }, 800);
+
+            } else {
+                // Message d'erreur en cas d'échec
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'Error when modifying the avatar';
+                avatarForm.insertBefore(errorMessage, avatarSubmitButton);
+
+                setTimeout(() => {
+                    const modalElement = document.getElementById('modalAvatar');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+
+                    document.body.style.filter = 'blur(5px)';
+
+                    let location = window.location.href;
+                    const str_split = location.split('/');
+                    const length = str_split.length;
+                    const locationFinal = '/' + str_split[length - 1];
+                    navigateTo(locationFinal);
+
+                    let blurAmount = 4;
+                    const interval = setInterval(() => {
+                        blurAmount -= 0.1;
+                        document.body.style.filter = `blur(${Math.max(0, blurAmount)}px)`;
+
+                        if (blurAmount <= 0) {
+                            clearInterval(interval);
+                        }
+                    }, 25);
+                }, 800);
+            }
+        } catch (error) {
+            console.error('Error during the avatar update', error);
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'An error occurred while updating the avatar';
+            avatarForm.insertBefore(errorMessage, avatarSubmitButton);
+
+            setTimeout(() => {
+                const modalElement = document.getElementById('modalAvatar');
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                modalInstance.hide();
+
+                document.body.style.filter = 'blur(5px)';
+
+                let location = window.location.href;
+                const str_split = location.split('/');
+                const length = str_split.length;
+                const locationFinal = '/' + str_split[length - 1];
+                navigateTo(locationFinal);
+
+                let blurAmount = 4;
+                const interval = setInterval(() => {
+                    blurAmount -= 0.1;
+                    document.body.style.filter = `blur(${Math.max(0, blurAmount)}px)`;
+
+                    if (blurAmount <= 0) {
+                        clearInterval(interval);
+                    }
+                }, 25);
+            }, 800);
+        }
+    });
+
+    // Action du bouton "Remove avatar" pour supprimer l'avatar actuel
+    removeAvatarButton.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/api/deleteAvatar/', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            });
+
+            // Suppression des messages précédents
+            const errorMessages = accessibilityForm.querySelectorAll('.text-danger');
+            errorMessages.forEach(message => message.remove());
+            const successMessages = accessibilityForm.querySelectorAll('.text-success');
+            successMessages.forEach(message => message.remove());
+            if (response.ok) {
+                // Mettre à jour l'avatar avec une image par défaut après suppression
+                const avatarImage = document.querySelector('.avatarImage');
+                avatarImage.src = '/path/to/default-avatar.png';  // Remplacer par l'URL de l'avatar par défaut
+
+                // Afficher un message de succès
+                const successMessage = document.createElement('p');
+                successMessage.className = 'text-success';
+                successMessage.textContent = 'Avatar successfully removed';
+                avatarForm.appendChild(successMessage);
+
+                setTimeout(() => {
+                    const modalElement = document.getElementById('modalAvatar');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+
+                    document.body.style.filter = 'blur(5px)';
+
+                    let location = window.location.href;
+                    const str_split = location.split('/');
+                    const length = str_split.length;
+                    const locationFinal = '/' + str_split[length - 1];
+                    navigateTo(locationFinal);
+
+                    let blurAmount = 4;
+                    const interval = setInterval(() => {
+                        blurAmount -= 0.1;
+                        document.body.style.filter = `blur(${Math.max(0, blurAmount)}px)`;
+
+                        if (blurAmount <= 0) {
+                            clearInterval(interval);
+                        }
+                    }, 25);
+                }, 800);
+
+            } else {
+                // Message d'erreur si suppression échoue
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'Error when removing the avatar';
+                avatarForm.appendChild(errorMessage);
+
+                setTimeout(() => {
+                    const modalElement = document.getElementById('modalAvatar');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+
+                    document.body.style.filter = 'blur(5px)';
+
+                    let location = window.location.href;
+                    const str_split = location.split('/');
+                    const length = str_split.length;
+                    const locationFinal = '/' + str_split[length - 1];
+                    navigateTo(locationFinal);
+
+                    let blurAmount = 4;
+                    const interval = setInterval(() => {
+                        blurAmount -= 0.1;
+                        document.body.style.filter = `blur(${Math.max(0, blurAmount)}px)`;
+
+                        if (blurAmount <= 0) {
+                            clearInterval(interval);
+                        }
+                    }, 25);
+                }, 800);
+            }
+
+        } catch (error) {
+            console.error('Error during the avatar removal', error);
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'An error occurred while removing the avatar';
+            avatarForm.appendChild(errorMessage);
+
+            setTimeout(() => {
+                const modalElement = document.getElementById('modalAvatar');
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                modalInstance.hide();
+
+                document.body.style.filter = 'blur(5px)';
+
+                let location = window.location.href;
+                const str_split = location.split('/');
+                const length = str_split.length;
+                const locationFinal = '/' + str_split[length - 1];
+                navigateTo(locationFinal);
+
+                let blurAmount = 4;
+                const interval = setInterval(() => {
+                    blurAmount -= 0.1;
+                    document.body.style.filter = `blur(${Math.max(0, blurAmount)}px)`;
+
+                    if (blurAmount <= 0) {
+                        clearInterval(interval);
+                    }
+                }, 25);
+            }, 800);
+        }
+    });
+
+////////////////////////////////////////////////////////////////////////////////////
         const TitleNickname = document.createElement('h4');
         TitleNickname.className = 'TitleNickname mt-2 pb-4';
         TitleNickname.textContent = `${userData.nickname}`;
@@ -734,11 +1106,11 @@ export function navigationBar(container) {
 function createNavButton(text, onClick) {
     const listItem = document.createElement('li');
     listItem.className = 'ElemListNavBar text-center py-2';
-    
+
     const button = document.createElement('button');
     button.className = 'btn text-primary';
     button.textContent = text;
-    
+
     // Remove the outline when the button loses focus
     button.addEventListener('blur', () => {
         button.style.outline = 'none';

@@ -13,6 +13,12 @@
 	padding: 0;
 }
 
+.SVGModifyAvatar {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
 .avatarImage {
 	border-radius: 50%;
 }
@@ -62,6 +68,57 @@ button.buttonLogOut {
 button.buttonLogOut:active {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Ombre plus forte au clic */
 }
+
+/*MODAL AVATAR*/
+.modalAvatarContent {
+	background-color: rgba(255, 234, 234, 0.5);
+	transition: transform 0.5s ease, opacity 0.5s ease; /* S'assurer que la transition est appliquée */
+	transform: translateX(-100vw); /* Part de la gauche en dehors de l'écran */
+	opacity: 0 ; /* Initialement invisible */
+	/* transition: transform 0.5s ease, opacity 0.5s ease ; */
+	/* transform: translateY(-1000px); Départ de l'animation, hors écran */
+}
+
+.modalAvatar.fade.show .modalAvatarContent {
+	transform: translateX(0); /* Ramener à la position d'origine */
+	opacity: 1 ; /* Rendre visible */
+}
+
+.modalAvatarHeader {
+	justify-content: space-between;
+}
+
+.modalAvatarTitle {
+	color : #F4ED37;
+}
+
+.modalAvatarDialog {
+	position: relative;
+    margin: 0 !important;  /* Désactiver la marge centrale par défaut */
+    top: auto;  /* Désactiver la position centrale verticale par défaut */
+    left: auto; /* Désactiver la position centrale horizontale par défaut */
+	max-width: 400px !important; /* Limiter la largeur à 400px ou à une taille adaptée */
+    width: auto !important;  /* Permettre à la modal de s'adapter automatiquement au contenu étendre sans restriction de largeur */
+}
+
+#closeButtonAvatar {
+	color: #aaa;
+	position: absolute;
+	top: 10px;
+	right: 20px;
+	font-size: 20px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+#closeButtonAvatar:hover,
+#closeButtonAvatar:focus {
+	color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
 
 
 /*MODAL INFOS*/
