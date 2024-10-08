@@ -1128,29 +1128,3 @@ function createNavButton(text, onClick) {
 
     return listItem;
 }
-
-function createNavButton(text, onClick) {
-    const listItem = document.createElement('li');
-    listItem.className = 'ElemListNavBar text-center py-2';
-
-    const button = document.createElement('button');
-    button.className = 'btn text-primary';
-    button.textContent = text;
-
-    // Remove the outline when the button loses focus
-    button.addEventListener('blur', () => {
-        button.style.outline = 'none';
-    });
-
-    listItem.appendChild(button);
-
-    button.addEventListener('click', () => {
-        if (DEBUG) {console.log(`Navigating to ${text}`, 'actual:', window.location.pathname);}
-        if (window.location.pathname === `/${text.toLowerCase()}`) {
-            return;
-        }
-        onClick();
-    });
-
-    return listItem;
-}
