@@ -23,7 +23,7 @@ class User_site(AbstractUser):
         if self.pk:
             old_user = User_site.objects.get(pk=self.pk)
             if old_user.status != self.status:  # Comparer l'ancien et le nouveau statut
-                self.status_update_send_WS(old_status=old_user.status, new_status=self.status)
+                self.status_update_send_WS()
 
         # Sauvegarde réelle de l'objet
         super(User_site, self).save(*args, **kwargs)
