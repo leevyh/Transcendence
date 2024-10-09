@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractUser, User
+from django.contrib.auth.models import AbstractUser
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
 
@@ -23,7 +23,7 @@ class User_site(AbstractUser):
         if self.pk:
             old_user = User_site.objects.get(pk=self.pk)
             if old_user.status != self.status:  # Comparer l'ancien et le nouveau statut
-                self.status_update_send_WS(old_status=old_user.status, new_status=self.status)
+                self.status_update_send_WS() # Appel de la méthode pour envoyer le statut
 
         # Sauvegarde réelle de l'objet
         super(User_site, self).save(*args, **kwargs)
@@ -117,12 +117,19 @@ class MatchHistory(models.Model):
 
 
 class Notification(models.Model):
+    CATEGORY = (
+        ('friend_request', models.ForeignKey('FriendRequest', on_delete=models.CASCADE, null=True)),
+        ('new_message', models.ForeignKey('Message', on_delete=models.CASCADE, null=True)),
+        ('game_invite', 'game_invite'),
+        ('tournament_invite', 'tournament_invite'),
+    )
+
     user = models.ForeignKey(User_site, on_delete=models.CASCADE)
     type = models.CharField(max_length=255)
     status = models.CharField(max_length=255, default='unread', choices=[('unread', 'unread'), ('read', 'read')])
-    friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
+    category = models.CharField(max_length=255, choices=CATEGORY)
+    # friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(default=timezone.now)
-
 
 
 # class PrivateGameInvite(model.Model):

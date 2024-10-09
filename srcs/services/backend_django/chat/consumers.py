@@ -160,6 +160,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # Send message notifications to the members of the conversation
     async def send_message_notifications(self, sender, members, message):
+        from api.models import Notification
         for member in members:
             if member.id != sender.id:  # Exclure l'expéditeur
                 # Check if the user is active in the chat, if not -> send a notification
@@ -176,6 +177,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 "message": message,
                             },
                         }
+                    )
+                # Save message in the database
+                    await database_sync_to_async(Notification.objects.create)(
+                        user=member,
+                        type='new_message',
+                        category='new_message',
+                        status='unread'
                     )
 
 
