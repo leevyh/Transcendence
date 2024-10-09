@@ -117,18 +117,11 @@ class MatchHistory(models.Model):
 
 
 class Notification(models.Model):
-    CATEGORY = (
-        ('friend_request', models.ForeignKey('FriendRequest', on_delete=models.CASCADE, null=True)),
-        ('new_message', models.ForeignKey('Message', on_delete=models.CASCADE, null=True)),
-        ('game_invite', 'game_invite'),
-        ('tournament_invite', 'tournament_invite'),
-    )
-
     user = models.ForeignKey(User_site, on_delete=models.CASCADE)
     type = models.CharField(max_length=255)
     status = models.CharField(max_length=255, default='unread', choices=[('unread', 'unread'), ('read', 'read')])
-    category = models.CharField(max_length=255, choices=CATEGORY)
-    # friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
+    friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
+    new_message = models.ForeignKey('chat.Message', on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(default=timezone.now)
 
 
@@ -136,8 +129,3 @@ class Notification(models.Model):
 
 
 # class TournamentInvite(model.Model):
-
-
-
-
-
