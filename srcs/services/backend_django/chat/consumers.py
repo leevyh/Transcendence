@@ -30,7 +30,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Send chat history
         await self.chat_history()
-        
+
 
     async def disconnect(self, close_code):
         # Leave conversation group
