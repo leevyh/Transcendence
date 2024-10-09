@@ -5,6 +5,7 @@ from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
 
 class User_site(AbstractUser):
+    # from chat.consumers import encode_avatar
     class Status(models.TextChoices):
         ONLINE = "online"
         OFFLINE = "offline"
@@ -19,28 +20,45 @@ class User_site(AbstractUser):
         return self.username
 
     def save(self, *args, **kwargs):
-        # On vérifie si l'objet existe déjà en base de données
-        if self.pk:
-            old_user = User_site.objects.get(pk=self.pk)
-            if old_user.status != self.status:  # Comparer l'ancien et le nouveau statut
-                self.status_update_send_WS()
-
-        # Sauvegarde réelle de l'objet
         super(User_site, self).save(*args, **kwargs)
-
-    def status_update_send_WS(self):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             "status_updates",
             {
                 "type": "send_status_update",
                 "message": {
-                    "user_id": self.id,
+                    "user_id": self.id,  # Ajoutez l'ID de l'utilisateur
                     "nickname": self.nickname,
                     "status": self.status,
+                    # "avatar": self.encode_avatar(self), TODO: Fix this
                 },
             },
         )
+
+    # def save(self, *args, **kwargs):
+    #     # On vérifie si l'objet existe déjà en base de données
+    #     if self.pk:
+    #         old_user = User_site.objects.get(pk=self.pk)
+    #         if old_user.status != self.status:  # Comparer l'ancien et le nouveau statut
+    #             self.status_update_send_WS()
+
+    #     # Sauvegarde réelle de l'objet
+    #     super(User_site, self).save(*args, **kwargs)
+
+    # def status_update_send_WS(self):
+    #     channel_layer = get_channel_layer()
+    #     async_to_sync(channel_layer.group_send)(
+    #         "status_updates",
+    #         {
+    #             "type": "send_status_update",
+    #             "message": {
+    #                 "user_id": self.id,
+    #                 "nickname": self.nickname,
+    #                 "status": self.status,
+    #             },
+    #         },
+    #     )
+
 
 class Accessibility(models.Model):
     class Language(models.TextChoices):
