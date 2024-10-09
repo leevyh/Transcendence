@@ -19,13 +19,14 @@ class User_site(AbstractUser):
         return self.username
 
     def save(self, *args, **kwargs):
-        # On vérifie si l'objet existe déjà en base de données
+
         if self.pk:
             old_user = User_site.objects.get(pk=self.pk)
-            if old_user.status != self.status:  # Comparer l'ancien et le nouveau statut
-                self.status_update_send_WS() # Appel de la méthode pour envoyer le statut
+            # Check if the status has changed
+            if old_user.status != self.status:
+                self.status_update_send_WS()
 
-        # Sauvegarde réelle de l'objet
+        # Call the "real" save() method.
         super(User_site, self).save(*args, **kwargs)
 
     def status_update_send_WS(self):
