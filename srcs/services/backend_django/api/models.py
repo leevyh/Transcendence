@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
-from asgiref.sync import async_to_sync, sync_to_async
+from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 class User_site(AbstractUser):
@@ -19,17 +19,8 @@ class User_site(AbstractUser):
         return self.username
 
     def save(self, *args, **kwargs):
-
-        if self.pk:
-            old_user = User_site.objects.get(pk=self.pk)
-            # Check if the status has changed
-            if old_user.status != self.status:
-                self.status_update_send_WS()
-
-        # Call the "real" save() method.
+        from chat.consumers import encode_avatar
         super(User_site, self).save(*args, **kwargs)
-
-    def status_update_send_WS(self):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             "status_updates",
@@ -39,9 +30,11 @@ class User_site(AbstractUser):
                     "user_id": self.id,
                     "nickname": self.nickname,
                     "status": self.status,
+                    "avatar": encode_avatar(self),
                 },
             },
         )
+
 
 class Accessibility(models.Model):
     class Language(models.TextChoices):
@@ -62,8 +55,6 @@ class Stats_user(models.Model):
     nb_point_taken = models.IntegerField(default=0)
     nb_point_given = models.IntegerField(default=0)
     win_rate = models.FloatField(default=0.0)
-
-
 
 
 class FriendRequest(models.Model):
@@ -92,6 +83,7 @@ class FriendRequest(models.Model):
                 },
             },
         )
+
 
 class Friendship(models.Model):
     user1 = models.ForeignKey(User_site, related_name='friendships_initiated', on_delete=models.CASCADE)

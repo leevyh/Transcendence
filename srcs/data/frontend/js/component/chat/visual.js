@@ -86,16 +86,26 @@ export function createUserCard(user, userList) {
         userCard.id = user.user_id; // ID = nickname
         userList.appendChild(userCard);
 
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'position-relative d-inline-block';
+        userCard.appendChild(avatarDiv);
+
+        const userAvatar = document.createElement('img');
+        userAvatar.alt = 'User image';
+        userAvatar.className = 'user-img rounded-circle chat-user-img';
+        userAvatar.src = `data:image/png;base64, ${user.avatar}`;
+        avatarDiv.appendChild(userAvatar);
+
         const userStatusDot = document.createElement('span');
-        userStatusDot.className = 'rounded-circle status-icon';
-        userCard.appendChild(userStatusDot);
+        userStatusDot.className = 'rounded-circle position-absolute status-icon';
+        avatarDiv.appendChild(userStatusDot);
         
         const userInfo = document.createElement('div');
         userInfo.className = 'mt-auto mb-auto user-info';
         userInfo.innerHTML = `<span>${user.nickname}</span>`;
         userCard.appendChild(userInfo);
         
-        const userStatus = document.createElement('p');
+        const userStatus = document.createElement('div');
         userStatus.className = 'user-status';
         userStatus.textContent = 'offline';
         userInfo.appendChild(userStatus);
@@ -120,10 +130,13 @@ export function createUserCard(user, userList) {
         userCard.appendChild(blockButton);
     }
 
-    // Update the user status and the status dot
-    const userStatus = userCard.querySelector('.user-status');
-    userStatus.textContent = user.status;
+    // Update the user avatar if the user changed it
+    const userAvatar = userCard.querySelector('.user-img');
+    if (userAvatar.src !== `data:image/png;base64, ${user.avatar}`) {
+        userAvatar.src = `data:image/png;base64, ${user.avatar}`;
+    }
 
+    // Update the status dot color
     const userStatusDot = userCard.querySelector('.status-icon');
     if (user.status === 'online') {
         userStatusDot.style.backgroundColor = 'green';
@@ -133,17 +146,21 @@ export function createUserCard(user, userList) {
         userStatusDot.style.backgroundColor = 'orange';
     }
 
-    // Update the nickname if the user changed it
+    // Update the nickname on the userCard if the user changed it
     const userInfo = userCard.querySelector('.user-info');
     if (userInfo.children[0].textContent !== user.nickname) {
         userInfo.children[0].textContent = user.nickname;
-        // if the conversation is open with the user, change the chat title
+
+        // if the conversation is open with this user, update the chat title and the user image
         const chatTitle = document.querySelector('.chat-title');
-        if (chatTitle.textContent !== `Chat with ${user.nickname}`) {
+        if (chatTitle.textContent === `Chat with ${user.nickname}`) {
             chatTitle.textContent = `Chat with ${user.nickname}`;
         }
     }
 
+    // Update the user status
+    const userStatus = userCard.querySelector('.user-status');
+    userStatus.textContent = user.status;
 
     // Sort the users list
     const users = userList.children;
@@ -194,12 +211,6 @@ function createChatContainerHeader() {
     const div1 = document.createElement('div');
     div1.className = 'd-flex align-items-center';
     chatHeader.appendChild(div1);
-
-    const userImgChat = document.createElement('img');
-    userImgChat.style.display = 'none'; // Hide the user image
-    userImgChat.alt = 'User image';
-    userImgChat.className = 'rounded-circle user-img chat-user-img';
-    div1.appendChild(userImgChat);
 
     const chatTitle = document.createElement('span');
     chatTitle.textContent = 'Chat Window';

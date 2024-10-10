@@ -1,4 +1,5 @@
 import { navigationBar } from './navigation.js';
+import { notifications } from './notifications.js';
 
 export async function profileView(container) {
     container.innerHTML = '';
@@ -77,6 +78,9 @@ export async function profileView(container) {
     const historical = document.createElement('div');
     historical.className = 'historical h-100';
     ContainerHistorical.appendChild(historical);
+
+    const notifications_div = await notifications();
+    div.appendChild(notifications_div);
 }
 
 

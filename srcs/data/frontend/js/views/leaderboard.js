@@ -1,4 +1,5 @@
 import { navigationBar } from './navigation.js';
+// import { notifications } from './notifications.js';
 
 
 export async function leaderboardView(container) {
@@ -13,4 +14,8 @@ export async function leaderboardView(container) {
     
     const viewContainer = document.createElement('div');
     div.appendChild(viewContainer);
+
+
+    // const notifications_div = await notifications();
+    // div.appendChild(notifications_div);
 }

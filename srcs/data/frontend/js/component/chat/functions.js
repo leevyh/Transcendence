@@ -50,9 +50,10 @@ export function openChatWithUser(user) {
 async function openConversation(conversationID, otherUser) {
     if (chatWS) {chatWS.close();}
 
-    // Update the chat title and the user status
+    // Update the chat title with the other user's nickname
     const chatTitle = document.querySelector('.chat-title');
     chatTitle.textContent = `Chat with ${otherUser}`;
+
 
     // Display the view profile button and the invite game button
     const profileButton = document.getElementById('view-profile-button');
@@ -81,11 +82,6 @@ async function openConversation(conversationID, otherUser) {
             // Get the conversation data: Users info (nickname, avatar, blocked_status)
             const conversation = receivedMessage.conversation;
 
-            // Update the user image and display the chat history
-            const userImgChat = document.querySelector('.chat-user-img');
-            userImgChat.src = `data:image/png;base64, ${conversation.other.avatar}`;
-            userImgChat.style.display = 'block';
-            
             // If chat history exists, display the messages
             if (receivedMessage.messages.length > 0) {
                 receivedMessage.messages.forEach(message => {
@@ -151,7 +147,7 @@ function displayMessage(messageData) {
     // Avatar
     const Avatar = messageData.sender.avatar;
     const imgAvatar = document.createElement('img');
-    imgAvatar.className = 'rounded-circle h-100 avatar';
+    imgAvatar.className = 'rounded-circle avatar';
     imgAvatar.src = `data:image/png;base64, ${Avatar}`;
 
     if (messageData.sender.nickname === messageData.user) {
