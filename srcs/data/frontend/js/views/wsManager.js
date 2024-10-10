@@ -17,7 +17,6 @@ class WebSocketManager {
         });
     }
 
-
     async connect(){
         if (this.token) {
             //Check token validity with backend
@@ -75,6 +74,6 @@ class WebSocketManager {
     }
 }
 const wsManager = new WebSocketManager('ws://' + window.location.host + '/ws/notifications/');
-export default wsManager;
 
+export default wsManager;
 wsManager.connect();

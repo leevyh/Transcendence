@@ -141,5 +141,79 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
     async def send_notification(self, event):
         await self.send_json(event["message"])
 
-# class FriendRequestConsumer(AsyncWebsocketConsumer):
-#     pass
+
+class FriendShipConsumer(AsyncJsonWebsocketConsumer):
+    async def connect(self):
+        if not self.scope["user"].is_authenticated:
+            await self.close()
+            return
+        user = self.scope["user"]
+        if user.is_authenticated:
+            self.room_name = f"user_{user.id}"
+            await self.channel_layer.group_add(
+                self.room_name,
+                self.channel_name
+            )
+            await self.accept()
+        else:
+            await self.close()
+
+    async def disconnect(self, close_code):
+        user = self.scope["user"]
+        if user.is_authenticated:
+            await self.channel_layer.group_discard(
+                self.room_name,
+                self.channel_name
+            )
+
+    async def receive_json(self, content):
+        type = ['get_friends', 'delete_friend']
+        if content['type'] in type:
+            await self.handle_friendship(content)
+
+    async def handle_friendship(self, data):
+        from .models import User_site, Friendship
+        user = self.scope["user"]
+        type = data['type']
+        print(f"Data received: {data}")
+
+        if type == 'get_friends':
+            # Encapsulation complète de l'accès aux données synchrones
+            friends = await database_sync_to_async(lambda: list(Friendship.objects.filter(
+                models.Q(user1=user) | models.Q(user2=user)
+            )))()
+
+            friends_list = []
+            for friend in friends:
+                # Encapsulation de l'accès à user1 et user2
+                user1 = await database_sync_to_async(lambda: friend.user1)()
+                user2 = await database_sync_to_async(lambda: friend.user2)()
+
+                if user1 == user:
+                    # Retourne les informations de user2
+                    encoded_avatar = base64.b64encode(user2.avatar.read()).decode('utf-8')
+                    friends_list.append({
+                        'nickname': user2.nickname,
+                        'avatar': encoded_avatar,
+                        'status': user2.status
+                    })
+                else:
+                    encoded_avatar = base64.b64encode(user1.avatar.read()).decode('utf-8')
+                    # Retourne les informations de user1
+                    friends_list.append({
+                        'nickname': user1.nickname,
+                        'avatar': encoded_avatar,
+                        'status': user1.status
+                    })
+            await self.send_json({"type": "get_friends", "friends": friends_list})
+
+        elif type == 'delete_friend':
+            # Gestion de la suppression d'ami
+            friend = await database_sync_to_async(User_site.objects.get)(nickname=data['nickname'])
+            friendship = await database_sync_to_async(Friendship.objects.get)(
+                models.Q(user1=user, user2=friend) | models.Q(user1=friend, user2=user)
+            )
+            await database_sync_to_async(friendship.delete)()
+            print(f"Friendship between {user.nickname} and {friend.nickname} deleted")
+        else:
+            await self.close()
