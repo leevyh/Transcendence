@@ -135,13 +135,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         # Prepare message data to send to the group
-        sender_avatar_base64 = encode_avatar(sender)
         message_data = {
             'message': message.content,
             'sender': {
                 'nickname': sender.nickname,
                 'id': sender.id,
-                'avatar': sender_avatar_base64,
+                'avatar': encode_avatar(sender),
             },
             'timestamp': str(message.timestamp)
         }
