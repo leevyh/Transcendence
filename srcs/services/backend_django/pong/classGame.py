@@ -122,6 +122,7 @@ class PongGame:
                 self.player_2_score += 1
                 self.reset_ball()
                 if self.player_2_score >= iv.WINNING_SCORE:
+                    await self.broadcastState()
                     await self.stop_game()
         elif self.ball_position_x >= iv.GAME_WIDTH - iv.PADDLE_WIDTH:
             if self.ball_position_y > self.player_2_position and self.ball_position_y < self.player_2_position + iv.PADDLE_HEIGHT:
@@ -130,6 +131,7 @@ class PongGame:
                 self.player_1_score += 1
                 self.reset_ball()
                 if self.player_1_score >= iv.WINNING_SCORE:
+                    await self.broadcastState()
                     await self.stop_game()
     
     def inverse_direction(self, paddle_position):
@@ -201,20 +203,3 @@ class PongGame:
         match_history_player_2 = MatchHistory(player=self.player_2, game=game_database)
         await sync_to_async(match_history_player_1.save, thread_sensitive=True)()
         await sync_to_async(match_history_player_2.save, thread_sensitive=True)()
-
-
-# #class for a ball  
-# class Ball :
-#     def __init__(self, *args, **kwargs):
-#         self.position_x = position_x
-#         self.position_y = position_y
-#         self.speed_x = speed_x
-#         self.speed_y = speed_y
-    
-
-# #class for a player
-# class Paddle :
-#     def __init__(self, player, *args, **kwargs):
-#         self.position = 0
-#         self.player = player
-#         self.speed = 0

@@ -86,8 +86,6 @@ export async function pongView(container) {
     const wsUrl = 'ws://' + window.location.host + `/ws/pong/`;
     PongWebSocketManager.init(wsUrl);
 
-
-
     PongWebSocketManager.socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
 

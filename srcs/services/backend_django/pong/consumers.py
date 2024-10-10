@@ -4,6 +4,7 @@ from asgiref.sync import sync_to_async
 from django.db import models
 import asyncio
 from pong.classGame import PongGame, list_of_games
+from pong.classTournament import Tournament, list_of_tournaments
 from . import initValues as iv
 
 # File d'attente pour le matchmaking
@@ -112,3 +113,75 @@ class PongConsumer(AsyncWebsocketConsumer):
             'action_type': 'end_of_game',
         }))
 
+
+#class tournament consumer qui va avec la class TournamentGame, en attendant les autres, a partir de 4, le tournoi peut commencer
+class TournamentConsumer(AsyncWebsocketConsumer):
+
+    players = []
+
+    async def connect(self):
+        await self.accept()
+
+        player = self.scope['user']
+        if player.is_authenticated:
+            await self.findTournament(player)
+        else:
+            await self.close()
+
+    async def findTournament(self, player):
+        if (len(list_of_tournaments) == 0) :
+            print("create tournament with user : ", player)
+            tournament = Tournament()
+            list_of_tournaments.append(tournament)
+            self.tournament = tournament
+            self.tournament.status = "waiting"
+            self.tournament.player[0] = player
+            self.tournament.channel_layer_player[0] = self.channel_name
+            self.tournament.nbPlayers += 1
+            self.current_player = 'player_1'
+            self.tournament.channel_layer_player[0] = self.channel_name
+            await self.send(text_data=json.dumps({
+                'action_type': 'update_player_list',
+                'players': [
+                    {'nickname': player.nickname, 'id': player.id}
+                    for player in self.tournament.player if player is not None
+                ]
+            }))
+        elif (list_of_tournaments[0].nbPlayers < 4) :
+            print("join tournament with user : ", player)
+            self.tournament = list_of_tournaments[0]
+            self.tournament.player[self.tournament.nbPlayers] = player
+            self.tournament.channel_layer_player[self.tournament.nbPlayers] = self.channel_name
+            self.tournament.nbPlayers += 1
+            self.current_player = 'player_' + str(self.tournament.nbPlayers)
+            await self.send(text_data=json.dumps({
+                'action_type': 'update_player_list',
+                'players': [
+                    {'nickname': player.nickname, 'id': player.id}
+                    for player in self.tournament.player if player is not None
+                ]
+            }))
+        else :
+            print("error no tournament available")
+        if(self.tournament.nbPlayers == 4) :
+            list_of_tournaments.pop(0)
+            print("tournament with 4 players")
+            tournament_database = await create_tournament(self.tournament.player[0], self.tournament.player[1], self.tournament.player[2], self.tournament.player[3])
+            self.tournament.id = tournament_database.id
+            tournament_database.is_active = True
+            await self.channel_layer.group_add(f"tournament_{self.tournament.id}", self.tournament.channel_layer_player[0])
+            await self.channel_layer.group_add(f"tournament_{self.tournament.id}", self.tournament.channel_layer_player[1])
+            await self.channel_layer.group_add(f"tournament_{self.tournament.id}", self.tournament.channel_layer_player[2])
+            await self.channel_layer.group_add(f"tournament_{self.tournament.id}", self.tournament.channel_layer_player[3])
+            self.tournament.status = "ready"
+            self.task = asyncio.create_task(self.tournament.start_tournament())
+        return self.tournament
+
+    async def disconnect(self):
+        print("disconnect user : ", self.scope['user'])
+        await self.close()
+
+@sync_to_async
+def create_tournament(player_1, player_2, player_3, player_4):
+    from pong.models import Tournament
+    return Tournament.objects.create(player_1=player_1, player_2=player_2, player_3=player_3, player_4=player_4, is_active=True)
