@@ -1,6 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+from asgiref.sync import sync_to_async
 import base64
 
 active_connections = {}
@@ -23,6 +24,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Add inactive_connections -> Means the user is active in the chat
         active_connections[user.id] = self.channel_name
+
+        # Check and remode any existing notifications for this conversation
+        await self.remove_notifications(user, self.conversation_id)
 
         # Send chat history
         await self.chat_history()
@@ -155,13 +159,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         # Notify the other members of the conversation (except the sender)
-        await self.send_message_notifications(sender, members, message.content)
+        await self.send_message_notifications(sender, members, message)
 
 
     # Send message notifications to the members of the conversation
     async def send_message_notifications(self, sender, members, message):
+        from api.models import Notification
+        from .models import Message
         for member in members:
-            if member.id != sender.id:  # Exclure l'expéditeur
+            if member.id != sender.id:  # Exclude the sender
                 # Check if the user is active in the chat, if not -> send a notification
                 if not await self.is_user_in_group(member.id):
                     await self.channel_layer.group_send(
@@ -173,10 +179,35 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 "from_user": sender.id,
                                 "from_nickname": sender.nickname,
                                 "from_avatar": encode_avatar(sender),
-                                "message": message,
+                                "message": message.content,
                             },
                         }
                     )
+                    # Save the notification in the database
+                    await database_sync_to_async(Notification.objects.create)(
+                        user=member,
+                        type='new_message',
+                        new_message=message,
+                        status='unread'
+                    )
+
+
+    # Remove notifications from the database
+    async def remove_notifications(self, user, conversation_id):
+        from api.models import Notification
+
+        # Fetch all unread notifications related to this conversation for the user
+        notifications = await sync_to_async(list)(Notification.objects.filter(
+            user=user,
+            type='new_message',
+            new_message__conversation_id=conversation_id,
+            status='unread'
+        ))
+
+        # Delete them from the database
+        for notification in notifications:
+            await sync_to_async(notification.delete)()
+
 
 
     # Check if the user is active in the chat

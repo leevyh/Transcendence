@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractUser, User
+from django.contrib.auth.models import AbstractUser
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
 
@@ -19,13 +19,14 @@ class User_site(AbstractUser):
         return self.username
 
     def save(self, *args, **kwargs):
-        # On vérifie si l'objet existe déjà en base de données
+
         if self.pk:
             old_user = User_site.objects.get(pk=self.pk)
-            if old_user.status != self.status:  # Comparer l'ancien et le nouveau statut
+            # Check if the status has changed
+            if old_user.status != self.status:
                 self.status_update_send_WS()
 
-        # Sauvegarde réelle de l'objet
+        # Call the "real" save() method.
         super(User_site, self).save(*args, **kwargs)
 
     def status_update_send_WS(self):
@@ -121,16 +122,11 @@ class Notification(models.Model):
     type = models.CharField(max_length=255)
     status = models.CharField(max_length=255, default='unread', choices=[('unread', 'unread'), ('read', 'read')])
     friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
+    new_message = models.ForeignKey('chat.Message', on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(default=timezone.now)
-
 
 
 # class PrivateGameInvite(model.Model):
 
 
 # class TournamentInvite(model.Model):
-
-
-
-
-
