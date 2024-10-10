@@ -114,8 +114,8 @@ class Notification(models.Model):
     type = models.CharField(max_length=255)
     status = models.CharField(max_length=255, default='unread', choices=[('unread', 'unread'), ('read', 'read')])
     friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
+    new_message = models.ForeignKey('chat.Message', on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(default=timezone.now)
-
 
 
 # class PrivateGameInvite(model.Model):
