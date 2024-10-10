@@ -1,4 +1,5 @@
 import { navigationBar } from './navigation.js';
+import { notifications } from './notifications.js';
 
 import {
     play,
@@ -112,6 +113,9 @@ export async function pongView(container) {
     });
 
     stopGameButton.disabled = true; // Le bouton Stop est désactivé au début
+
+    const notifications_div = await notifications();
+    div.appendChild(notifications_div);
 }
 
 
