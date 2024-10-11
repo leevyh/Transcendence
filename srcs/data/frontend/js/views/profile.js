@@ -1,5 +1,36 @@
 import { navigationBar } from './navigation.js';
 import { notifications } from './notifications.js';
+import { getCookie } from './utils.js';
+
+// async function fetchUserStats() {
+//     const response = await fetch(`/api/stats/`, {  // URL de ton API pour récupérer les statistiques
+//         method: 'GET',
+//         headers: {
+//             'Authorization': `Bearer ${localStorage.getItem('token')}`,
+//             'Content-Type': 'application/json',
+//             'X-CSRFToken': getCookie('csrftoken'),
+//         },
+//     });
+
+//     if (response.status === 200) {
+//         return response.json();  // Convertit la réponse en JSON si tout va bien
+//     } else if (response.status === 307) {
+//         localStorage.removeItem('token');
+//         await fetch('/api/logout/', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'X-CSRFToken': getCookie('csrftoken'),
+//             },
+//         });
+//         navigateTo('/');
+//         return null;
+//     } else {
+//         console.error('Error:', response);
+//         return null;
+//     }
+// }
+
 
 export async function profileView(container) {
     container.innerHTML = '';
@@ -8,6 +39,47 @@ export async function profileView(container) {
     div.className = 'd-flex h-100';
     container.appendChild(div);
 
+    const userData = await fetch(`/api/settings/`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+    })
+    .then(response => {
+        if (response.status === 200) {
+            return response.json(); // Retourne les données si le statut est 200
+        } else {
+            console.error('Error:', response);
+            return null; // Gérer les autres erreurs sans faire de logout
+        }
+    })
+    .then(data => {
+        if (!data) {
+           console.error('No data received');
+           return null;
+        }
+        // Retourne les données utilisateur
+        return {
+            username: data.username,
+            nickname: data.nickname,
+            email: data.email,
+            language: data.language,
+            font_size: data.font_size,
+            theme: data.dark_mode,
+            avatar: data.avatar,
+        };
+    })
+    .catch(error => {
+        console.error('Failed to fetch user data:', error);
+        return null;
+    });
+
+    // Si aucune donnée n'a été récupérée, on arrête là
+    if (!userData) {
+        return;
+    }
     const navBarContainer = navigationBar(container);
     div.appendChild(navBarContainer);
 
@@ -81,7 +153,7 @@ export async function profileView(container) {
     const imgAv = document.createElement('img');
     imgAv.src = '/js/img/women.svg';
     imgAv.alt = 'Avatar First Place';
-    imgAv.className = 'imgAv';
+    imgAv.className = 'imgAv rounded-circle';
     imgAv.style.width = '50px';
     imgAv.style.height = '50px';
     imgAv.style.position = 'absolute';
@@ -123,7 +195,7 @@ export async function profileView(container) {
     const img2Av = document.createElement('img');
     img2Av.src = '/js/img/women.svg';
     img2Av.alt = 'Avatar Second Place';
-    img2Av.className = 'img2Av';
+    img2Av.className = 'img2Av rounded-circle';
     img2Av.style.width = '50px';
     img2Av.style.height = '50px';
     imgContainerSecPos.appendChild(img2Av);
@@ -156,7 +228,7 @@ export async function profileView(container) {
     const img3Av = document.createElement('img');
     img3Av.src = '/js/img/women.svg';
     img3Av.alt = 'Avatar Third Place';
-    img3Av.className = 'img3Av';
+    img3Av.className = 'img3Av rounded-circle';
     img3Av.style.width = '50px';
     img3Av.style.height = '50px';
     imgContainerThirdPos.appendChild(img3Av);
@@ -177,7 +249,7 @@ export async function profileView(container) {
 
     const TitleStatsProfile = document.createElement('h5');
     TitleStatsProfile.className ='TitlePosition TitleStatsProfile d-flex justify-content-center align-items-center py-3';
-    TitleStatsProfile.textContent = 'User Stats';
+    TitleStatsProfile.textContent = `${userData.nickname}'s Stats`;
     HeaderStatsProfile.appendChild(TitleStatsProfile);
 
     const ContentuserStatsProfile = document.createElement('div');
@@ -188,13 +260,10 @@ export async function profileView(container) {
     CharWinRateContener.className = 'CharWinRateContener d-flex justify-content-center align-items-center  w-100';
     ContentuserStatsProfile.appendChild(CharWinRateContener);
 
-
-    // Définir les données pour les victoires (wins) et les pertes (losses)
-    const wins = 20;  // Nombre de victoires
-    const losse = 10; // Nombre de pertes
+    const wins = 20;
+    const losse = 10;
     const totalGames = wins + losse;
 
-    // VERIFIER SI AUCUNE PARTIE N'EST JOUER
     function createPieChart(wins, losse, totalGames) {
 
         const canvas = document.createElement('canvas');
@@ -203,7 +272,7 @@ export async function profileView(container) {
         CharWinRateContener.appendChild(canvas);
 
         const data = [wins, losse]; // Victoires et pertes
-        const colors = ["#1e7145", "#b91d47"]; // Vert pour victoires, Rouge pour pertes
+        const colors = ["rgba(0, 123, 255, 0.3)", "rgba(255, 0, 0, 0.3)"]; // Vert pour victoires, Rouge pour pertes
         const labels = ["Wins", "Defeats"];
 
         // Fonction pour dessiner un cercle rempli de blanc
@@ -235,35 +304,26 @@ export async function profileView(container) {
                 content.arc(canvas.width / 2, canvas.height / 2, Math.min(canvas.width / 2, canvas.height / 2) - 10, startAngle, startAngle + sliceAngle);
                 content.closePath();
 
-                // Remplir chaque portion avec la couleur correspondante
                 content.fillStyle = colors[i];
                 content.fill();
 
-                // Ajouter des labels pour chaque portion
                 const labelX = canvas.width / 2 + (Math.min(canvas.width / 2, canvas.height / 4) / 2) * Math.cos(startAngle + sliceAngle / 2);
                 const labelY = canvas.height / 2 + (Math.min(canvas.width / 2, canvas.height / 4) / 2) * Math.sin(startAngle + sliceAngle / 2);
                 content.fillStyle = "white";
                 content.font = "14px Arial";
                 content.fillText(labels[i], labelX, labelY);
 
-                startAngle += sliceAngle; // Ajuster l'angle de départ pour la prochaine portion
+                startAngle += sliceAngle;
             }
         }
-
-        // Si aucune partie n'est jouée, dessiner un cercle rempli de blanc
         if (totalGames === 0) {
             drawFilledWhiteCircle('myCanvas');
         } else {
-            // Sinon, dessiner le diagramme circulaire
             drawPieChart('myCanvas', data, colors, labels);
         }
     }
 
-    // Appeler la fonction pour créer le diagramme
     createPieChart(wins, losse, totalGames);
-
-
-
 
     const UserStatsContener = document.createElement('div');
     UserStatsContener.className = 'UserStatsContener w-100 d-flex align-items-end p-2';
@@ -303,20 +363,116 @@ export async function profileView(container) {
     TitleNbGame.textContent = 'Games: 84';
     ContenerNbGame.appendChild(TitleNbGame);
 
-//nb_games': stats.nb_games,
-// 'nb_wins': stats.nb_wins,
-// 'nb_losses': stats.nb_losses,
-// 'win_rate': stats.win_rate,
-// 'nb_point_taken' :stats.nb_point_taken,
-// 'nb_point_given' :stats.nb_point_given,
 
+    function createGameHistory(player1Avatar, player1Name, score, player2Avatar, player2Name) {
+        // Création de ContenerHistoriqueGame
+        const ContenerHistoriqueGame = document.createElement('div');
+        ContenerHistoriqueGame.className = 'ContenerHistoriqueGame d-flex flex-row w-100';
+
+        // Conteneur pour le premier joueur (player 1)
+        const ContenerYourAvatar = document.createElement('div');
+        ContenerYourAvatar.className = 'ContenerYourAvatar w-25 d-flex justify-content-center align-items-center flex-column';
+        ContenerHistoriqueGame.appendChild(ContenerYourAvatar);
+
+        const YouravatarImage = document.createElement('img');
+        YouravatarImage.src = player1Avatar;
+        YouravatarImage.alt = 'YouravatarImage';
+        YouravatarImage.className = 'YouravatarImage rounded-circle';
+        YouravatarImage.style.width = '90px';
+        YouravatarImage.style.height = '90px';
+        ContenerYourAvatar.appendChild(YouravatarImage);
+
+        const YourUsername = document.createElement('p');
+        YourUsername.className = 'YourUsername w-100 h-25 m-0 pt-1';
+        YourUsername.textContent = player1Name;
+        ContenerYourAvatar.appendChild(YourUsername);
+
+        // Conteneur pour le score de la partie
+        const ContenerScore = document.createElement('div');
+        ContenerScore.className = 'ContenerScore w-50 d-flex justify-content-center align-items-center';
+        ContenerHistoriqueGame.appendChild(ContenerScore);
+
+        const ScoreGame = document.createElement('p');
+        ScoreGame.className = 'ScoreGame h-100 w-100 m-0 d-flex justify-content-center align-items-center fs-2';
+        ScoreGame.textContent = score;
+        ContenerScore.appendChild(ScoreGame);
+
+        // Conteneur pour le deuxième joueur (player 2)
+        const ContenerHisAvatar = document.createElement('div');
+        ContenerHisAvatar.className = 'ContenerHisAvatar w-25 d-flex justify-content-center align-items-center flex-column';
+        ContenerHistoriqueGame.appendChild(ContenerHisAvatar);
+
+        const HisavatarImage = document.createElement('img');
+        HisavatarImage.src = player2Avatar;
+        HisavatarImage.alt = 'HisavatarImage';
+        HisavatarImage.className = 'HisavatarImage rounded-circle';
+        HisavatarImage.style.width = '90px';
+        HisavatarImage.style.height = '90px';
+        ContenerHisAvatar.appendChild(HisavatarImage);
+
+        const HisUsername = document.createElement('p');
+        HisUsername.className = 'HisUsername w-100 h-25 m-0 pt-1';
+        HisUsername.textContent = player2Name;
+        ContenerHisAvatar.appendChild(HisUsername);
+
+        // Comparaison des scores
+        const scores = score.split('-'); // Séparer le score par le tiret
+        const score1 = parseInt(scores[0], 10); // Convertir en nombre la première partie
+        const score2 = parseInt(scores[1], 10); // Convertir en nombre la deuxième partie
+
+        // Appliquer le style en fonction du score
+        if (score1 > score2) {
+            // Si le score du joueur 1 est plus grand, changer le background avec une opacité
+            ContenerHistoriqueGame.style.backgroundColor = 'rgba(0, 123, 255, 0.3)'; // Bleu clair avec une opacité de 0.3
+        } else if (score2 > score1) {
+            // Si le score du joueur 2 est plus grand, tu peux aussi changer le background (facultatif)
+            ContenerHistoriqueGame.style.backgroundColor = 'rgba(255, 0, 0, 0.3)'; // Rouge clair avec une opacité de 0.3
+        }
+
+        // Retourne l'élément créé
+        return ContenerHistoriqueGame;
+    }
+
+    // Utilisation de la fonction pour ajouter plusieurs historiques de jeu
     const ContainerHistorical = document.createElement('div');
-    ContainerHistorical.className = 'ContainerHistorical flex-fill pt-3';  // Ajout de la classe ContainerHistorical
+    ContainerHistorical.className = 'ContainerHistorical flex-fill pt-3';
     mainDiv.appendChild(ContainerHistorical);
 
     const historical = document.createElement('div');
     historical.className = 'historical h-100';
     ContainerHistorical.appendChild(historical);
+
+    // Exemple : Générer 3 parties
+    historical.appendChild(createGameHistory(`data:image/png;base64, ${userData.avatar}`, `${userData.nickname}`, '14-22', '/js/img/download.jpeg', 'Player 2'));
+    // historical.appendChild(createGameHistory('/js/img/avatar3.jpeg', 'Player 3', '10-18', '/js/img/avatar4.jpeg', 'Player 4'));
+    // historical.appendChild(createGameHistory('/js/img/avatar5.jpeg', 'Player 5', '20-17', '/js/img/avatar6.jpeg', 'Player 6'));
+
+    // try {
+    //     const stats = await fetchUserStats();  // Appel à l'API pour récupérer les statistiques
+    //     if (stats) {
+
+    //         console.log('Nombre de parties jouées:', stats.nb_games);
+    //         console.log('Nombre de victoires:', stats.nb_wins);
+    //         console.log('Nombre de défaites:', stats.nb_losses);
+    //         console.log('Taux de victoire (win-rate):', stats.win_rate);
+    //         console.log('Points pris:', stats.nb_point_taken);
+    //         console.log('Points donnés:', stats.nb_point_given);
+    //         //console.log('stats recup');
+    //         // Utilisation des données récupérées pour mettre à jour la vue
+    //         const gamesPlayedElement = document.createElement('p');
+    //         gamesPlayedElement.textContent = `Games Played: ${stats.nb_games}`;
+    //         usersContainer.appendChild(gamesPlayedElement);
+
+    //         const gamesWonElement = document.createElement('p');
+    //         gamesWonElement.textContent = `Games Won: ${stats.nb_wins}`;
+    //         usersContainer.appendChild(gamesWonElement);
+
+    //         // Afficher d'autres statistiques si besoin
+    //         // Par exemple, win rate, points pris, points donnés, etc.
+    //     }
+    // } catch (error) {
+    //     console.error('Error fetching user stats:', error);
+    // }
 
     const notifications_div = await notifications();
     div.appendChild(notifications_div);
