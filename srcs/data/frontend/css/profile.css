@@ -1,19 +1,23 @@
 .usersContainer {
-    width: 45%;    /* 45% de la largeur totale */
-    height: 100%;   /* Prendre toute la hauteur disponible */
-    margin-right: 20px; /* Ajout d'un espace entre usersContainer et ContainerHistorical */
+    width: 45%;
+    height: 100%;
+    margin-right: 20px;
 }
 
 .userPosition {
-    height: 35%;
+    height: 40%;
     background-color: #435574;
     width: 100%;
-    margin-bottom: 15px; /* Ajout d'un espace entre userPosition et userStatsProfile */
+    margin-bottom: 15px;
 }
 
 .userStatsProfile {
-    height: 65%;
+    height: 60%;
     background-color: #435574;
+}
+
+.CharWinRateContener {
+    height: 65%;
 }
 
 .ChartGame{
@@ -21,15 +25,13 @@
 	align-items: center;
 }
 
-
 .ContainerHistorical {
-    width: 55%;    /* 55% de la largeur totale */
-    height: 100%;  /* Prendre toute la hauteur disponible */
-    background-color: #435574;
+    width: 55%;
+    height: 100%;
 }
 
 .historical {
-    height: 100%;   /* Assurer que la hauteur soit bien remplie */
+    height: 100%;
     background-color: #435574;
 }
 
@@ -41,6 +43,15 @@
     background-color: #584401;
 }
 
-.ProgressBar {
-    color:#012970;
+.UserStatsContener {
+    height: 35%;
+
+}
+
+.ProgressText {
+	background: linear-gradient(to right, #F4ED37, #cecec3);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	cursor: pointer;
 }

@@ -23,11 +23,22 @@ export async function profileView(container) {
     userPosition.className = 'userPosition d-flex flex-column mb-3';
     usersContainer.appendChild(userPosition);
 
+    const HeaderUser = document.createElement('div');
+    HeaderUser.classList = 'HeaderUser d-flex justify-content-center align-items-center'; // Ajouter la classe 'd-flex' pour les mettre en ligne
+    userPosition.appendChild(HeaderUser);
+
+    const Titlehash = document.createElement('h5');
+    Titlehash.className = 'TitlePosition Titlehash fst-italic py-3 ';
+    Titlehash.textContent = '#';
+    Titlehash.style.display = 'inline-block';
+    HeaderUser.appendChild(Titlehash);
+
     const TitlePosition = document.createElement('h5');
-    TitlePosition.className = 'TitlePosition d-flex justify-content-center pt-3 w-100 p-2';
+    TitlePosition.className = 'TitlePosition py-3';
     TitlePosition.textContent = '58';
     TitlePosition.style.display = 'inline-block';
-    userPosition.appendChild(TitlePosition);
+    HeaderUser.appendChild(TitlePosition);
+
 
     const ContentPosition = document.createElement('div');
     ContentPosition.className = 'ContentPosition flex-grow-1 d-flex flex-row p-3';
@@ -160,173 +171,137 @@ export async function profileView(container) {
     userStatsProfile.className = 'userStatsProfile';
     usersContainer.appendChild(userStatsProfile);
 
+    const HeaderStatsProfile = document.createElement('div');
+    HeaderStatsProfile.className = 'HeaderStatsProfile ';
+    userStatsProfile.appendChild(HeaderStatsProfile);
+
+    const TitleStatsProfile = document.createElement('h5');
+    TitleStatsProfile.className ='TitlePosition TitleStatsProfile d-flex justify-content-center align-items-center py-3';
+    TitleStatsProfile.textContent = 'User Stats';
+    HeaderStatsProfile.appendChild(TitleStatsProfile);
+
     const ContentuserStatsProfile = document.createElement('div');
-    ContentuserStatsProfile.className = 'ContentuserStatsProfile d-flex justify-content-center flex-row w-100 h-100';
+    ContentuserStatsProfile.className = 'ContentuserStatsProfile d-flex justify-content-center flex-column w-100 h-75';
     userStatsProfile.appendChild(ContentuserStatsProfile);
 
-    // Conteneur pour le taux de victoire
     const CharWinRateContener = document.createElement('div');
-    CharWinRateContener.className = 'CharWinRateContener  d-flex justify-content-center align-items-center flex-column h-100 w-50'; // w-50 pour 50%
+    CharWinRateContener.className = 'CharWinRateContener d-flex justify-content-center align-items-center  w-100';
     ContentuserStatsProfile.appendChild(CharWinRateContener);
 
-    const ChartGame = document.createElement('div');
-    ChartGame.className = 'ChartGame bg-black w-100 h-75 d-flex align-items-center';
-    CharWinRateContener.appendChild(ChartGame);
 
-    // Conteneur pour les statistiques de l'utilisateur
+    // Définir les données pour les victoires (wins) et les pertes (losses)
+    const wins = 20;  // Nombre de victoires
+    const losse = 10; // Nombre de pertes
+    const totalGames = wins + losse;
+
+    // VERIFIER SI AUCUNE PARTIE N'EST JOUER
+    function createPieChart(wins, losse, totalGames) {
+
+        const canvas = document.createElement('canvas');
+        canvas.id = 'myCanvas';
+        canvas.className = 'h-100 p-1';
+        CharWinRateContener.appendChild(canvas);
+
+        const data = [wins, losse]; // Victoires et pertes
+        const colors = ["#1e7145", "#b91d47"]; // Vert pour victoires, Rouge pour pertes
+        const labels = ["Wins", "Defeats"];
+
+        // Fonction pour dessiner un cercle rempli de blanc
+        function drawFilledWhiteCircle(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const content = canvas.getContext('2d');
+
+            // Dessiner un cercle plein blanc
+            content.beginPath();
+            content.arc(canvas.width / 2, canvas.height / 2, Math.min(canvas.width / 2, canvas.height / 2) - 10, 0, 2 * Math.PI);
+            content.closePath();
+            content.fillStyle = "#ffffff"; // Remplir le cercle de blanc
+            content.fill();
+        }
+
+        // Fonction pour dessiner le diagramme circulaire
+        function drawPieChart(canvasId, data, colors, labels) {
+            const canvas = document.getElementById(canvasId);
+            const content = canvas.getContext('2d');
+            const total = data.reduce((acc, value) => acc + value, 0); // Total des valeurs
+
+            let startAngle = 0;
+            for (let i = 0; i < data.length; i++) {
+                const sliceAngle = (data[i] / total) * 2 * Math.PI;
+
+                // Dessiner chaque portion du cercle
+                content.beginPath();
+                content.moveTo(canvas.width / 2, canvas.height / 2); // Centre du cercle
+                content.arc(canvas.width / 2, canvas.height / 2, Math.min(canvas.width / 2, canvas.height / 2) - 10, startAngle, startAngle + sliceAngle);
+                content.closePath();
+
+                // Remplir chaque portion avec la couleur correspondante
+                content.fillStyle = colors[i];
+                content.fill();
+
+                // Ajouter des labels pour chaque portion
+                const labelX = canvas.width / 2 + (Math.min(canvas.width / 2, canvas.height / 4) / 2) * Math.cos(startAngle + sliceAngle / 2);
+                const labelY = canvas.height / 2 + (Math.min(canvas.width / 2, canvas.height / 4) / 2) * Math.sin(startAngle + sliceAngle / 2);
+                content.fillStyle = "white";
+                content.font = "14px Arial";
+                content.fillText(labels[i], labelX, labelY);
+
+                startAngle += sliceAngle; // Ajuster l'angle de départ pour la prochaine portion
+            }
+        }
+
+        // Si aucune partie n'est jouée, dessiner un cercle rempli de blanc
+        if (totalGames === 0) {
+            drawFilledWhiteCircle('myCanvas');
+        } else {
+            // Sinon, dessiner le diagramme circulaire
+            drawPieChart('myCanvas', data, colors, labels);
+        }
+    }
+
+    // Appeler la fonction pour créer le diagramme
+    createPieChart(wins, losse, totalGames);
+
+
+
+
     const UserStatsContener = document.createElement('div');
-    UserStatsContener.className = 'UserStatsContener h-100 w-50 d-flex jsutify-content-center align-items-center ms-1';
+    UserStatsContener.className = 'UserStatsContener w-100 d-flex align-items-end p-2';
     ContentuserStatsProfile.appendChild(UserStatsContener);
 
     const UserStats = document.createElement('div');
-    UserStats.className = 'UserStats w-100 h-75 d-flex flex-column align-items-center'; // Utiliser flex-column pour empiler les éléments
+    UserStats.className = 'UserStats w-100  d-flex flex-column align-items-center'; // Utiliser flex-column pour empiler les éléments
     UserStatsContener.appendChild(UserStats);
 
-    const ContenerNbWin = document.createElement('div');
-    ContenerNbWin.className = 'ContenerNbWin d-flex flex-column align-items-center w-100'; // Utiliser flex-column pour empiler le titre et la barre
-    UserStats.appendChild(ContenerNbWin);
-
-    // Créer un titre pour les victoires
-    // const TitleNbWin = document.createElement('p');
-    // TitleNbWin.className = 'TitleNbWin mb-2 text-success d-flex align-items-start'; // Ajout d'une marge en bas
-    // TitleNbWin.textContent = 'Victories';
-    // ContenerNbWin.appendChild(TitleNbWin);
-
-    // Créer le conteneur de la barre de progression
-    const ProgressContainer = document.createElement('div');
-    ProgressContainer.className = 'progress w-75 mb-3'; // Ajouter w-75 pour définir la largeur de la barre
-    ProgressContainer.setAttribute('role', 'progressbar');
-    ProgressContainer.setAttribute('aria-label', 'Progress example');
-    ProgressContainer.setAttribute('aria-valuenow', '25');
-    ProgressContainer.setAttribute('aria-valuemin', '0');
-    ProgressContainer.setAttribute('aria-valuemax', '100');
-    ContenerNbWin.appendChild(ProgressContainer);
-
-    const ProgressBar = document.createElement('div');
-    ProgressBar.className = 'ProgressBar progress-bar progress-bar-striped bg-success overflow-visible'; // Classe Bootstrap pour la barre de progression
-    ProgressBar.textContent = 'Wins';
-    ProgressBar.style.fontSize = '90%'; // Définit la largeur de la barre de progression
-    ProgressContainer.appendChild(ProgressBar);
-
-    // Fonction générique pour mettre à jour la barre de progression
-    function updateProgressBarWin(wins, totalGames) {
-        const progressBar = document.querySelector('.progress-bar.bg-success'); // Sélectionner la barre
-        const progressContainer = document.querySelector('.progress'); // Sélectionner le conteneur
-
-        if (totalGames === 0) {
-            progressBar.style.width = '0%'; // Si aucun jeu n'a été joué, la barre est vide
-            progressContainer.setAttribute('aria-valuenow', '0');
-        } else {
-            const winPercentage = (wins / totalGames) * 100; // Calcul du pourcentage de victoires
-            progressBar.style.width = `${winPercentage}%`; // Mise à jour de la largeur
-            progressContainer.setAttribute('aria-valuenow', winPercentage.toFixed(2)); // Mise à jour de l'attribut
-        }
-    }
-
-    // Simuler des valeurs pour les victoires et les parties jouées (peuvent être remplacées plus tard par les données de l'API)
-    let wins = 60;      // Valeur fictive pour les victoires
-    let totalGames = 100; // Valeur fictive pour les jeux joués
-
-    // Appel de la fonction avec les valeurs actuelles
-    updateProgressBarWin(wins, totalGames);
-
-    const ContenerNbLoss = document.createElement('div');
-    ContenerNbLoss.className = 'ContenerNbLoss py-2 d-flex flex-column align-items-center w-100';
-    UserStats.appendChild(ContenerNbLoss);
-
-    // // Créer un titre pour les défaites
-    // const TitleNbLoss = document.createElement('p');
-    // TitleNbLoss.className = 'TitleNbLoss mb-2 text-danger d-flex align-items-start'; // Ajout d'une marge en bas
-    // TitleNbLoss.textContent = 'Defeats';
-    // ContenerNbLoss.appendChild(TitleNbLoss);
-
-    // Créer le conteneur de la barre de progression
-    const ProgressContainerLoss = document.createElement('div');
-    ProgressContainerLoss.className = 'progress w-75 position-relative'; // Ajouter w-75 pour définir la largeur de la barre
-    ProgressContainerLoss.setAttribute('role', 'progressbar');
-    ProgressContainerLoss.setAttribute('aria-label', 'Progress example');
-    ProgressContainerLoss.setAttribute('aria-valuenow', '50');
-    ProgressContainerLoss.setAttribute('aria-valuemin', '0');
-    ProgressContainerLoss.setAttribute('aria-valuemax', '100');
-    ContenerNbLoss.appendChild(ProgressContainerLoss);
-
-    // Créer la barre de progression pour les défaites
-    const ProgressBarLoss = document.createElement('div');
-    ProgressBarLoss.className = 'ProgressBar overflow-visible progress-bar progress-bar-striped bg-danger'; // Classe Bootstrap pour la barre de progression
-    ProgressBarLoss.textContent = 'Defeats';
-    ProgressBarLoss.style.width = '40%'; // Définit la largeur de la barre de progression
-    ProgressContainerLoss.appendChild(ProgressBarLoss); // Ajouter la barre de progression au conteneur
-
-    // Fonction générique pour mettre à jour la barre de progression
-    function updateProgressBarLosse(losse, totalGames) {
-        const progressBar = document.querySelector('.progress-bar.bg-danger'); // Sélectionner la barre
-        const progressContainer = document.querySelector('.progress'); // Sélectionner le conteneur
-
-        if (totalGames === 0) {
-            progressBar.style.width = '0%'; // Si aucun jeu n'a été joué, la barre est vide
-            progressContainer.setAttribute('aria-valuenow', '0');
-        } else {
-            const winPercentage = (losse / totalGames) * 100; // Calcul du pourcentage de victoires
-            progressBar.style.width = `${winPercentage}%`; // Mise à jour de la largeur
-            progressContainer.setAttribute('aria-valuenow', winPercentage.toFixed(2)); // Mise à jour de l'attribut
-        }
-    }
-
-    // Simuler des valeurs pour les victoires et les parties jouées (peuvent être remplacées plus tard par les données de l'API)
-    let losse = 100;      // Valeur fictive pour les victoires
-    // let totalGames = 100; // Valeur fictive pour les jeux joués
-
-    // Appel de la fonction avec les valeurs actuelles
-    updateProgressBarLosse(losse, totalGames);
-
     const ContenerPointTaken = document.createElement('div');
-    ContenerPointTaken.className = 'ContenerPointTaken py-2 d-flex flex-column align-items-center w-100';
+    ContenerPointTaken.className = 'ContenerPointTaken  d-flex justify-content-center align-items-center w-100';
     UserStats.appendChild(ContenerPointTaken);
 
     // Créer un titre pour les défaites
     const TitlePointTaken = document.createElement('p');
-    TitlePointTaken.className = 'TitlePointTaken mb-2 d-flex align-items-start'; // Ajout d'une marge en bas
-    TitlePointTaken.textContent = 'Point Taken';
+    TitlePointTaken.className = 'ProgressText TitlePointTaken mb-2 d-flex align-items-center'; // Ajout d'une marge en bas
+    TitlePointTaken.textContent = 'Point Taken: 36';
     ContenerPointTaken.appendChild(TitlePointTaken);
 
-    // Créer le conteneur de la barre de progression
-    const NumberPointTaken = document.createElement('div');
-    NumberPointTaken.className = 'NumberPointTaken';
-    NumberPointTaken.textContent = '36';
-    ContenerPointTaken.appendChild(NumberPointTaken);
-
-
     const ContenerPointGiven = document.createElement('div');
-    ContenerPointGiven.className = 'ContenerPointGiven py-2 d-flex flex-column align-items-center w-100';
+    ContenerPointGiven.className = 'ContenerPointGiven d-flex justify-content-center align-items-center w-100';
     UserStats.appendChild(ContenerPointGiven);
 
     // Créer un titre pour les défaites
     const TitlePointGiven = document.createElement('p');
-    TitlePointGiven.className = 'TitlePointGiven mb-2 d-flex align-items-start'; // Ajout d'une marge en bas
-    TitlePointGiven.textContent = 'Point Given';
+    TitlePointGiven.className = 'ProgressText TitlePointGiven mb-2 d-flex align-items-center';
+    TitlePointGiven.textContent = 'Point Given: 49';
     ContenerPointGiven.appendChild(TitlePointGiven);
 
-    // Créer le conteneur de la barre de progression
-    const NumberPointGiven = document.createElement('div');
-    NumberPointGiven.className = 'NumberPointGiven';
-    NumberPointGiven.textContent = '49';
-    ContenerPointGiven.appendChild(NumberPointGiven);
-
     const ContenerNbGame = document.createElement('div');
-    ContenerNbGame.className = 'ContenerNbGame py-2 d-flex flex-column align-items-center w-100';
+    ContenerNbGame.className = ' ContenerNbGame d-flex justify-content-center align-items-center w-100';
     UserStats.appendChild(ContenerNbGame);
 
     // Créer un titre pour les défaites
     const TitleNbGame = document.createElement('p');
-    TitleNbGame.className = 'TitleNbGame mb-2 d-flex align-items-start'; // Ajout d'une marge en bas
-    TitleNbGame.textContent = 'Point Given';
+    TitleNbGame.className = 'ProgressText TitleNbGame mb-2 d-flex align-items-center';
+    TitleNbGame.textContent = 'Games: 84';
     ContenerNbGame.appendChild(TitleNbGame);
-
-    // Créer le conteneur de la barre de progression
-    const NumberGame = document.createElement('div');
-    NumberGame.className = 'NumberGame';
-    NumberGame.textContent = '84';
-    ContenerNbGame.appendChild(NumberGame);
 
 //nb_games': stats.nb_games,
 // 'nb_wins': stats.nb_wins,
