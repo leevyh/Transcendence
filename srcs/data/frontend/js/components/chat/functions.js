@@ -162,7 +162,7 @@ function displayMessage(messageData) {
         messageDiv.appendChild(imgAvatar);
     } else {
         imgAvatar.alt = 'Other user avatar';
-        messageDiv.className = 'd-flex justify-content-start mb-4 ml-2'; 
+        messageDiv.className = 'd-flex justify-content-start mb-4 ml-2';
         messageContent.className = 'chat-msg position-relative received-msg';
         messageContent.innerHTML = `
             ${messageData.message}
@@ -183,7 +183,7 @@ export function handleMessage(message) {
             message: message,
             timestamp: new Date().toISOString()
         };
-        chatWS.send(JSON.stringify(messageData)); 
+        chatWS.send(JSON.stringify(messageData));
     } else {
         if (DEBUG) {console.error('WebSocket is not open.');}
     }
@@ -218,7 +218,7 @@ function enableChat(otherUser) {
     const chatSendButton = document.querySelector('.chat-send-button');
     const inviteGameButton = document.querySelector('.invite-game-button');
     const blockUserButton = document.getElementById(otherUser).querySelector('.block-button')
-    
+
     if (chatInput && chatSendButton) {
         chatInput.disabled = false;
         chatSendButton.disabled = false;

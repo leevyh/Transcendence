@@ -2,35 +2,34 @@ import { navigationBar } from './navigation.js';
 import { notifications } from './notifications.js';
 import { getCookie } from './utils.js';
 
-// async function fetchUserStats() {
-//     const response = await fetch(`/api/stats/`, {  // URL de ton API pour récupérer les statistiques
-//         method: 'GET',
-//         headers: {
-//             'Authorization': `Bearer ${localStorage.getItem('token')}`,
-//             'Content-Type': 'application/json',
-//             'X-CSRFToken': getCookie('csrftoken'),
-//         },
-//     });
+async function fetchUserStats() {
+    const response = await fetch(`/api/stats/`, {  // URL de ton API pour récupérer les statistiques
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+    });
 
-//     if (response.status === 200) {
-//         return response.json();  // Convertit la réponse en JSON si tout va bien
-//     } else if (response.status === 307) {
-//         localStorage.removeItem('token');
-//         await fetch('/api/logout/', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'X-CSRFToken': getCookie('csrftoken'),
-//             },
-//         });
-//         navigateTo('/');
-//         return null;
-//     } else {
-//         console.error('Error:', response);
-//         return null;
-//     }
-// }
-
+    if (response.status === 200) {
+        return response.json();  // Convertit la réponse en JSON si tout va bien
+    } else if (response.status === 307) {
+        localStorage.removeItem('token');
+        await fetch('/api/logout/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        });
+        navigateTo('/');
+        return null;
+    } else {
+        console.error('Error:', response);
+        return null;
+    }
+}
 
 export async function profileView(container) {
     container.innerHTML = '';
@@ -420,13 +419,16 @@ export async function profileView(container) {
         const score1 = parseInt(scores[0], 10); // Convertir en nombre la première partie
         const score2 = parseInt(scores[1], 10); // Convertir en nombre la deuxième partie
 
-        // Appliquer le style en fonction du score
+
         if (score1 > score2) {
-            // Si le score du joueur 1 est plus grand, changer le background avec une opacité
+            HisUsername.style.color = 'rgb(199, 49, 49)';
+            YourUsername.style.color = 'rgb(37, 37, 90)';
             ContenerHistoriqueGame.style.backgroundColor = 'rgba(0, 123, 255, 0.3)'; // Bleu clair avec une opacité de 0.3
         } else if (score2 > score1) {
-            // Si le score du joueur 2 est plus grand, tu peux aussi changer le background (facultatif)
+
             ContenerHistoriqueGame.style.backgroundColor = 'rgba(255, 0, 0, 0.3)'; // Rouge clair avec une opacité de 0.3
+            HisUsername.style.color = 'rgb(37, 37, 90)';
+            YourUsername.style.color = 'rgb(199, 49, 49)';
         }
 
         // Retourne l'élément créé
@@ -447,32 +449,32 @@ export async function profileView(container) {
     // historical.appendChild(createGameHistory('/js/img/avatar3.jpeg', 'Player 3', '10-18', '/js/img/avatar4.jpeg', 'Player 4'));
     // historical.appendChild(createGameHistory('/js/img/avatar5.jpeg', 'Player 5', '20-17', '/js/img/avatar6.jpeg', 'Player 6'));
 
-    // try {
-    //     const stats = await fetchUserStats();  // Appel à l'API pour récupérer les statistiques
-    //     if (stats) {
+    try {
+        const stats = await fetchUserStats();  // Appel à l'API pour récupérer les statistiques
+        if (stats) {
 
-    //         console.log('Nombre de parties jouées:', stats.nb_games);
-    //         console.log('Nombre de victoires:', stats.nb_wins);
-    //         console.log('Nombre de défaites:', stats.nb_losses);
-    //         console.log('Taux de victoire (win-rate):', stats.win_rate);
-    //         console.log('Points pris:', stats.nb_point_taken);
-    //         console.log('Points donnés:', stats.nb_point_given);
-    //         //console.log('stats recup');
-    //         // Utilisation des données récupérées pour mettre à jour la vue
-    //         const gamesPlayedElement = document.createElement('p');
-    //         gamesPlayedElement.textContent = `Games Played: ${stats.nb_games}`;
-    //         usersContainer.appendChild(gamesPlayedElement);
+            console.log('Nombre de parties jouées:', stats.nb_games);
+            console.log('Nombre de victoires:', stats.nb_wins);
+            console.log('Nombre de défaites:', stats.nb_losses);
+            console.log('Taux de victoire (win-rate):', stats.win_rate);
+            console.log('Points pris:', stats.nb_point_taken);
+            console.log('Points donnés:', stats.nb_point_given);
+            //console.log('stats recup');
+            // Utilisation des données récupérées pour mettre à jour la vue
+            const gamesPlayedElement = document.createElement('p');
+            gamesPlayedElement.textContent = `Games Played: ${stats.nb_games}`;
+            usersContainer.appendChild(gamesPlayedElement);
 
-    //         const gamesWonElement = document.createElement('p');
-    //         gamesWonElement.textContent = `Games Won: ${stats.nb_wins}`;
-    //         usersContainer.appendChild(gamesWonElement);
+            const gamesWonElement = document.createElement('p');
+            gamesWonElement.textContent = `Games Won: ${stats.nb_wins}`;
+            usersContainer.appendChild(gamesWonElement);
 
-    //         // Afficher d'autres statistiques si besoin
-    //         // Par exemple, win rate, points pris, points donnés, etc.
-    //     }
-    // } catch (error) {
-    //     console.error('Error fetching user stats:', error);
-    // }
+            // Afficher d'autres statistiques si besoin
+            // Par exemple, win rate, points pris, points donnés, etc.
+        }
+    } catch (error) {
+        console.error('Error fetching user stats:', error);
+    }
 
     const notifications_div = await notifications();
     div.appendChild(notifications_div);
