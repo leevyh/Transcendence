@@ -88,7 +88,6 @@ def get_profile(request, nickname):
                 avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
                 data = {'nickname': user.nickname,
                         'username': user.username,
-                        'email': user.email,
                         'created_at': user.created_at,
                         'status': user.status,
                         'nb_games': stats.nb_games,
@@ -228,21 +227,6 @@ def read_All_Notification(request):
             return JsonResponse({'message': 'All notifications read successfully'}, status=200)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-def get_Stats(request):
-    if request.method == 'GET':
-        try:
-            stats = Stats_user.objects.get(user=user_id)
-            return JsonResponse({'nb_games': stats.nb_games,
-                                 'nb_wins': stats.nb_wins,
-                                 'nb_losses': stats.nb_losses,
-                                 'win_rate': stats.win_rate,
-                                 'nb_point_taken' :stats.nb_point_taken,
-                                 'nb_point_given' :stats.nb_point_given}, status=200)
-        except Stats_user.DoesNotExist:
-            return JsonResponse({'error': 'Stats not found'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 

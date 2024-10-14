@@ -66,8 +66,8 @@ async function router() {
     }
 
     // Check if the URL is a user profile corresponding to /user/:nickname
-    const userProfileRegex = /^\/user\/([a-zA-Z0-9_-]+)$/;
-    const match = path.match(userProfileRegex);
+    const ProfileRegex = /^\/profile\/([a-zA-Z0-9_-]+)$/;
+    const match = path.match(ProfileRegex);
 
     // Get user's accessibility settings
     const userSettings = await getAccessibility();
@@ -77,6 +77,7 @@ async function router() {
     else {
         if (DEBUG) console.log('No user settings found');
     }
+
 
     if (match) {
         const nickname = match[1]; // Extract the nickname from the URL

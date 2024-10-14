@@ -12,7 +12,6 @@ urlpatterns = [
 	path('deleteAvatar/', views.deleteAvatar, name='deleteAvatar'),
 	path('updateAccessibility/', views.updateAccessibility, name='updateAccessibility'),
 	path('updatePassword/', views.updatePassword, name='updatePassword'),
-	path('stats/', views.get_Stats, name='stats'),
 	path('updateStats/', views.update_Stats, name='updateStats'),
 	# path('status_user/', views.get_status_all_users, name='status_user'), # Unused
 	path('users/', views.all_users, name='users'),
