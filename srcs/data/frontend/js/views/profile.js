@@ -363,7 +363,7 @@ export async function profileView(container) {
     ContenerNbGame.appendChild(TitleNbGame);
 
 
-    function createGameHistory(player1Avatar, player1Name, score, player2Avatar, player2Name) {
+    function createGameHistory(player1Avatar, player1Name, score, player2Avatar, player2Name, isTournament) {
         // Création de ContenerHistoriqueGame
         const ContenerHistoriqueGame = document.createElement('div');
         ContenerHistoriqueGame.className = 'ContenerHistoriqueGame d-flex flex-row w-100';
@@ -388,11 +388,20 @@ export async function profileView(container) {
 
         // Conteneur pour le score de la partie
         const ContenerScore = document.createElement('div');
-        ContenerScore.className = 'ContenerScore w-50 d-flex justify-content-center align-items-center';
+        ContenerScore.className = 'ContenerScore w-50 d-flex justify-content-center align-items-center flex-column';
         ContenerHistoriqueGame.appendChild(ContenerScore);
 
+        const SvgisTournament = document.createElement('li');
+        SvgisTournament.className = 'SvgisTournament bi bi-award-fill w-100 d-flex justify-content-center align-items-center';
+        SvgisTournament.setAttribute('xmlns', "http://www.w3.org/2000/svg");
+        SvgisTournament.setAttribute('width', '16');
+        SvgisTournament.setAttribute('height', '16');
+        SvgisTournament.setAttribute('fill', 'currentColor');
+        SvgisTournament.setAttribute('viewBox', '0 0 16 16');
+        ContenerScore.appendChild(SvgisTournament);
+
         const ScoreGame = document.createElement('p');
-        ScoreGame.className = 'ScoreGame h-100 w-100 m-0 d-flex justify-content-center align-items-center fs-2';
+        ScoreGame.className = 'ScoreGame w-100 m-0 d-flex justify-content-center align-items-center fs-2 mb-4';
         ScoreGame.textContent = score;
         ContenerScore.appendChild(ScoreGame);
 
@@ -414,27 +423,29 @@ export async function profileView(container) {
         HisUsername.textContent = player2Name;
         ContenerHisAvatar.appendChild(HisUsername);
 
-        // Comparaison des scores
-        const scores = score.split('-'); // Séparer le score par le tiret
-        const score1 = parseInt(scores[0], 10); // Convertir en nombre la première partie
-        const score2 = parseInt(scores[1], 10); // Convertir en nombre la deuxième partie
+        // let isTournament = 0; //BACK
 
+        if (!isTournament) {
+            SvgisTournament.style.visibility = 'hidden';
+        }
+
+        const scores = score.split('-');
+        const score1 = parseInt(scores[0], 10);
+        const score2 = parseInt(scores[1], 10);
 
         if (score1 > score2) {
             HisUsername.style.color = 'rgb(199, 49, 49)';
-            YourUsername.style.color = 'rgb(37, 37, 90)';
-            ContenerHistoriqueGame.style.backgroundColor = 'rgba(0, 123, 255, 0.3)'; // Bleu clair avec une opacité de 0.3
+            YourUsername.style.color = 'rgb(29, 29, 82)';
+            ContenerHistoriqueGame.style.backgroundColor = 'rgba(0, 123, 255, 0.3)';
         } else if (score2 > score1) {
-
-            ContenerHistoriqueGame.style.backgroundColor = 'rgba(255, 0, 0, 0.3)'; // Rouge clair avec une opacité de 0.3
-            HisUsername.style.color = 'rgb(37, 37, 90)';
+            ContenerHistoriqueGame.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
+            HisUsername.style.color = 'rgb(29, 29, 82)';
             YourUsername.style.color = 'rgb(199, 49, 49)';
         }
 
         // Retourne l'élément créé
         return ContenerHistoriqueGame;
     }
-
     // Utilisation de la fonction pour ajouter plusieurs historiques de jeu
     const ContainerHistorical = document.createElement('div');
     ContainerHistorical.className = 'ContainerHistorical flex-fill pt-3';
@@ -445,7 +456,7 @@ export async function profileView(container) {
     ContainerHistorical.appendChild(historical);
 
     // Exemple : Générer 3 parties
-    historical.appendChild(createGameHistory(`data:image/png;base64, ${userData.avatar}`, `${userData.nickname}`, '14-22', '/js/img/download.jpeg', 'Player 2'));
+    historical.appendChild(createGameHistory(`data:image/png;base64, ${userData.avatar}`, `${userData.nickname}`, '22-14', '/js/img/download.jpeg', 'Player 2', 1));
     // historical.appendChild(createGameHistory('/js/img/avatar3.jpeg', 'Player 3', '10-18', '/js/img/avatar4.jpeg', 'Player 4'));
     // historical.appendChild(createGameHistory('/js/img/avatar5.jpeg', 'Player 5', '20-17', '/js/img/avatar6.jpeg', 'Player 6'));
 
