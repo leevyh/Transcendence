@@ -30,7 +30,7 @@ class Tournament:
 
     #start the tournament
     async def start_tournament(self):
-        print("start tournament")
+        # print("start tournament")
         self.channel_layer = get_channel_layer()
         await self.channel_layer.group_send(
             f"tournament_{self.id}",
@@ -49,7 +49,7 @@ class Tournament:
         # await self.end_tournament()
   
     async def create_semi_finals(self):
-        print("create semi_finals games")
+        # print("create semi_finals games")
         
         # Liste d'indices correspondant aux joueurs (de 0 à 3)
         player_indices = [0, 1, 2, 3]
@@ -69,16 +69,9 @@ class Tournament:
         self.semi_finals1.id = game_database.id
         await self.channel_layer.group_add(f"game_{self.semi_finals1.id}", self.channel_layer_player[player_indices[0]])
         await self.channel_layer.group_add(f"game_{self.semi_finals1.id}", self.channel_layer_player[player_indices[1]])
-        #send a message to the front to say who is player1 and player2
-        # await self.channel_layer.group_send(
-        #     f"game_{self.semi_finals1.id}",
-        #     {
-        #         'type': 'define_player',
-        #     }
-        # )
         self.semi_finals1.status = "ready"
 
-        print("semi_finals1", self.semi_finals1.player_1, self.semi_finals1.player_2)
+        # print("semi_finals1", self.semi_finals1.player_1, self.semi_finals1.player_2)
 
         self.semi_finals2 = PongGame(self.player[player_indices[2]])
         self.semi_finals2.player_1 = self.player[player_indices[2]]
@@ -92,10 +85,10 @@ class Tournament:
         await self.channel_layer.group_add(f"game_{self.semi_finals2.id}", self.channel_layer_player[player_indices[3]])
         self.semi_finals2.status = "ready"
 
-        print("semi_finals2", self.semi_finals2.player_1, self.semi_finals2.player_2)
+        # print("semi_finals2", self.semi_finals2.player_1, self.semi_finals2.player_2)
 
     async def start_semi_finals(self):
-        print("start semi_finals")
+        # print("start semi_finals")
         await self.channel_layer.group_send(
             f"game_{self.semi_finals1.id}",
             {
@@ -108,6 +101,9 @@ class Tournament:
                 'type': 'show_game',
             }
         )
+
+        await self.send_define_player(self.semi_finals1, 'player_1', 'player_2')
+        await self.send_define_player(self.semi_finals2, 'player_1', 'player_2')
         await asyncio.gather(
             self.semi_finals1.game_loop(),
             self.semi_finals2.game_loop()
@@ -115,13 +111,13 @@ class Tournament:
 
     #wait for the games to finish
     async def wait_for_games(self):
-        print("wait for games")
+        # print("wait for games")
         while self.semi_finals1.is_active or self.semi_finals2.is_active:
             await asyncio.sleep(1)
-        print("semi finals are finished")
+        # print("semi finals are finished")
 
     async def create_small_final(self):
-        print("create small final")
+        # print("create small final")
         game = PongGame()
         game.player_1 = self.semi_finals1.winner
         game.player_2 = self.semi_finals2.winner
@@ -154,15 +150,49 @@ class Tournament:
         self.final = game
         self.final.status = "ready"
 
-    async def start_finals(self):
-        print("start finals")
-        # await self.small_final.game_loop()
-        # await self.final.game_loop()
+    async def send_define_player(self, game, current_player_1, current_player_2):
+        print("send define player between", game.player_1, game.player_2)
+        await self.channel_layer.send(
+            game.channel_player_1,
+            {
+                'type': 'define_player',
+                'current_player': current_player_1
+            }
+        )
+        await self.channel_layer.send(
+            game.channel_player_2,
+            {
+                'type': 'define_player',
+                'current_player': current_player_2
+            }
+        )
 
+    async def move_player(self, player, move):
+        if player == self.semi_finals1.player_1:
+            await self.semi_finals1.move_player(move)
+        elif player == self.semi_finals1.player_2:
+            await self.semi_finals1.move_player(move)
+        elif player == self.semi_finals2.player_1:
+            await self.semi_finals2.move_player(move)
+        elif player == self.semi_finals2.player_2:
+            await self.semi_finals2.move_player(move)
+        elif player == self.small_final.player_1:
+            await self.small_final.move_player(move)
+        elif player == self.small_final.player_2:
+            await self.small_final.move_player(move)
+        elif player == self.final.player_1:
+            await self.final.move_player(move)
+        elif player == self.final.player_2:
+            await self.final.move_player(move)
+
+    async def start_finals(self):
+        # print("start finals")
+        await self.small_final.game_loop()
+        await self.final.game_loop()
 
     #end the tournament
     async def end_tournament(self):
-        print("end tournament")
+        # print("end tournament")
         #send the winner to the front
         #save the tournament in the database
         # from pong.models import Tournament
@@ -180,4 +210,4 @@ class Tournament:
 
         # #delete the games
         list_of_games.clear()
-        print("tournament is finished")
+        # print("tournament is finished")

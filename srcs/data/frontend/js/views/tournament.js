@@ -133,7 +133,7 @@ export function tournamentView(container) {
 
     // Fonction pour démarrer la vue Pong
     function startPongView() {
-        console.log("Starting Pong view...");
+        console.log("Starting Pong view");
         pongView(tournamentContainer, tournamentSocket);
     }
 }

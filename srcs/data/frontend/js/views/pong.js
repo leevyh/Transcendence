@@ -1,6 +1,7 @@
 import { navigationBar } from './navigation.js';
 import { PongWebSocketManager } from './wsPongManager.js';
 import { notifications } from './notifications.js';
+import { currentPlayer } from './tournament.js';
 
 import {
     play,
@@ -17,8 +18,7 @@ import {
 import { GameOn } from './pong_game.js';
 export let canvas = 'null'
 
-
-export function pongView(container, tournamentSocket) {
+export async function pongView(container, tournamentSocket) {
     container.innerHTML = '';
     // document.body.classList.add('page-with-nav'); // Ajout de la classe pour la navigation bar (padding)
 
@@ -97,7 +97,7 @@ export function pongView(container, tournamentSocket) {
     PongWebSocketManager.socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
 
-        console.log("data = ", data);
+        // console.log("data = ", data);
 
         if (data.action_type === 'define_player') {
             var currentPlayer = data.current_player;
@@ -108,10 +108,15 @@ export function pongView(container, tournamentSocket) {
             } else if (currentPlayer === 'player_2') {
                 document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_2'));
                 document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_2'));
+            } else if (currentPlayer === 'player_3') {
+                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_3'));
+                document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_3'));
+            } else if (currentPlayer === 'player_4') {
+                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_4'));
+                document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_4'));
             }
         }
         if (data.action_type === 'start_game') {
-            console.log("start_game ??");
             startGame(stopButton);
         }
         if (GameOn) {
