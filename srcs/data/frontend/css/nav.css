@@ -235,3 +235,121 @@ button.buttonLogOut:active {
     box-shadow: #3a4250 0px 4px 12px;
 }
 
+/* friends */
+.friends_ul{
+	width: 95%;
+}
+
+.friendItem {
+	margin-bottom: 15px; /* Espacement entre les cartes */
+	width: 100%; /* Prendre toute la largeur disponible */
+}
+
+.friendItem .friend-name {
+	font-size: 14px; /* Taille de police réduite */
+	font-weight: 300; /* Police fine */
+	color: #F4ED37; /* Jaune pour correspondre aux autres éléments */
+	display: block; /* Assure que le texte prenne toute la largeur disponible */
+}
+
+.friendItem small {
+	font-size: 12px; /* Taille plus petite pour le statut */
+	color: #cecec3;
+}
+
+.friendItem .card {
+	padding: 8px; /* Réduction du padding de la carte pour un aspect plus fin */
+	background-color: #2f3c50;
+	border-radius: 12px; /* Réduit légèrement les arrondis */
+	box-shadow: rgba(0, 0, 0, 0.16) 0px 5px 15px;
+	transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	border: none;
+	color: white;
+}
+
+.friendItem .card:hover {
+	transform: scale(1.02); /* Zoom léger au survol */
+	box-shadow: rgba(0, 0, 0, 0.2) 0px 8px 30px; /* Ombre plus marquée au survol */
+}
+
+.friendItem img {
+	width: 40px; /* Réduit la taille de l'avatar à 40px */
+	height: 40px;
+	border-radius: 50%;
+	border: 2px solid #F4ED37;
+}
+
+
+.friendItem .card-body {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding-left: 8px; /* Espace entre l'avatar et les textes */
+}
+
+.divListFriends {
+	flex-grow: 1;  /* Permet à la liste de prendre tout l'espace disponible */
+	max-height: 45%; /* Ajuste la hauteur max pour laisser de la place au bouton Logout */
+	overflow-y: auto; /* Active le scroll si la liste dépasse la hauteur */
+	scrollbar-width: thin; /* Pour les navigateurs supportant cette propriété */
+	scrollbar-color: #F4ED37 #435574; /* Couleur personnalisée de la scrollbar */
+}
+
+@media screen and (max-height: 805px) {
+	.divListFriends {
+		max-height: 40%; /* Réduit la hauteur max */
+	}
+}
+
+@media screen and (max-height: 740px) {
+	.divListFriends {
+		max-height: 35%; /* Réduit encore un peu plus */
+	}
+}
+
+@media screen and (max-height: 685px) {
+	.divListFriends {
+		max-height: 25%; /* Continue de rétrécir */
+	}
+}
+
+@media screen and (max-height: 600px) {
+	.divListFriends {
+		max-height: 20%; /* Réduit encore plus */
+	}
+}
+
+/* Si la hauteur de la fenêtre est inférieure ou égale à 550px, la div disparaît */
+@media screen and (max-height: 565px) {
+	.divListFriends {
+		display: none !important; /* Cache complètement la liste d'amis */
+	}
+}
+
+.friendItem .card-body h5 {
+	margin: 0;
+	font-size: 14px;
+	font-weight: bold;
+	color: #F4ED37; /* Jaune pour correspondre à la couleur des titres */
+}
+
+.friendItem .card-body small {
+	color: #cecec3; /* Couleur plus douce pour le statut (offline/online) */
+	font-size: 12px;
+}
+
+/* Style personnalisé pour la scrollbar (pour Chrome, Edge, Safari) */
+.divListFriends::-webkit-scrollbar {
+	width: 6px;
+}
+
+.divListFriends::-webkit-scrollbar-track {
+	background-color: #435574; /* Couleur du fond de la scrollbar */
+	border-radius: 10px;
+}
+
+.divListFriends::-webkit-scrollbar-thumb {
+	background-color: #F4ED37; /* Couleur du curseur */
+	border-radius: 10px;
+}
+
