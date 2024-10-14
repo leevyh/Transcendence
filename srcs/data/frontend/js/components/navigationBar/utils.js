@@ -1,7 +1,8 @@
-import { DEBUG } from '../../app.js';
+import { DEBUG, navigateTo } from '../../app.js';
 
 // Refresh actual page without reload (SPA)
 export function actualPage() {
+    console.log('window.location.href:', window.location.href);
     let location = window.location.href;
     const str_split = location.split('/');
     const length = str_split.length;
@@ -57,6 +58,7 @@ export function openModal(modalToOpen) {
 }
 
 export function closeModal(modalToClose) {
+    if (modalToClose) console.log('modalToClose');
     setTimeout(() => {
         // Use the Bootstrap API to hide the modal
         const modalInstance = bootstrap.Modal.getInstance(modalToClose);
@@ -64,7 +66,8 @@ export function closeModal(modalToClose) {
 
         document.body.style.filter = 'blur(5px)'; // Add a blur effect to the body
 
-        navigateTo(actualPage);
+        const actual = actualPage();
+        navigateTo(actual); // Refresh the page without reloading       
 
         let blurAmount = 4;
         const interval = setInterval(() => {

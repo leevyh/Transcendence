@@ -143,7 +143,7 @@ async function createSettingsForm() {
                 settingsForm.reset();
 
                 // Close the modal with Bootstrap
-                closeModal(document.getElementById('modalSettings'));
+                closeModal(modalSettings);
             }
             else {
                 const errorMessage = document.createElement('p');
