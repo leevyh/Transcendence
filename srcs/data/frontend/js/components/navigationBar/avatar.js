@@ -264,9 +264,9 @@ async function createAvatarModal() {
 
             if (response.ok) {
                 // Update the avatar image path by the default avatar path
-                const avatarImage = document.querySelector('.avatarImage');
-                avatarImage.src = '/path/to/default-avatar.png'; // TODO: Fix this
-
+                const avatarImage = document.querySelector('.avatarImage');                
+                avatarImage.src = '/path/to/default-avatar.png'; // FIXME: Update the path to the default avatar
+                
                 const successMessage = document.createElement('p');
                 successMessage.className = 'text-success';
                 successMessage.textContent = 'Avatar successfully removed';
