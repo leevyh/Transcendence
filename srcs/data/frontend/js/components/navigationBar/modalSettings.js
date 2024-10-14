@@ -2,7 +2,7 @@ import { DEBUG } from '../../app.js';
 import { getCookie } from '../../views/utils.js';
 import { closeModal } from './utils.js';
 
-export async function createModalSettings(container, userData) {
+export async function createModalSettings(userData) {
     const modalSettings = document.createElement('div');
     modalSettings.className = 'modal fade modalSettings';
     modalSettings.id = 'modalSettings';
@@ -27,7 +27,7 @@ export async function createModalSettings(container, userData) {
     modalSettingsTitle.className = 'modal-title modalSettingsTitle';
     modalSettingsHeader.appendChild(modalSettingsTitle);
 
-    // Bouton pour fermer la modale
+    // Close button
     const modalSettingsCloseButton = document.createElement('span');
     modalSettingsCloseButton.id = 'closeButtonParam';
     modalSettingsCloseButton.setAttribute('data-bs-dismiss', 'modal');
@@ -37,29 +37,28 @@ export async function createModalSettings(container, userData) {
     modalSettingsCloseButton.textContent = '×';
     modalSettingsHeader.appendChild(modalSettingsCloseButton);
 
-    // Event listener for keyboard accessibility
+// KEYBOARD ACCESSIBILITY
+    // Event listener for keyboard accessibility: when the button is focused and we press Enter, the modal closes and the focus goes back to the button
     modalSettingsCloseButton.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
-            modalSettings.classList.remove('modalSettings-show');
-            setTimeout(() => {
-                modalSettings.style.display = 'none';
-            }, 500);
+            modalSettingsCloseButton.click();
         }
     });
 
-    // Event listener for mouse click
+// MOUSE ACCESSIBILITY
+    // Event listener for mouse click: when the button is focused and we click on it, the modal closes
     modalSettingsCloseButton.addEventListener('click', () => {
-        modalSettings.classList.remove('modalSettings-show'); // Retirer la classe d'animation
+        modalSettings.classList.remove('modalSettings-show');
         setTimeout(() => {
-            modalSettings.style.display = 'none'; // Cacher la modale après l'animation
-        }, 500); // Délai correspondant à la durée de l'animation CSS
+            modalSettings.style.display = 'none';
+        }, 500);
     });
 
     const modalSettingsBody = document.createElement('div');
     modalSettingsBody.className = 'modal-body modalSettingsBody';
     modalSettingsContent.appendChild(modalSettingsBody);
 
-    // Formulaire de modification des paramètres {nickname, email} = settingsForm
+    // Creation of the settings form
     const settingsForm = await createSettingsForm();
     modalSettingsBody.appendChild(settingsForm);
 

@@ -118,7 +118,7 @@ async function createAvatarModal() {
     });
 
 // MOUSE ACCESSIBILITY
-    // Event listener for mouse accessibility: when the button is focused and the Space key is pressed, close the modal
+    // Event listener for mouse accessibility: when the button is focused and we click on it, close the modal
     modalAvatarCloseButton.addEventListener('click', () => {
         modalAvatar.classList.remove('modalAvatar-show');
         setTimeout(() => {

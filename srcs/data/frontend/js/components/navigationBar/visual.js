@@ -32,17 +32,16 @@ export async function createNavigationBar(container, userData) {
     const divListFriends = document.createElement('div');
     divListFriends.className = 'divListFriends d-flex justify-content-center w-100 py-3';
     divListFriends.textContent = 'Friends list';
-    // TODO: Ajouter la liste des amis
     nav.appendChild(divListFriends);
 
     const logoutButton = createLogoutButton();
     nav.appendChild(logoutButton);
 
     // Create modals for the navigation bar
-    const modalInfo = await createModalInfo(container, userData);
+    const modalInfo = await createModalInfo(userData);
     container.appendChild(modalInfo); // Direclty in the container to avoid positioning issues
 
-    const modalSettings = await createModalSettings(container, userData);
+    const modalSettings = await createModalSettings(userData);
     container.appendChild(modalSettings); // Direclty in the container to avoid positioning issues
 
     return nav;

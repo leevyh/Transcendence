@@ -1,6 +1,6 @@
 import { openModal } from './utils.js';
 
-export async function createModalInfo(container, userData) {
+export async function createModalInfo(userData) {
     const modalInfo = document.createElement('div');
     modalInfo.className = 'modal fade modalInfo';
     modalInfo.id = 'modalInfo';
@@ -25,7 +25,7 @@ export async function createModalInfo(container, userData) {
     modalInfoTitle.className = 'modal-title modalInfoTitle';
     modalInfoHeader.appendChild(modalInfoTitle);
 
-    // Bouton pour fermer la modale
+    // Close button
     const modalInfoCloseButton = document.createElement('span');
     modalInfoCloseButton.id = 'closeButtonInfos';
     modalInfoCloseButton.setAttribute('data-bs-dismiss', 'modal');
@@ -35,17 +35,16 @@ export async function createModalInfo(container, userData) {
     modalInfoCloseButton.textContent = '×';
     modalInfoHeader.appendChild(modalInfoCloseButton);
 
-    // Event listener for keyboard accessibility
+// KEYBOARD ACCESSIBILITY
+    // Event listener for keyboard accessibility: when the button is focused and we press Enter, the modal closes
     modalInfoCloseButton.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
-            modalInfo.classList.remove('modalInfo-show');
-            setTimeout(() => {
-                modalInfo.style.display = 'none';
-            }, 500);
+            modalInfoCloseButton.click();
         }
     });
 
-    // Event listener for mouse click
+// MOUSE ACCESSIBILITY
+    // Event listener for mouse accessibility: when the button is focused and we click on it, the modal closes
     modalInfoCloseButton.addEventListener('click', () => {
         modalInfo.classList.remove('modalInfo-show');
         setTimeout(() => {
@@ -68,7 +67,8 @@ export async function createModalInfo(container, userData) {
     SvgModify.setAttribute('tabindex', '0'); // To make the element focusable
     modalInfoBody.appendChild(SvgModify);
 
-    // Event listener for keyboard accessibility
+// KEYBOARD ACCESSIBILITY
+    // Event listener for keyboard accessibility: when the button is focused and we press Enter, the modalSettings opens
     SvgModify.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             // We close modalInfo before opening modalSettings
@@ -83,7 +83,8 @@ export async function createModalInfo(container, userData) {
         }
     });
 
-    // Event listener for mouse click
+// MOUSE ACCESSIBILITY
+    // Event listener for mouse click: when the button is focused and we click on it, the modalSettings opens
     SvgModify.addEventListener('click', () => {
         // We close modalInfo before opening modalSettings
         const modalInfoElement = document.getElementById('modalInfo');
@@ -93,7 +94,6 @@ export async function createModalInfo(container, userData) {
                 bootstrapModalInfo.hide(); // Close "modalInfo"
             }
         }
-
         openModal(document.getElementById('modalSettings'));
     });
 
