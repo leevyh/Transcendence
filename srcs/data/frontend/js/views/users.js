@@ -99,7 +99,6 @@ function createUserRow(user_list_row, data) {
     userNickname.textContent = data.nickname;
 }
 
-
 export async function friendsView(container) {
     container.innerHTML = '';
 
@@ -109,7 +108,6 @@ export async function friendsView(container) {
     const url = window.location.href.split('/').pop();
 
     const statusSocket = new WebSocket('ws://' + window.location.host + '/ws/status/');
-
     statusSocket.onopen = function (event) {
         if (DEBUG) {console.log('Status socket opened');}
     }
@@ -117,25 +115,15 @@ export async function friendsView(container) {
     statusSocket.onmessage = function (event) {
         if (DEBUG) {console.log('Message received:', event.data);}
         const data = JSON.parse(event.data);
-        //Update status of user in the card
-        //Get the card with the nickname
-        // const userCard = document.getElementById(data.nickname);
-        // //Get the status paragraph
-        // const userStatus = userCard.querySelector('.card-text');
-        // //Update the status
-        // userStatus.textContent = `${data.status}`;
         const user_list_row = document.querySelector('.user_list_row');
         createUserRow(user_list_row, data);
-        //Update the dot color
     };
 
     statusSocket.onclose = function (event) {
         if (DEBUG) {console.error('Status socket closed', event);}
     }
 
-
     container.innerHTML = '';
-    // navigationBar(container); // Add navigation bar Old version
 
     const global_div = document.createElement('div');
     global_div.className= 'd-flex justify-content-start align-item-center w-100 h-100';
@@ -150,26 +138,9 @@ export async function friendsView(container) {
     const user_list_row = document.createElement('div');
     user_list_row.className = 'row p-4 user_list_row';
 
-
-
-
-    //Get all users with websocket status and display them (if new user inside a database, add it to the list)
-
     user_list.appendChild(user_list_row);
     global_div.appendChild(user_list);
 
-    // const isAuth = await isAuthenticated();
-
-
-
-
-
-    // if (isAuth) {
-        // container.appendChild(buttonSettings);
-        // container.appendChild(logoutButton);
-        //TEMPORAIRE FRIENDS SYSTEM
-
-        //GET ALL USERS
     fetch('/api/users/', {
         method: 'GET',
         headers: {
@@ -183,55 +154,7 @@ export async function friendsView(container) {
         data.forEach(user => {
             createUserRow(user_list_row, user);
         });
-
     });
-
-
-        //     //Display card with user info (Nickname, avatar, status (onffline = Red dot, online = Green dot))
-    //     data.forEach(user => {
-    //         const userCard = document.createElement('div');
-    //         userCard.className = 'card';
-    //         userCard.style = 'width: 50%;';
-    //         //Create card with id = user.nickname
-    //         userCard.id = user.nickname;
-    //
-    //         const userAvatar = document.createElement('img');
-    //         userAvatar.src = `data:image/png;base64,${user.avatar}`;
-    //         userAvatar.className = 'card-img-top';
-    //         userAvatar.style = 'width: 100px; height: 100px;';
-    //         userAvatar.alt = 'User avatar';
-    //
-    //         const userCardBody = document.createElement('div');
-    //         userCardBody.className = 'card-body';
-    //
-    //         const userNickname = document.createElement('h5');
-    //         userNickname.className = 'card-title';
-    //         userNickname.textContent = user.nickname;
-    //
-    //         //Put this dot behind the status text
-    //         const userStatus = document.createElement('p');
-    //         userStatus.className = 'card-text';
-    //         userStatus.setAttribute('data-nickname', user.nickname);
-    //         userStatus.style = 'display: flex; align-items: center;';
-    //         userStatus.textContent = `${user.status}`;
-    //
-    //         const friendRequestButton = document.createElement('button');
-    //         friendRequestButton.className = 'btn btn-primary';
-    //         friendRequestButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-add" viewBox="0 0 16 16">\n' +
-    //             '  <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>\n' +
-    //             '  <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>\n' +
-    //             '</svg>';
-    //         friendRequestButton.addEventListener('click', (event) => {
-    //             sendFriendRequest(user.nickname);
-    //         });
-    //         userCardBody.appendChild(userNickname);
-    //         userCardBody.appendChild(userStatus);
-    //         userCardBody.appendChild(friendRequestButton);
-    //         userCard.appendChild(userAvatar);
-    //         userCard.appendChild(userCardBody);
-    //         container.appendChild(userCard);
-    //     });
-    // }
 
     const notifications_div = await notifications();
     global_div.appendChild(notifications_div);
