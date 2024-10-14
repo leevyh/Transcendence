@@ -129,7 +129,7 @@ export async function friendsView(container) {
     global_div.className= 'd-flex justify-content-start align-item-center w-100 h-100';
     container.appendChild(global_div);
 
-    const nav = navigationBar(container);
+    const nav = await navigationBar(container);
     global_div.appendChild(nav);
 
     const user_list = document.createElement('div');
@@ -150,7 +150,7 @@ export async function friendsView(container) {
         },
     })
     .then(response => response.json())
-    .then(data => {
+    .then(data => { // FIXME: if it's about me, don't display me
         data.forEach(user => {
             createUserRow(user_list_row, user);
         });

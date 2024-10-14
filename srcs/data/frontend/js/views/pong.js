@@ -38,7 +38,7 @@ export async function pongView(container) {
     div.className = 'd-flex h-100';
     container.appendChild(div);
 
-    const navBarContainer = navigationBar(container);
+    const navBarContainer = await navigationBar(container);
     div.appendChild(navBarContainer);
 
 	loadPongCSS();  // CSS
