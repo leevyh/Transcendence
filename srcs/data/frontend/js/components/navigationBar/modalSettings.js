@@ -112,6 +112,15 @@ async function createSettingsForm() {
         const nickname = data.get('newNicknameModify');
         const email = data.get('newEmailModify');
 
+        // Check the size of the nickname (between 3 and 10 characters)
+        if (nickname.length < 3 || nickname.length > 10) {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Nickname must be between 3 and 10 characters';
+            settingsForm.insertBefore(errorMessage, settingsSubmitButton);
+            return;
+        }
+
         try {
             // Send the data to the server
             const response = await fetch('/api/updateSettings/', {
