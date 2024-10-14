@@ -30,31 +30,36 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     # cree une partie si le joueur est le premier a se connecter ou rejoint une partie si un autre joueur est deja connecte. return cette partie
     async def findMatch(self, player):
+        # if player.status == 'ingame':
+        #     return
         if (len(list_of_games) == 0) :
             print("create game with user : ", player)
             game = PongGame(player)
             list_of_games.append(game)
             game.status = "waiting"
             game.player_1 = player
+            # player.status = 'ingame'
             game.nbPlayers += 1
             game.channel_player_1 = self.channel_name
-            #envoyer au front si il doit ecouter le joueur 1 ou 2 sans passer par un groupe
             await self.send(text_data=json.dumps({
                 'action_type': 'define_player',
                 'current_player': 'player_1'
             }))
             self.game = game
         else :
+            if list_of_games[0].player_1 == player :
+                return
             print("join game with user : ", player)
             game = list_of_games.pop(0)
             game.player_2 = player
+            # player.status = 'ingame'
             game.nbPlayers += 1   
             game.channel_player_2 = self.channel_name
             await self.send(text_data=json.dumps({
                 'action_type': 'define_player',
                 'current_player': 'player_2'
             }))
-            await self.channel_layer.group_add(f"game_{game.id}", self.channel_name)
+            # await self.channel_layer.group_add(f"game_{game.id}", self.channel_name)
             self.game = game
 
         if(game.nbPlayers == 2) :
@@ -84,7 +89,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             'game': event['game']
         }))
 
-    async def disconnect(self, close_code):
+    async def disconnect(self, code):
         # Retirer le joueur de la file d'attente s'il quitte la connexion
         print("disconnect user : ", self.scope['user'])
         player = self.scope['user']
@@ -123,12 +128,21 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
         player = self.scope['user']
+        print("user : ", self.scope['user'])
+        print("player : ", player)
         if player.is_authenticated:
             await self.findTournament(player)
         else:
             await self.close()
 
+    async def websocket_send(self, event):
+        text_data = event['text']
+        await self.send(text_data=text_data)
+
     async def findTournament(self, player):
+        # if player.status == 'intournament':
+        #     print("player already in tournament")
+            # return
         if (len(list_of_tournaments) == 0) :
             print("create tournament with user : ", player)
             tournament = Tournament()
@@ -140,27 +154,19 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.tournament.nbPlayers += 1
             self.current_player = 'player_1'
             self.tournament.channel_layer_player[0] = self.channel_name
-            await self.send(text_data=json.dumps({
-                'action_type': 'update_player_list',
-                'players': [
-                    {'nickname': player.nickname, 'id': player.id}
-                    for player in self.tournament.player if player is not None
-                ]
-            }))
+            await self.update_player_list(self.tournament)
         elif (list_of_tournaments[0].nbPlayers < 4) :
+            for i in range(4):
+                if list_of_tournaments[0].player[i] == player :
+                    print("player already in THIS tournament")
+                    return
             print("join tournament with user : ", player)
             self.tournament = list_of_tournaments[0]
             self.tournament.player[self.tournament.nbPlayers] = player
             self.tournament.channel_layer_player[self.tournament.nbPlayers] = self.channel_name
             self.tournament.nbPlayers += 1
             self.current_player = 'player_' + str(self.tournament.nbPlayers)
-            await self.send(text_data=json.dumps({
-                'action_type': 'update_player_list',
-                'players': [
-                    {'nickname': player.nickname, 'id': player.id}
-                    for player in self.tournament.player if player is not None
-                ]
-            }))
+            await self.update_player_list(self.tournament)
         else :
             print("error no tournament available")
         if(self.tournament.nbPlayers == 4) :
@@ -177,9 +183,73 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.task = asyncio.create_task(self.tournament.start_tournament())
         return self.tournament
 
-    async def disconnect(self):
+    async def disconnect(self, code):
         print("disconnect user : ", self.scope['user'])
         await self.close()
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+
+    async def update_player_list(self, event):
+        if event.nbPlayers >= 1:
+            await self.channel_layer.send(event.channel_layer_player[0], {
+                "type": "websocket.send",
+                'text': json.dumps({
+                    'action_type': 'update_player_list',
+                    'current_player': 'player_1',
+                    'players': [
+                        {'nickname': player.nickname, 'id': player.id}
+                        for player in self.tournament.player if player is not None
+                    ]
+                })
+            })
+        if event.nbPlayers >= 2:
+            await self.channel_layer.send(event.channel_layer_player[1], {
+                "type": "websocket.send",
+                'text': json.dumps({
+                    'action_type': 'update_player_list',
+                    'current_player': 'player_2',
+                    'players': [
+                        {'nickname': player.nickname, 'id': player.id}
+                        for player in self.tournament.player if player is not None
+                    ]
+                })
+            })
+        if event.nbPlayers >= 3:
+            await self.channel_layer.send(event.channel_layer_player[2], {
+                "type": "websocket.send",
+                'text': json.dumps({
+                    'action_type': 'update_player_list',
+                    'current_player': 'player_3',
+                    'players': [
+                        {'nickname': player.nickname, 'id': player.id}
+                        for player in self.tournament.player if player is not None
+                    ]
+                })
+            })
+        if event.nbPlayers >= 4:
+            await self.channel_layer.send(event.channel_layer_player[3], {
+                "type": "websocket.send",
+                'text': json.dumps({
+                    'action_type': 'update_player_list',
+                    'current_player': 'player_4',
+                    'players': [
+                        {'nickname': player.nickname, 'id': player.id}
+                        for player in self.tournament.player if player is not None
+                    ]
+                })
+            })
+
+    async def start_tournament(self, event):
+        await self.send(text_data=json.dumps({
+            'action_type': 'start_tournament',
+        }))
+
+    async def show_game(self, event):
+        await self.send(text_data=json.dumps({
+            'action_type': 'show_game',
+        }))
+
 
 @sync_to_async
 def create_tournament(player_1, player_2, player_3, player_4):

@@ -31,7 +31,16 @@ class Tournament:
     #start the tournament
     async def start_tournament(self):
         print("start tournament")
+        self.channel_layer = get_channel_layer()
+        await self.channel_layer.group_send(
+            f"tournament_{self.id}",
+            {
+                'type': 'start_tournament',
+            }
+        )
+        
         await self.create_semi_finals()
+        await asyncio.sleep(2)
         await self.start_semi_finals()
         # await self.wait_for_games()
         # await self.create_small_final()
@@ -48,45 +57,61 @@ class Tournament:
         # Tirer au sort ces indices sans répétition
         random.shuffle(player_indices)
         
-        # Associer les joueurs selon les indices tirés au sort
-        for i in range(0, 4, 2):
-            game1 = PongGame()
-            game1.player_1 = self.player[player_indices[i]]
-            game1.channel_player_1 = self.channel_layer_player[player_indices[i]]
-            game1.player_2 = self.player[player_indices[i + 1]]
-            game1.channel_player_2 = self.channel_layer_player[player_indices[i + 1]]
-            game1.nbPlayers = 2
-            game_database = await create_game(game1.player_1, game1.player_2)
-            game1.id = game_database.id
-            await self.channel_layer.group_add(f"game_{game1.id}", self.channel_layer_player[player_indices[i]])
-            await self.channel_layer.group_add(f"game_{game1.id}", self.channel_layer_player[player_indices[i + 1]])
-            self.semi_finals1 = game1
-            #send a message to the front to say who is player1 and player2
-            await self.channel_layer.group_send(
-                f"game_{self.game1.id}",
-                {
-                    'type': 'define_player',
-                }
-            )
-            self.semi_finals1.status = "ready"
+        self.semi_finals1 = PongGame(self.player[player_indices[0]])
+        self.semi_finals1.player_1 = self.player[player_indices[0]]
+        self.semi_finals1.channel_player_1 = self.channel_layer_player[player_indices[0]]
+        self.semi_finals1.player_2 = self.player[player_indices[1]]
+        self.semi_finals1.channel_player_2 = self.channel_layer_player[player_indices[1]]
+        self.semi_finals1.nbPlayers = 2
 
-            game2 = PongGame()
-            game2.player_1 = self.player[player_indices[i + 2]]
-            game2.channel_player_1 = self.channel_layer_player[player_indices[i + 2]]
-            game2.player_2 = self.player[player_indices[i + 3]]
-            game2.channel_player_2 = self.channel_layer_player[player_indices[i + 3]]
-            game2.nbPlayers = 2
-            game_database = await create_game(game2.player_1, game2.player_2)
-            game2.id = game_database.id
-            await self.channel_layer.group_add(f"game_{game2.id}", self.channel_layer_player[player_indices[i + 2]])
-            await self.channel_layer.group_add(f"game_{game2.id}", self.channel_layer_player[player_indices[i + 3]])
-            self.semi_finals2 = game2
-            self.semi_finals2.status = "ready"
+        from pong.consumers import create_game
+        game_database = await create_game(self.semi_finals1.player_1, self.semi_finals1.player_2)
+        self.semi_finals1.id = game_database.id
+        await self.channel_layer.group_add(f"game_{self.semi_finals1.id}", self.channel_layer_player[player_indices[0]])
+        await self.channel_layer.group_add(f"game_{self.semi_finals1.id}", self.channel_layer_player[player_indices[1]])
+        #send a message to the front to say who is player1 and player2
+        # await self.channel_layer.group_send(
+        #     f"game_{self.semi_finals1.id}",
+        #     {
+        #         'type': 'define_player',
+        #     }
+        # )
+        self.semi_finals1.status = "ready"
+
+        print("semi_finals1", self.semi_finals1.player_1, self.semi_finals1.player_2)
+
+        self.semi_finals2 = PongGame(self.player[player_indices[2]])
+        self.semi_finals2.player_1 = self.player[player_indices[2]]
+        self.semi_finals2.channel_player_1 = self.channel_layer_player[player_indices[2]]
+        self.semi_finals2.player_2 = self.player[player_indices[3]]
+        self.semi_finals2.channel_player_2 = self.channel_layer_player[player_indices[3]]
+        self.semi_finals2.nbPlayers = 2
+        game_database = await create_game(self.semi_finals2.player_1, self.semi_finals2.player_2)
+        self.semi_finals2.id = game_database.id
+        await self.channel_layer.group_add(f"game_{self.semi_finals2.id}", self.channel_layer_player[player_indices[2]])
+        await self.channel_layer.group_add(f"game_{self.semi_finals2.id}", self.channel_layer_player[player_indices[3]])
+        self.semi_finals2.status = "ready"
+
+        print("semi_finals2", self.semi_finals2.player_1, self.semi_finals2.player_2)
 
     async def start_semi_finals(self):
         print("start semi_finals")
-        # await self.semi_finals1.game_loop()
-        # await self.semi_finals2.game_loop()
+        await self.channel_layer.group_send(
+            f"game_{self.semi_finals1.id}",
+            {
+                'type': 'show_game',
+            }
+        )
+        await self.channel_layer.group_send(
+            f"game_{self.semi_finals2.id}",
+            {
+                'type': 'show_game',
+            }
+        )
+        await asyncio.gather(
+            self.semi_finals1.game_loop(),
+            self.semi_finals2.game_loop()
+        )
 
     #wait for the games to finish
     async def wait_for_games(self):
@@ -103,6 +128,8 @@ class Tournament:
         game.channel_player_1 = self.semi_finals1.channel_player_1
         game.channel_player_2 = self.semi_finals2.channel_player_1
         game.nbPlayers = 2
+
+        from pong.consumers import create_game
         game_database = await create_game(game.player_1, game.player_2)
         game.id = game_database.id
         await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_1)
@@ -118,6 +145,8 @@ class Tournament:
         game.channel_player_1 = self.small_final.channel_player_1
         game.channel_player_2 = self.small_final.channel_player_2
         game.nbPlayers = 2
+
+        from pong.consumers import create_game
         game_database = await create_game(game.player_1, game.player_2)
         game.id = game_database.id
         await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_1)

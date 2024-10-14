@@ -1,4 +1,5 @@
 import { navigationBar } from './navigation.js';
+import { pongView } from './pong.js';
 
 export let currentPlayer = null;
 
@@ -76,7 +77,12 @@ export function tournamentView(container) {
             currentPlayer = data.current_player;
             updatePlayerList(data);
         }
-
+        if(data.action_type === 'start_tournament') {
+            startTournament();
+        }
+        if(data.action_type === 'show_game') {
+            startPongView();
+        }
     };
 
     // Gérer la fermeture de la connexion WebSocket
@@ -101,12 +107,45 @@ export function tournamentView(container) {
             }
         }
     }
+
+    // Fonction pour démarrer le tournoi qui affiche "Tournament started!" en rouge après le nom des joueurs
+    function startTournament() {
+        console.log("Tournament started!");
+        
+        // Sélectionner tous les slots de joueurs
+        const playerSlots = document.querySelectorAll('#player-list li');
+
+        // Pour chaque slot, appliquer le style sans changer la couleur
+        playerSlots.forEach(playerSlot => {
+            playerSlot.style.fontWeight = 'bold';  // Mettre en gras le nom du joueur
+        });
+
+        // Créer un nouvel élément pour le message
+        const messageElement = document.createElement('p');
+        messageElement.textContent = "Tournament started!";
+        messageElement.style.color = 'red';  // Appliquer la couleur rouge
+        messageElement.style.fontWeight = 'bold'; // Mettre le message en gras si souhaité
+
+        // Ajouter le message après la liste des joueurs
+        const playerListContainer = document.getElementById('player-list');
+        playerListContainer.appendChild(messageElement);
+    }
+
+    // Fonction pour démarrer la vue Pong
+    function startPongView() {
+        console.log("Starting Pong view...");
+        pongView(tournamentContainer, tournamentSocket);
+    }
 }
 
 // CSS Pong
 function loadPongCSS() {
     const style = document.createElement('style');
     style.textContent = `
+
+        body, h2, ul, li {
+        color: white;
+        }
 
 		body {
 			display: flex;

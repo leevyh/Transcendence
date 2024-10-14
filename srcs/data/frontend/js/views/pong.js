@@ -18,7 +18,7 @@ import { GameOn } from './pong_game.js';
 export let canvas = 'null'
 
 
-export async function pongView(container) {
+export function pongView(container, tournamentSocket) {
     container.innerHTML = '';
     // document.body.classList.add('page-with-nav'); // Ajout de la classe pour la navigation bar (padding)
 
@@ -83,11 +83,21 @@ export async function pongView(container) {
     draw();
 
     // WebSocket
-    const wsUrl = 'ws://' + window.location.host + `/ws/pong/`;
-    PongWebSocketManager.init(wsUrl);
+    if (tournamentSocket == null) {
+        const wsUrl = 'ws://' + window.location.host + `/ws/pong/`;
+        const tournamentSocket = new WebSocket(wsUrl);
+        
+        PongWebSocketManager.init(null, tournamentSocket);
+    } 
+    else {
+        PongWebSocketManager.socket = tournamentSocket;
+        console.log("PongWebSocketManager.socket");
+    }
 
     PongWebSocketManager.socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
+
+        console.log("data = ", data);
 
         if (data.action_type === 'define_player') {
             var currentPlayer = data.current_player;
@@ -101,6 +111,7 @@ export async function pongView(container) {
             }
         }
         if (data.action_type === 'start_game') {
+            console.log("start_game ??");
             startGame(stopButton);
         }
         if (GameOn) {

@@ -10,6 +10,7 @@ class User_site(AbstractUser):
         ONLINE = "online"
         OFFLINE = "offline"
         INGAME = "ingame"
+        INTOURNAMENT = "intournament"
 
     nickname = models.CharField(max_length=10, unique=True)
     created_at = models.DateTimeField(default=timezone.now)
