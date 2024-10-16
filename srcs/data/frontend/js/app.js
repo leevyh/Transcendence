@@ -11,7 +11,7 @@ import { profileView } from './views/profile.js';
 import { callback42 } from './views/callback42.js';
 import { chatView } from './views/chat.js';
 import { leaderboardView } from './views/leaderboard.js';
-
+import { menuPongView } from './views/menuPong.js';
 
 const appDiv = document.getElementById('app');
 
@@ -48,13 +48,17 @@ const routes = {
         title: 'profile',
         view: profileView,
     },
+    '/menuPong': {
+        title: 'menuPong',
+        view: menuPongView,
+    },
 };
 
 async function router() {
     const pageTitle = "Transcendence";
     let path = location.pathname;
     if (DEBUG) {console.log(`Navigating to ${path}`);}
-    
+
     if (chatWS) {chatWS.close();}
 
     // If the user is not authenticated and tries to access a private route, redirect to the home page

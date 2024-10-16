@@ -1,0 +1,34 @@
+.btn-custom {
+	position: relative;
+	padding: 10px 20px;
+	border: none;
+	background-color: #007bff;
+	color: white;
+	font-size: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+
+.btn-custom img {
+	width: 40px;
+	height: 40px;
+	transition: opacity 0.3s ease-in-out;
+}
+
+.btn-custom .static-img {
+	display: block;
+}
+
+.btn-custom .hover-gif {
+	display: none;
+}
+
+.btn-custom:hover .static-img {
+	display: none;
+}
+
+.btn-custom:hover .hover-gif {
+	display: block;
+}
