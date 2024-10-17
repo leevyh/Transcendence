@@ -1,4 +1,4 @@
-.btn-custom {
+/* .btn-custom {
 	position: relative;
 	padding: 10px 20px;
 	border: none;
@@ -31,4 +31,69 @@
 
 .btn-custom:hover .hover-gif {
 	display: block;
+} */
+
+/* Style pour le bouton */
+
+
+/* Style commun pour tous les boutons */
+.soloButton, .DuoButton, .TournamentButton {
+	position: relative; /* Positionnement des éléments relatifs entre eux */
+	overflow: hidden; /* Cache les débordements si nécessaire */
 }
+
+/* Style pour le contenu (texte) des boutons */
+.soloButtonContent, .DuoButtonContent, .TournamentButtonContent {
+	position: relative;
+	z-index: 2; /* Le texte sera au-dessus de l'image statique */
+	color: white;
+	text-align: center;
+	transition: opacity 0.5s ease; /* Transition pour une disparition en douceur */
+}
+
+/* Style pour l'image statique */
+.static-img {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: cover;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	transition: opacity 0.5s ease; /* Transition pour la disparition */
+}
+
+/* Style pour le GIF */
+.hoverGif {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: cover;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 3; /* Le GIF sera au-dessus de tout */
+	opacity: 0; /* Par défaut, le GIF est invisible */
+	transition: opacity 0.5s ease; /* Transition pour l'apparition */
+}
+
+/* Effets au survol du bouton */
+.soloButton:hover .static-img,
+.DuoButton:hover .static-img,
+.TournamentButton:hover .static-img,
+.soloButton:hover .soloButtonContent,
+.DuoButton:hover .DuoButtonContent,
+.TournamentButton:hover .TournamentButtonContent {
+	opacity: 0; /* Faire disparaître l'image statique et le texte */
+}
+
+.soloButton:hover .hoverGif,
+.DuoButton:hover .hoverGif,
+.TournamentButton:hover .hoverGif {
+	opacity: 1; /* Faire apparaître le GIF */
+}
+
+

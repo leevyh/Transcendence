@@ -168,7 +168,7 @@ export function loginView(container) {
     // Ajouter un gestionnaire d'événements au lien
     cardFooter.querySelector('#registerLink').addEventListener('click', function(event) {
         event.preventDefault();
-        navigateTo('/register');
+        To('/register');
     });
 
     document.addEventListener('DOMContentLoaded', function() {
