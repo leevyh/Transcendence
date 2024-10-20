@@ -262,6 +262,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             'action_type': 'end_of_game',
         }))
 
+    async def end_of_tournament(self, event):
+        await self.send(text_data=json.dumps({
+            'action_type': 'end_of_tournament',
+        }))
+
 @sync_to_async
 def create_tournament(player_1, player_2, player_3, player_4):
     from pong.models import Tournament

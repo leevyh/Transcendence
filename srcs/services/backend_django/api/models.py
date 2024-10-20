@@ -125,10 +125,15 @@ class Friendship(models.Model):
 
 class MatchHistory(models.Model):
     from pong.models import Game
-    player = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='player')
+    player = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='match_histories')
     game = models.ForeignKey('pong.Game', on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
 
+class TournamentHistory(models.Model):
+    from pong.models import Tournament
+    player = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='tournament_histories')
+    tournament = models.ForeignKey('pong.Tournament', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
 
 class Notification(models.Model):
     user = models.ForeignKey(User_site, on_delete=models.CASCADE)

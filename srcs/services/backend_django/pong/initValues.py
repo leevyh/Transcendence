@@ -14,5 +14,5 @@ PADDLE_HEIGHT = 80
 PADDLE_WIDTH = 5
 
 # Score de victoire
-WINNING_SCORE = 3
+WINNING_SCORE = 2
 

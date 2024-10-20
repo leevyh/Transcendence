@@ -108,12 +108,9 @@ export async function pongView(container, tournamentSocket) {
             } else if (currentPlayer === 'player_2') {
                 document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_2'));
                 document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_2'));
-            } else if (currentPlayer === 'player_3') {
-                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_3'));
-                document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_3'));
-            } else if (currentPlayer === 'player_4') {
-                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_4'));
-                document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_4'));
+            } else {
+                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, data.player));
+                document.addEventListener('keyup', (event) => handleKeyUp(event, data.player));
             }
         }
         if (data.action_type === 'start_game') {

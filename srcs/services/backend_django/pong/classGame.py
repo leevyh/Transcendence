@@ -31,6 +31,10 @@ class PongGame:
         self.is_active = False
         self.channel_player_1 = None
         self.channel_player_2 = None
+        self.winner = None
+        self.loser = None
+        self.channel_winner = None
+        self.channel_loser = None
         self.id = 0
         self.status = 0
         self.created_at = datetime.now()
@@ -182,6 +186,10 @@ class PongGame:
         print("stop game")
         self.is_active = False
         self.status = "finished"
+        self.winner = self.player_1 if self.player_1_score >= self.player_2_score else self.player_2
+        self.loser = self.player_1 if self.player_1_score < self.player_2_score else self.player_2
+        self.channel_winner = self.channel_player_1 if self.player_1_score >= self.player_2_score else self.channel_player_2
+        self.channel_loser = self.channel_player_1 if self.player_1_score < self.player_2_score else self.channel_player_2
         await self.save_game()
         self.channel_layer = get_channel_layer()
         await self.channel_layer.group_send(
@@ -198,6 +206,7 @@ class PongGame:
         game_database.player_2_score = self.player_2_score
         game_database.is_active = False
         await sync_to_async(game_database.save, thread_sensitive=True)()
+        
         from api.models import MatchHistory
         match_history_player_1 = MatchHistory(player=self.player_1, game=game_database)
         match_history_player_2 = MatchHistory(player=self.player_2, game=game_database)
