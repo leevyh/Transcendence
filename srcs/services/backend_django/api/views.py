@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.hashers import make_password, check_password
 
 from .forms import UserRegistrationForm, AccessibilityUpdateForm
-from .models import User_site, Accessibility, Stats_user, FriendRequest, Notification
+from .models import User_site, Accessibility, Stats_user, FriendRequest, Notification, Game_Settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from typing import Optional
@@ -47,6 +47,8 @@ def register(request):
                 settings.save()
                 stats = Stats_user(user=user)
                 stats.save()
+                game_settings = Game_Settings(user=user)
+                game_settings.save()
                 return JsonResponse({'message': 'User registered successfully'}, status=201)
             else:
                 print("DEBUG")
@@ -254,6 +256,32 @@ def get_settings(request):
                     'avatar': avatar}
             return JsonResponse(data, status=200)
         except Accessibility.DoesNotExist:
+            return JsonResponse({'error': 'Settings not found'}, status=404)
+            # except token_user.DoesNotExist:
+    #     return JsonResponse({'error': 'Token not found'}, status=404)        # FIXME Check if token user exists here and in other functions
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@login_required(login_url='/api/login')
+@csrf_protect
+def get_game_setting(request):
+    if request.method == 'GET':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307) #307 Temporary Redirect
+            username = payload['username']
+            user_id = User_site.objects.get(username=username).id
+            game_setting = Game_Settings.objects.get(user=user_id)
+            data = {'background_game': game_setting.background_game,
+                    'pads_color': game_setting.pads_color,
+                    'ball_color': game_setting.ball_color,
+                    }
+            return JsonResponse(data, status=200)
+        except Game_Settings.DoesNotExist:
             return JsonResponse({'error': 'Settings not found'}, status=404)
             # except token_user.DoesNotExist:
     #     return JsonResponse({'error': 'Token not found'}, status=404)        # FIXME Check if token user exists here and in other functions

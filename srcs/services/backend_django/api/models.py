@@ -57,6 +57,26 @@ class Stats_user(models.Model):
     win_rate = models.FloatField(default=0.0)
 
 
+class Game_Settings(models.Model):
+    class Color(models.TextChoices):
+        BLACK = "black"
+        WHITE = "white"
+        PURPLE = "purple"
+        PINK = "pink"
+        YELLOW = "yellow"
+        GREEN = "green"
+        GRAY = "gray"
+        BLUE = "blue"
+        LILA = "lila"
+        RED = "red"
+        BROWN = "brown"
+        GREEN_LIGHT = "green_light"
+        BLUE_LIGHT = "blue_light"
+    user = models.OneToOneField(User_site, on_delete=models.CASCADE, primary_key=True)
+    background_game = models.CharField(default=Color.BLACK, choices=Color.choices)
+    pads_color = models.CharField(default=Color.WHITE, choices=Color.choices)
+    ball_color = models.CharField(default=Color.WHITE, choices=Color.choices)
+
 class FriendRequest(models.Model):
     STATUS = (
         ('pending', 'pending'),

@@ -81,3 +81,36 @@ export async function navigationBar(container) {
 
     return div;
 }
+
+function createNavButton(text, onClick) {
+    const listItem = document.createElement('li');
+    listItem.className = 'ElemListNavBar text-center py-2';
+
+    const button = document.createElement('button');
+    button.className = 'btn text-primary';
+    button.textContent = text;
+
+    // Remove the outline when the button loses focus
+    button.addEventListener('blur', () => {
+        button.style.outline = 'none';
+    });
+
+    listItem.appendChild(button);
+
+    button.addEventListener('click', () => {
+        if (DEBUG) {
+            console.log(`Navigating to ${text}`, 'actual:', window.location.pathname);
+        }
+
+        // Check if the text is "pong" and redirect to "/menuPong"
+        const targetPath = text.toLowerCase() === 'pong' ? '/menuPong' : `/${text.toLowerCase()}`;
+
+        if (window.location.pathname === targetPath) {
+            return;
+        }
+
+        onClick();
+    });
+
+    return listItem;
+}
