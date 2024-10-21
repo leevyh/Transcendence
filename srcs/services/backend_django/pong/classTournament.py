@@ -62,6 +62,7 @@ class Tournament:
         self.semi_finals1.channel_player_1 = self.channel_layer_player[player_indices[0]]
         self.semi_finals1.player_2 = self.player[player_indices[1]]
         self.semi_finals1.channel_player_2 = self.channel_layer_player[player_indices[1]]
+        self.semi_finals1.name = "semi_finals1"
         self.semi_finals1.nbPlayers = 2
 
         from pong.consumers import create_game
@@ -78,6 +79,7 @@ class Tournament:
         self.semi_finals2.channel_player_1 = self.channel_layer_player[player_indices[2]]
         self.semi_finals2.player_2 = self.player[player_indices[3]]
         self.semi_finals2.channel_player_2 = self.channel_layer_player[player_indices[3]]
+        self.semi_finals2.name = "semi_finals2"
         self.semi_finals2.nbPlayers = 2
 
         game_database = await create_game(self.semi_finals2.player_1, self.semi_finals2.player_2)
@@ -125,6 +127,7 @@ class Tournament:
         self.small_final.player_2 = self.semi_finals2.loser
         self.small_final.channel_player_1 = self.semi_finals1.channel_loser
         self.small_final.channel_player_2 = self.semi_finals2.channel_loser
+        self.small_final.name = "small_final"
         self.small_final.nbPlayers = 2
 
         from pong.consumers import create_game
@@ -142,6 +145,7 @@ class Tournament:
         self.final.player_2 = self.semi_finals2.winner
         self.final.channel_player_1 = self.semi_finals1.channel_winner
         self.final.channel_player_2 = self.semi_finals2.channel_winner
+        self.final.name = "final"
         self.final.nbPlayers = 2
 
         print("final", self.final.player_1, self.final.player_2)
@@ -161,34 +165,30 @@ class Tournament:
             game.channel_player_1,
             {
                 'type': 'define_player',
-                'current_player': current_player_1
+                'name_player': game.player_1.nickname,
+                'current_player': current_player_1,
+                'game': game.name
             }
         )
         await self.channel_layer.send(
             game.channel_player_2,
             {
                 'type': 'define_player',
-                'current_player': current_player_2
+                'name_player': game.player_2.nickname,
+                'current_player': current_player_2,
+                'game': game.name
             }
         )
 
-    async def move_player(self, player, move):
-        if player == self.semi_finals1.player_1:
-            await self.semi_finals1.move_player(move)
-        elif player == self.semi_finals1.player_2:
-            await self.semi_finals1.move_player(move)
-        elif player == self.semi_finals2.player_1:
-            await self.semi_finals2.move_player(move)
-        elif player == self.semi_finals2.player_2:
-            await self.semi_finals2.move_player(move)
-        elif player == self.small_final.player_1:
-            await self.small_final.move_player(move)
-        elif player == self.small_final.player_2:
-            await self.small_final.move_player(move)
-        elif player == self.final.player_1:
-            await self.final.move_player(move)
-        elif player == self.final.player_2:
-            await self.final.move_player(move)
+    def move_player(self, player, move, player_name, game):
+        if game == self.semi_finals1.name:
+            self.semi_finals1.move_player(player, move)
+        elif game == self.semi_finals2.name:
+            self.semi_finals2.move_player(player, move)
+        elif game == self.small_final.name:
+            self.small_final.move_player(player, move)
+        elif game == self.final.name:
+            self.final.move_player(player, move)
 
     #start the finals
     async def start_finals(self):
@@ -223,10 +223,10 @@ class Tournament:
             {
                 'type': 'end_of_tournament',
                 'ranking': [
+                    self.final.winner,
                     self.final.loser,
-                    self.small_final.loser,
-                    self.semi_finals1.loser,
-                    self.semi_finals2.loser
+                    self.small_final.winner,
+                    self.small_final.loser
                 ]
             }
         )
@@ -249,6 +249,4 @@ class Tournament:
         await sync_to_async(tournament_history_player_3.save, thread_sensitive=True)()
         await sync_to_async(tournament_history_player_4.save, thread_sensitive=True)()
 
-        # #delete the games
-        list_of_games.clear()
         print("tournament is finished")

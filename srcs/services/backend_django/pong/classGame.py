@@ -15,6 +15,7 @@ class PongGame:
     def __init__(self, player1, *args, **kwargs):
         self.player_1 = 0
         self.player_2 = 0
+        self.name = "game"
         self.nbPlayers = 0
         self.player_1_score = 0
         self.player_2_score = 0
@@ -57,6 +58,7 @@ class PongGame:
         print("start game")
         self.is_active = True
         self.reset_ball()
+        print("game name : ", self.name)
         self.channel_layer = get_channel_layer()
         await self.channel_layer.group_send(
             f"game_{self.id}",
@@ -70,7 +72,8 @@ class PongGame:
                         'y': self.ball_position_y
                     },
                     'player_1_position': self.player_1_position,
-                    'player_2_position': self.player_2_position
+                    'player_2_position': self.player_2_position,
+                    'game_name': self.name
                 }
             }
         )

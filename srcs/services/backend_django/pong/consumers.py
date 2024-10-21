@@ -231,8 +231,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         }))
 
     async def start_game(self, event):
-        # print("start game user : ", self.scope['user'])
-        # self.game.status = "playing"
+        print("game name : ", event['game'])
         await self.send(text_data=json.dumps({
             'action_type': 'start_game',
             'game': event['game']
@@ -247,13 +246,15 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def define_player(self, event):
         await self.send(text_data=json.dumps({
             'action_type': 'define_player',
-            'current_player': event['current_player']
+            'name_player': event['name_player'],
+            'current_player': event['current_player'],
+            'game': event['game']
         }))
     
     async def receive(self, text_data):
         data = json.loads(text_data)
         if data['type'] == 'update_player_position':
-            await self.tournament.move_player(data['player'], data['move'])
+            self.tournament.move_player(data['player'], data['move'], data['player_name'], data['game'])
         if data['type'] == 'stop_game' :
             await self.game.stop_game()
 

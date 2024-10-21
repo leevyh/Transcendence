@@ -138,6 +138,47 @@ export function tournamentView(container) {
     }
 }
 
+
+export function endOfTournamentView(container, data) {
+
+    // // Vérifier si le container est fourni ou essayer de récupérer par l'ID
+    // let endTournamentContainer = container || document.getElementById('end-tournament-container');
+
+    // // Si le container n'existe pas, le créer
+    // if (!endTournamentContainer) {
+    //     endTournamentContainer = document.createElement('div');
+    //     endTournamentContainer.id = 'end-tournament-container';
+    //     document.body.appendChild(endTournamentContainer);  // L'ajouter au body
+    // }
+    // else {
+    //     // Effacer tout contenu existant
+    //     endTournamentContainer.innerHTML = '';
+    // }
+
+    // // Créer un titre
+    // const title = document.createElement('h2');
+    // title.textContent = 'Final rankings';
+    // endTournamentContainer.appendChild(title);
+
+    // // Créer une liste pour afficher les classements
+    // const rankingList = document.createElement('ul');
+    // rankingList.className = 'ranking-list';
+
+    // // Utiliser les données de classement fournies dans l'événement WebSocket
+    // const rankings = data.ranking;  // Récupérer les classements des données
+
+    // rankings.forEach((player, index) => {
+    //     const listItem = document.createElement('li');
+    //     listItem.textContent = `${index + 1}. ${player}`;
+    //     rankingList.appendChild(listItem);
+    // });
+
+    // endTournamentContainer.appendChild(rankingList);
+}
+
+
+
+
 // CSS Pong
 function loadPongCSS() {
     const style = document.createElement('style');

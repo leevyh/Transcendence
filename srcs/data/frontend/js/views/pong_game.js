@@ -11,12 +11,15 @@ const MAX_SPEED = 10;
 const PLAYER_SPEED = 9;
 
 export var game = {
+    game_name: null,
     player1: {
+        name: null,
         x: PLAYER_WIDTH,
         y: GAME_HEIGHT,
         dy: PLAYER_SPEED
     },
     player2: {
+        name: null,
         x: 640 - PLAYER_WIDTH,
         y: GAME_HEIGHT,
         dy: PLAYER_SPEED
@@ -78,11 +81,11 @@ export function endOfGame(data) {
 }
 
 // Key Down
-export function handleKeyDown(event, stopButton, currentPlayer) {
+export function handleKeyDown(event, stopButton, currentPlayer, player_name, game_name) {
 	if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W')
-        PongWebSocketManager.sendPlayerPosition(currentPlayer, 'up');
+        PongWebSocketManager.sendPlayerPosition(currentPlayer, 'up', player_name, game_name);
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
-		PongWebSocketManager.sendPlayerPosition(currentPlayer, 'down');
+		PongWebSocketManager.sendPlayerPosition(currentPlayer, 'down', player_name, game_name);
     if (event.key === ' ' && GameOn == false) {
         //play();
         spaceDown = true;
@@ -110,11 +113,11 @@ export function handleKeyDown(event, stopButton, currentPlayer) {
 }
 
 // Key Up
-export function handleKeyUp(event, currentPlayer) {
+export function handleKeyUp(event, currentPlayer, player_name, game_name) {
 	if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W')
-		PongWebSocketManager.sendPlayerPosition(currentPlayer, 'stop up');
+		PongWebSocketManager.sendPlayerPosition(currentPlayer, 'stop up', player_name, game_name);
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
-		PongWebSocketManager.sendPlayerPosition(currentPlayer, 'stop down');
+		PongWebSocketManager.sendPlayerPosition(currentPlayer, 'stop down', player_name, game_name);
     if (event.key === "Escape")
         escapeDown = false;
     if (event.key === ' ')

@@ -1,7 +1,7 @@
 import { navigationBar } from './navigation.js';
 import { PongWebSocketManager } from './wsPongManager.js';
 import { notifications } from './notifications.js';
-import { currentPlayer } from './tournament.js';
+import { currentPlayer, endOfTournamentView } from './tournament.js';
 
 import {
     play,
@@ -97,24 +97,25 @@ export async function pongView(container, tournamentSocket) {
     PongWebSocketManager.socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
 
-        // console.log("data = ", data);
-
+        
         if (data.action_type === 'define_player') {
             var currentPlayer = data.current_player;
+            var player_name = data.name_player;
+            var game_name = data.game;
+            console.log("data = ", data);
             console.log("currentPlayer = ", currentPlayer);
             if (currentPlayer === 'player_1') {
-                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_1'));
-                document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_1'));
+                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_1', player_name, game_name));
+                document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_1', player_name, game_name));
             } else if (currentPlayer === 'player_2') {
-                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_2'));
-                document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_2'));
-            } else {
-                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, data.player));
-                document.addEventListener('keyup', (event) => handleKeyUp(event, data.player));
+                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_2', player_name, game_name));
+                document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_2', player_name, game_name));
             }
         }
         if (data.action_type === 'start_game') {
-            startGame(stopButton);
+            var game_name = data.game.game_name;
+            console.log("game_name = ", game_name);
+            startGame(stopButton, game_name);
         }
         if (GameOn) {
             if (data.action_type === 'game_state')
@@ -123,6 +124,10 @@ export async function pongView(container, tournamentSocket) {
         if (data.action_type === 'end_of_game') {
             endOfGame(data);
             stopButton.disabled = true;
+        }
+        if (data.action_type === 'end_of_tournament') {
+            stopButton.disabled = true;
+            endOfTournamentView(data);
         }
     };
 
@@ -145,7 +150,7 @@ export async function pongView(container, tournamentSocket) {
 }
 
 // Fonction pour démarrer le décompte
-function startCountdown() {
+function startCountdown(game_name) {
     let countdownValue = 3; // Décompte de 3 secondes
 
     // Créer dynamiquement un élément pour afficher le décompte
@@ -161,8 +166,22 @@ function startCountdown() {
     countdownElement.style.zIndex = '1000';
     countdownElement.innerText = countdownValue;
 
+     // Créer un élément pour afficher le nom du jeu
+     let gameNameElement = document.createElement('div');
+     gameNameElement.id = 'game-name';
+     gameNameElement.style.position = 'absolute';
+     gameNameElement.style.top = '40%'; // Un peu au-dessus du décompte
+     gameNameElement.style.left = '50%';
+     gameNameElement.style.transform = 'translate(-50%, -50%)';
+     gameNameElement.style.fontSize = '32px';
+     gameNameElement.style.color = 'white';
+     gameNameElement.style.textAlign = 'center';
+     gameNameElement.style.zIndex = '1000';
+     gameNameElement.innerText = `${game_name}`;
+
     // Ajouter l'élément à la page
     document.body.appendChild(countdownElement);
+    document.body.appendChild(gameNameElement);
 
     // Commencer le décompte
     let countdownInterval = setInterval(() => {
@@ -176,6 +195,7 @@ function startCountdown() {
             // Supprimer le décompte après un court délai
             setTimeout(() => {
                 countdownElement.remove();
+                gameNameElement.remove();
                 play(); // Appelle la fonction `play` pour démarrer le jeu
                 // envoyer au back que le jeu commence avec la fonction sendGameStarted() du PongWebSocketManager
                 PongWebSocketManager.sendGameStarted();
@@ -185,9 +205,9 @@ function startCountdown() {
 }
 
 // Fonction pour démarrer le jeu lorsque le serveur jumelle deux joueurs
-function startGame(stopButton)
+function startGame(stopButton, game_name)
 {
-    startCountdown(); // Démarrer le décompte avant de lancer le jeu
+    startCountdown(game_name); // Démarrer le décompte avant de lancer le jeu
     stopButton.disabled = false; // Activer le bouton Stop
 }
 
