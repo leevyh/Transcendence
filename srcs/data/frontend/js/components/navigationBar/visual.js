@@ -3,6 +3,7 @@ import { createModalInfo } from './modalInfos.js';
 import { createModalSettings } from './modalSettings.js';
 import { createNavButton, openModal } from './utils.js';
 import { navigateTo } from '../../app.js';
+import { getCookie } from '../../views/utils.js';
 
 // Creation of the navigation bar component
 export async function createNavigationBar(container, userData) {

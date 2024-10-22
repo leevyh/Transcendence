@@ -17,7 +17,7 @@ export function displayMessages(notification, offcanvas_body) {
     notification_type_header_text.className = 'd-flex flex-column';
 
     const notification_type_header_text_type = document.createElement('span');
-    notification_type_header_text_type.textContent = 'New Message';
+    notification_type_header_text_type.textContent = 'New Message from ' + notification.from_nickname;
 
     const notification_type_header_text_time = document.createElement('span');
     notification_type_header_text_time.textContent = notification.timestamp;

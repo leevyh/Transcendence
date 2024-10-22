@@ -162,27 +162,61 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
 
     # Send message notifications to the members of the conversation
-    async def send_message_notifications(self, sender, members, message):
+    # async def send_message_notifications(self, sender, members, message):
+    #     from api.models import Notification
+        # for member in members:
+        #     if member.id != sender.id:  # Exclude the sender
+                # Check if the user is active in the chat, if not -> send a notification
+                # if not await self.is_user_in_group(member.id):
+                #     # Send the notification to the user
+                #     print(f"Sending notification to user_{member.id} from user_{sender.id}: {message.content}")
+                #     await self.channel_layer.group_send(
+                #         f"user_{member.id}",
+                #         {
+                #             "type": "send_notification", #call function async send_notification in consumers.py
+                #             "message": {
+                #                 "type": "new_message",
+                #                 "from_user": sender.id,
+                #                 "from_nickname": sender.nickname,
+                #                 "from_avatar": encode_avatar(sender),
+                #                 "message": message.content,
+                #             },
+                #         }
+                #     )
+                #     # Save the notification in the database
+                #     await database_sync_to_async(Notification.objects.create)(
+                #         user=member,
+                #         type='new_message',
+                #         new_message=message,
+                #         status='unread'
+                #     )
+
+    async def send_message_notifications(self, sender, members, message): # Tentative de fix error "No handler for message type send_notification"
         from api.models import Notification
-        from .models import Message
         for member in members:
             if member.id != sender.id:  # Exclude the sender
                 # Check if the user is active in the chat, if not -> send a notification
                 if not await self.is_user_in_group(member.id):
+                # Prépare les données de notification
+                    notification_data = {
+                        "type": "new_message",
+                        "from_user": sender.id,
+                        "from_nickname": sender.nickname,
+                        "from_avatar": encode_avatar(sender),
+                        "message": message.content,
+                    }
+
+                    # Envoi via le channel layer
                     await self.channel_layer.group_send(
                         f"user_{member.id}",
                         {
                             "type": "send_notification",
-                            "message": {
-                                "type": "new_message",
-                                "from_user": sender.id,
-                                "from_nickname": sender.nickname,
-                                "from_avatar": encode_avatar(sender),
-                                "message": message.content,
-                            },
-                        }
+                            "message": notification_data,
+                        },
                     )
-                    # Save the notification in the database
+
+                    # Sauvegardez la notification dans la base de données
+                    print(f"Saving notification for user_{member.id}")
                     await database_sync_to_async(Notification.objects.create)(
                         user=member,
                         type='new_message',
@@ -194,7 +228,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Remove notifications from the database
     async def remove_notifications(self, user, conversation_id):
         from api.models import Notification
-
         # Fetch all unread notifications related to this conversation for the user
         notifications = await sync_to_async(list)(Notification.objects.filter(
             user=user,
@@ -206,7 +239,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Delete them from the database
         for notification in notifications:
             await sync_to_async(notification.delete)()
-
 
 
     # Check if the user is active in the chat
@@ -267,6 +299,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
             return
 
+
     # Receive information about blocked users
     async def block_user(self, event):
         await self.send(text_data=json.dumps({
@@ -275,6 +308,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'blocker': event['blocker'],
             'user': self.scope['user'].nickname # Who am I
         }))
+
 
     # Receive information about unblocked users
     async def unblock_user(self, event):

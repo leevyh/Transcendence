@@ -5,7 +5,6 @@ from channels.db import database_sync_to_async
 from django.db import models
 import base64
 
-
 class StatusConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add("status_updates", self.channel_name)
@@ -33,7 +32,6 @@ class StatusConsumer(AsyncJsonWebsocketConsumer):
         # await self.send_json(event["message"])
 
 
-
 class NotificationConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         if not self.scope["user"].is_authenticated:
@@ -59,9 +57,9 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
             )
 
     async def receive_json(self, content):
-        type = ['friend_request', 'game_invite', 'tournament_invite', 'accept_friend_request', 'reject_friend_request', 'game_accept', 'game_refuse', 'tournament_accept', 'tournament_refuse']
+        type = ['friend_request', 'game_invite', 'tournament_invite', 'accept_friend_request', 'reject_friend_request', 'game_accept', 'game_refuse', 'tournament_accept', 'tournament_refuse', 'new_message']
         if content['type'] in type:
-            # print(f"Notification type {content['type']} received")         # DEBUG
+            print(f"Notification type {content['type']} received")         # DEBUG
             await self.handle_notification(content)
 
     async def handle_notification(self, data):
@@ -113,6 +111,24 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
                 },
             )
 
+        elif type == 'new_message':  # Tentative de fix error "No handler for message type send_notification"
+            # Gestion des messages de chat
+            destinataire = await database_sync_to_async(User_site.objects.get)(nickname=data['nickname'])
+
+            print(f"New message from {user.nickname} to {destinataire.nickname}")
+            await self.channel_layer.group_send(
+                f"user_{destinataire.id}",
+                {
+                    "type": "send_notification",
+                    "message": {
+                        "type": "new_message",
+                        "from_user": user.id,
+                        "from_nickname": user.nickname,
+                        "from_avatar": encode_avatar(user),
+                        "message": data['message'],  # Contenu du message
+                    },
+                },
+            )
 
         elif type == 'accept_friend_request' or type == 'reject_friend_request':
             print(f"data: {data}")
@@ -132,14 +148,15 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
             print(f"Friendship created between {user.nickname} and {friend.nickname}")
 
             # Supprimer la demande d'ami après traitement (acceptée ou refusée)
-
             await database_sync_to_async(lambda: Notification.objects.filter(friend_request=friend_request).delete())()
             await database_sync_to_async(friend_request.delete)()
         else:
             await self.close()
 
     async def send_notification(self, event):
-        await self.send_json(event["message"])
+        print(f"Sending notification: {event}")  # DEBUG
+        message = event["message"]
+        await self.send_json(message)
 
 
 class FriendShipConsumer(AsyncJsonWebsocketConsumer):
