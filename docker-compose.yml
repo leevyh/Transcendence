@@ -245,8 +245,8 @@ services:
       - backend-pga-certs:/pga/certs/
     networks:
       - default
-    ports:
-      - 9093:9093
+    expose:
+      - 9093
     env_file:
       - ./env/alertmanager.env
     healthcheck:
@@ -281,40 +281,57 @@ services:
       backend-prometheus:
         condition: service_healthy
     restart: on-failure
-  export_frontend:
+  export-frontend:
     container_name: export-frontend
     build: ./srcs/services/export_frontend
+    volumes:
+      - backend-pga-certs:/pga/certs/
     networks:
       - default
     expose:
       - 9113
     depends_on:
-      - backend-prometheus
-      - frontend-nginx
+      backend-prometheus:
+        condition: service_healthy
+      frontend-nginx:
+        condition: service_healthy
     restart: on-failure
-  export_proxy:
+  export-proxy:
     container_name: export-proxy
     build: ./srcs/services/export_proxy
+    volumes:
+      - backend-pga-certs:/pga/certs/
     networks:
       - default
     expose:
       - 9113
     depends_on:
-      - backend-prometheus
-      - proxy-nginx
+      backend-prometheus:
+        condition: service_healthy
+      proxy-nginx:
+        condition: service_healthy
     restart: on-failure
-  export_elastic:
+  export-elastic:
     container_name: export-elastic
     build: ./srcs/services/export_elastic
+    volumes:
+      - backend-pga-certs:/pga/certs/
     networks:
       - default
     expose:
       - 9114
     env_file:
       - ./env/elastic.env
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /pga/certs/status/e_elastic.done ]"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
     depends_on:
-      - backend-prometheus
-      - backend-elastic
+      backend-prometheus:
+        condition: service_healthy
+      backend-elastic:
+        condition: service_healthy
     restart: on-failure
 
 

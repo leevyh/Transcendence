@@ -50,29 +50,47 @@ if [ ! -f /pga/certs/ssl.done ]; then
   touch /pga/certs/ssl.done;
 fi;
 
-while [ ! -f /pga/certs/status/prometheus.done ]; do
-  if curl -s --insecure --cacert /pga/certs/ca/ca.crt https://backend-prometheus:9090/-/healthy | grep -q 'Prometheus Server is Healthy.'; then
-    touch /pga/certs/status/prometheus.done;
-  else
-    sleep 5;
-  fi;
-done;
+services=0
+while true; do
 
-while [ ! -f /pga/certs/status/alertmanager.done ]; do
-  if curl -s --insecure --cacert /pga/certs/ca/ca.crt https://backend-alertmanager:9093/-/healthy | grep -q 'OK'; then
-    touch /pga/certs/status/alertmanager.done;
-  else
-    sleep 5;
-  fi;
-done;
+  if [ ! -f /pga/certs/status/prometheus.done ]; then
+    if curl -s --insecure --cacert /pga/certs/ca/ca.crt https://backend-prometheus:9090/-/healthy | grep -q 'Prometheus Server is Healthy.'; then
+      touch /pga/certs/status/prometheus.done
+      services=$((services + 1))
+    fi
+  fi
 
-while [ ! -f /pga/certs/status/grafana.done ]; do
-  if curl -s --insecure --cacert /pga/certs/ca/ca.crt https://backend-grafana:3000/api/health | grep -q '\"database\": \"ok\"'; then
-    touch /pga/certs/status/grafana.done;
-  else
-    sleep 5;
-  fi;
-done;
+  if [ ! -f /pga/certs/status/alertmanager.done ]; then
+    if curl -s --insecure --cacert /pga/certs/ca/ca.crt https://backend-alertmanager:9093/-/healthy | grep -q 'OK'; then
+      touch /pga/certs/status/alertmanager.done
+      services=$((services + 1))
+    fi
+  fi
+
+  if [ ! -f /pga/certs/status/grafana.done ]; then
+    if curl -s --insecure --cacert /pga/certs/ca/ca.crt https://backend-grafana:3000/api/health | grep -q '\"database\": \"ok\"'; then
+      touch /pga/certs/status/grafana.done
+      services=$((services + 1))
+    fi
+  fi
+
+  if [ ! -f /pga/certs/status/e_elastic.done ]; then
+    if curl -s http://export-elastic:9114/metrics | grep -q 'elasticsearch_node_stats_up'; then
+      touch /pga/certs/status/e_elastic.done
+      services=$((services + 1))
+    fi
+  fi
+
+  echo $services
+
+  if [ "$services" -eq 4 ]; then
+    echo "All services are healthy."
+    sleep 15
+    rm /pga/certs/status/*
+    break
+  fi
+done
+
 
 until false; do
   echo "Prometheus configuration successfully completed";
