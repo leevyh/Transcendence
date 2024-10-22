@@ -422,7 +422,7 @@ export async function profileView(container) {
         mainDiv.appendChild(ContainerHistorical);
 
         const historical = document.createElement('div');
-        historical.className = 'historical h-100';
+        historical.className = 'historical h-100 overflow-y-auto';
         ContainerHistorical.appendChild(historical);
 
         // Exemple : Générer 3 parties
