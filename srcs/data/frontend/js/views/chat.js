@@ -63,6 +63,6 @@ export async function chatView(container) {
         if (DEBUG) {console.error('Error:', error);}
     });
 
-    const notification_div = notifications(container);
+    const notification_div = await notifications(container);
     div.appendChild(notification_div);
 }
