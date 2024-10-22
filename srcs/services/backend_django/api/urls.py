@@ -17,6 +17,7 @@ urlpatterns = [
 	path('updateStats/', views.update_Stats, name='updateStats'),
 	# path('status_user/', views.get_status_all_users, name='status_user'), # Unused
 	path('users/', views.all_users, name='users'),
+	path('profile/<int:id>/', views.get_profile_id, name='profile_id'), # For router /profile/:id
 	path('logout/', views.logoutView, name='logout'),
 	path('check_auth/', views.check_auth, name='check_auth'),
 	path('auth/', views.auth_42, name='auth'),

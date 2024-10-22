@@ -54,10 +54,6 @@ const routes = {
         title: 'Leaderboard',
         view: leaderboardView,
     },
-    '/profile': {
-        title: 'profile',
-        view: profileView,
-    },
     '/menuPong': {
         title: 'menuPong',
         view: menuPongView,
@@ -79,27 +75,49 @@ async function router() {
         path = '/'; // Redirect to the home page
     }
 
-    // Check if the URL is a user profile corresponding to /user/:nickname
-    const ProfileRegex = /^\/profile\/([a-zA-Z0-9_-]+)$/;
-    const match = path.match(ProfileRegex);
-
-    // Get user's accessibility settings
+    // Get user's accessibility settings and apply them if they exist
     const userSettings = await getAccessibility();
     if (userSettings) {
         applyAccessibilitySettings(userSettings);
-    }
-    else {
+    } else {
         if (DEBUG) console.log('No user settings found');
     }
 
 
-    if (match) {
-        const nickname = match[1]; // Extract the nickname from the URL
-        document.title = `${pageTitle} | ${nickname}'s profile`;
+    // Handle the "/profile" and "/profile/id" paths
+    if (path === '/profile') {
+        if (await isAuthenticated() === true) {
+            // If the user is authenticated, redirect to their own profile
+            const currentUser = await getCurrentUser(); // Function to get the current user
+            history.pushState(null, null, `/profile/${currentUser.id}`);
+            path = `/profile/${currentUser.id}`;
+        } else {
+            // Redirect to the home page if not authenticated
+            path = '/';
+        }
+    }
 
-        appDiv.innerHTML = '';
-        profileView(appDiv, nickname);
+    // Check if the URL is a user profile corresponding to /user/:id
+    const ProfileRegex = /^\/profile\/([a-zA-Z0-9_-]+)$/; // TODO: Change the regex to take into account the ID
+    const profileMatch = path.match(ProfileRegex);
+
+    if (profileMatch) {
+        const nickname = profileMatch[1]; // Extraire le pseudo de l'URL
+
+        // Vérifier si l'utilisateur existe
+        const user = await findUser(nickname); // Fonction pour trouver l'utilisateur recherché
+        if (DEBUG) console.log('User found:', user);
+        if (user) {
+            document.title = `${pageTitle} | Profil de ${nickname}`;
+            appDiv.innerHTML = '';
+            profileView(appDiv, user.id); // Afficher la vue de profil de l'utilisateur
+        } else {
+            // Rediriger vers la page 404 si l'utilisateur n'existe pas
+            history.pushState(null, null, '/404');
+            path = '/404';
+        }
     } else {
+        // Gérer les autres routes
         const view = routes[path] || routes['/404'];
         document.title = `${pageTitle} | ${view.title}`;
         appDiv.innerHTML = '';
@@ -107,23 +125,69 @@ async function router() {
     }
 }
 
+// Function to navigate to a specific route
 export function navigateTo(path) {
     history.pushState(null, null, path);
     router();
 }
 
+// Event listeners for history change and DOM load
 window.addEventListener("popstate", router);
 window.addEventListener("DOMContentLoaded", () => {
     document.body.addEventListener("click", (e) => {
         if (e.target.matches("[data-link]")) {
             e.preventDefault();
             const href = e.target.getAttribute("href");
-                navigateTo(href);
+            navigateTo(href);
             return;
         }
     });
     router();
 });
+
+
+// isAuthenticated() : vérifier si l'utilisateur est connecté.
+// getCurrentUser() : récupérer les informations sur l'utilisateur connecté.
+// findUser(nickname) : vérifier si un utilisateur avec ce pseudo existe. --> Utiliser API all_users to check if user exists
+
+
+async function getCurrentUser() {
+    try {
+        const response = await fetch('/api/current_user/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        if (response.ok) {
+            const data = await response.json();
+            if (DEBUG) console.log('current user:', data);
+            return data;
+        }
+    } catch (error) {
+        if (DEBUG) console.error('Error getting current user:', error);
+        return null;
+    }
+}
+
+// Fonction pour trouver un utilisateur avec le pseudo donné
+async function findUser(nickname) {
+    fetch(`/api/users/`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+    })
+    .then(response => response.json())
+    .then(users => users.find(user => user.nickname === nickname)) // renvoie l'utilisateur si trouvé
+    .catch(error => {
+        if (DEBUG) console.error('Error finding user:', error);
+        return null;
+    });
+}
+
 
 
 // OLD METHOD FOR MULTILANGUAGE
@@ -197,10 +261,3 @@ window.addEventListener("DOMContentLoaded", () => {
 //         history.pushState(null, '', `/${currentLanguage}${url}`);
 //     }
 // }
-
-// window.addEventListener('popstate', () => {
-//     navigateTo(location.pathname);
-// });
-
-// // Initial load test
-// navigateTo(location.pathname || '/home');

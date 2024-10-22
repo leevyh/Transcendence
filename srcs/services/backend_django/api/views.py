@@ -331,6 +331,42 @@ def all_users(request):
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
 
+
+# Function to get the profile of a user with the id
+@login_required(login_url='/api/login')
+def get_profile_id(request, id):
+    if request.method == 'GET':
+        try:
+            user = User_site.objects.get(id=id)
+            data = {'nickname': user.nickname,
+                    'id': user.id}
+            return JsonResponse(data, status=200)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+# Function to know who Am I
+@login_required(login_url='/api/login')
+def who_am_i(request):
+    if request.method == 'GET':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            user = User_site.objects.get(username=username)
+            data = {'nickname': user.nickname,
+                    'id': user.id}
+            return JsonResponse(data, status=200)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+            
+
 @login_required(login_url='/api/login')
 @csrf_protect
 def updateSettings(request):
