@@ -80,7 +80,7 @@ export async function profileView(container) {
     if (!userData) {
         return;
     }
-    const navBarContainer = navigationBar(container);
+    const navBarContainer = await navigationBar(container);
     div.appendChild(navBarContainer);
 
     const mainDiv = document.createElement('div');

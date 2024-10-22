@@ -1,8 +1,8 @@
 import { navigateTo } from '../app.js';
 import { getCookie } from './utils.js';
-import { displayFriendRequests } from '../component/notifications/friendRequestNotifications.js';
-import { displayMessages } from '../component/notifications/newMessageNotifications.js';
-// import { getNotifications } from "../component/notifications/getNotifications";
+import { displayFriendRequests } from '../components/notifications/friendRequestNotifications.js';
+import { displayMessages } from '../components/notifications/newMessageNotifications.js';
+// import { getNotifications } from "../components/notifications/getNotifications";
 import wsManager from "./wsManager.js";
 
 

@@ -9,7 +9,7 @@ export async function leaderboardView(container) {
     div.className = 'd-flex h-100';
     container.appendChild(div);
     
-    const navBarContainer = navigationBar(container);
+    const navBarContainer = await navigationBar(container);
     div.appendChild(navBarContainer);
     
     const viewContainer = document.createElement('div');
