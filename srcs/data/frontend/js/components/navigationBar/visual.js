@@ -31,7 +31,7 @@ export async function createNavigationBar(container, userData) {
     // Friends list
     const divListFriends = document.createElement('div');
     divListFriends.className = 'divListFriends d-flex justify-content-center w-100 py-3';
-    divListFriends.textContent = 'Friends list';
+    // divListFriends.textContent = 'Friends list';
     nav.appendChild(divListFriends);
 
     const logoutButton = createLogoutButton();
