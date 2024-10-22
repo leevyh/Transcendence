@@ -1,4 +1,4 @@
-import { DEBUG } from '../../app.js';
+import { DEBUG, navigateTo } from '../../app.js';
 import { actualPage, openModal } from './utils.js';
 import { getCookie } from '../../views/utils.js';
 
