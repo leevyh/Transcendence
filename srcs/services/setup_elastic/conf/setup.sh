@@ -68,6 +68,30 @@ if [ ! -f config/certs/certs.zip ] && [ ! -f config/certs/ca.zip ]; then
   until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/_security/user/kibana_system/_password -d "{\"password\":\"$KIBANA_PASSWORD\"}" | grep -q "^{}"; do
     sleep 1;
   done;
+
+  echo "Setting ILM policy"
+  until curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/_ilm/policy/default-policy -d "{\"policy\":{\"_meta\":{\"description\":\"Default cluster-elk ILM\"},\"phases\":{\"delete\":{\"min_age\":\"30d\",\"actions\":{\"delete\":{}}}}}}}" | grep -q "^{\"acknowledged\":true}"; do
+    sleep 1;
+  done;
+
+  echo "Enrolling postgresql indexes in the ILM policy"
+  until curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/postgresql*/_settings -d "{\"index\":{\"lifecycle\":{\"name\":\"default-policy\"}}}" | grep -q "^{\"acknowledged\":true}"; do
+    sleep 1;
+  done;
+
+  echo "Enrolling django indexes in the ILM policy"
+  until curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/django*/_settings -d "{\"index\":{\"lifecycle\":{\"name\":\"default-policy\"}}}" | grep -q "^{\"acknowledged\":true}"; do
+    sleep 1;
+  done;
+
+  echo "Enrolling nginx indexes in the ILM policy"
+  until curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/.ds-logs-nginx*/_settings -d "{\"index\":{\"lifecycle\":{\"name\":\"default-policy\"}}}" | grep -q "^{\"acknowledged\":true}"; do
+    sleep 1;
+  done;
+
+  until curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/.ds-metrics-nginx*/_settings -d "{\"index\":{\"lifecycle\":{\"name\":\"default-policy\"}}}" | grep -q "^{\"acknowledged\":true}"; do
+    sleep 1;
+  done;
 fi;
 
 until false; do
