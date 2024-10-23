@@ -96,11 +96,19 @@ class PongConsumer(AsyncWebsocketConsumer):
         if player in waiting_players:
             waiting_players.remove(player)
         
-        if hasattr(self, 'game'):
-            self.game.is_active = False
-
         if hasattr(self, 'game_id'):
             await self.channel_layer.group_discard(f"game_{self.game_id}", self.channel_name)
+        
+        if hasattr(self, 'game'):
+            if self.game.player_1 == player:
+                self.game.winner = self.game.player_2
+                self.game.loser = self.game.player_1
+            else:
+                self.game.winner = self.game.player_1
+                self.game.loser = self.game.player_2
+            await self.game.broadcastState()
+            await self.game.stop_game()
+
         await self.close()
 
     async def receive(self, text_data):
@@ -111,6 +119,14 @@ class PongConsumer(AsyncWebsocketConsumer):
         # if data['type'] == 'game_started':
         #     await self.game.is_active = True
         if data['type'] == 'stop_game' :
+            player = self.scope['user']
+            if self.game.player_1 == player:
+                self.game.winner = self.game.player_2
+                self.game.loser = self.game.player_1
+            else:
+                self.game.winner = self.game.player_1
+                self.game.loser = self.game.player_2
+            await self.game.broadcastState()
             await self.game.stop_game()
 
     async def end_of_game(self, event):
@@ -185,12 +201,16 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         # retirer le joueur du tournoi s'il quitte la connexion
         player = self.scope['user']
         if player in self.tournament.player:
-            self.tournament.player[self.tournament.player.index(player)] = None
-            self.tournament.nbPlayers -= 1
-            for i in range(4):
-                if self.tournament.channel_layer_player[i] == self.channel_name:
-                    self.tournament.channel_layer_player[i] = None
-                    break
+            if self.tournament.status == "waiting":
+                self.tournament.player[self.tournament.player.index(player)] = None
+                self.tournament.nbPlayers -= 1
+                for i in range(4):
+                    if self.tournament.channel_layer_player[i] == self.channel_name:
+                        self.tournament.channel_layer_player[i] = None
+                        break
+                #retrouver si le joueur etait dans une partie et le mettre forfait pour le reste du tournoi
+                    
+
             if hasattr(self, 'tournament_id'):
                 await self.channel_layer.group_discard(f"tournament_{self.tournament_id}", self.channel_name)
             await self.update_player_list(self.tournament)

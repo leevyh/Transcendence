@@ -17,6 +17,7 @@ import {
 
 import { GameOn } from './pong_game.js';
 export let canvas = 'null'
+export let inTournament = false;
 
 export async function pongView(container, tournamentSocket) {
     container.innerHTML = '';
@@ -57,7 +58,7 @@ export async function pongView(container, tournamentSocket) {
 
     const scoreP = document.createElement('p');
     scoreP.className = 'd-flex justify-content-center';
-    scoreP.innerHTML = 'Joueur 1 : <em id="player1-score">0</em> - Joueur 2 : <em id="player2-score">0</em>';
+    scoreP.innerHTML = '<em id="player1-name">Joueur 1</em> : <em id="player1-score">0</em> - <em id="player2-score">0</em> : <em id="player2-name">Joueur 2</em>';
 
     // const buttonGameSettingsContainer = document.createElement('div');
     // buttonGameSettingsContainer.className = "buttonGameSettingsContainer";
@@ -85,13 +86,12 @@ export async function pongView(container, tournamentSocket) {
     // WebSocket
     if (tournamentSocket == null) {
         const wsUrl = 'ws://' + window.location.host + `/ws/pong/`;
-        const tournamentSocket = new WebSocket(wsUrl);
-        
-        PongWebSocketManager.init(null, tournamentSocket);
+        PongWebSocketManager.init(wsUrl);
     } 
     else {
         PongWebSocketManager.socket = tournamentSocket;
         console.log("PongWebSocketManager.socket");
+        inTournament = true;
     }
 
     PongWebSocketManager.socket.onmessage = (event) => {
@@ -113,9 +113,8 @@ export async function pongView(container, tournamentSocket) {
             }
         }
         if (data.action_type === 'start_game') {
-            var game_name = data.game.game_name;
-            console.log("game_name = ", game_name);
-            startGame(stopButton, game_name);
+            updatePlayerName(data.game.player1_name, data.game.player2_name);
+            startGame(stopButton, data.game.game_name);
         }
         if (GameOn) {
             if (data.action_type === 'game_state')
@@ -232,6 +231,14 @@ function updateScores(player_1_score, player_2_score) {
     document.querySelector('#player1-score').textContent = player_1_score;
     document.querySelector('#player2-score').textContent = player_2_score;
 }
+
+function updatePlayerName(player1_name, player2_name) {
+    document.querySelector(`#player1-name`).textContent = player1_name;
+    document.querySelector(`#player2-name`).textContent = player2_name;
+}
+
+
+
 
 // CSS Pong
 function loadPongCSS() {

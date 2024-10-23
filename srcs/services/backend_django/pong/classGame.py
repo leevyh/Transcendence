@@ -73,7 +73,9 @@ class PongGame:
                     },
                     'player_1_position': self.player_1_position,
                     'player_2_position': self.player_2_position,
-                    'game_name': self.name
+                    'game_name': self.name,
+                    'player1_name': self.player_1.nickname,
+                    'player2_name': self.player_2.nickname
                 }
             }
         )
@@ -189,8 +191,9 @@ class PongGame:
         print("stop game")
         self.is_active = False
         self.status = "finished"
-        self.winner = self.player_1 if self.player_1_score >= self.player_2_score else self.player_2
-        self.loser = self.player_1 if self.player_1_score < self.player_2_score else self.player_2
+        if self.winner is None or self.loser is None:
+            self.winner = self.player_1 if self.player_1_score >= self.player_2_score else self.player_2
+            self.loser = self.player_1 if self.player_1_score < self.player_2_score else self.player_2
         self.channel_winner = self.channel_player_1 if self.player_1_score >= self.player_2_score else self.channel_player_2
         self.channel_loser = self.channel_player_1 if self.player_1_score < self.player_2_score else self.channel_player_2
         await self.save_game()
@@ -215,3 +218,4 @@ class PongGame:
         match_history_player_2 = MatchHistory(player=self.player_2, game=game_database)
         await sync_to_async(match_history_player_1.save, thread_sensitive=True)()
         await sync_to_async(match_history_player_2.save, thread_sensitive=True)()
+

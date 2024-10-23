@@ -1,4 +1,5 @@
 export { canvas } from './pong.js'; // space game
+import { inTournament } from './pong.js';
 // export var game; // statut game
 import { PongWebSocketManager } from './wsPongManager.js';
 export var anim;
@@ -78,6 +79,9 @@ export function stop() {
 export function endOfGame(data) {
     cancelAnimationFrame(anim);
     GameOn = false;
+    if (inTournament == false) {
+        // return to the main menu
+    }
 }
 
 // Key Down
