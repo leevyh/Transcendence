@@ -74,7 +74,7 @@ function createNavBarList() {
     const navBarList = document.createElement('ul');
     navBarList.className = 'navBarList list-unstyled d-flex flex-column';
 
-    navBarList.appendChild(createNavButton('Pong', () => navigateTo('/pong')));
+    navBarList.appendChild(createNavButton('Pong', () => navigateTo('/menuPong')));
     navBarList.appendChild(createNavButton('Chat', () => navigateTo('/chat')));
     navBarList.appendChild(createNavButton('Users', () => navigateTo('/users')));
     navBarList.appendChild(createNavButton('Leaderboard', () => navigateTo('/leaderboard')));

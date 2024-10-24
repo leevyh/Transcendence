@@ -28,8 +28,15 @@ export function createNavButton(text, onClick) {
     listItem.appendChild(button);
 
     button.addEventListener('click', () => {
-        if (DEBUG) {console.log(`Navigating to ${text}`, 'actual:', window.location.pathname);}
-        if (window.location.pathname === `/${text.toLowerCase()}`) {
+        if (DEBUG) {
+            console.log(`Navigating to connard ${text}`, 'actual:', window.location.pathname);
+        }
+
+        // Check if the text is "pong" and redirect to "/menuPong"
+        const targetPath = text.toLowerCase() === 'pong' ? '/menuPong' : `/${text.toLowerCase()}`;
+
+        console.log("targetPath:", targetPath);
+        if (window.location.pathname === targetPath) {
             return;
         }
         onClick();

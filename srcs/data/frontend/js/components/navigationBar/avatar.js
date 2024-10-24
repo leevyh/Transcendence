@@ -41,9 +41,25 @@ export async function createAvatarDiv(container, userData) {
     });
 
     // Add event listener for keyboard accessibility: when the image is not focused, remove the blur effect
-    avatarImage.addEventListener('blur', () => {
-        avatarImage.style.filter = 'none';
-        SVGModifyAvatar.style.opacity = '0';
+    avatarImage.addEventListener('mouseout', (event) => {
+        // Vérifie si la souris est sortie vers le SVG, sinon retire le flou
+        if (!SVGModifyAvatar.contains(event.relatedTarget)) {
+            avatarImage.style.filter = 'none';
+            SVGModifyAvatar.style.opacity = '0';
+        }
+    });
+
+    SVGModifyAvatar.addEventListener('mouseover', () => {
+        avatarImage.style.filter = 'blur(5px)';
+        SVGModifyAvatar.style.opacity = '1';
+    });
+
+    SVGModifyAvatar.addEventListener('mouseout', (event) => {
+        // Vérifie si la souris est sortie vers l'image de l'avatar, sinon retire le flou
+        if (!avatarImage.contains(event.relatedTarget)) {
+            avatarImage.style.filter = 'none';
+            SVGModifyAvatar.style.opacity = '0';
+        }
     });
 
     // Event listener for keyboard accessibility: when the image is focused and the Enter key is pressed, open the modal
