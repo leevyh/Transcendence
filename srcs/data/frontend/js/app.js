@@ -1,7 +1,7 @@
 export const DEBUG = true;
 
 import { chatWS } from './components/chat/functions.js';
-import { getAccessibility, applyAccessibilitySettings, isAuthenticated } from './views/utils.js';
+import { getCookie, getAccessibility, applyAccessibilitySettings, isAuthenticated } from './views/utils.js';
 
 import { homeView } from './views/home.js';
 import { notFoundView } from './views/404.js';
