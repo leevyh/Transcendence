@@ -81,8 +81,6 @@ while true; do
     fi
   fi
 
-  echo $services
-
   if [ "$services" -eq 4 ]; then
     echo "All services are healthy."
     sleep 15
