@@ -58,6 +58,10 @@ const routes = {
         title: 'menuPong',
         view: menuPongView,
     },
+    '/profile': {
+        title: 'Profile',
+        view: profileView,
+    },
 };
 
 async function router() {
@@ -69,13 +73,19 @@ async function router() {
 
     // If the user is not authenticated and tries to access a private route, redirect to the home page
     const privateRoutes = ['/chat', '/users', '/pong', '/menuPong', '/profile', '/leaderboard'];
-    if (privateRoutes.includes(path) && await isAuthenticated() === false) {
-        if (DEBUG) {console.log(`Trying to access ${path} but user is not authenticated`);}
-        history.pushState(null, null, path); // Change the URL without reloading the page
-        path = '/'; // Redirect to the home page
+    const ProfileRegex = /^\/profile\/([a-zA-Z0-9_-]+)$/; // Regex to match /profile/:user_id
+    const match = path.match(ProfileRegex);
+
+    const isPrivateRoute = privateRoutes.includes(path) || match; // Consider profile/:user_id as a private route
+
+    if (isPrivateRoute && await isAuthenticated() === false) {
+        if (DEBUG) { console.log(`Trying to access ${path} but user is not authenticated`); }
+        path = '/'; // Redirect to 404 if not authenticated
+        // Change the URL to the new path
+        history.pushState(null, null, path);
     }
 
-    // Get user's accessibility settings and apply them if they exist
+    // Get user's accessibility settings
     const userSettings = await getAccessibility();
     if (userSettings) {
         applyAccessibilitySettings(userSettings);
@@ -83,41 +93,22 @@ async function router() {
         if (DEBUG) console.log('No user settings found');
     }
 
-
-    // Handle the "/profile" and "/profile/id" paths
     if (path === '/profile') {
-        if (await isAuthenticated() === true) {
-            // If the user is authenticated, redirect to their own profile
-            const currentUser = await getCurrentUser(); // Function to get the current user
-            history.pushState(null, null, `/profile/${currentUser.id}`);
-            path = `/profile/${currentUser.id}`;
-        } else {
-            // Redirect to the home page if not authenticated
-            path = '/';
-        }
-    }
+        // Load the current user's profile if no specific ID is provided
+        const currentUser = await getCurrentUser();
+        document.title = `${pageTitle} | My Profile`;
 
-    // Check if the URL is a user profile corresponding to /user/:id
-    const ProfileRegex = /^\/profile\/([a-zA-Z0-9_-]+)$/; // TODO: Change the regex to take into account the ID
-    const profileMatch = path.match(ProfileRegex);
+        history.pushState(null, null, `/profile/${currentUser.id}`);
+        profileView(appDiv, currentUser.id);
+    } else if (match) { // TODO: Need to fix the path in every link that leads to a profile
+        // Load a specific user's profile
+        const userId = match[1]; // Extract the user ID from the URL
+        document.title = `${pageTitle} | User ${userId}'s Profile`;
 
-    if (profileMatch) {
-        const nickname = profileMatch[1]; // Extraire le pseudo de l'URL
-
-        // Vérifier si l'utilisateur existe
-        const user = await findUser(nickname); // Fonction pour trouver l'utilisateur recherché
-        if (DEBUG) console.log('User found:', user);
-        if (user) {
-            document.title = `${pageTitle} | Profil de ${nickname}`;
-            appDiv.innerHTML = '';
-            profileView(appDiv, user.id); // Afficher la vue de profil de l'utilisateur
-        } else {
-            // Rediriger vers la page 404 si l'utilisateur n'existe pas
-            history.pushState(null, null, '/404');
-            path = '/404';
-        }
+        appDiv.innerHTML = '';
+        profileView(appDiv, userId); // Load the profile view with the specific user ID
     } else {
-        // Gérer les autres routes
+        // Handle other routes
         const view = routes[path] || routes['/404'];
         document.title = `${pageTitle} | ${view.title}`;
         appDiv.innerHTML = '';
@@ -146,17 +137,15 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// isAuthenticated() : vérifier si l'utilisateur est connecté.
-// getCurrentUser() : récupérer les informations sur l'utilisateur connecté.
-// findUser(nickname) : vérifier si un utilisateur avec ce pseudo existe. --> Utiliser API all_users to check if user exists
-
-
+// Function to get the current user
 async function getCurrentUser() {
     try {
         const response = await fetch('/api/current_user/', {
             method: 'GET',
             headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
             },
         });
         if (response.ok) {
@@ -170,9 +159,33 @@ async function getCurrentUser() {
     }
 }
 
-// Fonction pour trouver un utilisateur avec le pseudo donné
-async function findUser(nickname) {
-    fetch(`/api/users/`, {
+
+// Function to find a user by nickname
+async function findUserByNickname(nickname) {
+    try {
+        const response = await fetch(`/api/all_users/${nickname}/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        });
+        if (response.ok) {
+            const data = await response.json();
+            if (DEBUG) console.log('User found:', data);
+            return data;
+        }
+    }
+    catch (error) {
+        if (DEBUG) console.error('Error finding user:', error);
+        return null;
+    }
+}
+
+// Function to find a user by ID
+async function findUserByID(id) {
+    fetch(`/api/profile/${id}/`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -181,7 +194,10 @@ async function findUser(nickname) {
         },
     })
     .then(response => response.json())
-    .then(users => users.find(user => user.nickname === nickname)) // renvoie l'utilisateur si trouvé
+    .then(data => {
+        if (DEBUG) console.log('User found:', data);
+        return data;
+    })
     .catch(error => {
         if (DEBUG) console.error('Error finding user:', error);
         return null;

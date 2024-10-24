@@ -142,6 +142,26 @@ def get_profile(request, id):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+    
+# Function to know who Am I / Current user
+def who_am_i(request):
+    if request.method == 'GET':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            user = User_site.objects.get(username=username)
+            data = {'nickname': user.nickname,
+                    'id': user.id}
+            print("user:", data)         # DEBUG
+            return JsonResponse(data, status=200)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def get_friend_request(request, nickname):
     if request.method == 'GET':
@@ -323,18 +343,6 @@ def get_game_setting(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-# @login_required(login_url='/api/login')
-# def get_status_all_users(request):
-#     if request.method == 'GET':
-#         users = User_site.objects.all().exclude(id=request.user.id)  # Exclure l'utilisateur actuel
-#         data = []
-#         for user in users:
-#             data.append({'nickname': user.nickname,
-#                          'status': user.status})
-#             # print(data)         # DEBUG
-#         return JsonResponse(data, status=200, safe=False)
-#     else:
-#         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
 def all_users(request):
@@ -365,41 +373,6 @@ def all_users(request):
                 return JsonResponse({'error': 'Invalid token'}, status=401)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
-
-
-# Function to get the profile of a user with the id
-# @login_required(login_url='/api/login')
-# def get_profile_id(request, id):
-#     if request.method == 'GET':
-#         try:
-#             user = User_site.objects.get(id=id)
-#             data = {'nickname': user.nickname,
-#                     'id': user.id}
-#             return JsonResponse(data, status=200)
-#         except User_site.DoesNotExist:
-#             return JsonResponse({'error': 'User not found'}, status=404)
-#     else:
-#         return JsonResponse({'error': 'Invalid request method'}, status=405)
-    
-# Function to know who Am I / Current user
-@login_required(login_url='/api/login')
-def who_am_i(request):
-    if request.method == 'GET':
-        try:
-            token_user = request.headers.get('Authorization').split(' ')[1]
-            try:
-                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
-            except jwt.ExpiredSignatureError:
-                return JsonResponse({'error': 'Token expired'}, status=307)
-            username = payload['username']
-            user = User_site.objects.get(username=username)
-            data = {'nickname': user.nickname,
-                    'id': user.id}
-            return JsonResponse(data, status=200)
-        except User_site.DoesNotExist:
-            return JsonResponse({'error': 'User not found'}, status=404)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
             
 
 @login_required(login_url='/api/login')
