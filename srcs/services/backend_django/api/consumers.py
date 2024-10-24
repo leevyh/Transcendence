@@ -57,9 +57,9 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
             )
 
     async def receive_json(self, content):
-         type = ['friend_request', 'game_invite', 'tournament_invite', 'accept_friend_request', 'reject_friend_request', 'game_accept', 'game_refuse', 'tournament_accept', 'tournament_refuse']
+        type = ['friend_request', 'game_invite', 'tournament_invite', 'accept_friend_request', 'reject_friend_request', 'game_accept', 'game_refuse', 'tournament_accept', 'tournament_refuse']
         if content['type'] in type:
-            print(f"Notification type {content['type']} received")         # DEBUG
+            # print(f"Notification type {content['type']} received")         # DEBUG
             await self.handle_notification(content)
 
     async def handle_notification(self, data):
