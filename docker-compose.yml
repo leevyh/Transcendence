@@ -137,9 +137,6 @@ services:
     restart: on-failure
   backend-kibana:
     container_name: backend-kibana
-    depends_on:
-      backend-elastic:
-        condition: service_healthy
     build: ./srcs/services/backend_kibana
     volumes:
       - backend-kibana:/usr/share/kibana/data/
@@ -158,6 +155,9 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
+    depends_on:
+      backend-elastic:
+        condition: service_healthy
     restart: on-failure
   backend-logstash:
     container_name: backend-logstash
@@ -196,9 +196,10 @@ services:
     env_file:
       - ./env/fleet.env
       - ./env/elastic.env
+      - ./env/kibana.env
       - ./srcs/services/backend_fleet/conf/elastic-agent.env
     healthcheck:
-      test: ["CMD-SHELL", "curl -s -IL http://localhost:6791/liveness | grep -q 'HTTP/1.1 200 OK'"]
+      test: ["CMD-SHELL", "curl -s -I http://localhost:6791/liveness | grep -q 'HTTP/1.1 200 OK'"]
       interval: 10s
       timeout: 10s
       retries: 120
