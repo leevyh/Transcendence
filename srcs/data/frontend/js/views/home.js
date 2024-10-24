@@ -378,12 +378,14 @@ export function homeView(container) {
         })
         .then(response => {
             if (!response.ok) {
+                formRegister.reset();
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'Error while registering, please try again';
                 formRegister.insertBefore(errorMessage, submitRegisterButton);
             }
             else {
+                formRegister.reset();
                 // Si l'inscription est réussie, on ferme la modale et on ouvre la modale de connexion
                 modalRegister.classList.remove('ModalLoginBase-show');
                 setTimeout(() => {
@@ -410,7 +412,9 @@ export function homeView(container) {
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Error while registering, please try again';
             formRegister.insertBefore(errorMessage, submitRegisterButton);
+            formRegister.reset();
             });
+
     });
     modalRegisterBody.appendChild(formRegister);
 

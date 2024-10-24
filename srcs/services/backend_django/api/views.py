@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.hashers import make_password, check_password
 
 from .forms import UserRegistrationForm, AccessibilityUpdateForm
-from .models import User_site, Accessibility, Stats_user, FriendRequest, Notification
+from .models import User_site, Accessibility, Stats_user, FriendRequest, Notification, Game_Settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from typing import Optional
@@ -47,6 +47,8 @@ def register(request):
                 settings.save()
                 stats = Stats_user(user=user)
                 stats.save()
+                game_settings = Game_Settings(user=user)
+                game_settings.save()
                 return JsonResponse({'message': 'User registered successfully'}, status=201)
             else:
                 print("DEBUG")
@@ -88,7 +90,6 @@ def get_profile(request, nickname):
                 avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
                 data = {'nickname': user.nickname,
                         'username': user.username,
-                        'email': user.email,
                         'created_at': user.created_at,
                         'status': user.status,
                         'nb_games': stats.nb_games,
@@ -231,21 +232,6 @@ def read_All_Notification(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-def get_Stats(request):
-    if request.method == 'GET':
-        try:
-            stats = Stats_user.objects.get(user=user_id)
-            return JsonResponse({'nb_games': stats.nb_games,
-                                 'nb_wins': stats.nb_wins,
-                                 'nb_losses': stats.nb_losses,
-                                 'win_rate': stats.win_rate,
-                                 'nb_point_taken' :stats.nb_point_taken,
-                                 'nb_point_given' :stats.nb_point_given}, status=200)
-        except Stats_user.DoesNotExist:
-            return JsonResponse({'error': 'Stats not found'}, status=404)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
-
 @login_required(login_url='/api/login')
 def get_settings(request):
     if request.method == 'GET':
@@ -270,6 +256,32 @@ def get_settings(request):
                     'avatar': avatar}
             return JsonResponse(data, status=200)
         except Accessibility.DoesNotExist:
+            return JsonResponse({'error': 'Settings not found'}, status=404)
+            # except token_user.DoesNotExist:
+    #     return JsonResponse({'error': 'Token not found'}, status=404)        # FIXME Check if token user exists here and in other functions
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@login_required(login_url='/api/login')
+@csrf_protect
+def get_game_setting(request):
+    if request.method == 'GET':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307) #307 Temporary Redirect
+            username = payload['username']
+            user_id = User_site.objects.get(username=username).id
+            game_setting = Game_Settings.objects.get(user=user_id)
+            data = {'background_game': game_setting.background_game,
+                    'pads_color': game_setting.pads_color,
+                    'ball_color': game_setting.ball_color,
+                    }
+            return JsonResponse(data, status=200)
+        except Game_Settings.DoesNotExist:
             return JsonResponse({'error': 'Settings not found'}, status=404)
             # except token_user.DoesNotExist:
     #     return JsonResponse({'error': 'Token not found'}, status=404)        # FIXME Check if token user exists here and in other functions
@@ -346,6 +358,55 @@ def updateSettings(request):
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@login_required(login_url='/api/login')
+@csrf_protect
+def updateGameSettings(request):
+    if request.method == 'PUT':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            data = json.loads(request.body)
+            if not data:
+                return JsonResponse({'error': 'No data provided'}, status=400)
+            user_id = User_site.objects.get(username=username).id
+            game_setting = Game_Settings.objects.get(user=user_id)
+            valid_colors = [choice[0] for choice in Game_Settings.Color.choices]
+            if 'background_game' in data:
+                if data['background_game'].strip() == "":
+                    return JsonResponse({'error': 'background_game cannot be empty'}, status=400)
+                if data['background_game'] in valid_colors:
+                    game_setting.background_game = data['background_game']
+                else:
+                    return JsonResponse({'error': 'Invalid background_game color'}, status=400)
+            if 'pads_color' in data:
+                if data['pads_color'].strip() == "":
+                    return JsonResponse({'error': 'pads_color cannot be empty'}, status=400)
+                if data['pads_color'] in valid_colors:
+                    game_setting.pads_color = data['pads_color']
+                else:
+                    return JsonResponse({'error': 'Invalid pads_color color'}, status=400)
+            if 'ball_color' in data:
+                if data['ball_color'].strip() == "":
+                    return JsonResponse({'error': 'ball_color cannot be empty'}, status=400)
+                if data['ball_color'] in valid_colors:
+                    game_setting.ball_color = data['ball_color']
+                else:
+                    return JsonResponse({'error': 'Invalid ball_color color'}, status=400)
+            game_setting.save()
+            return JsonResponse({'message': 'Settings updated successfully'}, status=200)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 @login_required(login_url='/api/login')
 @csrf_protect

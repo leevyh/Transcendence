@@ -11,7 +11,7 @@ import { profileView } from './views/profile.js';
 import { callback42 } from './views/callback42.js';
 import { chatView } from './views/chat.js';
 import { leaderboardView } from './views/leaderboard.js';
-
+import { menuPongView } from './views/menuPong.js';
 
 const appDiv = document.getElementById('app');
 
@@ -48,17 +48,21 @@ const routes = {
         title: 'profile',
         view: profileView,
     },
+    '/menuPong': {
+        title: 'menuPong',
+        view: menuPongView,
+    },
 };
 
 async function router() {
     const pageTitle = "Transcendence";
     let path = location.pathname;
     if (DEBUG) {console.log(`Navigating to ${path}`);}
-    
+
     if (chatWS) {chatWS.close();}
 
     // If the user is not authenticated and tries to access a private route, redirect to the home page
-    const privateRoutes = ['/chat', '/users', '/pong', '/profile', '/leaderboard'];
+    const privateRoutes = ['/chat', '/users', '/pong', '/menuPong', '/profile', '/leaderboard'];
     if (privateRoutes.includes(path) && await isAuthenticated() === false) {
         if (DEBUG) {console.log(`Trying to access ${path} but user is not authenticated`);}
         history.pushState(null, null, path); // Change the URL without reloading the page
@@ -66,8 +70,8 @@ async function router() {
     }
 
     // Check if the URL is a user profile corresponding to /user/:nickname
-    const userProfileRegex = /^\/user\/([a-zA-Z0-9_-]+)$/;
-    const match = path.match(userProfileRegex);
+    const ProfileRegex = /^\/profile\/([a-zA-Z0-9_-]+)$/;
+    const match = path.match(ProfileRegex);
 
     // Get user's accessibility settings
     const userSettings = await getAccessibility();
@@ -77,6 +81,7 @@ async function router() {
     else {
         if (DEBUG) console.log('No user settings found');
     }
+
 
     if (match) {
         const nickname = match[1]; // Extract the nickname from the URL
@@ -103,7 +108,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (e.target.matches("[data-link]")) {
             e.preventDefault();
             const href = e.target.getAttribute("href");
-            navigateTo(href);
+                navigateTo(href);
             return;
         }
     });
