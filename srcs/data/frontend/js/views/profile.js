@@ -46,7 +46,7 @@ export async function profileView(container) {
     div.appendChild(navBarContainer);
 
     try {
-        const stats = await fetchUserStats();  // Appel à l'API pour récupérer les statistiques
+        const stats = await fetchUserStats();
 
         const mainDiv = document.createElement('div');
         mainDiv.className = 'd-flex flex-grow-1 m-4';
@@ -76,7 +76,6 @@ export async function profileView(container) {
         TitlePosition.style.display = 'inline-block';
         HeaderUser.appendChild(TitlePosition);
 
-
         const ContentPosition = document.createElement('div');
         ContentPosition.className = 'ContentPosition flex-grow-1 d-flex flex-row p-3';
         userPosition.appendChild(ContentPosition);
@@ -97,8 +96,8 @@ export async function profileView(container) {
         TextFirstPos.className = 'TextFirstPos';
         TextFirstPos.textContent = '1st';
         TextFirstPos.style.margin = '0';
+        TextFirstPos.style.color = '#f5b041';
         firstplaceContainer.appendChild(TextFirstPos);
-
 
         const imgContainer = document.createElement('div');
         imgContainer.className = 'img-container position-relative d-flex justify-content-center align-items-center';
@@ -130,6 +129,7 @@ export async function profileView(container) {
         const FirstUserName = document.createElement('div');
         FirstUserName .className = 'thirdUserName m-0 text-center fs-6 d-none d-lg-block';
         FirstUserName .textContent = 'firstname';
+        FirstUserName.style.color = '#f5b041';
         firstplaceContainer.appendChild(FirstUserName);
 
 
@@ -149,6 +149,7 @@ export async function profileView(container) {
         TextSecPos.className = 'TextSecPos text-center w-100 mb-2';
         TextSecPos.textContent = '2nd';
         TextSecPos.style.margin = '0';
+        TextSecPos.style.color = '#95a5a6';
         secplaceContainer.appendChild(TextSecPos);
 
         const imgContainerSecPos = document.createElement('div');
@@ -168,6 +169,7 @@ export async function profileView(container) {
         const SecUserName = document.createElement('div');
         SecUserName.className = 'SecUserName m-0 text-center fs-6 d-none d-lg-block';
         SecUserName.textContent = 'secondname';
+        SecUserName.style.color = '#95a5a6';
         secplaceContainer.appendChild(SecUserName);
 
         const thirdplace = document.createElement('div');
@@ -182,6 +184,7 @@ export async function profileView(container) {
         TextThirdPos.className = 'TextThirdPos text-center w-100 mb-2';
         TextThirdPos.textContent = '3rd';
         TextThirdPos.style.margin = '0';
+        TextThirdPos.style.color = '#6e2c00';
         thirdplaceContainer.appendChild(TextThirdPos);
 
         const imgContainerThirdPos = document.createElement('div');
@@ -201,6 +204,7 @@ export async function profileView(container) {
         const thirdUserName = document.createElement('div');
         thirdUserName.className = 'thirdUserName m-0 text-center fs-6 d-none d-lg-block';
         thirdUserName.textContent = 'thirdname';
+        thirdUserName.style.color = '#6e2c00';
         thirdplaceContainer.appendChild(thirdUserName);
 
 

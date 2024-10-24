@@ -125,7 +125,7 @@ export async function leaderboardView(container) {
     TextThirdPos.className = 'TextThirdPos text-center w-100 mb-2 d-none d-sm-block';
     TextThirdPos.textContent = '3rd';
     TextThirdPos.style.margin = '0';
-    TextThirdPos.style.color = '#6e2c00 ';
+    TextThirdPos.style.color = '#6e2c00';
     thirdplaceContainer.appendChild(TextThirdPos);
 
     const imgContainerThirdPos = document.createElement('div');
@@ -182,8 +182,8 @@ export async function leaderboardView(container) {
 
     const RankPosUsername = document.createElement('div');
     RankPosUsername.classList = 'RankPosUsername d-flex align-items-center h-100 p-1 overflow-x-hidden';
-    RankPosUsername.style.position = 'absolute'; // Pour centrer l'élément de manière absolue
-    RankPosUsername.style.left = '50%'; // Place l'élément à 50% de la largeur du parent
+    RankPosUsername.style.position = 'absolute';
+    RankPosUsername.style.left = '50%';
     RankPosUsername.style.transform = 'translateX(-50%)';
     RankPosUsername.textContent = "Username";
     ContenerRankingPos.appendChild(RankPosUsername);
@@ -193,13 +193,9 @@ export async function leaderboardView(container) {
     RankPosScore.textContent = "17456";
     ContenerRankingPos.appendChild(RankPosScore);
 
-    // const ContenerListLeadBis = document.createElement('div');
-    // ContenerListLeadBis.className = 'ContenerListLeadBis d-flex  flex-row p-3 h-50 w-100 ';
-    // mainDiv.appendChild(ContenerListLeadBis);
-
     const ContenerRankingPosBis = document.createElement('div');
     ContenerRankingPosBis.className = 'ContenerRankingPos d-flex justify-content-between flex-row align-items-center w-100 overflow-x-hidden overflow-y-hidden';
-    ContenerRankingPosBis.style.position = 'relative'; // Ajouter position relative
+    ContenerRankingPosBis.style.position = 'relative';
     ContenerRankingPosBis.style.height = '50px';
     ContenerRankingPosBis.style.backgroundColor = '#2874a6';
     ContenerListLead.appendChild(ContenerRankingPosBis);
@@ -223,8 +219,8 @@ export async function leaderboardView(container) {
 
     const RankPosUsernameBis = document.createElement('div');
     RankPosUsernameBis.classList = 'RankPosUsername d-flex align-items-center h-100 p-1 ';
-    RankPosUsernameBis.style.position = 'absolute'; // Pour centrer l'élément de manière absolue
-    RankPosUsernameBis.style.left = '50%'; // Place l'élément à 50% de la largeur du parent
+    RankPosUsernameBis.style.position = 'absolute';
+    RankPosUsernameBis.style.left = '50%';
     RankPosUsernameBis.style.transform = 'translateX(-50%)';
     RankPosUsernameBis.textContent = "Usernamedsdas";
     ContenerRankingPosBis.appendChild(RankPosUsernameBis);
