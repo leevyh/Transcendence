@@ -57,7 +57,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
             )
 
     async def receive_json(self, content):
-        type = ['friend_request', 'game_invite', 'tournament_invite', 'accept_friend_request', 'reject_friend_request', 'game_accept', 'game_refuse', 'tournament_accept', 'tournament_refuse', 'new_message']
+         type = ['friend_request', 'game_invite', 'tournament_invite', 'accept_friend_request', 'reject_friend_request', 'game_accept', 'game_refuse', 'tournament_accept', 'tournament_refuse']
         if content['type'] in type:
             print(f"Notification type {content['type']} received")         # DEBUG
             await self.handle_notification(content)
@@ -111,24 +111,6 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
                 },
             )
 
-        elif type == 'new_message':  # Tentative de fix error "No handler for message type send_notification"
-            # Gestion des messages de chat
-            destinataire = await database_sync_to_async(User_site.objects.get)(nickname=data['nickname'])
-
-            print(f"New message from {user.nickname} to {destinataire.nickname}")
-            await self.channel_layer.group_send(
-                f"user_{destinataire.id}",
-                {
-                    "type": "send_notification",
-                    "message": {
-                        "type": "new_message",
-                        "from_user": user.id,
-                        "from_nickname": user.nickname,
-                        "from_avatar": encode_avatar(user),
-                        "message": data['message'],  # Contenu du message
-                    },
-                },
-            )
 
         elif type == 'accept_friend_request' or type == 'reject_friend_request':
             print(f"data: {data}")
@@ -154,9 +136,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
             await self.close()
 
     async def send_notification(self, event):
-        print(f"Sending notification: {event}")  # DEBUG
-        message = event["message"]
-        await self.send_json(message)
+        await self.send_json(event["message"])
 
 
 class FriendShipConsumer(AsyncJsonWebsocketConsumer):
