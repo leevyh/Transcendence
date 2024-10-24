@@ -201,6 +201,155 @@ export async function menuPongView(container) {
 		'ContenerTournamentButton w-50 h-100 d-flex justify-content-center align-items-center' // Classe du conteneur
 	);
 
+///////////////////////////////////////////////////////////////
+    // Modal
+    // const modalGameSettings = document.createElement('div');
+    // modalGameSettings.className = 'modal modalGameSettingsBase';
+    // modalGameSettings.setAttribute('tabindex', '-1');
+    // modalGameSettings.setAttribute('aria-labelledby', 'modalGameSettingsLabel');
+    // modalGameSettings.setAttribute('aria-hidden', 'true');
+    // modalGameSettings.style.display = 'none'; // Initialement caché
+    // container.appendChild(modalGameSettings);
+
+    // const modalGameSettingsDialog = document.createElement('div');
+    // modalGameSettingsDialog.className = 'modal-dialog-centered d-flex justify-content-center align-items-center modalGameSettingsDialog';
+    // modalGameSettings.appendChild(modalGameSettingsDialog);
+
+    // const modalGameSettingsContent = document.createElement('div');
+    // modalGameSettingsContent.className = 'modal-content modalGameSettingsContent';
+    // modalGameSettingsDialog.appendChild(modalGameSettingsContent);
+
+    // const modalGameSettingsHeader = document.createElement('div');
+    // modalGameSettingsHeader.className = 'modal-header pb-2 border border-0 modalGameSettingsHeader';
+    // modalGameSettingsContent.appendChild(modalGameSettingsHeader);
+
+    // const modalGameSettingsTitle = document.createElement('h2');
+    // modalGameSettingsTitle.textContent = 'Game Settings';
+    // modalGameSettingsTitle.className = 'modal-title modalGameSettingsTitle';
+    // modalGameSettingsHeader.appendChild(modalGameSettingsTitle);
+
+    // const closeButton = document.createElement('span');
+    // closeButton.id = 'closeButton';
+    // closeButton.setAttribute('aria-label', 'Close');
+    // closeButton.setAttribute('role', 'button'); // Make it focusable for accessibility
+    // closeButton.setAttribute('tabindex', '0'); // Make it focusable for accessibility
+    // closeButton.className = 'closeButton';
+    // closeButton.textContent = '×';
+    // modalGameSettingsHeader.appendChild(closeButton);
+
+    // // Add event listener for keyboard accessibility
+    // closeButton.addEventListener('keydown', function(event) {
+    //     if (event.key === 'Enter' || event.key === ' ') {
+    //         event.preventDefault(); // Disable the default action
+    //         closeButton.click(); // Simulate a click on the button
+    //     }
+    // });
+
+    // // Add event listener for mouse accessibility
+    // closeButton.addEventListener('click', () => {
+    //     modalGameSettings.classList.remove('modalGameSettingsBase-show');
+    //     setTimeout(() => {
+    //         modalGameSettings.style.display = 'none';
+    //     }, 500);
+    // });
+
+    // const modalGameSettingsBody = document.createElement('div');
+    // modalGameSettingsBody.className = 'modal-body';
+    // modalGameSettingsContent.appendChild(modalGameSettingsBody);
+
+    // const form = document.createElement('form');
+
+    // const fields = [
+    //     { label: "Username", type: 'text', id: 'username', placeholder: "Your Username" },
+    //     { label: 'Password', type: 'password', id: 'password', placeholder: 'Your Password' },
+    // ];
+
+    // fields.forEach(field => {
+    //     const formGroup = document.createElement('div');
+    //     formGroup.className = 'mb-3';
+
+    //     const label = document.createElement('label');
+    //     label.className = 'form-label titleLabelRegister';
+    //     label.htmlFor = field.id;
+    //     label.textContent = field.label;
+
+    //     const input = document.createElement('input');
+    //     input.type = field.type;
+    //     input.className = 'form-control FormChamp';
+    //     input.id = field.id;
+    //     input.placeholder = field.placeholder;
+
+    //     formGroup.appendChild(label);
+    //     formGroup.appendChild(input);
+    //     form.appendChild(formGroup);
+    // });
+    // modalGameSettingsBody.appendChild(form);
+
+    // const playButton = document.createElement('button');
+    // playButton.type = 'submit';
+    // playButton.className = 'btn btn-primary w-100 Button mb-3';
+    // playButton.textContent = 'Play';
+    // form.appendChild(playButton);
+
+    // form.addEventListener('submit', (event) => {
+    //     event.preventDefault();
+
+    //     const errorMessages = form.querySelectorAll('.text-danger');
+    //     errorMessages.forEach(message => message.remove());
+
+    //     const username = document.getElementById('username').value;
+    //     const password = document.getElementById('password').value;
+
+    //     if (!username || !password) {
+    //         const errorMessage = document.createElement('p');
+    //         errorMessage.className = 'text-danger';
+    //         errorMessage.textContent = 'All fields are required';
+    //         form.insertBefore(errorMessage, playButton);
+    //         return;
+    //     }
+
+    //     fetch('/apin/', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'X-CSRFToken': getCookie('csrftoken'),
+    //         },
+    //         body: JSON.stringify({ username, password }),
+    //     })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.message === 'User logged in successfully') {
+    //                 localStorage.setItem('token', data.token);
+    //                 window.dispatchEvent(new Event('userAuthenticated'));
+    //                 modalGameSettings.classList.remove('modalGameSettingsBase-show');
+    //                 setTimeout(() => {
+    //                     modalGameSettings.style.display = 'none';
+    //                 }, 500);
+    //                 navigateTo('/profile');///////////
+    //             } else if (data.error) {
+    //                 const errorMessage = document.createElement('p');
+    //                 errorMessage.className = 'text-danger';
+    //                 errorMessage.textContent = 'Bad password or Username';
+    //                 form.insertBefore(errorMessage, playButton);
+    //             }
+    //         })
+    //         .catch(error => {
+    //             const errorMessage = document.createElement('p');
+    //             errorMessage.className = 'text-danger';
+    //             errorMessage.textContent = 'An error has occurred. Please try again.';
+    //             form.insertBefore(errorMessage, playButton);
+    //         });
+    // });
+
+    // // // Ajout de l'événement pour afficher la modal
+    // ButtonHome.addEventListener('mousedown', () => {
+    //     modalGameSettings.style.display = 'block'; // Affiche la modal
+    //     setTimeout(() => {
+    //         modalGameSettings.classList.add('modalGameSettingsBase-show'); // Ajoute la classe pour l'animation
+    //     }, 10); // Légère temporisation pour l'effet d'animation
+    // });
+
+
 
 	const notifications_div = await notifications();
 	div.appendChild(notifications_div);

@@ -77,9 +77,22 @@ export async function pongView(container) {
     scoreP.className = 'd-flex justify-content-center';
     scoreP.innerHTML = 'Joueur 1 : <em id="player-score">0</em> - Joueur 2 : <em id="computer-score">0</em>';
 
+    // const buttonGameSettingsContainer = document.createElement('div');
+    // buttonGameSettingsContainer.className = "buttonGameSettingsContainer";
+
+    // const buttonGameSettings = document.createElement('button');
+    // buttonGameSettings.className = 'GameSettings btn p-4 w-75 bg-black';
+    // buttonGameSettingsContainer.appendChild(buttonGameSettings);
+
+    // const buttonGameSettingsContent = document.createElement('p');
+    // buttonGameSettingsContent.textContent = 'settings';
+    // buttonGameSettingsContent.className = 'buttonGameSettingsContent m-0 w-100 h-100 d-flex justify-content-center align-items-center';
+    // buttonGameSettings.appendChild(buttonGameSettingsContent);
+
     viewContainer.appendChild(ul);
     viewContainer.appendChild(canvasElement);
     viewContainer.appendChild(scoreP);
+    //viewContainer.appendChild(buttonGameSettingsContainer);
 
     div.appendChild(viewContainer);
 
@@ -87,7 +100,6 @@ export async function pongView(container) {
 
 	reset(); // Init game
     draw();
-    console.log("coucou");
     // Event
 
     document.addEventListener('keydown', (event) => handleKeyDown(event, startButton, stopButton));
