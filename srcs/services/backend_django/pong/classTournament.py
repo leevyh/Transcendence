@@ -92,6 +92,7 @@ class Tournament:
 
     async def start_semi_finals(self):
         # print("start semi_finals")
+        self.status = "semi_finals"
         await self.channel_layer.group_send(
             f"game_{self.semi_finals1.id}",
             {
@@ -104,7 +105,6 @@ class Tournament:
                 'type': 'show_game',
             }
         )
-
         await self.send_define_player(self.semi_finals1, 'player_1', 'player_2')
         await self.send_define_player(self.semi_finals2, 'player_1', 'player_2')
         await asyncio.gather(
@@ -148,16 +148,12 @@ class Tournament:
         self.final.name = "final"
         self.final.nbPlayers = 2
 
-        print("final", self.final.player_1, self.final.player_2)
-
         from pong.consumers import create_game
         game_database = await create_game(self.final.player_1, self.final.player_2)
         self.final.id = game_database.id
         await self.channel_layer.group_add(f"game_{self.final.id}", self.final.channel_player_1)
         await self.channel_layer.group_add(f"game_{self.final.id}", self.final.channel_player_2)
         self.final.status = "ready"
-
-        print("final", self.final.player_1, self.final.player_2)
 
     async def send_define_player(self, game, current_player_1, current_player_2):
         print("send define player between", game.player_1, game.player_2)
@@ -193,6 +189,7 @@ class Tournament:
     #start the finals
     async def start_finals(self):
         print("start finals")
+        self.status = "finals"
         await self.channel_layer.group_send(
             f"game_{self.small_final.id}",
             {
@@ -205,7 +202,6 @@ class Tournament:
                 'type': 'show_game',
             }
         )
-
         await self.send_define_player(self.small_final, 'player_1', 'player_2')
         await self.send_define_player(self.final, 'player_1', 'player_2')
         await asyncio.gather(

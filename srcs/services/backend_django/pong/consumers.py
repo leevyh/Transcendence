@@ -97,9 +97,6 @@ class PongConsumer(AsyncWebsocketConsumer):
             waiting_players.remove(player)
         
         if hasattr(self, 'game_id'):
-            await self.channel_layer.group_discard(f"game_{self.game_id}", self.channel_name)
-        
-        if hasattr(self, 'game'):
             if self.game.player_1 == player:
                 self.game.winner = self.game.player_2
                 self.game.loser = self.game.player_1
@@ -108,7 +105,10 @@ class PongConsumer(AsyncWebsocketConsumer):
                 self.game.loser = self.game.player_2
             await self.game.broadcastState()
             await self.game.stop_game()
-
+            await self.channel_layer.group_discard(f"game_{self.game_id}", self.channel_name)
+        
+        if hasattr(self, 'game'):
+            self.game = None
         await self.close()
 
     async def receive(self, text_data):
@@ -208,8 +208,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     if self.tournament.channel_layer_player[i] == self.channel_name:
                         self.tournament.channel_layer_player[i] = None
                         break
-                #retrouver si le joueur etait dans une partie et le mettre forfait pour le reste du tournoi
-                    
+            # if self.tournament.status == "ready":
+            #     if player == self.tournament.semi_finals.player_1:
+
 
             if hasattr(self, 'tournament_id'):
                 await self.channel_layer.group_discard(f"tournament_{self.tournament_id}", self.channel_name)
