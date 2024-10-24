@@ -176,7 +176,7 @@ async function createAvatarModal() {
             return;
         }
         // Check if the file is an image, otherwise display an error message
-        if (!avatarFile.type.startsWith('image/')) {
+        if (!avatarFile.type.startsWith('image/')) { // Accept only images (jpg, jpeg, png, gif)
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Error: File type not supported.';
@@ -264,8 +264,8 @@ async function createAvatarModal() {
 
             if (response.ok) {
                 // Update the avatar image path by the default avatar path
-                const avatarImage = document.querySelector('.avatarImage');                
-                avatarImage.src = '/path/to/default-avatar.png'; // FIXME: Update the path to the default avatar
+                // const avatarImage = document.querySelector('.avatarImage');                
+                // avatarImage.src = '/path/to/default-avatar.png'; // FIXME: Update the path to the default avatar
                 
                 const successMessage = document.createElement('p');
                 successMessage.className = 'text-success';
