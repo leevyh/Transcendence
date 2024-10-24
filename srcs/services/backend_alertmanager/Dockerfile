@@ -7,6 +7,4 @@ COPY ./conf/alertmanager.yml /etc/alertmanager/alertmanager.yml
 COPY ./conf/web-config.yml /etc/alertmanager/web-config.yml
 COPY ./conf/alertmanager.sh /etc/alertmanager/alertmanager.sh
 
-RUN chmod +x /etc/alertmanager/alertmanager.sh
-
 ENTRYPOINT ["/bin/sh", "/etc/alertmanager/alertmanager.sh"]

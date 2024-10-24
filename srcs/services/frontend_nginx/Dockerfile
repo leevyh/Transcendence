@@ -19,6 +19,4 @@ RUN chown -R www-data:www-data /var/www/ft_transcendence
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 COPY ./conf/elastic-agent.sh /elastic-agent.sh
 
-RUN chmod +x /elastic-agent.sh
-
 ENTRYPOINT ["/elastic-agent.sh"]
