@@ -62,7 +62,7 @@ async function router() {
     if (chatWS) {chatWS.close();}
 
     // If the user is not authenticated and tries to access a private route, redirect to the home page
-    const privateRoutes = ['/chat', '/users', '/menuPong', '/profile', '/leaderboard'];
+    const privateRoutes = ['/chat', '/users', '/pong', '/menuPong', '/profile', '/leaderboard'];
     if (privateRoutes.includes(path) && await isAuthenticated() === false) {
         if (DEBUG) {console.log(`Trying to access ${path} but user is not authenticated`);}
         history.pushState(null, null, path); // Change the URL without reloading the page

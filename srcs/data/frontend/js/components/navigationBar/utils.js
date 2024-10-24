@@ -29,7 +29,7 @@ export function createNavButton(text, onClick) {
 
     button.addEventListener('click', () => {
         if (DEBUG) {
-            console.log(`Navigating to connard ${text}`, 'actual:', window.location.pathname);
+            console.log(`Navigating to ${text}`, 'actual:', window.location.pathname);
         }
 
         // Check if the text is "pong" and redirect to "/menuPong"
