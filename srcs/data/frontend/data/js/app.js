@@ -1,18 +1,16 @@
 export const DEBUG = true;
 
-import { chatWS } from './component/chat/functions.js';
+import { chatWS } from './components/chat/functions.js';
+import { getAccessibility, applyAccessibilitySettings, isAuthenticated } from './views/utils.js';
 
 import { homeView } from './views/home.js';
 import { notFoundView } from './views/404.js';
-// import { loginView } from './views/fr/login.js';
-// import { registerView } from './views/fr/register.js';
-// import { settingsView } from './views/fr/settings.js';
-// import { passwordView } from './views/fr/password.js';
 import { friendsView } from './views/users.js';
 import { pongView } from './views/pong.js';
 import { profileView } from './views/profile.js';
 import { callback42 } from './views/callback42.js';
 import { chatView } from './views/chat.js';
+import { leaderboardView } from './views/leaderboard.js';
 
 
 const appDiv = document.getElementById('app');
@@ -26,22 +24,6 @@ const routes = {
         title: '404',
         view: notFoundView,
     },
-    // '/register': {
-    //     title: 'Register',
-    //     view: registerView,
-    // },
-    // '/login': {
-    //     title: 'Login',
-    //     view: loginView,
-    // },
-    // '/settings': {
-    //     title: 'Settings',
-    //     view: settingsView,
-    // },
-    // '/password': {
-    //     title: 'Password',
-    //     view: passwordView,
-    // },
     '/chat': {
         title: 'Chat',
         view: chatView,
@@ -58,20 +40,46 @@ const routes = {
         title: 'Authentification 42',
         view: callback42,
     },
+    '/leaderboard': {
+        title: 'Leaderboard',
+        view: leaderboardView,
+    },
+    '/profile': {
+        title: 'profile',
+        view: profileView,
+    },
 };
 
 async function router() {
     const pageTitle = "Transcendence";
     let path = location.pathname;
+    if (DEBUG) {console.log(`Navigating to ${path}`);}
     
     if (chatWS) {chatWS.close();}
 
-    // Vérifier si l'URL correspond au modèle /user/:nickname
+    // If the user is not authenticated and tries to access a private route, redirect to the home page
+    const privateRoutes = ['/chat', '/users', '/pong', '/profile', '/leaderboard'];
+    if (privateRoutes.includes(path) && await isAuthenticated() === false) {
+        if (DEBUG) {console.log(`Trying to access ${path} but user is not authenticated`);}
+        history.pushState(null, null, path); // Change the URL without reloading the page
+        path = '/'; // Redirect to the home page
+    }
+
+    // Check if the URL is a user profile corresponding to /user/:nickname
     const userProfileRegex = /^\/user\/([a-zA-Z0-9_-]+)$/;
     const match = path.match(userProfileRegex);
 
+    // Get user's accessibility settings
+    const userSettings = await getAccessibility();
+    if (userSettings) {
+        applyAccessibilitySettings(userSettings);
+    }
+    else {
+        if (DEBUG) console.log('No user settings found');
+    }
+
     if (match) {
-        const nickname = match[1]; // Extrait le nom d'utilisateur du chemin
+        const nickname = match[1]; // Extract the nickname from the URL
         document.title = `${pageTitle} | ${nickname}'s profile`;
 
         appDiv.innerHTML = '';
@@ -96,6 +104,7 @@ window.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             const href = e.target.getAttribute("href");
             navigateTo(href);
+            return;
         }
     });
     router();

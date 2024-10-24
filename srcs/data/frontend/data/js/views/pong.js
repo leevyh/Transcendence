@@ -1,4 +1,5 @@
 import { navigationBar } from './navigation.js';
+import { notifications } from './notifications.js';
 
 import {
     play,
@@ -28,7 +29,7 @@ export let canvas = 'null'
 // };
 
 
-export function pongView(container) {
+export async function pongView(container) {
     container.innerHTML = '';
     // document.body.classList.add('page-with-nav'); // Ajout de la classe pour la navigation bar (padding)
 
@@ -37,7 +38,7 @@ export function pongView(container) {
     div.className = 'd-flex h-100';
     container.appendChild(div);
 
-    const navBarContainer = navigationBar(container);
+    const navBarContainer = await navigationBar(container);
     div.appendChild(navBarContainer);
 
 	loadPongCSS();  // CSS
@@ -112,6 +113,9 @@ export function pongView(container) {
     });
 
     stopGameButton.disabled = true; // Le bouton Stop est désactivé au début
+
+    const notifications_div = await notifications();
+    div.appendChild(notifications_div);
 }
 
 

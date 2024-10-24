@@ -1,17 +1,3 @@
-/* .navigationBarDiv {
-	position: fixed;
-	top: 0;
-	left: 0;
-	height: 100%;
-	z-index: 1000;
-}
-
-@media screen and (max-width: 600px) {
-	.navigationBarDiv {
-		opacity: 0;
-	}
-} */
-
 .nav {
 	padding: 15px;
 	/* width: min-content; */
@@ -27,6 +13,12 @@
 	padding: 0;
 }
 
+.SVGModifyAvatar {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
 .avatarImage {
 	border-radius: 50%;
 }
@@ -38,26 +30,31 @@
 	cursor: pointer;
 }
 
-.PlayElem {
-	background: linear-gradient(to right, #F4ED37, #cecec3);
-	background-clip: text;
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-}
-.ElemListNavBar {
+.TitleNickname:focus {
+    outline: 2px solid #007bff; /* Contour bleu pour indiquer le focus */
+    outline-offset: 4px; /* Espacement entre le titre et le contour */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Ombre pour rendre le focus plus visible */
+} /* Not working */
 
+.ElemListNavBar {
 	background: linear-gradient(to right, #F4ED37, #cecec3);
 	background-clip: text;
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
+	cursor: pointer
+}
+
+.ElemListNavBar button:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .border-custom-color {
-    border-color: #000000 !important;  /* Exemple avec une couleur orange */
+    border-color: #000000 !important;		
 }
 
 .divListFriends {
-
 	width: 100%;
 	display: flex;
 	justify-content: center;
@@ -71,6 +68,57 @@ button.buttonLogOut {
 button.buttonLogOut:active {
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Ombre plus forte au clic */
 }
+
+/*MODAL AVATAR*/
+.modalAvatarContent {
+	background-color: rgba(255, 234, 234, 0.5);
+	transition: transform 0.5s ease, opacity 0.5s ease; /* S'assurer que la transition est appliquée */
+	transform: translateX(-100vw); /* Part de la gauche en dehors de l'écran */
+	opacity: 0 ; /* Initialement invisible */
+	/* transition: transform 0.5s ease, opacity 0.5s ease ; */
+	/* transform: translateY(-1000px); Départ de l'animation, hors écran */
+}
+
+.modalAvatar.fade.show .modalAvatarContent {
+	transform: translateX(0); /* Ramener à la position d'origine */
+	opacity: 1 ; /* Rendre visible */
+}
+
+.modalAvatarHeader {
+	justify-content: space-between;
+}
+
+.modalAvatarTitle {
+	color : #F4ED37;
+}
+
+.modalAvatarDialog {
+	position: relative;
+    margin: 0 !important;  /* Désactiver la marge centrale par défaut */
+    top: auto;  /* Désactiver la position centrale verticale par défaut */
+    left: auto; /* Désactiver la position centrale horizontale par défaut */
+	max-width: 400px !important; /* Limiter la largeur à 400px ou à une taille adaptée */
+    width: auto !important;  /* Permettre à la modal de s'adapter automatiquement au contenu étendre sans restriction de largeur */
+}
+
+#closeButtonAvatar {
+	color: #aaa;
+	position: absolute;
+	top: 10px;
+	right: 20px;
+	font-size: 20px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+#closeButtonAvatar:hover,
+#closeButtonAvatar:focus {
+	color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
 
 
 /*MODAL INFOS*/
@@ -185,5 +233,123 @@ button.buttonLogOut:active {
 .modalSettingsButtonsSubmit.clicked {
     background-color: #000;
     box-shadow: #3a4250 0px 4px 12px;
+}
+
+/* friends */
+.friends_ul{
+	width: 95%;
+}
+
+.friendItem {
+	margin-bottom: 15px; /* Espacement entre les cartes */
+	width: 100%; /* Prendre toute la largeur disponible */
+}
+
+.friendItem .friend-name {
+	font-size: 14px; /* Taille de police réduite */
+	font-weight: 300; /* Police fine */
+	color: #F4ED37; /* Jaune pour correspondre aux autres éléments */
+	display: block; /* Assure que le texte prenne toute la largeur disponible */
+}
+
+.friendItem small {
+	font-size: 12px; /* Taille plus petite pour le statut */
+	color: #cecec3;
+}
+
+.friendItem .card {
+	padding: 8px; /* Réduction du padding de la carte pour un aspect plus fin */
+	background-color: #2f3c50;
+	border-radius: 12px; /* Réduit légèrement les arrondis */
+	box-shadow: rgba(0, 0, 0, 0.16) 0px 5px 15px;
+	transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	border: none;
+	color: white;
+}
+
+.friendItem .card:hover {
+	transform: scale(1.02); /* Zoom léger au survol */
+	box-shadow: rgba(0, 0, 0, 0.2) 0px 8px 30px; /* Ombre plus marquée au survol */
+}
+
+.friendItem img {
+	width: 40px; /* Réduit la taille de l'avatar à 40px */
+	height: 40px;
+	border-radius: 50%;
+	border: 2px solid #F4ED37;
+}
+
+
+.friendItem .card-body {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding-left: 8px; /* Espace entre l'avatar et les textes */
+}
+
+.divListFriends {
+	flex-grow: 1;  /* Permet à la liste de prendre tout l'espace disponible */
+	max-height: 45%; /* Ajuste la hauteur max pour laisser de la place au bouton Logout */
+	overflow-y: auto; /* Active le scroll si la liste dépasse la hauteur */
+	scrollbar-width: thin; /* Pour les navigateurs supportant cette propriété */
+	scrollbar-color: #F4ED37 #435574; /* Couleur personnalisée de la scrollbar */
+}
+
+@media screen and (max-height: 805px) {
+	.divListFriends {
+		max-height: 40%; /* Réduit la hauteur max */
+	}
+}
+
+@media screen and (max-height: 740px) {
+	.divListFriends {
+		max-height: 35%; /* Réduit encore un peu plus */
+	}
+}
+
+@media screen and (max-height: 685px) {
+	.divListFriends {
+		max-height: 25%; /* Continue de rétrécir */
+	}
+}
+
+@media screen and (max-height: 600px) {
+	.divListFriends {
+		max-height: 20%; /* Réduit encore plus */
+	}
+}
+
+/* Si la hauteur de la fenêtre est inférieure ou égale à 550px, la div disparaît */
+@media screen and (max-height: 565px) {
+	.divListFriends {
+		display: none !important; /* Cache complètement la liste d'amis */
+	}
+}
+
+.friendItem .card-body h5 {
+	margin: 0;
+	font-size: 14px;
+	font-weight: bold;
+	color: #F4ED37; /* Jaune pour correspondre à la couleur des titres */
+}
+
+.friendItem .card-body small {
+	color: #cecec3; /* Couleur plus douce pour le statut (offline/online) */
+	font-size: 12px;
+}
+
+/* Style personnalisé pour la scrollbar (pour Chrome, Edge, Safari) */
+.divListFriends::-webkit-scrollbar {
+	width: 6px;
+}
+
+.divListFriends::-webkit-scrollbar-track {
+	background-color: #435574; /* Couleur du fond de la scrollbar */
+	border-radius: 10px;
+}
+
+.divListFriends::-webkit-scrollbar-thumb {
+	background-color: #F4ED37; /* Couleur du curseur */
+	border-radius: 10px;
 }
 

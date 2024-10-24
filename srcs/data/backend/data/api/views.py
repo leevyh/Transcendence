@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.hashers import make_password, check_password
 
 from .forms import UserRegistrationForm, AccessibilityUpdateForm
-from .models import User_site, Accessibility, Stats_user, FriendRequest
+from .models import User_site, Accessibility, Stats_user, FriendRequest, Notification
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from typing import Optional
@@ -63,8 +63,8 @@ def loginView(request):
             data = json.loads(request.body)
             user = authenticate(request, username=data['username'], password=data['password'])
             if user is not None:
-                login(request, user)
                 user.status = User_site.Status.ONLINE
+                login(request, user)
                 user.save()
                 encoded_jwt = jwt.encode({'username': user.username, 'exp': time.time() + 3600}, 'secret', algorithm='HS256')
                 return JsonResponse({'message': 'User logged in successfully', 'token': encoded_jwt}, status=200)
@@ -140,6 +140,96 @@ def get_friend_request(request, nickname):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+
+def get_Notification(request):
+    if request.method == 'GET':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            if (token_user == 'null'):
+                return JsonResponse({'error': 'Invalid token'}, status=401)
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            #get the user, the user_id and the notifications and content of notifications inside the good table
+            user = User_site.objects.get(username=username)
+            user_id = user.id
+            notifications = Notification.objects.filter(user=user_id)
+            notifications_list = []
+            #Table of notifications :
+            # class Notification(models.Model):
+            # user = models.ForeignKey(User_site, on_delete=models.CASCADE)
+            # type = models.CharField(max_length=255)
+            # status = models.CharField(max_length=255, default='unread', choices=[('unread', 'unread'), ('read', 'read')])
+            # friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
+            # # game_invite = models.ForeignKey(GameInvite, on_delete=models.CASCADE, null=True)
+            # # tournament_invite = models.ForeignKey(TournamentInvite, on_delete=models.CASCADE, null=True)
+            # created_at = models.DateTimeField(default=timezone.now)
+            for notification in notifications:
+                if notification.type == 'friend_request':
+                    avatar = base64.b64encode(notification.friend_request.user.avatar.read()).decode('utf-8')
+                    notifications_list.append({'type': notification.type,
+                                'from_nickname': notification.friend_request.user.nickname,
+                                'from_avatar': avatar,
+                                'created_at': notification.created_at})
+
+            return JsonResponse(notifications_list, status=200, safe=False)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def get_notificationUnread(request):
+    if request.method == 'GET':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            if (token_user == 'null'):
+                return JsonResponse({'error': 'Invalid token'}, status=401)
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            user = User_site.objects.get(username=username)
+            user_id = user.id
+            notifications = Notification.objects.filter(user=user_id, status='unread')
+            notifications_list = []
+            for notification in notifications:
+                if notification.type == 'friend_request':
+                    avatar = base64.b64encode(notification.friend_request.user.avatar.read()).decode('utf-8')
+                    notifications_list.append({'type': notification.type,
+                                'from_user': notification.friend_request.user.nickname,
+                                'from_avatar': avatar,
+                                'created_at': notification.created_at})
+            return JsonResponse(notifications_list, status=200, safe=False)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def read_All_Notification(request):
+    if request.method == 'PUT':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            if (token_user == 'null'):
+                return JsonResponse({'error': 'Invalid token'}, status=401)
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            user = User_site.objects.get(username=username)
+            user_id = user.id
+            notifications = Notification.objects.filter(user=user_id, status='unread')
+            for notification in notifications:
+                notification.status = 'read'
+                notification.save()
+            return JsonResponse({'message': 'All notifications read successfully'}, status=200)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def get_Stats(request):
     if request.method == 'GET':
@@ -220,6 +310,7 @@ def all_users(request):
                     avatar_image = user.avatar
                     avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
                     data.append({'nickname': user.nickname,
+                                    'user_id': user.id,
                                     'avatar': avatar,
                                     'status': user.status})
                 return JsonResponse(data, status=200, safe=False)
@@ -273,7 +364,7 @@ def updateAvatar(request):
             #save file in media directory
             with open(f'media/{username}.jpg', 'wb') as f:
                 f.write(data)
-            user.avatar = f'{username}.jpg'
+            user.avatar = f'media/{username}.jpg'
             user.save()
             return JsonResponse({'message': 'Avatar updated successfully'}, status=200)
         except User_site.DoesNotExist:
@@ -296,7 +387,7 @@ def deleteAvatar(request):
             username = payload['username']
             #Delete the avatar of the user and set the default avatar
             user = User_site.objects.get(username=username)
-            user.avatar = 'default.jpg'
+            user.avatar = 'media/default.jpg'
             user.save()
             #delete the file in the media directory
             os.remove(f'media/{username}.jpg')
@@ -405,9 +496,8 @@ def update_Stats(request): #TODO without form and with json.loads. Need to chang
 def logoutView(request):
     if request.method == 'POST':
         username = request.user.username
-        status = User_site.Status.OFFLINE
         user = User_site.objects.get(id=request.user.id)
-        user.status = status
+        user.status = User_site.Status.OFFLINE
         user.save()
         logout(request)
         return JsonResponse({'message': 'User logged out successfully'}, status=200)
@@ -473,11 +563,11 @@ def create_user42(response, code):
         if not check_user42(username):
             user = User_site(username=username, email=email, nickname=nickname, avatar=avatar)
             user.set_password(code) #J espere que ca marche
+            user.status = User_site.Status.ONLINE
             user.save()
             settings = Accessibility(user=user)
             settings.save()
             stats = Stats_user(user=user)
-            user.status = User_site.Status.ONLINE
             stats.save()
         else:
             user = User_site.objects.get(nickname=nickname)
@@ -507,7 +597,7 @@ def token_42(request):
             # print('OKI MA GUEULE')         # DEBUG
             user = create_user42(r, code)
             if user != 401:
-                
+
                 #authenticate user
                 print('username: ', user.username)         # DEBUG
                 user = authenticate(request, username=user.username, password=code)
@@ -517,7 +607,7 @@ def token_42(request):
                     return JsonResponse({'message': 'Token created successfully', 'token': encoded_jwt, 'nickname': user.nickname}, status=200)
                 else:
                     return JsonResponse({'error': 'Invalid credentials'}, status=401)
-            else: 
+            else:
                 return JsonResponse({'error': 'User not created'}, status=401)
         else:
             return JsonResponse({'error': 'Invalid request'}, status=400)

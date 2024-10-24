@@ -30,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'backend-django']
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8888', 'https://localhost:8888'] # Ajoute pour se connecter sur un autre poste 42
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8888', 'https://localhost:8888']
 
 CORS_ALLOWED_ORIGINS = ['http://localhost:8888', 'https://localhost:8888']
 
@@ -68,6 +68,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'api.middleware.AuthenticationMiddleware'
     'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 

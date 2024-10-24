@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractUser, User
-from asgiref.sync import async_to_sync, sync_to_async
+from django.contrib.auth.models import AbstractUser
+from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 class User_site(AbstractUser):
@@ -19,6 +19,7 @@ class User_site(AbstractUser):
         return self.username
 
     def save(self, *args, **kwargs):
+        from chat.consumers import encode_avatar
         super(User_site, self).save(*args, **kwargs)
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
@@ -26,12 +27,14 @@ class User_site(AbstractUser):
             {
                 "type": "send_status_update",
                 "message": {
-                    "user_id": self.id,  # Ajoutez l'ID de l'utilisateur
+                    "user_id": self.id,
                     "nickname": self.nickname,
                     "status": self.status,
+                    "avatar": encode_avatar(self),
                 },
             },
         )
+
 
 class Accessibility(models.Model):
     class Language(models.TextChoices):
@@ -53,17 +56,6 @@ class Stats_user(models.Model):
     nb_point_given = models.IntegerField(default=0)
     win_rate = models.FloatField(default=0.0)
 
-class Notifications(models.Model):
-    TYPE = (
-        ('friend_request', 'friend_request'),
-        ('game_invite', 'game_invite'),
-        ('tournament_invite', 'tournament_invite'),
-    )
-
-    user = models.ForeignKey(User_site, on_delete=models.CASCADE)
-    type = models.CharField(max_length=255, choices=TYPE)
-    message = models.CharField(max_length=255)
-    created_at = models.DateTimeField(default=timezone.now)
 
 class FriendRequest(models.Model):
     STATUS = (
@@ -92,6 +84,7 @@ class FriendRequest(models.Model):
             },
         )
 
+
 class Friendship(models.Model):
     user1 = models.ForeignKey(User_site, related_name='friendships_initiated', on_delete=models.CASCADE)
     user2 = models.ForeignKey(User_site, related_name='friendships_received', on_delete=models.CASCADE)
@@ -115,12 +108,17 @@ class MatchHistory(models.Model):
     player_2_score = models.IntegerField()
     created_at = models.DateTimeField(default=timezone.now)
 
+
+class Notification(models.Model):
+    user = models.ForeignKey(User_site, on_delete=models.CASCADE)
+    type = models.CharField(max_length=255)
+    status = models.CharField(max_length=255, default='unread', choices=[('unread', 'unread'), ('read', 'read')])
+    friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
+    new_message = models.ForeignKey('chat.Message', on_delete=models.CASCADE, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+
 # class PrivateGameInvite(model.Model):
 
 
 # class TournamentInvite(model.Model):
-
-
-
-
-

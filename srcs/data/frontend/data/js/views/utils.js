@@ -86,14 +86,12 @@ export function changeLanguage(lang) {
 // }
 
 wsManager.AddNotificationListener((data) => {
-    if (data.type === 'friend_request') {
-        if (DEBUG) {console.log('New friend request received from ', data.from_nickname);}
-        displayFriendRequestNotification(data.from_nickname);
-    }
+        displayToast(data);
 })
 
-export function displayNotification(data) {
+export function displayToast(data) {
     let toast_container = document.querySelector('.toast-container');
+
 
     // Si le conteneur n'existe pas, le créer
     if (!toast_container) {
@@ -123,6 +121,46 @@ export function displayNotification(data) {
     const toast_header = document.createElement('div');
     toast_header.className = 'toast-header';
 
+    if (data.error)
+    {
+        //Friends request already sent avatar replace by error icon
+        const error_icon = document.createElement('i');
+        error_icon.className = 'bi bi-exclamation-triangle-fill';
+        error_icon.style = 'color: red;';
+        toast_header.appendChild(error_icon);
+
+        const strong = document.createElement('strong');
+        strong.className = 'me-auto';
+        strong.textContent = 'Error';
+
+        toast_header.appendChild(strong);
+
+        const button = document.createElement('button');
+        button.className = 'btn-close';
+        button.setAttribute('data-bs-dismiss', 'toast');
+        button.setAttribute('aria-label', 'Close');
+        button.addEventListener('click', () => {
+            toast.remove();
+        });
+
+        toast_header.appendChild(button);
+
+
+        toast.appendChild(toast_header);
+
+        const toast_body = document.createElement('div');
+        toast_body.className = 'toast-body';
+        toast_body.textContent = data.error;
+
+        toast.appendChild(toast_body);
+
+        toast_container.appendChild(toast);
+
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        return;
+    }
+
     const avatar_user_sender = document.createElement('img');
     avatar_user_sender.className = 'rounded me-2 user-img';
     avatar_user_sender.src = `data:image/png;base64, ${data.from_avatar}`;
@@ -140,6 +178,7 @@ export function displayNotification(data) {
     button.setAttribute('aria-label', 'Close');
     button.addEventListener('click', () => {
         toast.remove();
+        //Set notification as read in the database with websocket
     });
     toast_header.appendChild(button);
 
@@ -170,6 +209,7 @@ export function displayNotification(data) {
                 nickname: data.from_nickname,
             });
             toast.remove();
+            //Set notification as read in the database with websocket
         });
         div_buttons.appendChild(accept_button);
 
@@ -182,6 +222,7 @@ export function displayNotification(data) {
                 nickname: data.from_nickname,
             });
             toast.remove();
+            //Set notification as read in the database with websocket
         });
         div_buttons.appendChild(reject_button);
     }
@@ -283,9 +324,8 @@ export async function isAuthenticated() {
         });
         if (response.ok) {
             const data = await response.json();
-            return data.value;
-        } else {
-            return false;
+            if (data.value === true) {return true;}
+            else {return false;}
         }
     }
     catch (error) {
@@ -296,76 +336,82 @@ export async function isAuthenticated() {
 
 // Récupérer les paramètres d'accessibilité de l'utilisateur
 export async function getAccessibility() {
-    try {
-        const response = await fetch('/api/settings/', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-        });
-        if (response.status === 200) {
-            const data = await response.json();
-            const userData = {
-                language: data.language,
-                font_size: data.font_size,
-                theme: data.dark_mode,
-            };
-            return userData;
-        } else if (response.status === 307) {
-            localStorage.removeItem('token');
-
-            const logoutResponse = await fetch('/api/logout/', {
-                method: 'POST',
+    if (await isAuthenticated() === true) {
+        console.log('User is authenticated');
+        try {
+            const response = await fetch('/api/settings/', {
+                method: 'GET',
                 headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-CSRFToken': getCookie('csrftoken')
                 },
             });
+            if (response.status === 200) {
+                const data = await response.json();
+                const userData = {
+                    language: data.language,
+                    font_size: data.font_size,
+                    theme: data.dark_mode,
+                };
+                return userData;
+            } else if (response.status === 307) {
+                // Means the token is invalid, so we remove it from localStorage and redirect to the home page
+                localStorage.removeItem('token');
 
-            await logoutResponse.json(); // Traiter la réponse de logout si nécessaire
-            navigateTo('/login');
+                const logoutResponse = await fetch('/api/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                });
+
+                await logoutResponse.json();
+                navigateTo('/');
+                return null;
+            }
+        } catch (error) {
+            if (DEBUG) {console.error('Error fetching accessibility settings:', error);}
             return null;
-        } else {
-            throw new Error('Something went wrong');
         }
-    } catch (error) {
-        if (DEBUG) {console.error('Error fetching accessibility settings:', error);}
+    } else {
+        if (DEBUG) {console.log('User is not authenticated');}
         return null;
     }
 }
 
 export function applyAccessibilitySettings(userSettings) {
-    const rootElement = document.documentElement;
+    const bodyElement = document.body;
     if (!userSettings) {
         document.documentElement.setAttribute('lang', 'fr');
-        rootElement.style.fontSize = '16px';
+        bodyElement.style.fontSize = '16px';
         document.body.classList.remove('dark-mode');
         return;
     }
+    if (DEBUG) {console.log('User settings:', userSettings);}
 
-    // Appliquer le langage
+    // Apply the font size
+    switch (userSettings.font_size) {
+        case 1:
+            bodyElement.style.fontSize = '12px';
+            break;
+        case 2:
+            bodyElement.style.fontSize = '16px';
+            break;
+        case 3:
+            bodyElement.style.fontSize = '20px';
+            break;
+        default:
+            bodyElement.style.fontSize = '16px'; // Default value
+    }
+
+    // TODO: Apply the language
     if (userSettings.language) {
         document.documentElement.setAttribute('lang', userSettings.language);
     }
 
-    // Appliquer la taille de police
-    switch (userSettings.font_size) {
-        case 1:
-            rootElement.style.fontSize = '12px';
-            break;
-        case 2:
-            rootElement.style.fontSize = '16px'; // Taille par défaut
-            break;
-        case 3:
-            rootElement.style.fontSize = '20px';
-            break;
-        default:
-            rootElement.style.fontSize = '16px'; // Valeur par défaut
-    }
-
-    // Appliquer le mode sombre
+    // TODO: Apply the dark/light theme
     if (userSettings.theme) {
         document.body.classList.add('dark-mode');
     } else {

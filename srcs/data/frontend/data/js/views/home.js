@@ -26,11 +26,24 @@ export function homeView(container) {
     ButtonLoginHome.className = 'btn btn-primary btn-lg m-3 px-5 py-3 ButtonsHome';
     ButtonLoginHome.textContent = 'Login';
     cardHomeBody.appendChild(ButtonLoginHome);
+    ButtonLoginHome.addEventListener('click', () => {
+        modalLogin.style.display = 'block'; // Display the modal
+        setTimeout(() => {
+            modalLogin.classList.add('ModalLoginBase-show');
+        }, 10); // Slight delay for the animation effect
+    });
+
 
     const ButtonRegisterHome = document.createElement('button');
     ButtonRegisterHome.className = 'btn btn-primary btn-lg m-3 px-5 py-3 ButtonsHome';
     ButtonRegisterHome.textContent = 'Register';
     cardHomeBody.appendChild(ButtonRegisterHome);
+    ButtonRegisterHome.addEventListener('click', () => {
+        modalRegister.style.display = 'block'; // Display the modal
+        setTimeout(() => {
+            modalRegister.classList.add('modalRegisterBase-show');
+        }, 10); // Slight delay for the animation effect
+    });
 
     ///////////////////////////////////////////////////////////////
     // Modal-Login
@@ -62,11 +75,21 @@ export function homeView(container) {
     const closeButtonLogin = document.createElement('span');
     closeButtonLogin.id = 'closeButtonLogin';
     closeButtonLogin.setAttribute('aria-label', 'Close');
+    closeButtonLogin.setAttribute('role', 'button'); // Make it focusable for accessibility
+    closeButtonLogin.setAttribute('tabindex', '0'); // Make it focusable for accessibility
+    closeButtonLogin.className = 'closeButtonLogin';
     closeButtonLogin.textContent = '×';
     modalLoginHeader.appendChild(closeButtonLogin);
 
+    // Add event listener for keyboard accessibility
+    closeButtonLogin.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault(); // Disable the default action
+            closeButtonLogin.click(); // Simulate a click on the button
+        }
+    });
 
-
+    // Add event listener for mouse accessibility
     closeButtonLogin.addEventListener('click', () => {
         modalLogin.classList.remove('ModalLoginBase-show');
         setTimeout(() => {
@@ -141,11 +164,12 @@ export function homeView(container) {
             .then(data => {
                 if (data.message === 'User logged in successfully') {
                     localStorage.setItem('token', data.token);
+                    window.dispatchEvent(new Event('userAuthenticated'));
                     modalLogin.classList.remove('ModalLoginBase-show');
                     setTimeout(() => {
                         modalLogin.style.display = 'none';
                     }, 500);
-                    navigateTo('/pong');
+                    navigateTo('/profile');///////////
                 } else if (data.error) {
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'text-danger';
@@ -225,10 +249,22 @@ export function homeView(container) {
 
     // Bouton pour fermer la modale
     const closeRegisterButton = document.createElement('span');
+    closeRegisterButton.setAttribute('aria-label', 'Close');
+    closeRegisterButton.setAttribute('role', 'button'); // Make it focusable for accessibility
+    closeRegisterButton.setAttribute('tabindex', '0'); // Make it focusable for accessibility
     closeRegisterButton.className = 'closeRegisterButton';
-    closeRegisterButton.textContent = '×'; // Symbole de fermeture
+    closeRegisterButton.textContent = '×';
     modalRegisterHeader.appendChild(closeRegisterButton);
 
+    // Add event listener for keyboard accessibility
+    closeRegisterButton.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault(); // Disable the default action
+            closeRegisterButton.click(); // Simulate a click on the button
+        }
+    });
+
+    // Add event listener for mouse accessibility
     closeRegisterButton.addEventListener('click', () => {
         modalRegister.classList.remove('modalRegisterBase-show');
         setTimeout(() => {
