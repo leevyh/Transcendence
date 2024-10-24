@@ -3,12 +3,14 @@ from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from django.db.models.signals import post_save
 
 class User_site(AbstractUser):
     class Status(models.TextChoices):
         ONLINE = "online"
         OFFLINE = "offline"
         INGAME = "ingame"
+        INTOURNAMENT = "intournament"
 
     nickname = models.CharField(max_length=10, unique=True)
     created_at = models.DateTimeField(default=timezone.now)
@@ -122,12 +124,16 @@ class Friendship(models.Model):
 
 
 class MatchHistory(models.Model):
-    player1 = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='player1')
-    opponent = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='player2')
-    player_1_score = models.IntegerField()
-    player_2_score = models.IntegerField()
+    from pong.models import Game
+    player = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='match_histories')
+    game = models.ForeignKey('pong.Game', on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
 
+class TournamentHistory(models.Model):
+    from pong.models import Tournament
+    player = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='tournament_histories')
+    tournament = models.ForeignKey('pong.Tournament', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
 
 class Notification(models.Model):
     user = models.ForeignKey(User_site, on_delete=models.CASCADE)

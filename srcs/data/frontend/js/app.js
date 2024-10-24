@@ -7,6 +7,7 @@ import { homeView } from './views/home.js';
 import { notFoundView } from './views/404.js';
 import { friendsView } from './views/users.js';
 import { pongView } from './views/pong.js';
+import { tournamentView } from './views/tournament.js';
 import { profileView } from './views/profile.js';
 import { callback42 } from './views/callback42.js';
 import { chatView } from './views/chat.js';
@@ -35,6 +36,10 @@ const routes = {
     '/pong': {
         title: 'Pong',
         view: pongView,
+    },
+    '/tournament': {
+        title: 'Tournament',
+        view: tournamentView,
     },
     '/callback42': {
         title: 'Authentification 42',
