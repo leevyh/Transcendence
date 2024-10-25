@@ -164,7 +164,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Send message notifications to the members of the conversation
     async def send_message_notifications(self, sender, members, message):
         from api.models import Notification
-        from .models import Message
         for member in members:
             if member.id != sender.id:  # Exclude the sender
                 # Check if the user is active in the chat, if not -> send a notification
@@ -194,7 +193,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Remove notifications from the database
     async def remove_notifications(self, user, conversation_id):
         from api.models import Notification
-
         # Fetch all unread notifications related to this conversation for the user
         notifications = await sync_to_async(list)(Notification.objects.filter(
             user=user,
@@ -206,7 +204,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Delete them from the database
         for notification in notifications:
             await sync_to_async(notification.delete)()
-
 
 
     # Check if the user is active in the chat
@@ -267,6 +264,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
             return
 
+
     # Receive information about blocked users
     async def block_user(self, event):
         await self.send(text_data=json.dumps({
@@ -275,6 +273,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'blocker': event['blocker'],
             'user': self.scope['user'].nickname # Who am I
         }))
+
 
     # Receive information about unblocked users
     async def unblock_user(self, event):

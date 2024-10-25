@@ -5,7 +5,6 @@ from channels.db import database_sync_to_async
 from django.db import models
 import base64
 
-
 class StatusConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add("status_updates", self.channel_name)
@@ -31,7 +30,6 @@ class StatusConsumer(AsyncJsonWebsocketConsumer):
             "avatar": encoded_avatar
         })
         # await self.send_json(event["message"])
-
 
 
 class NotificationConsumer(AsyncJsonWebsocketConsumer):
@@ -132,7 +130,6 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
             print(f"Friendship created between {user.nickname} and {friend.nickname}")
 
             # Supprimer la demande d'ami après traitement (acceptée ou refusée)
-
             await database_sync_to_async(lambda: Notification.objects.filter(friend_request=friend_request).delete())()
             await database_sync_to_async(friend_request.delete)()
         else:
