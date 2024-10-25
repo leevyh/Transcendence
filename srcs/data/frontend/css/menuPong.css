@@ -1,57 +1,16 @@
-/* .btn-custom {
-	position: relative;
-	padding: 10px 20px;
-	border: none;
-	background-color: #007bff;
-	color: white;
-	font-size: 16px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-}
-
-.btn-custom img {
-	width: 40px;
-	height: 40px;
-	transition: opacity 0.3s ease-in-out;
-}
-
-.btn-custom .static-img {
-	display: block;
-}
-
-.btn-custom .hover-gif {
-	display: none;
-}
-
-.btn-custom:hover .static-img {
-	display: none;
-}
-
-.btn-custom:hover .hover-gif {
-	display: block;
-} */
-
-/* Style pour le bouton */
-
-
-/* Style commun pour tous les boutons */
 .soloButton, .DuoButton, .TournamentButton {
-	position: relative; /* Positionnement des éléments relatifs entre eux */
-	overflow: hidden; /* Cache les débordements si nécessaire */
+	position: relative;
+	overflow: hidden;
 }
 
-/* Style pour le contenu (texte) des boutons */
 .soloButtonContent, .DuoButtonContent, .TournamentButtonContent {
 	position: relative;
-	z-index: 2; /* Le texte sera au-dessus de l'image statique */
+	z-index: 2;
 	color: white;
 	text-align: center;
-	transition: opacity 0.5s ease; /* Transition pour une disparition en douceur */
+	transition: opacity 0.5s ease;
 }
 
-/* Style pour l'image statique */
 .static-img {
 	max-width: 100%;
 	max-height: 100%;
@@ -62,10 +21,9 @@
 	width: 100%;
 	height: 100%;
 	z-index: 1;
-	transition: opacity 0.5s ease; /* Transition pour la disparition */
+	transition: opacity 0.5s ease;
 }
 
-/* Style pour le GIF */
 .hoverGif {
 	max-width: 100%;
 	max-height: 100%;
@@ -75,25 +33,121 @@
 	left: 0;
 	width: 100%;
 	height: 100%;
-	z-index: 3; /* Le GIF sera au-dessus de tout */
-	opacity: 0; /* Par défaut, le GIF est invisible */
-	transition: opacity 0.5s ease; /* Transition pour l'apparition */
+	z-index: 3;
+	opacity: 0;
+	transition: opacity 0.5s ease;
 }
 
-/* Effets au survol du bouton */
 .soloButton:hover .static-img,
 .DuoButton:hover .static-img,
 .TournamentButton:hover .static-img,
 .soloButton:hover .soloButtonContent,
 .DuoButton:hover .DuoButtonContent,
 .TournamentButton:hover .TournamentButtonContent {
-	opacity: 0; /* Faire disparaître l'image statique et le texte */
+	opacity: 0;
 }
 
 .soloButton:hover .hoverGif,
 .DuoButton:hover .hoverGif,
 .TournamentButton:hover .hoverGif {
-	opacity: 1; /* Faire apparaître le GIF */
+	opacity: 1;
 }
 
 
+/* =======================MODAL-LOGIN===========================*/
+.modalGameSettingsBase {
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1050;
+    backdrop-filter: blur(10px);
+}
+
+
+.modalGameSettingsBase-show {
+    opacity: 1;
+}
+
+.ModalLogin{
+
+    background-color: rgba(255, 234, 234, 0.5);
+    backdrop-filter: blur(10px);
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%;
+    border-radius: 10px;
+    position: relative;
+    transition: transform 0.5s ease, opacity 0.5s ease ;
+    transform: translateY(-100vh);
+    opacity: 0;
+}
+
+.modalRegisterBody {
+    display: none;
+}
+.modalLoginTitle {
+    color : #F4ED37;
+}
+
+.modalLoginContent{
+    width: auto;
+    background-color: rgba(255, 234, 234, 0.5);
+}
+
+.modalGameSettingsBase-show .ModalLogin .ModalRegister .modalGameSettingsBase{
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.closeButtonMenuPong {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modalLoginHeader{
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.modalLoginDialog {
+    width: auto;
+}
+
+.closeButtonMenuPong {
+    cursor: crosshair;
+}
+
+.closeButtonMenuPong:hover,
+.closeButtonMenuPong:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+.ButtonLogin {
+    padding: 5px;
+    background-color: #3a4250;
+    border: none;
+    box-shadow: #6f87b1 0px 4px 12px;
+}
+
+
+.ButtonLogin:hover,
+.ButtonLogin:focus {
+    background-color: #000;
+    box-shadow: #435574 0px 4px 12px;
+}
