@@ -160,52 +160,6 @@ async function getCurrentUser() {
 }
 
 
-// Function to find a user by nickname
-async function findUserByNickname(nickname) {
-    try {
-        const response = await fetch(`/api/all_users/${nickname}/`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-        });
-        if (response.ok) {
-            const data = await response.json();
-            if (DEBUG) console.log('User found:', data);
-            return data;
-        }
-    }
-    catch (error) {
-        if (DEBUG) console.error('Error finding user:', error);
-        return null;
-    }
-}
-
-// Function to find a user by ID
-async function findUserByID(id) {
-    fetch(`/api/profile/${id}/`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken'),
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (DEBUG) console.log('User found:', data);
-        return data;
-    })
-    .catch(error => {
-        if (DEBUG) console.error('Error finding user:', error);
-        return null;
-    });
-}
-
-
-
 // OLD METHOD FOR MULTILANGUAGE
 // import { getAccessibility, applyAccessibilitySettings } from './views/utils.js';
 // const routes = {

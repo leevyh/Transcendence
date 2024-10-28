@@ -70,7 +70,11 @@ async function openConversation(conversationID, otherUser) {
         .then(response => response.json())
         .then(data => {
             // Get the user we want to see the profile
-            const otherUser_id = data.find(user => user.nickname === otherUser).id;
+            const otherUser_id = data.find(user => user.nickname === otherUser).user_id;
+            if (!otherUser_id) {
+                console.error('User not found');
+                navigateTo('/404');
+            }
             // Redirect to the profile page of the user
             navigateTo(`/profile/${otherUser_id}`);
         });

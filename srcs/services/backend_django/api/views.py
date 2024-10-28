@@ -79,36 +79,6 @@ def loginView(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-# @csrf_protect
-# def get_profile(request, nickname):
-#     if request.method == 'GET':
-#         try:
-#             user = User_site.objects.get(nickname=nickname)
-#             try:
-#                 stats = Stats_user.objects.get(user=user)
-#                 avatar_image = user.avatar
-#                 avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
-#                 data = {'nickname': user.nickname,
-#                         'username': user.username,
-#                         'email': user.email,
-#                         'created_at': user.created_at,
-#                         'status': user.status,
-#                         'nb_games': stats.nb_games,
-#                         'nb_wins': stats.nb_wins,
-#                         'nb_losses': stats.nb_losses,
-#                         'win_rate': stats.win_rate,
-#                         'nb_point_taken' :stats.nb_point_taken,
-#                         'nb_point_given' :stats.nb_point_given,
-#                         'avatar': avatar,
-#                         }
-#                 return JsonResponse(data, status=200)
-#             except Stats_user.DoesNotExist:
-#                 return JsonResponse({'error': 'Stats not found'}, status=404)
-#         except User_site.DoesNotExist:
-#             return JsonResponse({'error': 'User not found'}, status=404)
-#     else:
-#         return JsonResponse({'error': 'Invalid request method'}, status=405)
-
 
 @csrf_protect
 def get_profile(request, id):
