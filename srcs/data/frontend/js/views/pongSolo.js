@@ -84,7 +84,6 @@ export async function pongSoloView(container) {
 
 	reset(); // Init game
     draw();
-    console.log("coucou");
     // Event
 
     document.addEventListener('keydown', (event) => handleKeyDown(event, startButton, stopButton));

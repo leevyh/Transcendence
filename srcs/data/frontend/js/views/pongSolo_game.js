@@ -74,7 +74,7 @@ async function get_gameSettings_drawing() {
 
 export async function initialize_color() {
     await get_gameSettings_drawing();
-    console.log("background", background_color_key); // Vérification de la couleur
+
 }
 
 
@@ -201,7 +201,6 @@ export function reset() {
 
 export function stop() {
 
-    console.log("start of stop");
     cancelAnimationFrame(anim);
     reset();
 
@@ -224,7 +223,6 @@ export function handleKeyDown(event, startButton, stopButton) {
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
 		playerMovingDown = true;
     if (event.key === ' ' && GameOn == false) {
-        console.log("key down gamone = ", GameOn);
         play();
         spaceDown = true;
         startButton.disabled = true;
@@ -235,7 +233,6 @@ export function handleKeyDown(event, startButton, stopButton) {
     {
         spaceDown = true;
         stop();
-        console.log("ESPACE key down gamone = ", GameOn);
         startButton.disabled = false;
         stopButton.disabled = true;
     }
@@ -243,7 +240,6 @@ export function handleKeyDown(event, startButton, stopButton) {
     {
         escapeDown = true;
         stop();
-        console.log("ECHAP key down gamone = ", GameOn);
         startButton.disabled = false;
         stopButton.disabled = true;
     }

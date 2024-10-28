@@ -338,7 +338,6 @@ soloButton.addEventListener('click', () => {
                     } else if (colorType === 'ball') {
                         tempBallColor = colorName;
                     }
-                    console.log(GameSettings);
                 });
 
                 container.appendChild(colorDiv);
@@ -389,12 +388,6 @@ soloButton.addEventListener('click', () => {
             GameSettings.pads_color = tempPadsColor;
             GameSettings.ball_color = tempBallColor;
 
-            console.log("Background_game", GameSettings.background_game);
-            console.log("pads_color", GameSettings.pads_color);
-            console.log("ball_color", GameSettings.ball_color);
-
-
-
             try {
                 const response = await fetch('/api/updateGameSettings/', {
                     method: 'PUT',
@@ -435,7 +428,6 @@ soloButton.addEventListener('click', () => {
                     errorMessage.className = 'text-danger';
                     errorMessage.textContent = 'Invalid coulour choices';
                     form.insertBefore(errorMessage, playButton);
-                    console.log("-->", GameSettings);
                     form.reset();
                 }
             } catch (error) {
