@@ -233,10 +233,15 @@ export function displayUsers(users, search = '') {
     const userList = document.getElementById('user-list');
     let usersArray = Array.from(users);
 
-    let filteredUsers = usersArray.filter(user => user.id.toLowerCase().startsWith(search.toLowerCase()));
+    // Filter users according to the search (by their nickname in userCard.textContent)
+    let filteredUsers = usersArray.filter(user =>
+        user.textContent.toLowerCase().startsWith(search.toLowerCase())
+    );
 
     // Sort users by alphabetical order
-    filteredUsers.sort((a, b) => a.id.toLowerCase().localeCompare(b.id.toLowerCase()));
+    filteredUsers.sort((a, b) => 
+        a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase())
+    );
 
     // Display or hide users according to the search
     usersArray.forEach(user => {

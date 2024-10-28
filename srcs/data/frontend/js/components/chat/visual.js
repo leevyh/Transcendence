@@ -114,6 +114,20 @@ export function createUserCard(user, userList) {
             if (chatTitle.textContent === `Chat with ${user.nickname}`) {
                 return;
             } else {
+                // Hide the block button for the previous user
+                const users = userList.children;
+                for (let i = 0; i < users.length; i++) {
+                    const user = users[i].id;
+                    const userCard = document.getElementById(user);
+                    if (userCard.classList.contains('invisible')) {
+                        continue;
+                    }
+                    if (userCard.textContent !== user.nickname) {
+                        const blockButton = userCard.querySelector('.block-button');
+                        blockButton.style.display = 'none';
+                    }
+                }
+
                 const chatBody = document.querySelector('.chat-body');
                 chatBody.innerHTML = '';
                 openChatWithUser(user.nickname);

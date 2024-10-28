@@ -89,13 +89,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'nickname': user.nickname,
                     'id': user.id,
                     'avatar': encode_avatar(user),
-                    'blocked': await database_sync_to_async(lambda: UserBlock.objects.filter(blocked=user).exists())(),
+                    'blocked': await database_sync_to_async(lambda: UserBlock.objects.filter(blocker=other, blocked=user).exists())(),
                 },
                 'other': {
                     'nickname': other.nickname,
                     'id': other.id,
                     'avatar': encode_avatar(other),
-                    'blocked': await database_sync_to_async(lambda: UserBlock.objects.filter(blocked=other).exists())(),
+                    'blocked': await database_sync_to_async(lambda: UserBlock.objects.filter(blocker=user, blocked=other).exists())(),
                 },
             },
             'messages': [
