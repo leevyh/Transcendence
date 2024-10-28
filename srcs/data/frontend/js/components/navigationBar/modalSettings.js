@@ -153,11 +153,15 @@ async function createSettingsForm() {
             else {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'Error while modifying parameters';
-                settingsForm.insertBefore(errorMessage, settingsSubmitButton);
+                return response.json().then(data => {
+                    errorMessage.textContent = data.error;
+                    settingsForm.insertBefore(errorMessage, settingsSubmitButton);
+                    settingsForm.reset();
+                });
+                // errorMessage.textContent = 'Error while modifying parameters';
+                // settingsForm.insertBefore(errorMessage, settingsSubmitButton);
 
                 // Reset the form after success
-                settingsForm.reset();
             }
         } catch (error) {
             if (DEBUG) {console.error(error);}

@@ -363,6 +363,10 @@ def updateSettings(request):
             if data['nickname']:
                 user.nickname = data['nickname']
             if data['email']:
+                if user.user_school:
+                    return JsonResponse({'error': 'Cannot change email'}, status=403)
+                if User_site.objects.filter(email=data['email']).exclude(username=username).exists():
+                    return JsonResponse({'error': 'Email already used'}, status=409)
                 user.email = data['email']
             user.save()
             return JsonResponse({'message': 'Settings updated successfully'}, status=200)
@@ -608,7 +612,7 @@ def auth_42(request):
 
 def check_user42(login):
     try:
-        user = User_site.objects.get(nickname=login)
+        user = User_site.objects.get(username=login)
         return True
     except User_site.DoesNotExist:
         return False
@@ -639,13 +643,14 @@ def create_user42(response, code):
             user = User_site(username=username, email=email, nickname=nickname, avatar=avatar)
             user.set_password(code) #J espere que ca marche
             user.status = User_site.Status.ONLINE
+            user.user_school = True
             user.save()
             settings = Accessibility(user=user)
             settings.save()
             stats = Stats_user(user=user)
             stats.save()
         else:
-            user = User_site.objects.get(nickname=nickname)
+            user = User_site.objects.get(username=username)
             user.set_password(code)
             user.status = User_site.Status.ONLINE
             user.save()
@@ -674,7 +679,6 @@ def token_42(request):
             if user != 401:
 
                 #authenticate user
-                print('username: ', user.username)         # DEBUG
                 user = authenticate(request, username=user.username, password=code)
                 if user is not None:
                     login(request, user)
