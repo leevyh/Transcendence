@@ -151,15 +151,34 @@ export async function friendsView(container) {
     global_div.appendChild(user_list);
 
     // Add a search bar to search for users
-    const search_bar = document.createElement('input');
-    search_bar.type = 'text';
-    search_bar.className = 'form-control search_user';
-    search_bar.placeholder = 'Search for users';
-    user_list.appendChild(search_bar);
+    const inputGroup = document.createElement('div');
+    inputGroup.className = 'input-group p-2';
+    user_list.appendChild(inputGroup);
 
-    search_bar.addEventListener('input', (event) => {
-        // const searchText = event.target.value;
-        const search = search_bar.value.trim();
+    const inputGroupPrepend = document.createElement('div');
+    inputGroupPrepend.className = 'input-group-prepend';
+    inputGroup.appendChild(inputGroupPrepend);
+    
+    const searchIcon = document.createElement('span');
+    searchIcon.className = 'btn search-btn';
+    searchIcon.innerHTML = '<i class="bi bi-search text-white"></i>';
+    inputGroupPrepend.appendChild(searchIcon);
+    
+    const searchInputLabel = document.createElement('label');
+    searchInputLabel.setAttribute('for', 'search');
+    searchInputLabel.textContent = 'Search for users...'; // Text for screen readers
+    searchInputLabel.className = 'visually-hidden'; // Hide the label but keep it for screen readers
+    inputGroup.appendChild(searchInputLabel);
+
+    const searchInput = document.createElement('input');
+    searchInput.id = 'search';
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Search for users...';
+    searchInput.className = 'form-control border-0 search';
+    inputGroup.appendChild(searchInput);
+
+    searchInput.addEventListener('input', () => {
+        const search = searchInput.value.trim();
         displayUserCards(search);
     });
 
