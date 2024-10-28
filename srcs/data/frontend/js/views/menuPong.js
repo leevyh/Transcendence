@@ -4,10 +4,9 @@ import { notifications } from './notifications.js';
 import { getCookie } from './utils.js';
 
 
-async function fetchUserStats() {
-    const nickname = window.location.pathname.split('/profile/')[1];
-    console.log("Appel de fetchUserStats");
-    const response = await fetch(`/api/profile/${nickname}/`, {  // URL de ton API pour récupérer les statistiques
+async function fetchUserGameSettings() {
+
+    const response = await fetch(`/api/game_settings/`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -15,21 +14,18 @@ async function fetchUserStats() {
             'X-CSRFToken': getCookie('csrftoken'),
         },
     });
-
     if (response.status === 200) {
-        return response.json();  // Convertit la réponse en JSON si tout va bien
-    } else if (response.status === 307) {
-        localStorage.removeItem('token');
-        await fetch('/api/logout/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-        });
-        navigateTo('/');
-        return null;
-    } else {
+        const GameSet = await response.json();
+
+        if (GameSet) {
+            const GameSettings = {
+                background_game: GameSet.background_game,
+                pads_color: GameSet.pads_color,
+                ball_color: GameSet.ball_color,
+            };
+            return GameSettings;
+        }
+    }  else {
         console.error('Error:', response);
         return null;
     }
@@ -46,6 +42,9 @@ export async function menuPongView(container) {
     div.appendChild(navBarContainer);
 
     try {
+
+        const GameSettings = await fetchUserGameSettings();
+
         const mainDivMenu = document.createElement('div');
         mainDivMenu.className = 'd-flex flex-grow-1 m-4 d-flex flex-column';
         div.appendChild(mainDivMenu);
@@ -265,14 +264,29 @@ tournamentButton.addEventListener('click', () => {
         form.appendChild(colorOptionsContainer);
 
         // Tableau des couleurs disponibles
-        const colors = ['#000000', '#fdfefe', '#7d3c98', '#FFC0CB', '#f4d03f', '#229954','#a6acaf', '#1a5276', '#d7bde2','#c0392b', '#873600', '#58d68d', '#85c1e9 '];
+        // Correspondance des couleurs
+        const colorMapping = {
+            'black': '#000000',
+            'white': '#fdfefe',
+            'purple': '#7d3c98',
+            'pink': '#FFC0CB',
+            'yellow': '#f4d03f',
+            'green': '#229954',
+            'gray': '#a6acaf',
+            'blue': '#1a5276',
+            'lila': '#d7bde2',
+            'red': '#c0392b',
+            'brown': '#873600',
+            'green_light': '#58d68d',
+            'blue_light': '#85c1e9'
+        };
 
         // Fonction pour creer le visuel des couleurs
-        const addColorOptions = (container) => {
-            colors.forEach((color) => {
+        const addColorOptions = (container, colorType) => {
+            Object.entries(colorMapping).forEach(([colorName, colorValue]) => {
                 const colorDiv = document.createElement('div');
                 colorDiv.className = 'color-option';
-                colorDiv.style.backgroundColor = color;
+                colorDiv.style.backgroundColor = colorValue;
                 colorDiv.style.width = '40px';
                 colorDiv.style.height = '40px';
                 colorDiv.style.borderRadius = '50%';
@@ -280,25 +294,39 @@ tournamentButton.addEventListener('click', () => {
                 colorDiv.style.cursor = 'pointer';
                 colorDiv.style.border = '2px solid transparent'; // Bordure initialement transparente
 
-                // Ajout de l'événement de sélection de couleur
+                if (colorType === 'background' && GameSettings.background_game == colorName) {
+                    colorDiv.style.border = '4px solid #F4ED37';
+                }
+                else if (colorType === 'pads' && GameSettings.pads_color == colorName) {
+                    colorDiv.style.border = '4px solid #F4ED37';
+                }
+                else if (colorType === 'ball' && GameSettings.ball_color == colorName) {
+                    colorDiv.style.border = '4px solid #F4ED37';
+                }
+
                 colorDiv.addEventListener('click', () => {
-                    // Retirer la bordure des autres options du même conteneur
+                    const isSelected = colorDiv.style.border === '4px solid #F4ED37';
                     container.querySelectorAll('.color-option').forEach(option => {
                         option.style.border = '2px solid transparent';
                     });
-                    // Ajouter une bordure selon la couleur sélectionnée
-                    if (color === '#000000') {
-                        colorDiv.style.border = '2px solid #fff'; // Bordure blanche si noir sélectionné
-                    } else {
-                        colorDiv.style.border = '2px solid #000'; // Bordure noire pour les autres couleurs
+                    if (!isSelected)
+                        colorDiv.style.border = '4px solid #F4ED37';
+                    // Stocker la couleur sélectionnée dans l'objet GameSettings
+                    if (colorType === 'background') {
+                        GameSettings.background_game = colorName; // Correspond au nom de la couleur
+                    } else if (colorType === 'pads') {
+                        GameSettings.pads_color = colorName;
+                    } else if (colorType === 'ball') {
+                        GameSettings.ball_color = colorName;
                     }
+                    console.log(GameSettings);
                 });
 
                 container.appendChild(colorDiv);
             });
         };
 
-        addColorOptions(colorOptionsContainer);     // Pour le fond du jeu
+        addColorOptions(colorOptionsContainer, 'background');// Pour le fond du jeu
 
         const TitlePadsColor = document.createElement('h5');
         TitlePadsColor.className = 'TitlePadsColor mb-4';
@@ -309,7 +337,7 @@ tournamentButton.addEventListener('click', () => {
         colorOptionsContainerPad.className = 'd-flex justify-content-center mb-3 colorOptionsContainer';
         form.appendChild(colorOptionsContainerPad);
 
-        addColorOptions(colorOptionsContainerPad);  // COLOR Pour les pads
+        addColorOptions(colorOptionsContainerPad, 'pads');    // COLOR Pour les pads
 
         const TitleBallColor = document.createElement('h5');
         TitleBallColor.className = 'TitleBallColor mb-4';
@@ -320,7 +348,7 @@ tournamentButton.addEventListener('click', () => {
         colorOptionsContainerBall.className = 'd-flex justify-content-center mb-3 colorOptionsContainer';
         form.appendChild(colorOptionsContainerBall);
 
-        addColorOptions(colorOptionsContainerBall); //COLOR Pour la balle
+        addColorOptions(colorOptionsContainerBall, 'ball');  //COLOR Pour la balle
 
         const playButton = document.createElement('button');
         playButton.type = 'submit';
@@ -334,7 +362,7 @@ tournamentButton.addEventListener('click', () => {
 
             const errorMessages = form.querySelectorAll('.text-danger');
             errorMessages.forEach(message => message.remove());
-            const successMessages = settingsForm.querySelectorAll('.text-success');
+            const successMessages = form.querySelectorAll('.text-success');
             successMessages.forEach(message => message.remove());
 
             // CHAMPS SELECTION
@@ -354,14 +382,14 @@ tournamentButton.addEventListener('click', () => {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': getCookie('csrftoken'),
                     },
-                    body: JSON.stringify({ background_game, pads_color, ball_color }),
+                    body: JSON.stringify(GameSettings),
                 });
 
                 if (response.ok) {
 
                     const successMessage = document.createElement('p');
                     successMessage.className = 'text-success';
-                    successMessage.textContent = 'Parameters successfully modified';
+                    successMessage.textContent = 'Color successfully modified';
                     form.appendChild(successMessage);
                     modalGameSettings.classList.remove('modalGameSettingsBase-show');
                     setTimeout(() => {
