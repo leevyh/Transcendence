@@ -16,6 +16,7 @@ class User_site(AbstractUser):
     created_at = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=255, default=Status.OFFLINE, choices=Status.choices)
     avatar = models.ImageField(upload_to='avatar/', default='media/default.jpg')
+    user_school = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
