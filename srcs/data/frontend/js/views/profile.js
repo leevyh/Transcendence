@@ -4,10 +4,9 @@ import { getCookie } from './utils.js';
 
 
 
-async function fetchUserStats() {
-    const nickname = window.location.pathname.split('/profile/')[1];
-    console.log("Appel de fetchUserStats");
-    const response = await fetch(`/api/profile/${nickname}/`, {  // URL de ton API pour récupérer les statistiques
+async function fetchUserStats(userID) {
+    // const id = window.location.pathname.split('/profile/')[1];
+    const response = await fetch(`/api/profile/${userID}/`, {  // URL de ton API pour récupérer les statistiques
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -35,7 +34,7 @@ async function fetchUserStats() {
     }
 }
 
-export async function profileView(container) {
+export async function profileView(container, userID) {
     container.innerHTML = '';
 
     const div = document.createElement('div');
@@ -46,7 +45,7 @@ export async function profileView(container) {
     div.appendChild(navBarContainer);
 
     try {
-        const stats = await fetchUserStats();
+        const stats = await fetchUserStats(userID);
 
         const mainDiv = document.createElement('div');
         mainDiv.className = 'd-flex flex-grow-1 m-4';

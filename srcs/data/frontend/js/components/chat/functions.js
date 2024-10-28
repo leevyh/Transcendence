@@ -54,12 +54,30 @@ async function openConversation(conversationID, otherUser) {
     const chatTitle = document.querySelector('.chat-title');
     chatTitle.textContent = `Chat with ${otherUser}`;
 
-
     // Display the view profile button and the invite game button
     const profileButton = document.getElementById('view-profile-button');
     profileButton.style.display = 'block';
     profileButton.addEventListener('click', () => {
-        navigateTo(`/user/${otherUser}`);
+        // Call API to get the list of users and find the user we want to see the profile
+        fetch(`/api/users/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Get the user we want to see the profile
+            const otherUser_id = data.find(user => user.nickname === otherUser).user_id;
+            if (!otherUser_id) {
+                console.error('User not found');
+                navigateTo('/404');
+            }
+            // Redirect to the profile page of the user
+            navigateTo(`/profile/${otherUser_id}`);
+        });
     });
 
     const inviteGameButton = document.querySelector('.invite-game-button');

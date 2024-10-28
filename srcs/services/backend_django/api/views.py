@@ -79,30 +79,55 @@ def loginView(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+
 @csrf_protect
-def get_profile(request, nickname):
+def get_profile(request, id):
     if request.method == 'GET':
         try:
-            user = User_site.objects.get(nickname=nickname)
+            user = User_site.objects.get(id=id)
             try:
                 stats = Stats_user.objects.get(user=user)
                 avatar_image = user.avatar
                 avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
-                data = {'nickname': user.nickname,
-                        'username': user.username,
-                        'created_at': user.created_at,
-                        'status': user.status,
-                        'nb_games': stats.nb_games,
-                        'nb_wins': stats.nb_wins,
-                        'nb_losses': stats.nb_losses,
-                        'win_rate': stats.win_rate,
-                        'nb_point_taken' :stats.nb_point_taken,
-                        'nb_point_given' :stats.nb_point_given,
-                        'avatar': avatar,
-                        }
+                data = {
+                    'nickname': user.nickname,
+                    'username': user.username,
+                    'id': user.id,
+                    'email': user.email,
+                    'created_at': user.created_at,
+                    'status': user.status,
+                    'nb_games': stats.nb_games,
+                    'nb_wins': stats.nb_wins,
+                    'nb_losses': stats.nb_losses,
+                    'win_rate': stats.win_rate,
+                    'nb_point_taken' :stats.nb_point_taken,
+                    'nb_point_given' :stats.nb_point_given,
+                    'avatar': avatar
+                }
                 return JsonResponse(data, status=200)
             except Stats_user.DoesNotExist:
                 return JsonResponse({'error': 'Stats not found'}, status=404)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+    
+# Function to know who Am I / Current user
+def who_am_i(request):
+    if request.method == 'GET':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            user = User_site.objects.get(username=username)
+            data = {'nickname': user.nickname,
+                    'id': user.id}
+            print("user:", data)         # DEBUG
+            return JsonResponse(data, status=200)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
     else:
@@ -288,18 +313,6 @@ def get_game_setting(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-# @login_required(login_url='/api/login')
-# def get_status_all_users(request):
-#     if request.method == 'GET':
-#         users = User_site.objects.all().exclude(id=request.user.id)  # Exclure l'utilisateur actuel
-#         data = []
-#         for user in users:
-#             data.append({'nickname': user.nickname,
-#                          'status': user.status})
-#             # print(data)         # DEBUG
-#         return JsonResponse(data, status=200, safe=False)
-#     else:
-#         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required(login_url='/api/login')
 def all_users(request):
@@ -330,6 +343,7 @@ def all_users(request):
                 return JsonResponse({'error': 'Invalid token'}, status=401)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
+            
 
 @login_required(login_url='/api/login')
 @csrf_protect
