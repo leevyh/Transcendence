@@ -1,6 +1,6 @@
 import wsManager  from './wsManager.js';
 import { getCookie } from './utils.js';
-import { DEBUG } from '../app.js';
+import { DEBUG, navigateTo } from '../app.js';
 import { navigationBar } from './navigation.js';
 import { notifications } from './notifications.js';
 
@@ -77,11 +77,21 @@ function createUserRow(user_list_row, data) {
         user_status.textContent = data.status;
         user_info_name_status.appendChild(user_status);
 
+        // Add a button to see the user's profile
+        const profile_button = document.createElement('button');
+        user_global_info.appendChild(profile_button);
+        profile_button.className = 'btn btn-sm btn-light bi-person-lines-fill';
+        // profile_button.textContent = 'View profile';
+        profile_button.addEventListener('click', () => {
+            // Redirect to the profile page of the user
+            navigateTo(`/profile/${data.user_id}`);
+        });
+
         const friends_button = document.createElement('button');
         user_global_info.appendChild(friends_button);
         friends_button.className = 'btn btn-sm btn-primary';
         friends_button.textContent = 'Add friend';
-        friends_button.addEventListener('click', (event) => {
+        friends_button.addEventListener('click', () => {
             sendFriendRequest(data.nickname);
         });
     }
@@ -134,12 +144,25 @@ export async function friendsView(container) {
 
     const user_list = document.createElement('div');
     user_list.className = 'user_list container-fluid';
+    global_div.appendChild(user_list);
+
+    // Add a search bar to search for users
+    const search_bar = document.createElement('input');
+    search_bar.type = 'text';
+    search_bar.className = 'form-control search_user';
+    search_bar.placeholder = 'Search for users';
+    user_list.appendChild(search_bar);
+
+    search_bar.addEventListener('input', (event) => {
+        // const searchText = event.target.value;
+        const search = search_bar.value.trim();
+        displayUserCards(search);
+    });
 
     const user_list_row = document.createElement('div');
     user_list_row.className = 'row p-4 user_list_row';
-
+    user_list_row.id = 'user-list-row';
     user_list.appendChild(user_list_row);
-    global_div.appendChild(user_list);
 
     fetch('/api/users/', {
         method: 'GET',
@@ -158,4 +181,30 @@ export async function friendsView(container) {
 
     const notifications_div = await notifications();
     global_div.appendChild(notifications_div);
+}
+
+
+// Display the user cards that match the search query
+function displayUserCards(search = '') {
+    const userListRow = document.getElementById('user-list-row');
+    const userCols = Array.from(userListRow.children);
+
+    // Filter the `user_col` containing a `userCard` matching the search query
+    const matchingUserCols = userCols.filter(userCol => {
+        const nickname = userCol.querySelector('.user_nickname').textContent;
+        return nickname.toLowerCase().startsWith(search.toLowerCase());
+    });
+
+    // Display the matching user cards
+    matchingUserCols.forEach(userCol => {
+        userCol.classList.remove('invisible'); // Rendre visibles les cartes correspondantes
+        userListRow.appendChild(userCol); // Ajouter les cartes triées au conteneur
+    });
+
+    // Hide the non-matching user cards
+    userCols.forEach(userCol => {
+        if (!matchingUserCols.includes(userCol)) {
+            userCol.classList.add('invisible'); // Masquer les cartes non correspondantes
+        }
+    });
 }

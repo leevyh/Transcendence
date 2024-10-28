@@ -235,3 +235,21 @@ p {
 .user_status {
     font-size: 12px;
 }
+
+
+/* SEARCH BAR */
+.search_user {
+    font-size: inherit;
+    border-radius: 20px;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.search_user::placeholder {
+    color: white;
+}
+
+.search_user:focus {
+    color:white;
+    box-shadow: none !important;
+    outline: 0px !important;
+}
