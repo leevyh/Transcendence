@@ -7,6 +7,7 @@ import { homeView } from './views/home.js';
 import { notFoundView } from './views/404.js';
 import { friendsView } from './views/users.js';
 import { pongView } from './views/pong.js';
+import { pongSoloView } from './views/pongSolo.js';
 import { tournamentView } from './views/tournament.js';
 import { profileView } from './views/profile.js';
 import { callback42 } from './views/callback42.js';
@@ -36,6 +37,10 @@ const routes = {
     '/pong': {
         title: 'Pong',
         view: pongView,
+    },
+    '/pongSolo': {
+        title: 'Pong Solo',
+        view: pongSoloView,
     },
     '/tournament': {
         title: 'Tournament',

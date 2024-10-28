@@ -96,37 +96,47 @@ export async function menuPongView(container) {
 			hoverGif.src = ''; // Vider le chemin de l'image temporairement
 			hoverGif.src = gifSrc; // Remettre le même chemin pour redémarrer le GIF
 		});
+		return button;
 	}
 
 	// Appeler la fonction pour créer les boutons avec leurs images respectives
 
-	// Bouton Solo
-	const soloButton = createAnimatedButton(
-		'soloButton',               // Classe du bouton
-		'Solo',                     // Texte du bouton
-		'/js/img/pong1.png',       // PNG pour Solo
-		'/js/img/pong.gif',        // GIF pour Solo
-		'ContenerSoloButton w-50 h-100 d-flex justify-content-center align-items-end' // Classe du conteneur
-	);
+// Bouton Solo
+const soloButton = createAnimatedButton(
+    'soloButton',               // Classe du bouton
+    'Solo',                     // Texte du bouton
+    '/js/img/pong1.png',       // PNG pour Solo
+    '/js/img/pong.gif',        // GIF pour Solo
+    'ContenerSoloButton w-50 h-100 d-flex justify-content-center align-items-end' // Classe du conteneur
+);
 
+soloButton.addEventListener('click', () => {
+    navigateTo('/pongSolo'); // Page du jeu solo
+});
 
-	// Bouton Duo
-	createAnimatedButton(
-		'DuoButton',               // Classe du bouton
-		'Duo',                     // Texte du bouton
-		'/js/img/pong1.png',      // PNG pour Duo
-		'/js/img/pong.gif',       // GIF pour Duo
-		'ContenerDuoButton w-50 h-100 d-flex justify-content-center align-items-end' // Classe du conteneur
-	);
+// Bouton Duo
+const duoButton = createAnimatedButton(
+    'DuoButton',               // Classe du bouton
+    'Duo',                     // Texte du bouton
+    '/js/img/pong1.png',      // PNG pour Duo
+    '/js/img/pong.gif',       // GIF pour Duo
+    'ContenerDuoButton w-50 h-100 d-flex justify-content-center align-items-end'
+);
+duoButton.addEventListener('click', () => {
+    navigateTo('/pong'); // Page du jeu en duo
+});
 
-	// Bouton Tournament
-	createAnimatedButtonTournament(
-		'TournamentButton',        // Classe du bouton
-		'Tournament',              // Texte du bouton
-		'/js/img/pong1.png',      // PNG pour Tournament
-		'/js/img/pong.gif',       // GIF pour Tournament
-		'ContenerTournamentButton w-50 h-100 d-flex justify-content-center align-items-center' // Classe du conteneur
-	);
+// Bouton Tournament
+const tournamentButton = createAnimatedButtonTournament(
+    'TournamentButton',        // Classe du bouton
+    'Tournament',              // Texte du bouton
+    '/js/img/pong1.png',      // PNG pour Tournament
+    '/js/img/pong.gif',       // GIF pour Tournament
+    'ContenerTournamentButton w-50 h-100 d-flex justify-content-center align-items-center'
+);
+tournamentButton.addEventListener('click', () => {
+    navigateTo('/tournament');
+});
 
     soloButton.addEventListener('click', () => {
 

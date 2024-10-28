@@ -27,6 +27,7 @@ class Tournament:
         self.small_final = None
         self.final = None
         self.channel_layer_player = [None] * 4
+        self.resigned_players = []
 
     #start the tournament
     async def start_tournament(self):
@@ -88,7 +89,7 @@ class Tournament:
         await self.channel_layer.group_add(f"game_{self.semi_finals2.id}", self.channel_layer_player[player_indices[3]])
         self.semi_finals2.status = "ready"
 
-        # print("semi_finals2", self.semi_finals2.player_1, self.semi_finals2.player_2)
+        print("semi_finals2", self.semi_finals2.player_1, self.semi_finals2.player_2)
 
     async def start_semi_finals(self):
         # print("start semi_finals")
@@ -105,6 +106,7 @@ class Tournament:
                 'type': 'show_game',
             }
         )
+        await asyncio.sleep(1)
         await self.send_define_player(self.semi_finals1, 'player_1', 'player_2')
         await self.send_define_player(self.semi_finals2, 'player_1', 'player_2')
         await asyncio.gather(
@@ -121,7 +123,7 @@ class Tournament:
 
     #create the small_final game
     async def create_small_final(self):
-        print("create small final")
+                
         self.small_final = PongGame(self.semi_finals1.loser)
         self.small_final.player_1 = self.semi_finals1.loser
         self.small_final.player_2 = self.semi_finals2.loser
@@ -137,9 +139,11 @@ class Tournament:
         await self.channel_layer.group_add(f"game_{self.small_final.id}", self.small_final.channel_player_2)
         self.small_final.status = "ready"
 
+        print("small final", self.small_final.player_1, self.small_final.player_2)
+
     #create the final game
     async def create_final(self):
-        print("create final")
+
         self.final = PongGame(self.semi_finals1.winner)
         self.final.player_1 = self.semi_finals1.winner
         self.final.player_2 = self.semi_finals2.winner
@@ -154,6 +158,9 @@ class Tournament:
         await self.channel_layer.group_add(f"game_{self.final.id}", self.final.channel_player_1)
         await self.channel_layer.group_add(f"game_{self.final.id}", self.final.channel_player_2)
         self.final.status = "ready"
+
+        print("final", self.final.player_1, self.final.player_2)
+
 
     async def send_define_player(self, game, current_player_1, current_player_2):
         print("send define player between", game.player_1, game.player_2)
@@ -202,16 +209,35 @@ class Tournament:
                 'type': 'show_game',
             }
         )
-        await self.send_define_player(self.small_final, 'player_1', 'player_2')
+
+        tasks = []
+
+        #if a resigned player is not null
+        if self.resigned_players:
+            if self.resigned_players[0] == self.small_final.player_1:
+                self.small_final.winner = self.small_final.player_2
+                self.small_final.loser = self.small_final.player_1
+            else:
+                self.small_final.winner = self.small_final.player_1
+                self.small_final.loser = self.small_final.player_2
+        else:
+            await self.send_define_player(self.small_final, 'player_1', 'player_2')
+            tasks.append(self.small_final.game_loop())
+            
         await self.send_define_player(self.final, 'player_1', 'player_2')
-        await asyncio.gather(
-            self.small_final.game_loop(),
-            self.final.game_loop()
-        )
+        tasks.append(self.final.game_loop())
+       
+        await asyncio.gather(*tasks)
+
 
     #end the tournament
     async def end_tournament(self):
         print("end tournament")
+
+        print("small final winner", self.small_final.winner)
+        print("small final loser", self.small_final.loser)
+        print("final winner", self.final.winner)
+        print("final loser", self.final.loser)
 
         #send the winner to the front
         await self.channel_layer.group_send(
