@@ -77,22 +77,26 @@ function createUserRow(user_list_row, data) {
         user_status.textContent = data.status;
         user_info_name_status.appendChild(user_status);
 
+        // Add a container for the buttons
+        const user_buttons = document.createElement('div');
+        user_buttons.className = 'd-flex flex-row';
+        user_global_info.appendChild(user_buttons);
+
+        const friends_button = document.createElement('button');
+        friends_button.className = 'btn btn-sm btn-primary';
+        friends_button.textContent = 'Add friend';
+        user_buttons.appendChild(friends_button);
+        friends_button.addEventListener('click', () => {
+            sendFriendRequest(data.nickname);
+        });
+
         // Add a button to see the user's profile
         const profile_button = document.createElement('button');
-        user_global_info.appendChild(profile_button);
         profile_button.className = 'btn btn-sm btn-light bi-person-lines-fill';
-        // profile_button.textContent = 'View profile';
+        user_buttons.appendChild(profile_button);
         profile_button.addEventListener('click', () => {
             // Redirect to the profile page of the user
             navigateTo(`/profile/${data.user_id}`);
-        });
-
-        const friends_button = document.createElement('button');
-        user_global_info.appendChild(friends_button);
-        friends_button.className = 'btn btn-sm btn-primary';
-        friends_button.textContent = 'Add friend';
-        friends_button.addEventListener('click', () => {
-            sendFriendRequest(data.nickname);
         });
     }
 
