@@ -6,7 +6,12 @@ urlpatterns = [
 	path('register/', views.register, name='register'),
 	path('login/', views.loginView, name='login'),
 	# path('profile/<str:nickname>/', views.get_profile, name='profile'),
-	path('profile/<int:id>/', views.get_profile, name='profile'), # For router /profile/:id
+	path('profile/<int:id>/', views.get_profile, name='profile'),
+
+	path('match_history/<int:id>/', views.get_match_history, name='match_history'),
+
+
+
 	path('settings/', views.get_settings, name='settings'),
 	path('game_settings/', views.get_game_setting, name='game_settings'),
 	path('updateSettings/', views.updateSettings, name='updateSettings'),

@@ -6,7 +6,8 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.hashers import make_password, check_password
 
 from .forms import UserRegistrationForm, AccessibilityUpdateForm
-from .models import User_site, Accessibility, Stats_user, FriendRequest, Notification, Game_Settings
+from .models import User_site, Accessibility, Stats_user, FriendRequest, Notification, Game_Settings, MatchHistory
+from pong.models import Game
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from typing import Optional
@@ -205,6 +206,56 @@ def get_Notification(request):
             return JsonResponse({'error': 'User not found'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+#this function is used to get the match history of the user in url profile/id_user
+# id |          created_at           | game_id | player_id
+# ----+-------------------------------+---------+-----------
+# 1 | 2024-10-28 14:43:39.43119+00  |       1 |         1 -> user1
+# 2 | 2024-10-28 14:43:39.431306+00 |       1 |         2 -> user2
+#
+# id | player_1_score | player_2_score | is_active |          created_at           | player_1_id | player_2_id
+# ----+----------------+----------------+-----------+-------------------------------+-------------+-------------
+# 1 |              2 |              1 | f         | 2024-10-28 14:42:20.219059+00 |           1 |           2
+
+@csrf_exempt
+def get_match_history(request, id):
+    if request.method == 'GET':
+        try:
+            user = User_site.objects.get(id=id)
+            print("user:", user.nickname)         # DEBUG
+            match_histories = MatchHistory.objects.filter(player=user)
+            data = []
+
+            for match in match_histories:
+                game = Game.objects.get(id=match.game_id)
+                print(f"game player 1: {game.player_1_id} -> user nickname : {user.id}")         # DEBUG
+                if game.player_1_id == user.id:       # DEBUG
+                    opponent = User_site.objects.get(id=game.player_2_id).nickname
+                    opponent_avatar = base64.b64encode(User_site.objects.get(id=game.player_2_id).avatar.read()).decode('utf-8')
+                    player_score = game.player_1_score
+                    player_avatar = base64.b64encode(User_site.objects.get(id=game.player_1_id).avatar.read()).decode('utf-8')
+                    opponent_score = game.player_2_score
+                elif game.player_2_id == user.id:
+                    opponent = User_site.objects.get(id=game.player_1_id).nickname
+                    opponent_avatar = base64.b64encode(User_site.objects.get(id=game.player_1_id).avatar.read()).decode('utf-8')
+                    player_score = game.player_2_score
+                    player_avatar = base64.b64encode(User_site.objects.get(id=game.player_2_id).avatar.read()).decode('utf-8')
+                    opponent_score = game.player_1_score
+                else:
+                    return JsonResponse({'error': 'User not found'}, status=404)
+                data.append({'player': user.nickname,
+                            'player_score': player_score,
+                            'player_avatar': player_avatar,
+                            'opponent': opponent,
+                            'opponent_score': opponent_score,
+                            'opponent_avatar': opponent_avatar,
+                            'created_at': match.created_at})
+            return JsonResponse(data, status=200, safe=False)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 def get_notificationUnread(request):
     if request.method == 'GET':
