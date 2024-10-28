@@ -7,3 +7,7 @@ def pong_view(request):
 def tournament_view(request):
     # Retourner une page de tournoi
     return render(request, 'index.html')
+
+def pongSolo_view(request):
+    # Retourner une page de jeu Pong en solo
+    return render(request, 'index.html')

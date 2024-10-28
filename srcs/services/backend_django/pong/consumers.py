@@ -197,8 +197,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         return self.tournament
 
     async def disconnect(self, code):
-        # print("disconnect user : ", self.scope['user'])
-        # retirer le joueur du tournoi s'il quitte la connexion
+        print("disconnect user : ", self.scope['user'])
         player = self.scope['user']
         if player in self.tournament.player:
             if self.tournament.status == "waiting":
@@ -208,13 +207,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     if self.tournament.channel_layer_player[i] == self.channel_name:
                         self.tournament.channel_layer_player[i] = None
                         break
-            # if self.tournament.status == "ready":
-            #     if player == self.tournament.semi_finals.player_1:
-
+                await self.update_player_list(self.tournament)
+            else:
+                self.tournament.resigned_players.append(player)
 
             if hasattr(self, 'tournament_id'):
                 await self.channel_layer.group_discard(f"tournament_{self.tournament_id}", self.channel_name)
-            await self.update_player_list(self.tournament)
+        print("disconnect player :", self.tournament.status)
         await self.close()
 
     async def receive(self, text_data):
