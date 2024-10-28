@@ -1,6 +1,6 @@
 import wsManager  from './wsManager.js';
 import { getCookie } from './utils.js';
-import { DEBUG, navigateTo } from '../app.js';
+import { DEBUG, navigateTo, getCurrentUser } from '../app.js';
 import { navigationBar } from './navigation.js';
 import { notifications } from './notifications.js';
 
@@ -116,10 +116,12 @@ function createUserRow(user_list_row, data) {
 export async function friendsView(container) {
     container.innerHTML = '';
 
+    const me = await getCurrentUser(); // Current user
+
     const token = localStorage.getItem('token');
     console.log(token);
 
-    const url = window.location.href.split('/').pop();
+    // const url = window.location.href.split('/').pop();
 
     const statusSocket = new WebSocket('ws://' + window.location.host + '/ws/status/');
     statusSocket.onopen = function (event) {
@@ -129,8 +131,10 @@ export async function friendsView(container) {
     statusSocket.onmessage = function (event) {
         if (DEBUG) {console.log('Message received:', event.data);}
         const data = JSON.parse(event.data);
-        const user_list_row = document.querySelector('.user_list_row');
-        createUserRow(user_list_row, data);
+        if (data.user_id !== me.id) {
+            const user_list_row = document.querySelector('.user_list_row');
+            createUserRow(user_list_row, data);
+        }
     };
 
     statusSocket.onclose = function (event) {
@@ -196,7 +200,7 @@ export async function friendsView(container) {
         },
     })
     .then(response => response.json())
-    .then(data => { // FIXME: if it's about me, don't display me
+    .then(data => {
         data.forEach(user => {
             createUserRow(user_list_row, user);
         });
