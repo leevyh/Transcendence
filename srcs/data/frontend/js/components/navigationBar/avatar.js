@@ -11,8 +11,6 @@ export async function createAvatarDiv(container, userData) {
     avatarImage.className = 'avatarImage w-100 h-auto pb-2';
     avatarImage.src = `data:image/png;base64, ${userData.avatar}`;
     avatarImage.alt = 'Avatar';
-    avatarImage.setAttribute('role', 'button'); // To make the image clickable
-    avatarImage.setAttribute('tabindex', '0'); // To make the image focusable
     avatarDiv.appendChild(avatarImage);
 
     // Create a modal to modify the avatar
@@ -27,6 +25,8 @@ export async function createAvatarDiv(container, userData) {
     SVGModifyAvatar.setAttribute('height', '32');
     SVGModifyAvatar.setAttribute('fill', 'white');
     SVGModifyAvatar.setAttribute('viewBox', '0 0 16 16');
+    SVGModifyAvatar.setAttribute('role', 'button'); // To make the SVG clickable
+    SVGModifyAvatar.setAttribute('tabindex', '0'); // To make the image focusable
     SVGModifyAvatar.style.opacity = '0';
     SVGModifyAvatar.innerHTML = `
         <path d="M12.146.854a.5.5 0 0 1 .708 0l2.292 2.292a.5.5 0 0 1 0 .708l-9.146 9.146L5 13.5l.5-.5 9.146-9.146zM4 13.5V15h1.5l.146-.146L4 13.5zm-3.5.5a.5.5 0 0 1 0-1H1V12.5H.5a.5.5 0 0 1 0-1H1V11H.5a.5.5 0 0 1 0-1H1V9.5H.5a.5.5 0 0 1 0-1H1V8.5H.5a.5.5 0 0 1 0-1H1V7.5H.5a.5.5 0 0 1 0-1H1V6.5H.5a.5.5 0 0 1 0-1H1V5.5H.5a.5.5 0 0 1 0-1H1V4.5H.5a.5.5 0 0 1 0-1H1V3.5H.5a.5.5 0 0 1 0-1H1V2.5H.5a.5.5 0 0 1 0-1H1V1.5H.5a.5.5 0 0 1 0-1H1V.5H.5a.5.5 0 0 1 0-1H1V0h-.5a.5.5 0 0 1 0 1H1V.5H.5z"/>
@@ -42,7 +42,6 @@ export async function createAvatarDiv(container, userData) {
 
     // Add event listener for keyboard accessibility: when the image is not focused, remove the blur effect
     avatarImage.addEventListener('mouseout', (event) => {
-        // Vérifie si la souris est sortie vers le SVG, sinon retire le flou
         if (!SVGModifyAvatar.contains(event.relatedTarget)) {
             avatarImage.style.filter = 'none';
             SVGModifyAvatar.style.opacity = '0';
@@ -55,7 +54,6 @@ export async function createAvatarDiv(container, userData) {
     });
 
     SVGModifyAvatar.addEventListener('mouseout', (event) => {
-        // Vérifie si la souris est sortie vers l'image de l'avatar, sinon retire le flou
         if (!avatarImage.contains(event.relatedTarget)) {
             avatarImage.style.filter = 'none';
             SVGModifyAvatar.style.opacity = '0';
@@ -83,7 +81,7 @@ export async function createAvatarDiv(container, userData) {
     });
 
     // Event listener for mouse accessibility: when the image is clicked, open the modal
-    avatarImage.addEventListener('click', () => {
+    SVGModifyAvatar.addEventListener('click', () => {
         openModal(document.getElementById('modalAvatar'));
     });
 

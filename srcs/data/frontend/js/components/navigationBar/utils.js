@@ -2,7 +2,12 @@ import { DEBUG, navigateTo } from '../../app.js';
 
 // Refresh actual page without reload (SPA)
 export function actualPage() {
-    console.log('window.location.href:', window.location.href);
+    // If I am on a profile page, I want to refresh the page
+    if (window.location.href.includes('profile')) {
+        const id = window.location.href.split('/').pop();
+        return '/profile/' + id;
+    }
+
     let location = window.location.href;
     const str_split = location.split('/');
     const length = str_split.length;
