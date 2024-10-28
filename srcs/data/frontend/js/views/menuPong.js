@@ -267,33 +267,38 @@ tournamentButton.addEventListener('click', () => {
         // Tableau des couleurs disponibles
         const colors = ['#000000', '#fdfefe', '#7d3c98', '#FFC0CB', '#f4d03f', '#229954','#a6acaf', '#1a5276', '#d7bde2','#c0392b', '#873600', '#58d68d', '#85c1e9 '];
 
-        // Fonction pour créer chaque div de couleur
-        colors.forEach((color) => {
-            const colorDiv = document.createElement('div');
-            colorDiv.className = 'color-option';
-            colorDiv.style.backgroundColor = color;
-            colorDiv.style.width = '40px';
-            colorDiv.style.height = '40px';
-            colorDiv.style.borderRadius = '50%';
-            colorDiv.style.margin = '0 5px';
-            colorDiv.style.cursor = 'pointer';
-            colorDiv.style.border = '2px solid transparent'; // Bordure initialement transparente
+        // Fonction pour creer le visuel des couleurs
+        const addColorOptions = (container) => {
+            colors.forEach((color) => {
+                const colorDiv = document.createElement('div');
+                colorDiv.className = 'color-option';
+                colorDiv.style.backgroundColor = color;
+                colorDiv.style.width = '40px';
+                colorDiv.style.height = '40px';
+                colorDiv.style.borderRadius = '50%';
+                colorDiv.style.margin = '0 5px';
+                colorDiv.style.cursor = 'pointer';
+                colorDiv.style.border = '2px solid transparent'; // Bordure initialement transparente
 
-            // Ajout de l'événement de sélection de couleur
-            colorDiv.addEventListener('click', () => {
-                // Retirer la bordure des autres options
-                document.querySelectorAll('.color-option').forEach(option => {
-                    option.style.border = '2px solid transparent';
+                // Ajout de l'événement de sélection de couleur
+                colorDiv.addEventListener('click', () => {
+                    // Retirer la bordure des autres options du même conteneur
+                    container.querySelectorAll('.color-option').forEach(option => {
+                        option.style.border = '2px solid transparent';
+                    });
+                    // Ajouter une bordure selon la couleur sélectionnée
+                    if (color === '#000000') {
+                        colorDiv.style.border = '2px solid #fff'; // Bordure blanche si noir sélectionné
+                    } else {
+                        colorDiv.style.border = '2px solid #000'; // Bordure noire pour les autres couleurs
+                    }
                 });
-                if (color === '#000000') {
-                    colorDiv.style.border = '2px solid #fff'; // Bordure blanche si noir sélectionné
-                } else {
-                    colorDiv.style.border = '2px solid #000'; // Bordure noire pour les autres couleurs
-                }
-            });
 
-            colorOptionsContainer.appendChild(colorDiv);
-        });
+                container.appendChild(colorDiv);
+            });
+        };
+
+        addColorOptions(colorOptionsContainer);     // Pour le fond du jeu
 
         const TitlePadsColor = document.createElement('h5');
         TitlePadsColor.className = 'TitlePadsColor mb-4';
@@ -304,34 +309,7 @@ tournamentButton.addEventListener('click', () => {
         colorOptionsContainerPad.className = 'd-flex justify-content-center mb-3 colorOptionsContainer';
         form.appendChild(colorOptionsContainerPad);
 
-
-        // Fonction pour créer chaque div de couleur
-        colors.forEach((color) => {
-            const colorDiv = document.createElement('div');
-            colorDiv.className = 'color-option';
-            colorDiv.style.backgroundColor = color;
-            colorDiv.style.width = '40px';
-            colorDiv.style.height = '40px';
-            colorDiv.style.borderRadius = '50%';
-            colorDiv.style.margin = '0 5px';
-            colorDiv.style.cursor = 'pointer';
-            colorDiv.style.border = '2px solid transparent'; // Bordure initialement transparente
-
-            // Ajout de l'événement de sélection de couleur
-            colorDiv.addEventListener('click', () => {
-                // Retirer la bordure des autres options
-                document.querySelectorAll('.color-option').forEach(option => {
-                    option.style.border = '2px solid transparent';
-                });
-                if (color === '#000000') {
-                    colorDiv.style.border = '2px solid #fff'; // Bordure blanche si noir sélectionné
-                } else {
-                    colorDiv.style.border = '2px solid #000'; // Bordure noire pour les autres couleurs
-                }
-            });
-
-            colorOptionsContainerPad.appendChild(colorDiv);
-        });
+        addColorOptions(colorOptionsContainerPad);  // COLOR Pour les pads
 
         const TitleBallColor = document.createElement('h5');
         TitleBallColor.className = 'TitleBallColor mb-4';
@@ -342,34 +320,7 @@ tournamentButton.addEventListener('click', () => {
         colorOptionsContainerBall.className = 'd-flex justify-content-center mb-3 colorOptionsContainer';
         form.appendChild(colorOptionsContainerBall);
 
-
-        // Fonction pour créer chaque div de couleur
-        colors.forEach((color) => {
-            const colorDiv = document.createElement('div');
-            colorDiv.className = 'color-option';
-            colorDiv.style.backgroundColor = color;
-            colorDiv.style.width = '40px';
-            colorDiv.style.height = '40px';
-            colorDiv.style.borderRadius = '50%';
-            colorDiv.style.margin = '0 5px';
-            colorDiv.style.cursor = 'pointer';
-            colorDiv.style.border = '2px solid transparent'; // Bordure initialement transparente
-
-            // Ajout de l'événement de sélection de couleur
-            colorDiv.addEventListener('click', () => {
-                // Retirer la bordure des autres options
-                document.querySelectorAll('.color-option').forEach(option => {
-                    option.style.border = '2px solid transparent';
-                });
-                if (color === '#000000') {
-                    colorDiv.style.border = '2px solid #fff'; // Bordure blanche si noir sélectionné
-                } else {
-                    colorDiv.style.border = '2px solid #000'; // Bordure noire pour les autres couleurs
-                }
-            });
-
-            colorOptionsContainerBall.appendChild(colorDiv);
-        });
+        addColorOptions(colorOptionsContainerBall); //COLOR Pour la balle
 
         const playButton = document.createElement('button');
         playButton.type = 'submit';
@@ -418,7 +369,7 @@ tournamentButton.addEventListener('click', () => {
                         mainDivMenu.style.backdropFilter = 'none'; // Retire le flou via JS
                     }, 100);
                     form.reset();
-                    navigateTo('/pong');
+                    navigateTo('/pong');//pong solo
                 }
                 else {
                     const errorMessage = document.createElement('p');
