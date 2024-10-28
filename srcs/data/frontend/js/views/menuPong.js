@@ -96,40 +96,40 @@ export async function menuPongView(container) {
         }
 
         // Fonction pour créer un bouton Tournament (s'il y a des différences, on peut ajouter ici)
-        function createAnimatedButtonTournament(buttonClassName, buttonText, pngSrc, gifSrc, container) {
-            const buttonContainer = document.createElement('div');
-            buttonContainer.className = container;
-            ContenerTournament.appendChild(buttonContainer);
+    function createAnimatedButtonTournament(buttonClassName, buttonText, pngSrc, gifSrc, container) {
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = container;
+        ContenerTournament.appendChild(buttonContainer);
 
-            const button = document.createElement('button');
-            button.className = buttonClassName + ' btn p-4 w-75 bg-black';
-            buttonContainer.appendChild(button);
+        const button = document.createElement('button');
+        button.className = buttonClassName + ' btn p-4 w-75 bg-black';
+        buttonContainer.appendChild(button);
 
-            const buttonContent = document.createElement('p');
-            buttonContent.textContent = buttonText;
-            buttonContent.className = buttonClassName + 'Content m-0 w-100 h-100 d-flex justify-content-center align-items-center';
-            button.appendChild(buttonContent);
+        const buttonContent = document.createElement('p');
+        buttonContent.textContent = buttonText;
+        buttonContent.className = buttonClassName + 'Content m-0 w-100 h-100 d-flex justify-content-center align-items-center';
+        button.appendChild(buttonContent);
 
-            // Création de l'image statique (PNG)
-            const staticImage = document.createElement('img');
-            staticImage.src = pngSrc;
-            staticImage.classList.add('static-img');
-            button.appendChild(staticImage);
+        // Création de l'image statique (PNG)
+        const staticImage = document.createElement('img');
+        staticImage.src = pngSrc;
+        staticImage.classList.add('static-img');
+        button.appendChild(staticImage);
 
-            // Création de l'image GIF pour l'animation
-            const hoverGif = document.createElement('img');
-            hoverGif.src = gifSrc;
-            hoverGif.className = 'hoverGif';
-            hoverGif.classList.add('hover-gif');
-            button.appendChild(hoverGif);
+        // Création de l'image GIF pour l'animation
+        const hoverGif = document.createElement('img');
+        hoverGif.src = gifSrc;
+        hoverGif.className = 'hoverGif';
+        hoverGif.classList.add('hover-gif');
+        button.appendChild(hoverGif);
 
-		// Réinitialisation du GIF au survol
-		button.addEventListener('mouseenter', () => {
-			hoverGif.src = ''; // Vider le chemin de l'image temporairement
-			hoverGif.src = gifSrc; // Remettre le même chemin pour redémarrer le GIF
-		});
-		return button;
-	}
+    // Réinitialisation du GIF au survol
+    button.addEventListener('mouseenter', () => {
+        hoverGif.src = ''; // Vider le chemin de l'image temporairement
+        hoverGif.src = gifSrc; // Remettre le même chemin pour redémarrer le GIF
+    });
+    return button;
+}
 
         // Appeler la fonction pour créer les boutons avec leurs images respectives
 
@@ -142,9 +142,9 @@ const soloButton = createAnimatedButton(
     'ContenerSoloButton w-50 h-100 d-flex justify-content-center align-items-end' // Classe du conteneur
 );
 
-soloButton.addEventListener('click', () => {
-    navigateTo('/pongSolo'); // Page du jeu solo
-});
+// soloButton.addEventListener('click', () => {
+//     navigateTo('/pongSolo'); // Page du jeu solo
+// });
 
 // Bouton Duo
 const duoButton = createAnimatedButton(
@@ -166,20 +166,21 @@ const tournamentButton = createAnimatedButtonTournament(
     '/js/img/pong.gif',       // GIF pour Tournament
     'ContenerTournamentButton w-50 h-100 d-flex justify-content-center align-items-center'
 );
+
 tournamentButton.addEventListener('click', () => {
     navigateTo('/tournament');
 });
 
-        soloButton.addEventListener('click', () => {
+soloButton.addEventListener('click', () => {
 
-            modalGameSettings.style.display = 'block'; // Affiche la modal
-            setTimeout(() => {
-                modalGameSettings.classList.add('modalGameSettingsBase-show'); // Ajoute la classe pour l'animation
-                mainDivMenu.style.backdropFilter = 'blur(10px)'; // Ajoute le flou via JS
-                mainDivMenu.style.transition = 'backdrop-filter 0.3s ease'; // Ajoute une transition fluide
+    modalGameSettings.style.display = 'block'; // Affiche la modal
+    setTimeout(() => {
+        modalGameSettings.classList.add('modalGameSettingsBase-show'); // Ajoute la classe pour l'animation
+        mainDivMenu.style.backdropFilter = 'blur(10px)'; // Ajoute le flou via JS
+        mainDivMenu.style.transition = 'backdrop-filter 0.3s ease'; // Ajoute une transition fluide
 
-            }, 10);
-        });
+    }, 10);
+});
 
     ///////////////////////////////////////////////////////////////
         // ModalGameSettings
@@ -281,6 +282,10 @@ tournamentButton.addEventListener('click', () => {
             'blue_light': '#85c1e9'
         };
 
+        let tempBackgroundColor = GameSettings.background_game;
+        let tempPadsColor = GameSettings.pads_color;
+        let tempBallColor = GameSettings.ball_color;
+
         // Fonction pour creer le visuel des couleurs
         const addColorOptions = (container, colorType) => {
             Object.entries(colorMapping).forEach(([colorName, colorValue]) => {
@@ -313,11 +318,11 @@ tournamentButton.addEventListener('click', () => {
                         colorDiv.style.border = '4px solid #F4ED37';
                     // Stocker la couleur sélectionnée dans l'objet GameSettings
                     if (colorType === 'background') {
-                        GameSettings.background_game = colorName; // Correspond au nom de la couleur
+                        tempBackgroundColor = colorName; // Correspond au nom de la couleur
                     } else if (colorType === 'pads') {
-                        GameSettings.pads_color = colorName;
+                        tempPadsColor = colorName;
                     } else if (colorType === 'ball') {
-                        GameSettings.ball_color = colorName;
+                        tempBallColor = colorName;
                     }
                     console.log(GameSettings);
                 });
@@ -356,7 +361,7 @@ tournamentButton.addEventListener('click', () => {
         playButton.textContent = 'Play';
         form.appendChild(playButton);
 
-        form.addEventListener('submit', (event) => {
+        form.addEventListener('submit', async (event) => {
 
             event.preventDefault();
 
@@ -365,17 +370,12 @@ tournamentButton.addEventListener('click', () => {
             const successMessages = form.querySelectorAll('.text-success');
             successMessages.forEach(message => message.remove());
 
-            // CHAMPS SELECTION
-            //== COLOR SELECTIONNER ET ENREGISTRER BACK
-            //
-            //SI PREMIERE FOIS && AUCUN DES CHAMPS N'A ETE SELECTION
-            //== COLOR DEFAULT
-            //
-            //SI PAS PREMIERE FOIS && AUCUN DES CHAMPS N'A ETE SELECTION
-            // == COLOR DEFAULT OU COLOR SELECTIONNER AVANT
+            GameSettings.background_game = tempBackgroundColor;
+            GameSettings.pads_color = tempPadsColor;
+            GameSettings.ball_color = tempBallColor;
 
             try {
-                const response = fetch('/api/updateGameSettings/', {
+                const response = await fetch('/api/updateGameSettings/', {
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -384,7 +384,6 @@ tournamentButton.addEventListener('click', () => {
                     },
                     body: JSON.stringify(GameSettings),
                 });
-
                 if (response.ok) {
 
                     const successMessage = document.createElement('p');
@@ -395,15 +394,16 @@ tournamentButton.addEventListener('click', () => {
                     setTimeout(() => {
                         modalGameSettings.style.display = 'none';
                         mainDivMenu.style.backdropFilter = 'none'; // Retire le flou via JS
-                    }, 100);
+                    },100);
                     form.reset();
-                    navigateTo('/pong');//pong solo
+                    navigateTo('/pongSolo');//pong solo
                 }
                 else {
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'text-danger';
                     errorMessage.textContent = 'Invalid coulour choices';
                     form.insertBefore(errorMessage, playButton);
+                    console.log("-->", GameSettings);
                     form.reset();
                 }
             } catch (error) {
