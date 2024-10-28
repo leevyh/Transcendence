@@ -4,7 +4,7 @@ import { notifications } from './notifications.js';
 import { getCookie } from './utils.js';
 
 
-async function fetchUserGameSettings() {
+export async function fetchUserGameSettings() {
 
     const response = await fetch(`/api/game_settings/`, {
         method: 'GET',
@@ -29,6 +29,20 @@ async function fetchUserGameSettings() {
         console.error('Error:', response);
         return null;
     }
+}
+
+export function navigateWithBlur(modalToClose, targetPage) {
+    // Ajouter un flou
+    document.body.style.filter = 'blur(5px)';
+
+    // Masquer la modal après un délai
+    const modalInstance = bootstrap.Modal.getInstance(modalToClose);
+    modalInstance.hide();
+
+    setTimeout(() => {
+        // Naviguer vers la page cible
+        navigateTo(targetPage); // Assurez-vous que cela navigue vers la bonne page
+    }, 800); // Délai avant la navigation, peut être ajusté
 }
 
 export async function menuPongView(container) {
@@ -361,6 +375,7 @@ soloButton.addEventListener('click', () => {
         playButton.textContent = 'Play';
         form.appendChild(playButton);
 
+
         form.addEventListener('submit', async (event) => {
 
             event.preventDefault();
@@ -373,6 +388,12 @@ soloButton.addEventListener('click', () => {
             GameSettings.background_game = tempBackgroundColor;
             GameSettings.pads_color = tempPadsColor;
             GameSettings.ball_color = tempBallColor;
+
+            console.log("Background_game", GameSettings.background_game);
+            console.log("pads_color", GameSettings.pads_color);
+            console.log("ball_color", GameSettings.ball_color);
+
+
 
             try {
                 const response = await fetch('/api/updateGameSettings/', {
@@ -390,13 +411,24 @@ soloButton.addEventListener('click', () => {
                     successMessage.className = 'text-success';
                     successMessage.textContent = 'Color successfully modified';
                     form.appendChild(successMessage);
-                    modalGameSettings.classList.remove('modalGameSettingsBase-show');
-                    setTimeout(() => {
-                        modalGameSettings.style.display = 'none';
-                        mainDivMenu.style.backdropFilter = 'none'; // Retire le flou via JS
-                    },100);
-                    form.reset();
+                    // modalGameSettings.classList.remove('modalGameSettingsBase-show');
+                    // setTimeout(() => {
+
+                    //     modalGameSettings.style.display = 'none';
+                    //     mainDivMenu.style.backdropFilter = 'none'; // Retire le flou via JS
+                    //    // navigateTo('/pongSolo');//pong solo
+
+                    // },100);
                     navigateTo('/pongSolo');//pong solo
+
+
+                    // Ouvrir la modal et appliquer l'effet de flou
+                    // const modalToClose = document.getElementsByClassName('modalGameSettingsBase'); // Assurez-vous que l'ID est correct
+                    // navigateWithBlur(modalToClose, '/pongSolo'); // Naviguer vers la page /pongSolo après flou
+
+                    form.reset();
+                    //navigateTo('/pongSolo');//pong solo
+
                 }
                 else {
                     const errorMessage = document.createElement('p');

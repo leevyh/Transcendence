@@ -8,6 +8,7 @@ import {
     handleKeyDown,
     handleKeyUp,
     draw,
+    initialize_color,
 } from './pongSolo_game.js'; // Importation des fonctions et variables du jeu Pong
 
 
@@ -23,10 +24,10 @@ export async function pongSoloView(container) {
      const div = document.createElement('div');
      div.className = 'd-flex h-100';
      container.appendChild(div);
- 
+
      const navBarContainer = await navigationBar(container);
      div.appendChild(navBarContainer);
- 
+
 	loadPongSoloCSS();  // CSS
 
     // HTML
@@ -78,6 +79,8 @@ export async function pongSoloView(container) {
     div.appendChild(viewContainer);
 
     canvas = document.getElementById('canvas');
+	await initialize_color();
+
 
 	reset(); // Init game
     draw();
