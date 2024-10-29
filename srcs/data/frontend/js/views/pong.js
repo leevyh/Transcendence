@@ -15,6 +15,7 @@ import {
     handleKeyUp,
     draw,
     game,
+    initialize_color_duo,
 } from './pong_game.js'; // Importation des fonctions et variables du jeu Pong
 
 
@@ -83,6 +84,7 @@ export async function pongView(container, tournamentSocket) {
     div.appendChild(viewContainer);
 
     canvas = document.getElementById('canvas');
+    await initialize_color_duo();///
     draw();
 
     // WebSocket

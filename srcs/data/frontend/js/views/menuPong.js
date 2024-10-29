@@ -138,63 +138,75 @@ export async function menuPongView(container) {
         button.appendChild(hoverGif);
 
     // Réinitialisation du GIF au survol
-    button.addEventListener('mouseenter', () => {
-        hoverGif.src = ''; // Vider le chemin de l'image temporairement
-        hoverGif.src = gifSrc; // Remettre le même chemin pour redémarrer le GIF
+        button.addEventListener('mouseenter', () => {
+            hoverGif.src = ''; // Vider le chemin de l'image temporairement
+            hoverGif.src = gifSrc; // Remettre le même chemin pour redémarrer le GIF
+        });
+        return button;
+    }
+
+    let redirectTo = '';
+
+    function openModal() {
+        if (modalGameSettings.style.display === 'block') {
+            console.log("Modal is already open. Closing it first.");
+            modalGameSettings.classList.remove('modalGameSettingsBase-show'); // Enlève la classe d'animation
+            modalGameSettings.style.display = 'none'; // Ferme la modal
+        }
+
+        // Ouvre la modal
+        modalGameSettings.style.display = 'block';
+        setTimeout(() => {
+            modalGameSettings.classList.add('modalGameSettingsBase-show');
+            mainDivMenu.style.backdropFilter = 'blur(10px)';
+            mainDivMenu.style.transition = 'backdrop-filter 0.3s ease';
+        }, 10);
+    }
+
+    // Bouton Solo
+    const soloButton = createAnimatedButton(
+        'soloButton',               // Classe du bouton
+        'Solo',                     // Texte du bouton
+        '/js/img/pong1.png',       // PNG pour Solo
+        '/js/img/pong.gif',        // GIF pour Solo
+        'ContenerSoloButton w-50 h-100 d-flex justify-content-center align-items-end' // Classe du conteneur
+    );
+
+    soloButton.addEventListener('click', () => {
+
+        redirectTo = '/pongSolo';
+        openModal();
     });
-    return button;
-}
 
-        // Appeler la fonction pour créer les boutons avec leurs images respectives
+    // Bouton Duo
+    const duoButton = createAnimatedButton(
+        'DuoButton',               // Classe du bouton
+        'Duo',                     // Texte du bouton
+        '/js/img/pong1.png',      // PNG pour Duo
+        '/js/img/pong.gif',       // GIF pour Duo
+        'ContenerDuoButton w-50 h-100 d-flex justify-content-center align-items-end'
+    );
 
-// Bouton Solo
-const soloButton = createAnimatedButton(
-    'soloButton',               // Classe du bouton
-    'Solo',                     // Texte du bouton
-    '/js/img/pong1.png',       // PNG pour Solo
-    '/js/img/pong.gif',        // GIF pour Solo
-    'ContenerSoloButton w-50 h-100 d-flex justify-content-center align-items-end' // Classe du conteneur
-);
+    duoButton.addEventListener('click', () => {
+        redirectTo = '/pong';
+        openModal();
+    });
 
-// soloButton.addEventListener('click', () => {
-//     navigateTo('/pongSolo'); // Page du jeu solo
-// });
+    // Bouton Tournament
+    const tournamentButton = createAnimatedButtonTournament(
+        'TournamentButton',        // Classe du bouton
+        'Tournament',              // Texte du bouton
+        '/js/img/pong1.png',      // PNG pour Tournament
+        '/js/img/pong.gif',       // GIF pour Tournament
+        'ContenerTournamentButton w-50 h-100 d-flex justify-content-center align-items-center'
+    );
 
-// Bouton Duo
-const duoButton = createAnimatedButton(
-    'DuoButton',               // Classe du bouton
-    'Duo',                     // Texte du bouton
-    '/js/img/pong1.png',      // PNG pour Duo
-    '/js/img/pong.gif',       // GIF pour Duo
-    'ContenerDuoButton w-50 h-100 d-flex justify-content-center align-items-end'
-);
-duoButton.addEventListener('click', () => {
-    navigateTo('/pong'); // Page du jeu en duo
-});
+    tournamentButton.addEventListener('click', () => {
+        redirectTo = '/tournament';
+        openModal();
+    });
 
-// Bouton Tournament
-const tournamentButton = createAnimatedButtonTournament(
-    'TournamentButton',        // Classe du bouton
-    'Tournament',              // Texte du bouton
-    '/js/img/pong1.png',      // PNG pour Tournament
-    '/js/img/pong.gif',       // GIF pour Tournament
-    'ContenerTournamentButton w-50 h-100 d-flex justify-content-center align-items-center'
-);
 
-tournamentButton.addEventListener('click', () => {
-    navigateTo('/tournament');
-});
-
-soloButton.addEventListener('click', () => {
-
-    modalGameSettings.style.display = 'block'; // Affiche la modal
-    setTimeout(() => {
-        modalGameSettings.classList.add('modalGameSettingsBase-show'); // Ajoute la classe pour l'animation
-        mainDivMenu.style.backdropFilter = 'blur(10px)'; // Ajoute le flou via JS
-        mainDivMenu.style.transition = 'backdrop-filter 0.3s ease'; // Ajoute une transition fluide
-
-    }, 10);
-});
 
     ///////////////////////////////////////////////////////////////
         // ModalGameSettings
@@ -252,7 +264,7 @@ soloButton.addEventListener('click', () => {
 
         document.addEventListener('click', (event) => {
             // Si le clic est en dehors du contenu de la modal
-            if (!modalGameSettingsContent.contains(event.target) && !soloButton.contains(event.target) && modalGameSettings.style.display === 'block') {
+            if (!modalGameSettingsContent.contains(event.target) && !soloButton.contains(event.target) && !duoButton.contains(event.target) && !tournamentButton.contains(event.target) && modalGameSettings.style.display === 'block') {
                 modalGameSettings.classList.remove('modalGameSettingsBase-show');
                 document.body.classList.remove('blur-background'); // Enlève l'effet de flou
                 setTimeout(() => {
@@ -404,23 +416,8 @@ soloButton.addEventListener('click', () => {
                     successMessage.className = 'text-success';
                     successMessage.textContent = 'Color successfully modified';
                     form.appendChild(successMessage);
-                    // modalGameSettings.classList.remove('modalGameSettingsBase-show');
-                    // setTimeout(() => {
-
-                    //     modalGameSettings.style.display = 'none';
-                    //     mainDivMenu.style.backdropFilter = 'none'; // Retire le flou via JS
-                    //    // navigateTo('/pongSolo');//pong solo
-
-                    // },100);
-                    navigateTo('/pongSolo');//pong solo
-
-
-                    // Ouvrir la modal et appliquer l'effet de flou
-                    // const modalToClose = document.getElementsByClassName('modalGameSettingsBase'); // Assurez-vous que l'ID est correct
-                    // navigateWithBlur(modalToClose, '/pongSolo'); // Naviguer vers la page /pongSolo après flou
-
+                    navigateTo(redirectTo);
                     form.reset();
-                    //navigateTo('/pongSolo');//pong solo
 
                 }
                 else {
