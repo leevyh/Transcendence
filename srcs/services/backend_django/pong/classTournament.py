@@ -44,6 +44,7 @@ class Tournament:
         await asyncio.sleep(2)
         await self.start_semi_finals()
         await self.wait_for_games()
+        print("resigned players", self.resigned_players.nickname)
         await self.create_small_final()
         await self.create_final()
         await self.start_finals()
@@ -229,6 +230,16 @@ class Tournament:
        
         await asyncio.gather(*tasks)
 
+    async def stop_game(self, game):
+        print("stop game")
+        if game == self.semi_finals1.name:
+            await self.semi_finals1.stop_game()
+        elif game == self.semi_finals2.name:
+            await self.semi_finals2.stop_game()
+        elif game == self.small_final.name:
+            await self.small_final.stop_game()
+        elif game == self.final.name:
+            await self.final.stop_game()
 
     #end the tournament
     async def end_tournament(self):
@@ -243,16 +254,26 @@ class Tournament:
         await self.channel_layer.group_send(
             f"tournament_{self.id}",
             {
-                'type': 'end_of_tournament',
-                'ranking': [
-                    self.final.winner,
-                    self.final.loser,
-                    self.small_final.winner,
-                    self.small_final.loser
-                ]
+                'type': 'final_results',
+                'ranking': {
+                    'first': self.final.winner.nickname,
+                    'second': self.final.loser.nickname,
+                    'third': self.small_final.winner.nickname,
+                    'fourth': self.small_final.loser.nickname
+                }
             }
         )
-        #save the tournament in the database
+        await self.save_tournament()
+        await asyncio.sleep(4)
+        await self.channel_layer.group_send(
+            f"tournament_{self.id}",
+            {
+                'type': 'end_of_tournament'
+            }
+        )
+            
+    #save the tournament in the database
+    async def save_tournament(self):
 
         from pong.models import Tournament
         tournament_database = await sync_to_async(Tournament.objects.get, thread_sensitive=True)(id=self.id)

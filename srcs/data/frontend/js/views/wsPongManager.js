@@ -33,10 +33,11 @@ export const PongWebSocketManager = {
         }
     },
 
-    sendStopGame() {
+    sendStopGame(game_name) {
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
             const data = {
                 type: 'stop_game',
+                game: game_name,
             };
             this.socket.send(JSON.stringify(data));
         }
