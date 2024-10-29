@@ -6,7 +6,7 @@ import { getCookie } from './utils.js';
 
 async function fetchUserStats(userID) {
     // const id = window.location.pathname.split('/profile/')[1];
-    const response = await fetch(`/api/profile/${userID}/`, {  // URL de ton API pour récupérer les statistiques
+    const response = await fetch(`/api/stats/${userID}/`, {  // URL de ton API pour récupérer les statistiques
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
