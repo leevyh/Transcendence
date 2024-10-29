@@ -138,7 +138,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
 // Function to get the current user
-async function getCurrentUser() {
+export async function getCurrentUser() {
     try {
         const response = await fetch('/api/current_user/', {
             method: 'GET',
