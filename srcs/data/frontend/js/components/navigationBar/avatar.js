@@ -307,10 +307,10 @@ async function createAvatarModal() {
                     }, 25);
                 }, 800);
             } else {
-            //     const errorMessage = document.createElement('p');
-            //     errorMessage.className = 'text-danger';
-            //     errorMessage.textContent = 'An error occurred while removing the avatar.';
-            //    avatarForm.insertBefore(errorMessage, removeAvatarButton);
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-danger';
+                errorMessage.textContent = 'An error occurred while removing the avatar.';
+               avatarForm.insertBefore(errorMessage, removeAvatarButton);
             }
         } catch (error) {
             if (DEBUG) console.error('Error during the avatar removal', error);

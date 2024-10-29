@@ -273,12 +273,71 @@ export async function menuPongView(container) {
             }
         });
 
+        function createImageBlock(imagePath, imageSize, textContent) {
+            // Crée le conteneur pour le bloc
+            const blockTheme = document.createElement('div');
+            blockTheme.className = 'd-flex justify-content-around align-items-center flex-column w-25 h-100';
+
+            // Crée l'élément image
+            const imgElement = document.createElement('img');
+            imgElement.src = imagePath;
+            imgElement.alt = `Image de ${textContent}`;
+            imgElement.className = 'ImgWinter'; // Ou change le nom si nécessaire
+            imgElement.style.width = imageSize; // Définit la taille de l'image
+
+            // Ajoute l'image au bloc
+            blockTheme.appendChild(imgElement);
+
+            // Crée le paragraphe pour le texte
+            const textElement = document.createElement('p');
+            textElement.className = 'w-100 d-flex justify-content-center align-items-center';
+            textElement.textContent = textContent;
+
+            // Ajoute le texte au bloc
+            blockTheme.appendChild(textElement);
+
+            return blockTheme; // Retourne le bloc complet
+        }
+
         const modalGameSettingsBody = document.createElement('div');
         modalGameSettingsBody.className = 'modal-body mt-2';
         modalGameSettingsContent.appendChild(modalGameSettingsBody);
 
         const form = document.createElement('form');
         modalGameSettingsBody.appendChild(form);
+
+        const ContenerThemes = document.createElement('div');
+        ContenerThemes.className = 'ContenerThemes w-100 mb-3 rounded p-1 row';
+        ContenerThemes.style.backgroundColor = '#d4cbcb '; //#938c8c
+        form.appendChild(ContenerThemes);
+
+        // const blockTheme = document.createElement('div');
+        // blockTheme.className = 'd-flex justify-content-around align-items-center flex-column  w-25 h-100';
+        // ContenerThemes.appendChild(blockTheme);
+
+        // const ImgWinter = document.createElement('img');
+        // ImgWinter.src = '/js/img/Winter.png';
+        // ImgWinter.alt = 'ImgWinter d-flex justify-content-center align-items-center';
+        // ImgWinter.className = 'ImgWinter ';
+        // ImgWinter.style.width = '90px';
+        // blockTheme.appendChild(ImgWinter);
+
+        // const FirstTheme = document.createElement('p');
+        // FirstTheme.className = 'w-100 d-flex justify-content-center align-items-center';
+        // FirstTheme.textContent = 'Winter';
+        // blockTheme.appendChild(FirstTheme);
+
+        const winterBlock = createImageBlock('/js/img/Winter.png', '90px', 'Winter');
+        ContenerThemes.appendChild(winterBlock);
+
+        const springBlock = createImageBlock('/js/img/flower.png', '90px', 'Spring');
+        ContenerThemes.appendChild(springBlock);
+
+        const summerBlock = createImageBlock('/js/img/summer.png', '90px', 'Summer');
+        ContenerThemes.appendChild(summerBlock);
+
+        const autumnBlock = createImageBlock('/js/img/images.jpeg', '90px', 'Summer');
+        ContenerThemes.appendChild(autumnBlock);
 
         const TitleBackgroundColor = document.createElement('h5');
         TitleBackgroundColor.className = 'TitleBackgroundColor mb-4';

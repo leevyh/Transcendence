@@ -54,7 +54,7 @@
 }
 
 
-/* =======================MODAL-LOGIN===========================*/
+/* =======================MODAL===========================*/
 .modalGameSettingsBase {
     justify-content: center;
     align-items: center;
@@ -150,4 +150,18 @@
 .ButtonLogin:focus {
     background-color: #000;
     box-shadow: #435574 0px 4px 12px;
+}
+
+.ContenerThemes {
+    height: 150px;
+}
+
+/* .bi.bi-layout-split{
+    width: 50% !important;
+    height: 50% !important;
+} */
+
+.SVGTheme::before {
+    width: 10px;
+    height: 10px;
 }
