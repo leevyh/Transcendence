@@ -23,7 +23,7 @@ export async function createNavigationBar(container, userData) {
 
     // Navigation list
     const divNav = document.createElement('div');
-    divNav.className = 'divNav border-top border-2 border-bottom border-custom-color py-3 w-100';
+    divNav.className = 'divNav border-top border-2 border-bottom border-custom-color py-3 w-100 hide-on-short';
     nav.appendChild(divNav);
 
     const NavBarList = createNavBarList();
@@ -31,7 +31,7 @@ export async function createNavigationBar(container, userData) {
 
     // Friends list
     const divListFriends = document.createElement('div');
-    divListFriends.className = 'divListFriends d-flex justify-content-center w-100 py-3';
+    divListFriends.className = 'divListFriends d-flex justify-content-center w-100 py-3 hide-on-short';
     // divListFriends.textContent = 'Friends list';
     nav.appendChild(divListFriends);
 
