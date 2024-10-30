@@ -4,6 +4,7 @@ import { displayFriendRequests } from '../components/notifications/friendRequest
 import { displayMessages } from '../components/notifications/newMessageNotifications.js';
 // import { getNotifications } from "../components/notifications/getNotifications";
 import wsManager from "./wsManager.js";
+import { displayToast} from "./utils.js";
 
 
 async function getNotificationsWS() {
@@ -11,7 +12,9 @@ async function getNotificationsWS() {
     wsManager.AddNotificationListener(
         function(data) {
             displayNotifications(data, document.querySelector('.offcanvas-body'));
-            incrementNotificationCount();
+            if (data.type === 'new_message' || data.type === 'friend_request') {
+                incrementNotificationCount();
+            }
         });
 }
 
@@ -185,6 +188,9 @@ function displayNotifications(notifications, offcanvas_body) {
         displayFriendRequests(notifications, offcanvas_body);
     } else if (notifications.type === 'new_message') {
         displayMessages(notifications, offcanvas_body);
+    }
+    else {
+        console.log("Do nothing");
     }
 
     return offcanvas_body;
