@@ -38,6 +38,7 @@ class PongGame:
         self.channel_loser = None
         self.id = 0
         self.status = 0
+        self.intournament = False
         self.created_at = datetime.now()
 
     #loop for the game
@@ -60,6 +61,8 @@ class PongGame:
         self.reset_ball()
         print("game name : ", self.name)
         self.channel_layer = get_channel_layer()
+        print("channel player 1 : ", self.channel_player_1)
+        print("channel player 2 : ", self.channel_player_2)
         await self.channel_layer.group_send(
             f"game_{self.id}",
             {
@@ -202,7 +205,12 @@ class PongGame:
         self.channel_layer = get_channel_layer()
         await self.channel_layer.group_send(
             f"game_{self.id}",
-            {'type': 'end_of_game'}
+            {
+                'type': 'end_of_game',
+                'winner': self.winner.nickname,
+                'score_winner': self.player_1_score if self.player_1_score >= self.player_2_score else self.player_2_score,
+                'score_loser': self.player_1_score if self.player_1_score < self.player_2_score else self.player_2_score
+            }
         )
 
     #save the game in the database
@@ -213,6 +221,7 @@ class PongGame:
         game_database.player_1_score = self.player_1_score
         game_database.player_2_score = self.player_2_score
         game_database.is_active = False
+        game_database.intournament = self.intournament
         await sync_to_async(game_database.save, thread_sensitive=True)()
 
         from api.models import MatchHistory

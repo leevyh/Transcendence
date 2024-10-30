@@ -44,10 +44,12 @@ class Tournament:
         await asyncio.sleep(2)
         await self.start_semi_finals()
         await self.wait_for_games()
-        print("resigned players", self.resigned_players.nickname)
+        if self.resigned_players:
+            print("resigned players", self.resigned_players[0].nickname)
         await self.create_small_final()
         await self.create_final()
         await self.start_finals()
+        await self.wait_for_games()
         await self.end_tournament()
   
     async def create_semi_finals(self):
@@ -64,6 +66,7 @@ class Tournament:
         self.semi_finals1.channel_player_1 = self.channel_layer_player[player_indices[0]]
         self.semi_finals1.player_2 = self.player[player_indices[1]]
         self.semi_finals1.channel_player_2 = self.channel_layer_player[player_indices[1]]
+        self.semi_finals1.intournament = True
         self.semi_finals1.name = "semi_finals1"
         self.semi_finals1.nbPlayers = 2
 
@@ -81,6 +84,7 @@ class Tournament:
         self.semi_finals2.channel_player_1 = self.channel_layer_player[player_indices[2]]
         self.semi_finals2.player_2 = self.player[player_indices[3]]
         self.semi_finals2.channel_player_2 = self.channel_layer_player[player_indices[3]]
+        self.semi_finals2.intournament = True
         self.semi_finals2.name = "semi_finals2"
         self.semi_finals2.nbPlayers = 2
 
@@ -118,9 +122,13 @@ class Tournament:
     #wait for the games to finish
     async def wait_for_games(self):
         print("wait for games")
-        while self.semi_finals1.is_active or self.semi_finals2.is_active:
-            await asyncio.sleep(1)
-        print("semi finals are finished")
+        if self.status == "semi_finals":
+            while self.semi_finals1.is_active or self.semi_finals2.is_active:
+                await asyncio.sleep(1)
+        elif self.status == "finals":
+            while self.small_final.is_active or self.final.is_active:
+                await asyncio.sleep(1)
+        await asyncio.sleep(4)
 
     #create the small_final game
     async def create_small_final(self):
@@ -130,6 +138,7 @@ class Tournament:
         self.small_final.player_2 = self.semi_finals2.loser
         self.small_final.channel_player_1 = self.semi_finals1.channel_loser
         self.small_final.channel_player_2 = self.semi_finals2.channel_loser
+        self.small_final.intournament = True
         self.small_final.name = "small_final"
         self.small_final.nbPlayers = 2
 
@@ -150,6 +159,7 @@ class Tournament:
         self.final.player_2 = self.semi_finals2.winner
         self.final.channel_player_1 = self.semi_finals1.channel_winner
         self.final.channel_player_2 = self.semi_finals2.channel_winner
+        self.final.intournament = True
         self.final.name = "final"
         self.final.nbPlayers = 2
 
@@ -162,6 +172,41 @@ class Tournament:
 
         print("final", self.final.player_1, self.final.player_2)
 
+    #start the finals
+    async def start_finals(self):
+        print("start finals")
+        self.status = "finals"
+        await self.channel_layer.group_send(
+            f"game_{self.small_final.id}",
+            {
+                'type': 'show_game',
+            }
+        )
+        await self.channel_layer.group_send(
+            f"game_{self.final.id}",
+            {
+                'type': 'show_game',
+            }
+        )
+
+        tasks = []
+
+        #if a resigned player is not null
+        if self.resigned_players:
+            if self.resigned_players[0] == self.small_final.player_1:
+                self.small_final.winner = self.small_final.player_2
+                self.small_final.loser = self.small_final.player_1
+            elif self.resigned_players[0] == self.small_final.player_2:
+                self.small_final.winner = self.small_final.player_1
+                self.small_final.loser = self.small_final.player_2
+        else:
+            await self.send_define_player(self.small_final, 'player_1', 'player_2')
+            tasks.append(self.small_final.game_loop())
+            
+        await self.send_define_player(self.final, 'player_1', 'player_2')
+        tasks.append(self.final.game_loop())
+       
+        await asyncio.gather(*tasks)
 
     async def send_define_player(self, game, current_player_1, current_player_2):
         print("send define player between", game.player_1, game.player_2)
@@ -193,42 +238,6 @@ class Tournament:
             self.small_final.move_player(player, move)
         elif game == self.final.name:
             self.final.move_player(player, move)
-
-    #start the finals
-    async def start_finals(self):
-        print("start finals")
-        self.status = "finals"
-        await self.channel_layer.group_send(
-            f"game_{self.small_final.id}",
-            {
-                'type': 'show_game',
-            }
-        )
-        await self.channel_layer.group_send(
-            f"game_{self.final.id}",
-            {
-                'type': 'show_game',
-            }
-        )
-
-        tasks = []
-
-        #if a resigned player is not null
-        if self.resigned_players:
-            if self.resigned_players[0] == self.small_final.player_1:
-                self.small_final.winner = self.small_final.player_2
-                self.small_final.loser = self.small_final.player_1
-            else:
-                self.small_final.winner = self.small_final.player_1
-                self.small_final.loser = self.small_final.player_2
-        else:
-            await self.send_define_player(self.small_final, 'player_1', 'player_2')
-            tasks.append(self.small_final.game_loop())
-            
-        await self.send_define_player(self.final, 'player_1', 'player_2')
-        tasks.append(self.final.game_loop())
-       
-        await asyncio.gather(*tasks)
 
     async def stop_game(self, game):
         print("stop game")
@@ -264,7 +273,7 @@ class Tournament:
             }
         )
         await self.save_tournament()
-        await asyncio.sleep(4)
+        await asyncio.sleep(7)
         await self.channel_layer.group_send(
             f"tournament_{self.id}",
             {

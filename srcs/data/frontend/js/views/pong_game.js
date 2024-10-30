@@ -76,13 +76,10 @@ export function stop() {
     GameOn = false;
 }
 
-export function endOfGame(data) {
+export function endOfGame(winner) {
+    console.log("end of game");
     cancelAnimationFrame(anim);
     GameOn = false;
-    
-    // if (inTournament == false) {
-    //     // return to the main menu
-    // }
 }
 
 // Key Down

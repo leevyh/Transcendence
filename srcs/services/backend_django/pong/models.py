@@ -19,6 +19,7 @@ class Game(models.Model):
     player_1_score = models.IntegerField(default=0)
     player_2_score = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    intournament = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
