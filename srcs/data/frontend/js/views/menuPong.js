@@ -273,6 +273,27 @@ export async function menuPongView(container) {
             }
         });
 
+        let tempBackgroundColor = GameSettings.background_game;
+        let tempPadsColor = GameSettings.pads_color;
+        let tempBallColor = GameSettings.ball_color;
+        // Tableau des couleurs disponibles
+        // Correspondance des couleurs
+        const colorMapping = {
+            'black': '#000000',
+            'white': '#fdfefe',
+            'purple': '#7d3c98',
+            'pink': '#FFC0CB',
+            'yellow': '#f4d03f',
+            'green': '#229954',
+            'gray': '#a6acaf',
+            'blue': '#1a5276',
+            'lila': '#d7bde2',
+            'red': '#c0392b',
+            'brown': '#873600',
+            'green_light': '#58d68d',
+            'blue_light': '#85c1e9'
+        };
+
         function createImageBlock(imagePath, imageSize, textContent) {
 
             const blockTheme = document.createElement('div');
@@ -299,18 +320,45 @@ export async function menuPongView(container) {
             return blockTheme;
         }
 
+        let selectTheme = false;
+
+        const themeColorMapping = {
+            'Winter': { background: 'blue_light', pads: 'white', ball: 'blue' },
+            'Spring': { background: 'lila', pads: 'purple', ball: 'green_light' },
+            'Summer': { background: 'blue', pads: 'yellow', ball: 'red' },
+            'Autumn': { background: 'brown', pads: 'white', ball: 'white' }
+        };
+
         function selectBlock(selectedBlock) {
 
+            selectTheme = true;
             document.querySelectorAll('.theme-block').forEach(block => {
                 block.style.border = '';
             });
             selectedBlock.style.border = '4px solid #F4ED37';
+
+            // Déterminer le thème en fonction du texte du bloc sélectionné
+            const themeName = selectedBlock.querySelector('p').textContent;
+            const themeColors = themeColorMapping[themeName];
+
+            console.log("themecolors = ", themeColors);
+            if (themeColors) {
+                tempBackgroundColor = themeColors.background;
+                tempPadsColor = themeColors.pads;
+                tempBallColor = themeColors.ball;
+
+                refreshColorOptions();
+            }
         }
+
+
+
 
         document.addEventListener('click', (event) => {
             if (!ContenerThemes.contains(event.target)) { // Si le clic est en dehors de ContenerThemes
                 document.querySelectorAll('.theme-block').forEach(block => {
                     block.style.border = ''; // Supprime la bordure de tous les blocs
+                    selectTheme = false;
                 });
             }
         });
@@ -336,7 +384,7 @@ export async function menuPongView(container) {
         const summerBlock = createImageBlock('/js/img/iceCream.png', '90px', 'Summer');
         ContenerThemes.appendChild(summerBlock);
 
-        const autumnBlock = createImageBlock('/js/img/leaf.png', '90px', 'Summer');
+        const autumnBlock = createImageBlock('/js/img/leaf.png', '90px', 'Autumn');
         ContenerThemes.appendChild(autumnBlock);
 
 
@@ -350,27 +398,6 @@ export async function menuPongView(container) {
         colorOptionsContainer.className = 'd-flex justify-content-center mb-3 colorOptionsContainer';
         form.appendChild(colorOptionsContainer);
 
-        // Tableau des couleurs disponibles
-        // Correspondance des couleurs
-        const colorMapping = {
-            'black': '#000000',
-            'white': '#fdfefe',
-            'purple': '#7d3c98',
-            'pink': '#FFC0CB',
-            'yellow': '#f4d03f',
-            'green': '#229954',
-            'gray': '#a6acaf',
-            'blue': '#1a5276',
-            'lila': '#d7bde2',
-            'red': '#c0392b',
-            'brown': '#873600',
-            'green_light': '#58d68d',
-            'blue_light': '#85c1e9'
-        };
-
-        let tempBackgroundColor = GameSettings.background_game;
-        let tempPadsColor = GameSettings.pads_color;
-        let tempBallColor = GameSettings.ball_color;
 
         // Fonction pour creer le visuel des couleurs
         const addColorOptions = (container, colorType) => {
@@ -385,16 +412,30 @@ export async function menuPongView(container) {
                 colorDiv.style.cursor = 'pointer';
                 colorDiv.style.border = '2px solid transparent'; // Bordure initialement transparente
 
-                if (colorType === 'background' && GameSettings.background_game == colorName) {
-                    colorDiv.style.border = '4px solid #F4ED37';
+                console.log("fonc color : ", selectTheme);
+                console.log("temp backgound color : ", tempBackgroundColor);
+                console.log("temp pads color : ", tempPadsColor);
+                console.log("temp ball color : ", tempBallColor);
+                console.log("colortype :", colorType);
+                if (selectTheme == false) {
+                    if (colorType === 'background' && GameSettings.background_game == colorName) {
+                        colorDiv.style.border = '4px solid #F4ED37';
+                    }
+                    else if (colorType === 'pads' && GameSettings.pads_color == colorName) {
+                        colorDiv.style.border = '4px solid #F4ED37';
+                    }
+                    else if (colorType === 'ball' && GameSettings.ball_color == colorName) {
+                        colorDiv.style.border = '4px solid #F4ED37';
+                    }
                 }
-                else if (colorType === 'pads' && GameSettings.pads_color == colorName) {
-                    colorDiv.style.border = '4px solid #F4ED37';
+                if (selectTheme == true) {
+                    console.log("selecttheme =true");
+                    if ((colorType === 'background' && colorName === tempBackgroundColor) ||
+                    (colorType === 'pads' && colorName === tempPadsColor) ||
+                    (colorType === 'ball' && colorName === tempBallColor)) {
+                        colorDiv.style.border = '4px solid #F4ED37';
+                    }
                 }
-                else if (colorType === 'ball' && GameSettings.ball_color == colorName) {
-                    colorDiv.style.border = '4px solid #F4ED37';
-                }
-
                 colorDiv.addEventListener('click', () => {
                     const isSelected = colorDiv.style.border === '4px solid #F4ED37';
                     container.querySelectorAll('.color-option').forEach(option => {
@@ -439,6 +480,19 @@ export async function menuPongView(container) {
         form.appendChild(colorOptionsContainerBall);
 
         addColorOptions(colorOptionsContainerBall, 'ball');  //COLOR Pour la balle
+
+
+        function refreshColorOptions() {
+            // Vider les conteneurs avant de les remplir de nouvelles couleurs
+            colorOptionsContainer.innerHTML = '';
+            colorOptionsContainerPad.innerHTML = '';
+            colorOptionsContainerBall.innerHTML = '';
+
+            // Ajouter les options de couleur mises à jour
+            addColorOptions(colorOptionsContainer, 'background');
+            addColorOptions(colorOptionsContainerPad, 'pads');
+            addColorOptions(colorOptionsContainerBall, 'ball');
+        }
 
         const playButton = document.createElement('button');
         playButton.type = 'submit';
