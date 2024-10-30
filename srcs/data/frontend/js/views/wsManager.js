@@ -1,6 +1,5 @@
 import { isAuthenticated} from "./utils.js";
 import { DEBUG } from "../app.js";
-import { displayToast } from "./utils.js";
 
 class WebSocketManager {
     constructor(url) {
@@ -29,11 +28,11 @@ class WebSocketManager {
             try {
                 this.socket = new WebSocket(this.url);
             } catch (error) {
-                if (DEBUG) {console.error('WebSocket connection error:', error);}
+                if (DEBUG) {console.error('WSManager WebSocket connection error:', error);}
                 return;
             }
             this.socket.onopen = () => {
-                if (DEBUG) {console.log('WebSocket connection established');}
+                if (DEBUG) {console.log('WSManager WebSocket connection established');}
                 this.isConnected = true;
             };
 
@@ -43,12 +42,12 @@ class WebSocketManager {
             };
 
             this.socket.onclose = () => {
-                if (DEBUG) {console.log('WebSocket connection closed');}
+                if (DEBUG) {console.log('WSManager WebSocket connection closed');}
                 this.isConnected = false;
                 setTimeout(() => this.connect(), 5000);
             };
             this.socket.onerror = error => {
-                if (DEBUG) {console.error('WebSocket error:', error);}
+                if (DEBUG) {console.error('WSManager WebSocket error:', error);}
             };
         } else {
             console.error('No token found');
@@ -61,7 +60,7 @@ class WebSocketManager {
             if (DEBUG) {console.log("Sending data: ", data);}
             this.socket.send(JSON.stringify(data));
         } else {
-            if (DEBUG) {console.error('WebSocket is not connected');}
+            if (DEBUG) {console.error('WSManager WebSocket is not connected');}
         }
     }
 
@@ -73,6 +72,7 @@ class WebSocketManager {
         this.callbacks = this.callbacks.filter(cb => cb !== callback);
     }
 }
+
 const wsManager = new WebSocketManager('ws://' + window.location.host + '/ws/notifications/');
 
 export default wsManager;

@@ -20,7 +20,7 @@ async function sendFriendRequestToServer(nickname) {
             nickname: nickname,
         });
     } else {
-        if (DEBUG) {console.log("Websocket is not open friend request cannot be sent");}
+        if (DEBUG) {console.log("Friends Websocket is not open, friend request cannot be sent");}
     }
 }
 
@@ -125,7 +125,7 @@ export async function friendsView(container) {
 
     const statusSocket = new WebSocket('ws://' + window.location.host + '/ws/status/');
     statusSocket.onopen = function (event) {
-        if (DEBUG) {console.log('Status socket opened');}
+        if (DEBUG) {console.log('Status WebSocket opened (in Users)');}
     }
 
     statusSocket.onmessage = function (event) {
@@ -138,7 +138,7 @@ export async function friendsView(container) {
     };
 
     statusSocket.onclose = function (event) {
-        if (DEBUG) {console.error('Status socket closed', event);}
+        if (DEBUG) {console.error('Status WebSocket closed (in Users)', event);}
     }
 
     container.innerHTML = '';

@@ -89,12 +89,12 @@ async function openConversation(conversationID, otherUser) {
     chatWS = new WebSocket('ws://' + window.location.host + `/ws/chat/${conversationID}/`);
 
     chatWS.onopen = function() {
-        if (DEBUG) {console.log('WebSocket OPEN - conversationID:', conversationID);}
+        if (DEBUG) {console.log('Chat WebSocket OPEN - conversationID:', conversationID);}
     }
 
     chatWS.onmessage = function(event) {
         const receivedMessage = JSON.parse(event.data);
-        if (DEBUG) {console.log('WebSocket MESSAGE:', receivedMessage);}
+        if (DEBUG) {console.log('Chat WebSocket MESSAGE:', receivedMessage);}
 
         if (receivedMessage.type === 'chat_history') {
             // Get the conversation data: Users info (nickname, avatar, blocked_status)
@@ -147,11 +147,11 @@ async function openConversation(conversationID, otherUser) {
     }
 
     chatWS.onclose = function() {
-        if (DEBUG) {console.log('WebSocket CLOSE - conversationID:', conversationID);}
+        if (DEBUG) {console.log('Chat WebSocket CLOSE - conversationID:', conversationID);}
     }
 
     chatWS.onerror = function(event) {
-        if (DEBUG) {console.error('WebSocket ERROR:', event);}
+        if (DEBUG) {console.error('Chat WebSocket ERROR:', event);}
     }
 }
 
@@ -203,7 +203,7 @@ export function handleMessage(message) {
         };
         chatWS.send(JSON.stringify(messageData));
     } else {
-        if (DEBUG) {console.error('WebSocket is not open.');}
+        if (DEBUG) {console.error('Chat WebSocket is not open.');}
     }
 }
 

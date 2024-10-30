@@ -34,7 +34,7 @@ export async function navigationBar(container) {
 
                 const friends_websocket = new WebSocket(`ws://${window.location.host}/ws/friends/`);
                 friends_websocket.onopen = () => {
-                    if (DEBUG) console.log('WebSocket connection established');
+                    if (DEBUG) console.log('Friends WebSocket connection established');
                     friends_websocket.send(JSON.stringify({type: 'get_friends'}));
                 }
 
@@ -47,12 +47,12 @@ export async function navigationBar(container) {
                 };
 
                 friends_websocket.onclose = () => {
-                    if (DEBUG) console.error('WebSocket connection closed.');
+                    if (DEBUG) console.error('Friends WebSocket connection closed.');
                 };
 
                 // On WebSocket error
                 friends_websocket.onerror = error => {
-                    if (DEBUG) console.error('WebSocket error:', error);
+                    if (DEBUG) console.error('Friends WebSocket error:', error);
                 };
 
                 // Creation of the navigation bar

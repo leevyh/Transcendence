@@ -131,7 +131,7 @@ export async function pongView(container, tournamentSocket) {
     };
 
     PongWebSocketManager.socket.onclose = (event) => {
-        console.log("WebSocket disconnected", event);
+        console.log("Pong WebSocket disconnected", event);
     };
     const stopGameButton = document.querySelector('#stop-game');
 
