@@ -21,7 +21,7 @@ export async function chatView(container) {
     const statusSocket = new WebSocket('ws://' + window.location.host + '/ws/status/');
     // Onopen event
     statusSocket.onopen = function(event) {
-        if (DEBUG) {console.log('Status socket opened');}
+        if (DEBUG) {console.log('Status WebSocket opened (in Chat)');}
     };
 
     // On message received from the server (status of a user)
@@ -37,7 +37,7 @@ export async function chatView(container) {
 
     // Onclose event
     statusSocket.onclose = function(event) {
-        if (DEBUG) {console.error('Status socket closed', event);}
+        if (DEBUG) {console.error('Status WebSocket closed (in Chat)', event);}
     };
 
     const userList = document.getElementById('user-list');

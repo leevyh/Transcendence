@@ -6,7 +6,7 @@ export const PongWebSocketManager = {
         this.socket = new WebSocket(url);
 
         this.socket.onopen = () => {
-            console.log('WebSocket connection established');
+            console.log('Pong WebSocket connection established');
         };
     },
 
