@@ -274,30 +274,46 @@ export async function menuPongView(container) {
         });
 
         function createImageBlock(imagePath, imageSize, textContent) {
-            // Crée le conteneur pour le bloc
-            const blockTheme = document.createElement('div');
-            blockTheme.className = 'd-flex justify-content-around align-items-center flex-column w-25 h-100';
 
-            // Crée l'élément image
+            const blockTheme = document.createElement('div');
+            blockTheme.className = 'd-flex justify-content-around align-items-center flex-column w-25 h-100 rounded';
+            blockTheme.classList.add('theme-block');
+
             const imgElement = document.createElement('img');
             imgElement.src = imagePath;
             imgElement.alt = `Image de ${textContent}`;
-            imgElement.className = 'ImgWinter'; // Ou change le nom si nécessaire
+            imgElement.className = 'ImgSeason'; // Ou change le nom si nécessaire
             imgElement.style.width = imageSize; // Définit la taille de l'image
 
-            // Ajoute l'image au bloc
             blockTheme.appendChild(imgElement);
-
-            // Crée le paragraphe pour le texte
             const textElement = document.createElement('p');
             textElement.className = 'w-100 d-flex justify-content-center align-items-center';
             textElement.textContent = textContent;
 
-            // Ajoute le texte au bloc
             blockTheme.appendChild(textElement);
+            blockTheme.addEventListener('click', (event) => {
+                event.stopPropagation(); // Empêche la propagation pour éviter de déclencher le clic sur le document
+                selectBlock(blockTheme);
+            });
 
-            return blockTheme; // Retourne le bloc complet
+            return blockTheme;
         }
+
+        function selectBlock(selectedBlock) {
+
+            document.querySelectorAll('.theme-block').forEach(block => {
+                block.style.border = '';
+            });
+            selectedBlock.style.border = '4px solid #F4ED37';
+        }
+
+        document.addEventListener('click', (event) => {
+            if (!ContenerThemes.contains(event.target)) { // Si le clic est en dehors de ContenerThemes
+                document.querySelectorAll('.theme-block').forEach(block => {
+                    block.style.border = ''; // Supprime la bordure de tous les blocs
+                });
+            }
+        });
 
         const modalGameSettingsBody = document.createElement('div');
         modalGameSettingsBody.className = 'modal-body mt-2';
@@ -307,25 +323,9 @@ export async function menuPongView(container) {
         modalGameSettingsBody.appendChild(form);
 
         const ContenerThemes = document.createElement('div');
-        ContenerThemes.className = 'ContenerThemes w-100 mb-3 rounded p-1 row';
+        ContenerThemes.className = 'ContenerThemes m-3 rounded p-2 row';
         ContenerThemes.style.backgroundColor = '#d4cbcb '; //#938c8c
         form.appendChild(ContenerThemes);
-
-        // const blockTheme = document.createElement('div');
-        // blockTheme.className = 'd-flex justify-content-around align-items-center flex-column  w-25 h-100';
-        // ContenerThemes.appendChild(blockTheme);
-
-        // const ImgWinter = document.createElement('img');
-        // ImgWinter.src = '/js/img/Winter.png';
-        // ImgWinter.alt = 'ImgWinter d-flex justify-content-center align-items-center';
-        // ImgWinter.className = 'ImgWinter ';
-        // ImgWinter.style.width = '90px';
-        // blockTheme.appendChild(ImgWinter);
-
-        // const FirstTheme = document.createElement('p');
-        // FirstTheme.className = 'w-100 d-flex justify-content-center align-items-center';
-        // FirstTheme.textContent = 'Winter';
-        // blockTheme.appendChild(FirstTheme);
 
         const winterBlock = createImageBlock('/js/img/Winter.png', '90px', 'Winter');
         ContenerThemes.appendChild(winterBlock);
@@ -333,11 +333,12 @@ export async function menuPongView(container) {
         const springBlock = createImageBlock('/js/img/flower.png', '90px', 'Spring');
         ContenerThemes.appendChild(springBlock);
 
-        const summerBlock = createImageBlock('/js/img/summer.png', '90px', 'Summer');
+        const summerBlock = createImageBlock('/js/img/iceCream.png', '90px', 'Summer');
         ContenerThemes.appendChild(summerBlock);
 
-        const autumnBlock = createImageBlock('/js/img/images.jpeg', '90px', 'Summer');
+        const autumnBlock = createImageBlock('/js/img/leaf.png', '90px', 'Summer');
         ContenerThemes.appendChild(autumnBlock);
+
 
         const TitleBackgroundColor = document.createElement('h5');
         TitleBackgroundColor.className = 'TitleBackgroundColor mb-4';
