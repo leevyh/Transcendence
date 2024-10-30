@@ -6,7 +6,7 @@ import { getCookie } from './utils.js';
 
 async function fetchUserStats(userID) {
     // const id = window.location.pathname.split('/profile/')[1];
-    const response = await fetch(`/api/profile/${userID}/`, {  // URL de ton API pour récupérer les statistiques
+    const response = await fetch(`/api/stats/${userID}/`, {  // URL de ton API pour récupérer les statistiques
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -335,8 +335,7 @@ export async function profileView(container, userID) {
         TitleNbGame.textContent = "Games: " + parseInt(stats.nb_games);
         ContenerNbGame.appendChild(TitleNbGame);
 
-
-        function createGameHistory(player1Avatar, player1Name, score, player2Avatar, player2Name, isTournament) {
+        function createGameHistory(player1Avatar, player1Name, Player1Score, player2Avatar, player2Name, Player2Score, isTournament) {
             // Création de ContenerHistoriqueGame
             const ContenerHistoriqueGame = document.createElement('div');
             ContenerHistoriqueGame.className = 'ContenerHistoriqueGame d-flex flex-row w-100';
@@ -347,7 +346,8 @@ export async function profileView(container, userID) {
             ContenerHistoriqueGame.appendChild(ContenerYourAvatar);
 
             const YouravatarImage = document.createElement('img');
-            YouravatarImage.src = player1Avatar;
+            //base64 image
+            YouravatarImage.src = `data:image/png;base64,${player1Avatar}`;
             YouravatarImage.alt = 'YouravatarImage';
             YouravatarImage.className = 'YouravatarImage rounded-circle';
             YouravatarImage.style.width = '90px';
@@ -373,6 +373,9 @@ export async function profileView(container, userID) {
             SvgisTournament.setAttribute('viewBox', '0 0 16 16');
             ContenerScore.appendChild(SvgisTournament);
 
+
+            let score = Player1Score + '-' + Player2Score;
+
             const ScoreGame = document.createElement('p');
             ScoreGame.className = 'ScoreGame w-100 m-0 d-flex justify-content-center align-items-center fs-2 mb-4';
             ScoreGame.textContent = score;
@@ -384,7 +387,7 @@ export async function profileView(container, userID) {
             ContenerHistoriqueGame.appendChild(ContenerHisAvatar);
 
             const HisavatarImage = document.createElement('img');
-            HisavatarImage.src = player2Avatar;
+            HisavatarImage.src = `data:image/png;base64,${player2Avatar}`;
             HisavatarImage.alt = 'HisavatarImage';
             HisavatarImage.className = 'HisavatarImage rounded-circle';
             HisavatarImage.style.width = '90px';
@@ -428,10 +431,25 @@ export async function profileView(container, userID) {
         historical.className = 'historical h-100 overflow-y-auto';
         ContainerHistorical.appendChild(historical);
 
-        // Exemple : Générer 3 parties
-        // historical.appendChild(createGameHistory('/js/img/avatar3.jpeg', 'Player 3', '10-18', '/js/img/avatar4.jpeg', 'Player 4'));
-        // historical.appendChild(createGameHistory('/js/img/avatar5.jpeg', 'Player 5', '20-17', '/js/img/avatar6.jpeg', 'Player 6'));
-        historical.appendChild(createGameHistory(`data:image/png;base64, ${stats.avatar}`, `${stats.nickname}`, '22-14', '/js/img/download.jpeg', 'Player 2', 1));
+        // historical.appendChild(createGameHistory(${player_avatar}, `${player}`, ${player_score}, ${opponent_avatar}, ${opponent}, ${opponent_score}, 1));
+
+        // get Match history from back with this URL api/match_history/{user_id}/
+        const response = await fetch(`/api/match_history/${userID}/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        });
+        // get the data
+        const data = await response.json();
+        console.log(data);
+
+        // add the data to the view
+        data.forEach((game) => {
+            historical.appendChild(createGameHistory(`${game.player_avatar}`, `${game.player}`, `${game.player_score}`, `${game.opponent_avatar}`, `${game.opponent}`, `${game.opponent_score}`, 0));
+        }); //TODO CHANGE THE 0 TO 1 WHEN TOURNAMENT IS IMPLEMENTED
 
         const notifications_div = await notifications();
         div.appendChild(notifications_div);

@@ -6,7 +6,8 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.hashers import make_password, check_password
 
 from .forms import UserRegistrationForm, AccessibilityUpdateForm
-from .models import User_site, Accessibility, Stats_user, FriendRequest, Notification, Game_Settings
+from .models import User_site, Accessibility, Stats_user, FriendRequest, Notification, Game_Settings, MatchHistory
+from pong.models import Game
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from typing import Optional
@@ -80,40 +81,6 @@ def loginView(request):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
-@csrf_protect
-def get_profile(request, id):
-    if request.method == 'GET':
-        try:
-            user = User_site.objects.get(id=id)
-            try:
-                stats = Stats_user.objects.get(user=user)
-                avatar_image = user.avatar
-                avatar = base64.b64encode(avatar_image.read()).decode('utf-8')
-                data = {
-                    'nickname': user.nickname,
-                    'username': user.username,
-                    'id': user.id,
-                    'email': user.email,
-                    'created_at': user.created_at,
-                    'status': user.status,
-                    'nb_games': stats.nb_games,
-                    'nb_wins': stats.nb_wins,
-                    'nb_losses': stats.nb_losses,
-                    'win_rate': stats.win_rate,
-                    'nb_point_taken' :stats.nb_point_taken,
-                    'nb_point_given' :stats.nb_point_given,
-                    'avatar': avatar
-                }
-                return JsonResponse(data, status=200)
-            except Stats_user.DoesNotExist:
-                return JsonResponse({'error': 'Stats not found'}, status=404)
-        except User_site.DoesNotExist:
-            return JsonResponse({'error': 'User not found'}, status=404)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-    
-# Function to know who Am I / Current user
 def who_am_i(request):
     if request.method == 'GET':
         try:
@@ -150,9 +117,7 @@ def get_friend_request(request, nickname):
             except User_site.DoesNotExist:
                 return JsonResponse({'error': 'User to request not found'}, status=404)
             friend_request = FriendRequest.objects.filter(user=user, friend=friend).exclude(status='refused').first()
-            data = {}
             if friend_request:
-                # print("FIND FRIEND REQUEST")         # DEBUG
                 data = {'user': friend_request.user.nickname,
                         'friend': friend_request.friend.nickname,
                         'status': friend_request.status,
@@ -178,20 +143,10 @@ def get_Notification(request):
             except jwt.ExpiredSignatureError:
                 return JsonResponse({'error': 'Token expired'}, status=307)
             username = payload['username']
-            #get the user, the user_id and the notifications and content of notifications inside the good table
             user = User_site.objects.get(username=username)
             user_id = user.id
             notifications = Notification.objects.filter(user=user_id)
             notifications_list = []
-            #Table of notifications :
-            # class Notification(models.Model):
-            # user = models.ForeignKey(User_site, on_delete=models.CASCADE)
-            # type = models.CharField(max_length=255)
-            # status = models.CharField(max_length=255, default='unread', choices=[('unread', 'unread'), ('read', 'read')])
-            # friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
-            # # game_invite = models.ForeignKey(GameInvite, on_delete=models.CASCADE, null=True)
-            # # tournament_invite = models.ForeignKey(TournamentInvite, on_delete=models.CASCADE, null=True)
-            # created_at = models.DateTimeField(default=timezone.now)
             for notification in notifications:
                 if notification.type == 'friend_request':
                     avatar = base64.b64encode(notification.friend_request.user.avatar.read()).decode('utf-8')
@@ -205,6 +160,80 @@ def get_Notification(request):
             return JsonResponse({'error': 'User not found'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@csrf_exempt
+def get_match_history(request, id):
+    if request.method == 'GET':
+        try:
+            user = User_site.objects.get(id=id)
+            print("user:", user.nickname)         # DEBUG
+            match_histories = MatchHistory.objects.filter(player=user)
+            data = []
+
+            for match in match_histories:
+                game = Game.objects.get(id=match.game_id)
+                print(f"game player 1: {game.player_1_id} -> user nickname : {user.id}")         # DEBUG
+                if game.player_1_id == user.id:       # DEBUG
+                    opponent = User_site.objects.get(id=game.player_2_id).nickname
+                    opponent_avatar = base64.b64encode(User_site.objects.get(id=game.player_2_id).avatar.read()).decode('utf-8')
+                    player_score = game.player_1_score
+                    player_avatar = base64.b64encode(User_site.objects.get(id=game.player_1_id).avatar.read()).decode('utf-8')
+                    opponent_score = game.player_2_score
+                elif game.player_2_id == user.id:
+                    opponent = User_site.objects.get(id=game.player_1_id).nickname
+                    opponent_avatar = base64.b64encode(User_site.objects.get(id=game.player_1_id).avatar.read()).decode('utf-8')
+                    player_score = game.player_2_score
+                    player_avatar = base64.b64encode(User_site.objects.get(id=game.player_2_id).avatar.read()).decode('utf-8')
+                    opponent_score = game.player_1_score
+                else:
+                    return JsonResponse({'error': 'User not found'}, status=404)
+                data.append({'player': user.nickname,
+                            'player_score': player_score,
+                            'player_avatar': player_avatar,
+                            'opponent': opponent,
+                            'opponent_score': opponent_score,
+                            'opponent_avatar': opponent_avatar,
+                            'created_at': match.created_at})
+            return JsonResponse(data, status=200, safe=False)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def get_stats(request, id):
+    if request.method == 'GET':
+        try:
+            user = User_site.objects.get(id=id)
+            stats = Stats_user.objects.get(user=user)
+            data = {
+                "nickname": user.nickname,
+                "nb_games": 27,
+                "nb_wins": 12,
+                "nb_losses": 15,
+                "win_rate": 44.44,
+                "nb_point_taken": 36,
+                "nb_point_given": 24,
+            }
+            #TODO : GET THE GOOD STATS
+            # data = {
+            #     'nickname': user.nickname,
+            #     'nb_games': stats.nb_games,
+            #     'nb_wins': stats.nb_wins,
+            #     'nb_losses': stats.nb_losses,
+            #     'win_rate': stats.win_rate,
+            #     'nb_point_taken': stats.nb_point_taken,
+            #     'nb_point_given': stats.nb_point_given,
+            # }
+            return JsonResponse(data, status=200)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except Stats_user.DoesNotExist:
+            return JsonResponse({'error': 'Stats not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 def get_notificationUnread(request):
     if request.method == 'GET':

@@ -212,7 +212,7 @@ class PongGame:
         game_database.player_2_score = self.player_2_score
         game_database.is_active = False
         await sync_to_async(game_database.save, thread_sensitive=True)()
-        
+
         from api.models import MatchHistory
         match_history_player_1 = MatchHistory(player=self.player_1, game=game_database)
         match_history_player_2 = MatchHistory(player=self.player_2, game=game_database)
