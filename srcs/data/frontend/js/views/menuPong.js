@@ -147,11 +147,12 @@ export async function menuPongView(container) {
 
     let redirectTo = '';
 
+
     function openModal() {
         if (modalGameSettings.style.display === 'block') {
             console.log("Modal is already open. Closing it first.");
-            modalGameSettings.classList.remove('modalGameSettingsBase-show'); // Enlève la classe d'animation
-            modalGameSettings.style.display = 'none'; // Ferme la modal
+            modalGameSettings.removeAttribute('aria-hidden'); // Supprimer aria-hidden quand la modale est visible
+            modalGameSettings.focus(); // Donner le focus à la modale pour une meilleure accessibilité
         }
 
         // Ouvre la modal
@@ -162,6 +163,7 @@ export async function menuPongView(container) {
             mainDivMenu.style.transition = 'backdrop-filter 0.3s ease';
         }, 10);
     }
+
 
     // Bouton Solo
     const soloButton = createAnimatedButton(
@@ -259,6 +261,7 @@ export async function menuPongView(container) {
             setTimeout(() => {
                 modalGameSettings.style.display = 'none';
                 mainDivMenu.style.backdropFilter = 'none'; // Retire le flou via JS
+                modalGameSettings.setAttribute('aria-hidden', 'true');
             }, 100);
         });
 
@@ -269,6 +272,7 @@ export async function menuPongView(container) {
                 document.body.classList.remove('blur-background'); // Enlève l'effet de flou
                 setTimeout(() => {
                     modalGameSettings.style.display = 'none';
+                    modalGameSettings.setAttribute('aria-hidden', 'true');
                 }, 100);
             }
         });
@@ -276,6 +280,9 @@ export async function menuPongView(container) {
         let tempBackgroundColor = GameSettings.background_game;
         let tempPadsColor = GameSettings.pads_color;
         let tempBallColor = GameSettings.ball_color;
+
+        let selectTheme = localStorage.getItem('selectTheme') === 'true';
+        let selectedThemeName = localStorage.getItem('selectedThemeName') || null;
         // Tableau des couleurs disponibles
         // Correspondance des couleurs
         const colorMapping = {
@@ -295,32 +302,36 @@ export async function menuPongView(container) {
         };
 
         function createImageBlock(imagePath, imageSize, textContent) {
-
             const blockTheme = document.createElement('div');
-            blockTheme.className = 'd-flex justify-content-around align-items-center flex-column w-25 h-100 rounded';
-            blockTheme.classList.add('theme-block');
+            blockTheme.className = 'd-flex justify-content-around align-items-center flex-column w-25 h-100 rounded theme-block';
 
+            console.log("start createimage");
             const imgElement = document.createElement('img');
             imgElement.src = imagePath;
             imgElement.alt = `Image de ${textContent}`;
-            imgElement.className = 'ImgSeason'; // Ou change le nom si nécessaire
-            imgElement.style.width = imageSize; // Définit la taille de l'image
+            imgElement.className = 'ImgSeason';
+            imgElement.style.width = imageSize;
 
             blockTheme.appendChild(imgElement);
+
             const textElement = document.createElement('p');
             textElement.className = 'w-100 d-flex justify-content-center align-items-center';
             textElement.textContent = textContent;
 
             blockTheme.appendChild(textElement);
+
             blockTheme.addEventListener('click', (event) => {
-                event.stopPropagation(); // Empêche la propagation pour éviter de déclencher le clic sur le document
-                selectBlock(blockTheme);
+                event.stopPropagation();
+                selectBlock(blockTheme, textContent);
             });
+
+            console.log("create", selectTheme, selectedThemeName);
+            if (selectTheme && selectedThemeName === textContent) {
+                blockTheme.style.border = '4px solid #F4ED37'; // Applique la bordure si ce thème est sélectionné
+            }
 
             return blockTheme;
         }
-
-        let selectTheme = false;
 
         const themeColorMapping = {
             'Winter': { background: 'blue_light', pads: 'white', ball: 'blue' },
@@ -329,39 +340,26 @@ export async function menuPongView(container) {
             'Autumn': { background: 'brown', pads: 'white', ball: 'white' }
         };
 
-        function selectBlock(selectedBlock) {
-
-            selectTheme = true;
+        function selectBlock(block, themeName) {
             document.querySelectorAll('.theme-block').forEach(block => {
                 block.style.border = '';
             });
-            selectedBlock.style.border = '4px solid #F4ED37';
+            block.style.border = '4px solid #F4ED37';
+            selectTheme = true;
+            selectedThemeName = themeName;
 
-            // Déterminer le thème en fonction du texte du bloc sélectionné
-            const themeName = selectedBlock.querySelector('p').textContent;
-            const themeColors = themeColorMapping[themeName];
-
-            console.log("themecolors = ", themeColors);
+            // Sauvegarde dans le localStorage
+            localStorage.setItem('selectTheme', 'true');
+            localStorage.setItem('selectedThemeName', selectedThemeName);
+            // Déterminer les couleurs basées sur le thème sélectionné
+            const themeColors = themeColorMapping[selectedThemeName];
             if (themeColors) {
                 tempBackgroundColor = themeColors.background;
                 tempPadsColor = themeColors.pads;
                 tempBallColor = themeColors.ball;
-
                 refreshColorOptions();
             }
         }
-
-
-
-
-        document.addEventListener('click', (event) => {
-            if (!ContenerThemes.contains(event.target)) { // Si le clic est en dehors de ContenerThemes
-                document.querySelectorAll('.theme-block').forEach(block => {
-                    block.style.border = ''; // Supprime la bordure de tous les blocs
-                    selectTheme = false;
-                });
-            }
-        });
 
         const modalGameSettingsBody = document.createElement('div');
         modalGameSettingsBody.className = 'modal-body mt-2';
@@ -387,7 +385,6 @@ export async function menuPongView(container) {
         const autumnBlock = createImageBlock('/js/img/leaf.png', '90px', 'Autumn');
         ContenerThemes.appendChild(autumnBlock);
 
-
         const TitleBackgroundColor = document.createElement('h5');
         TitleBackgroundColor.className = 'TitleBackgroundColor mb-4';
         TitleBackgroundColor.textContent = 'Game color';
@@ -412,11 +409,6 @@ export async function menuPongView(container) {
                 colorDiv.style.cursor = 'pointer';
                 colorDiv.style.border = '2px solid transparent'; // Bordure initialement transparente
 
-                console.log("fonc color : ", selectTheme);
-                console.log("temp backgound color : ", tempBackgroundColor);
-                console.log("temp pads color : ", tempPadsColor);
-                console.log("temp ball color : ", tempBallColor);
-                console.log("colortype :", colorType);
                 if (selectTheme == false) {
                     if (colorType === 'background' && GameSettings.background_game == colorName) {
                         colorDiv.style.border = '4px solid #F4ED37';
@@ -435,6 +427,7 @@ export async function menuPongView(container) {
                     (colorType === 'ball' && colorName === tempBallColor)) {
                         colorDiv.style.border = '4px solid #F4ED37';
                     }
+
                 }
                 colorDiv.addEventListener('click', () => {
                     const isSelected = colorDiv.style.border === '4px solid #F4ED37';
@@ -498,6 +491,7 @@ export async function menuPongView(container) {
         playButton.type = 'submit';
         playButton.className = 'btn btn-primary w-100 Button mb-3';
         playButton.textContent = 'Play';
+        playButton.id = 'playButton';
         form.appendChild(playButton);
 
 
