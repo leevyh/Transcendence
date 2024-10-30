@@ -37,6 +37,23 @@ class User_site(AbstractUser):
                 },
             },
         )
+        friends = Friendship.objects.filter(models.Q(user1=self) | models.Q(user2=self))
+        for friend in friends:
+            friend_user = friend.user1 if friend.user1 != self else friend.user2
+            async_to_sync(channel_layer.group_send)(
+                f"user_{friend_user.id}_friends",
+                {
+                    "type": "send_friend_status_update",
+                    "message": {
+                        "type": "friends_status_update",
+                        "user_id": self.id,
+                        "nickname": self.nickname,
+                        "status": self.status,
+                        "avatar": encode_avatar(self),
+                    },
+                },
+            )
+
 
 
 class Accessibility(models.Model):

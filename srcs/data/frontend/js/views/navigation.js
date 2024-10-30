@@ -1,7 +1,7 @@
 import { DEBUG, navigateTo } from '../app.js';
 import { getCookie } from './utils.js';
 import { createNavigationBar } from '../components/navigationBar/visual.js';
-import { displayFriends } from '../components/navigationBar/friends.js';
+import {displayFriends, updateFriendStatus, addNewFriend} from '../components/navigationBar/friends.js';
 
 export async function navigationBar(container) {
     const div = document.createElement('div');
@@ -41,8 +41,11 @@ export async function navigationBar(container) {
                 friends_websocket.onmessage = event => {
                     const message = JSON.parse(event.data);
                     if (message.type === 'get_friends') {
-                        // Display the list of friends
                         displayFriends(message.friends);
+                    } else if (message.type === 'friends_status_update') {
+                        updateFriendStatus(message.user_id, message.nickname, message.status);
+                    } else if (message.type === 'new_friend_added') {
+                        addNewFriend(message.user_id, message.nickname, message.status, message.avatar);
                     }
                 };
 

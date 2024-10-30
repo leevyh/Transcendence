@@ -2,6 +2,7 @@ import { getCookie } from './utils.js';
 import { displayFriendRequests } from '../components/notifications/friendRequestNotifications.js';
 import { displayMessages } from '../components/notifications/newMessageNotifications.js';
 import wsManager from "./wsManager.js";
+import { displayToast} from "./utils.js";
 import { DEBUG } from '../app.js';
 
 let isNotificationWSInitialized = false;
@@ -21,7 +22,9 @@ async function getNotificationsWS() {
     wsManager.AddNotificationListener(
         function(data) {
             displayNotifications(data, document.querySelector('.offcanvas-body'));
-            incrementNotificationCount();
+            if (data.type === 'new_message' || data.type === 'friend_request') {
+                incrementNotificationCount();
+            }
         });
 }
 
@@ -193,6 +196,9 @@ function displayNotifications(notifications, offcanvas_body) {
         displayFriendRequests(notifications, offcanvas_body);
     } else if (notifications.type === 'new_message') {
         displayMessages(notifications, offcanvas_body);
+    }
+    else {
+        console.log("Do nothing");
     }
 
     return offcanvas_body;

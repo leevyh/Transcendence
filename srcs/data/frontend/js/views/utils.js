@@ -161,28 +161,33 @@ export function displayToast(data) {
         return;
     }
 
-    const avatar_user_sender = document.createElement('img');
-    avatar_user_sender.className = 'rounded me-2 user-img';
-    avatar_user_sender.src = `data:image/png;base64, ${data.from_avatar}`;
-    avatar_user_sender.alt = 'avatar';
-    toast_header.appendChild(avatar_user_sender);
+    if (data.type === 'new_message' || data.type === 'friend_request') {
+        const avatar_user_sender = document.createElement('img');
+        avatar_user_sender.className = 'rounded me-2 user-img';
+        avatar_user_sender.src = `data:image/png;base64, ${data.from_avatar}`;
+        avatar_user_sender.alt = 'avatar';
+        toast_header.appendChild(avatar_user_sender);
 
-    const strong = document.createElement('strong');
-    strong.className = 'me-auto';
-    strong.textContent = data.from_nickname;
-    toast_header.appendChild(strong);
+        const strong = document.createElement('strong');
+        strong.className = 'me-auto';
+        strong.textContent = data.from_nickname;
+        toast_header.appendChild(strong);
 
-    const button = document.createElement('button');
-    button.className = 'btn-close';
-    button.setAttribute('data-bs-dismiss', 'toast');
-    button.setAttribute('aria-label', 'Close');
-    button.addEventListener('click', () => {
-        toast.remove();
-        //Set notification as read in the database with websocket
-    });
-    toast_header.appendChild(button);
+        const button = document.createElement('button');
+        button.className = 'btn-close';
+        button.setAttribute('data-bs-dismiss', 'toast');
+        button.setAttribute('aria-label', 'Close');
+        button.addEventListener('click', () => {
+            toast.remove();
+            //Set notification as read in the database with websocket
+        });
+        toast_header.appendChild(button);
 
-    toast.appendChild(toast_header);
+        toast.appendChild(toast_header);
+    }
+    else {
+        return;
+    }
 
     // Gestion du type de notification
     if (data.type === 'new_message') {
@@ -225,6 +230,9 @@ export function displayToast(data) {
             //Set notification as read in the database with websocket
         });
         div_buttons.appendChild(reject_button);
+    }
+    else {
+        return ;
     }
 
     // Ajouter le toast au conteneur
