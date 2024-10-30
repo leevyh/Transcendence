@@ -55,5 +55,4 @@ export function displayMessages(notification, offcanvas_body) {
     const line = document.createElement('hr');
     line.className = 'w-100 separator_line_notifs';
     offcanvas_body.appendChild(line);
-
 }

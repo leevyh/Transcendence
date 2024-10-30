@@ -1,14 +1,24 @@
-import { navigateTo } from '../app.js';
 import { getCookie } from './utils.js';
 import { displayFriendRequests } from '../components/notifications/friendRequestNotifications.js';
 import { displayMessages } from '../components/notifications/newMessageNotifications.js';
-// import { getNotifications } from "../components/notifications/getNotifications";
 import wsManager from "./wsManager.js";
 import { displayToast} from "./utils.js";
+import { DEBUG } from '../app.js';
 
+let isNotificationWSInitialized = false;
 
 async function getNotificationsWS() {
 
+    if (isNotificationWSInitialized) {
+        if (DEBUG) console.log('WSManager WebSocket already initialized');
+        return;
+    }
+
+    isNotificationWSInitialized = true;
+
+    if (DEBUG) console.log('Initialization of getNotificationsWS');
+
+    // Create a WebSocketManager instance
     wsManager.AddNotificationListener(
         function(data) {
             displayNotifications(data, document.querySelector('.offcanvas-body'));
@@ -29,10 +39,10 @@ async function getUnreadNotifications() {
     });
 
     if (!response.ok) {
-        console.error("Erreur lors de la récupération des notifications non lues");
+        if (DEBUG) console.error("Error while getting unread notifications");
         return [];
     }
-    return await response.json(); // Assurez-vous que le backend renvoie un tableau
+    return await response.json();
 }
 
 
@@ -47,7 +57,7 @@ async function getNotifications() {
     });
 
     if (!response.ok) {
-        console.error("Erreur lors de la récupération des notifications");
+        if (DEBUG) console.error("Error while getting notifications");
         return [];
     }
     //call displayNotifications function for each notification in the response
@@ -77,7 +87,6 @@ export async function notifications() {
 
     // Get Notifications with status and count them. And create a badge only if there are notifications not read
     const unread_notification = await getUnreadNotifications();
-
 
     const notifications_badge = document.createElement('span');
     notifications_badge.className = 'badge badge_notifs bg-danger position-absolute top-0 end-0';
@@ -146,7 +155,6 @@ export async function notifications() {
         document.body.classList.remove('offcanvas-active');
     });
 
-
     await getNotificationsWS();
     return notifications_div;
 }
@@ -162,14 +170,14 @@ async function readAllNotifications() {
     });
 
     if (!response.ok) {
-        console.error("Erreur lors de la lecture des notifications");
+        console.error("Error while reading all notifications");
     }
     else
     {
         const badge = document.querySelector('.badge_notifs');
         if (badge) {
             badge.textContent = 0;
-            badge.style.display = 'none'; // Masquer le badge après avoir réinitialisé à 0
+            badge.style.display = 'none'; // Hide the badge if there are no notifications
         }
     }
 }
