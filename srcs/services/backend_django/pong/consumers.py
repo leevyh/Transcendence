@@ -118,7 +118,8 @@ class PongConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         # Update player positions or handle key events
         if data['type'] == 'update_player_position':
-            self.game.move_player(data['player'], data['move'])
+            if hasattr(self, 'game') and self.game is not None and self.game.is_active:
+                self.game.move_player(data['player'], data['move'])
         # if data['type'] == 'game_started':
         #     await self.game.is_active = True
         if data['type'] == 'stop_game' :

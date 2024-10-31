@@ -47,7 +47,7 @@ class PongGame:
         if (self.is_active == False):
             if(self.status == "ready"):
                 await self.start_game()
-        await asyncio.sleep(5.6)
+        await asyncio.sleep(5)
         while self.is_active:
             await self.move_ball()
             await self.move_player_loop()
@@ -149,8 +149,9 @@ class PongGame:
     def inverse_direction(self, paddle_position):
         self.ball_speed_x *= -1
         impact = self.ball_position_y - paddle_position - iv.PADDLE_HEIGHT / 2
-        ratio = 30 / (iv.PADDLE_HEIGHT / 2)
-        self.ball_speed_y = round(impact * ratio / 20)
+        ratio = 35 / (iv.PADDLE_HEIGHT / 2)
+        self.ball_speed_y = round(impact * ratio / 10)
+        self.ball_speed_x *= 1.2
     
     #move the player
     def move_player(self, player, move):

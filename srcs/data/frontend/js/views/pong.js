@@ -217,11 +217,6 @@ function startCountdown(container, game_name) {
             startCountdownTimer();
         }
     }
-    typeGameName();
-    window.addEventListener('beforeunload', () => {
-        countdownElement.remove();
-        gameNameElement.remove();
-    });
         
     function startCountdownTimer() {
         countdownElement.innerText = countdownValue;
