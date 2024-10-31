@@ -303,6 +303,7 @@ export async function menuPongView(container) {
         function createImageBlock(imagePath, imageSize, textContent) {
             const blockTheme = document.createElement('div');
             blockTheme.className = 'd-flex justify-content-around align-items-center flex-column w-25 h-100 rounded theme-block';
+            blockTheme.id = textContent;
 
             console.log("start createimage");
             const imgElement = document.createElement('img');
@@ -339,20 +340,21 @@ export async function menuPongView(container) {
             'Autumn': { background: 'brown', pads: 'white', ball: 'white' }
         };
 
-        let selectedThemeBlock = null;
+        // let selectedThemeBlock = null;
         function selectBlock(block, themeName) {
             document.querySelectorAll('.theme-block').forEach(block => {
                 block.style.border = '';
             });
             block.style.border = '4px solid #F4ED37';
-            selectedThemeBlock = block;
+            // selectedThemeBlock = block;
             selectTheme = true;
             selectedThemeName = themeName;
 
             // Sauvegarde dans le localStorage
             localStorage.setItem('selectTheme', 'true');
             localStorage.setItem('selectedThemeName', selectedThemeName);
-            localStorage.setItem('selectedThemeBlock', block.textContent.trim());
+            const blockName = block.textContent.trim();
+            localStorage.setItem('selectedThemeBlockName', blockName);
             // Déterminer les couleurs basées sur le thème sélectionné
             const themeColors = themeColorMapping[selectedThemeName];
             if (themeColors) {
@@ -363,6 +365,24 @@ export async function menuPongView(container) {
                 //verifySelectedThemeColors();
             }
         }
+
+        window.onload = () => {
+            const savedThemeName = localStorage.getItem('selectedThemeName');
+            const savedThemeBlockName = localStorage.getItem('selectedThemeBlockName');
+
+            if (savedThemeName) {
+                selectedThemeName = savedThemeName; // Met à jour le nom du thème
+
+                const themeBlocks = document.querySelectorAll('.theme-block');
+                themeBlocks.forEach(block => {
+                    // Comparez avec textContent.trim()
+                    console.log("window", block.textContent.trim(), savedThemeBlockName);
+                    if (block.textContent.trim() === savedThemeBlockName) {
+                        selectBlock(block, savedThemeName); // Sélectionnez le bloc si trouvé
+                    }
+                });
+            }
+        };
 
         function verifySelectedThemeColors() {
             console.log("verifytheme");
@@ -488,32 +508,27 @@ export async function menuPongView(container) {
                     if (colorsMatch) {
                         console.log("couleur correspondent");
                     } else {
-                        console.log("selectedThemeName", selectedThemeName);
-                        const themeBlock = selectedThemeBlock;
-                        console.log("themeBlock", themeBlock);
-                        console.log("selectedThemeName", selectedThemeName);
-                        if (themeBlock) {
-                            themeBlock.style.border = ''; // Retire la bordure
-                            console.log(`La bordure a été enlevée du thème: ${selectedThemeName}`);
-                        }
-                        else
-                            console.log("pas de themeblock donc pas enlever bordure");
+                        let elem = document.getElementById('Winter');
+                        if (elem)
+                            elem.style.border = '';
+                        elem = document.getElementById('Spring');
+                        if (elem)
+                            elem.style.border = '';
+                        elem = document.getElementById('Summer');
+                        if (elem)
+                            elem.style.border = '';
+                        elem = document.getElementById('Autumn');
+                        if (elem)
+                            elem.style.border = '';
                         selectTheme == false;
                         selectedThemeName = null;
-                        selectedThemeBlock= null;
+                        // selectedThemeBlock= null;
                         localStorage.setItem('selectTheme', 'false');
                         localStorage.setItem('selectedThemeName', '');
-                        localStorage.setItem('selectedThemeBlock', '');
+                        // localStorage.setItem('selectedThemeBlock', '');
                         // Les couleurs ne correspondent pas, avertir l'utilisateur
                     }
-                    // Stocker la couleur sélectionnée dans l'objet GameSettings
-                    // if (colorType === 'background') {
-                    //     tempBackgroundColor = colorName; // Correspond au nom de la couleur
-                    // } else if (colorType === 'pads') {
-                    //     tempPadsColor = colorName;
-                    // } else if (colorType === 'ball') {
-                    //     tempBallColor = colorName;
-                    // }
+
                 });
 
                 container.appendChild(colorDiv);
@@ -621,71 +636,3 @@ export async function menuPongView(container) {
         console.log("Menupong pas charger");
     }
 }
-
-// function removeThemeBorder(themeName) {
-//     const themeBlock = document.querySelector(`.theme-block[data-theme='${themeName}']`);
-//     if (themeBlock) {
-//         themeBlock.style.border = ''; // Retire la bordure
-//         console.log(`La bordure a été enlevée du thème: ${themeName}`);
-//     }
-// }
-
-
-// colorDiv.addEventListener('click', () => {
-//     const isSelected = colorDiv.style.border === '4px solid #F4ED37';
-//     container.querySelectorAll('.color-option').forEach(option => {
-//         option.style.border = '2px solid transparent';
-//     });
-
-//     // Si la couleur n'est pas déjà sélectionnée, appliquez la bordure
-//     if (!isSelected) {
-//         colorDiv.style.border = '4px solid #F4ED37';
-//     }
-
-//     // Vérifiez si un thème est sélectionné
-//     if (selectTheme === true) {
-//         console.log("click color");
-
-//         // Obtenez les couleurs du thème actuel
-//         const themeColors = themeColorMapping[currentThemeName];
-//         console.log("themeColors", themeColors);
-
-//         if (themeColors) {
-//             console.log("themeColors ", themeColors);
-
-//             // Récupération des couleurs du thème
-//             let tempBackground = themeColors.background;
-//             let tempPads = themeColors.pads;
-//             let tempBall = themeColors.ball;
-
-//             // Logique de comparaison
-//             console.log("comp theme et color choose ", tempBackground,  themeColors.background);
-//             console.log("comp theme et color choose ", tempPads,  themeColors.pads);
-//             console.log("comp theme et color choose ", tempBall,  themeColors.ball);
-
-//             // Comparaison des couleurs
-//             if ((colorType === 'background' && colorName === tempBackground) ||
-//                 (colorType === 'pads' && colorName === tempPads) ||
-//                 (colorType === 'ball' && colorName === tempBall)) {
-//                 console.log("La couleur sélectionnée correspond à la couleur du thème.");
-//                 // Appliquer la bordure si les couleurs correspondent
-//                 colorDiv.style.border = '4px solid #F4ED37';
-//             } else {
-//                 console.log("La couleur sélectionnée ne correspond pas à la couleur du thème.");
-//                 // Enlever la bordure si les couleurs ne correspondent pas
-//                 colorDiv.style.border = ''; // Retirer la bordure de la couleur sélectionnée
-//                 // Enlever la bordure du bloc thème sélectionné si les couleurs ne correspondent pas
-//                 removeThemeBorder(selectedThemeName);
-//             }
-//         }
-//     }
-
-//     // Stocker la couleur sélectionnée dans l'objet GameSettings
-//     if (colorType === 'background') {
-//         tempBackgroundColor = colorName; // Correspond au nom de la couleur
-//     } else if (colorType === 'pads') {
-//         tempPadsColor = colorName;
-//     } else if (colorType === 'ball') {
-//         tempBallColor = colorName;
-//     }
-// });
