@@ -1,7 +1,10 @@
 import { navigationBar } from './navigation.js';
+import { navigateTo } from '../app.js';
 import { PongWebSocketManager } from './wsPongManager.js';
 import { notifications } from './notifications.js';
 import { currentPlayer, endOfTournamentView } from './tournament.js';
+import { getCookie } from './utils.js';
+
 
 import {
     play,
@@ -58,7 +61,7 @@ export async function pongView(container, tournamentSocket) {
 
     const scoreP = document.createElement('p');
     scoreP.className = 'd-flex justify-content-center';
-    scoreP.innerHTML = '<em id="player1-name">Joueur 1</em> : <em id="player1-score">0</em> - <em id="player2-score">0</em> : <em id="player2-name">Joueur 2</em>';
+    scoreP.innerHTML = '<em id="player1-name"></em> : <em id="player1-score">0</em> - <em id="player2-score">0</em> : <em id="player2-name"></em>';
 
     // const buttonGameSettingsContainer = document.createElement('div');
     // buttonGameSettingsContainer.className = "buttonGameSettingsContainer";
@@ -114,19 +117,34 @@ export async function pongView(container, tournamentSocket) {
         }
         if (data.action_type === 'start_game') {
             updatePlayerName(data.game.player1_name, data.game.player2_name);
-            startGame(stopButton, data.game.game_name);
+            startGame(container, stopButton, data.game.game_name);
         }
+        // if(data.action_type === 'show_game') {
+        //     console.log("show game");
+        //     pongView(container, PongWebSocketManager.socket);
+        // }
         if (GameOn) {
             if (data.action_type === 'game_state')
                 updateState(data);
         }
         if (data.action_type === 'end_of_game') {
             endOfGame(data);
+            displayeWinner(data.winner);
+            update_Stats(data);
+            //wait 3 seconds before going back to the menu
             stopButton.disabled = true;
+            if (inTournament == false) {
+                setTimeout(() => {
+                    navigateTo('/menuPong');
+                }, 3000);
+            }
+        }
+        if (data.action_type === 'final_results') {
+            endOfGame(data);
+            endOfTournamentView(container, data.ranking);
         }
         if (data.action_type === 'end_of_tournament') {
-            stopButton.disabled = true;
-            endOfTournamentView(data);
+            navigateTo('/menuPong');
         }
     };
 
@@ -149,65 +167,100 @@ export async function pongView(container, tournamentSocket) {
 }
 
 // Fonction pour démarrer le décompte
-function startCountdown(game_name) {
-    let countdownValue = 3; // Décompte de 3 secondes
+function startCountdown(container, game_name) {
+    let countdownValue = 3;
 
-    // Créer dynamiquement un élément pour afficher le décompte
+    const gameContainer = container.querySelector('.PongDiv');
+    if (!gameContainer) {
+        console.error("Conteneur de jeu introuvable");
+        return;
+    }
+
+    const canvas = document.getElementById('canvas'); // Assurez-vous que l'ID correspond bien à celui de votre canvas
+
     let countdownElement = document.createElement('div');
     countdownElement.id = 'countdown';
     countdownElement.style.position = 'absolute';
-    countdownElement.style.top = '50%';
-    countdownElement.style.left = '50%';
+    countdownElement.style.top = `${canvas.offsetTop + canvas.height / 2}px`;
+    countdownElement.style.left = `${canvas.offsetLeft + canvas.width / 2}px`;
     countdownElement.style.transform = 'translate(-50%, -50%)';
     countdownElement.style.fontSize = '48px';
     countdownElement.style.color = 'white';
     countdownElement.style.textAlign = 'center';
     countdownElement.style.zIndex = '1000';
-    countdownElement.innerText = countdownValue;
+    // countdownElement.innerText = countdownValue;
 
-     // Créer un élément pour afficher le nom du jeu
-     let gameNameElement = document.createElement('div');
-     gameNameElement.id = 'game-name';
-     gameNameElement.style.position = 'absolute';
-     gameNameElement.style.top = '40%'; // Un peu au-dessus du décompte
-     gameNameElement.style.left = '50%';
-     gameNameElement.style.transform = 'translate(-50%, -50%)';
-     gameNameElement.style.fontSize = '32px';
-     gameNameElement.style.color = 'white';
-     gameNameElement.style.textAlign = 'center';
-     gameNameElement.style.zIndex = '1000';
-     gameNameElement.innerText = `${game_name}`;
+    let gameNameElement = document.createElement('div');
+    gameNameElement.id = 'game-name';
+    gameNameElement.style.position = 'absolute';
+    gameNameElement.style.top = `${canvas.offsetTop + canvas.height / 2 - 50}px`;
+    gameNameElement.style.left = `${canvas.offsetLeft + canvas.width / 2}px`;
+    gameNameElement.style.transform = 'translate(-50%, -50%)';
+    gameNameElement.style.fontSize = '32px';
+    gameNameElement.style.color = 'white';
+    gameNameElement.style.textAlign = 'center';
+    gameNameElement.style.zIndex = '1000';
+    // gameNameElement.innerText = `${game_name}`;
 
-    // Ajouter l'élément à la page
-    document.body.appendChild(countdownElement);
+    // document.body.appendChild(countdownElement);
     document.body.appendChild(gameNameElement);
 
-    // Commencer le décompte
-    let countdownInterval = setInterval(() => {
-        countdownValue--; // Décrémente la valeur du décompte
-        countdownElement.innerText = countdownValue;
+    let index = 0;
+    function typeGameName() {
+        if (index < game_name.length) {
+            gameNameElement.innerText += game_name.charAt(index);
+            index++;
+            setTimeout(typeGameName, 150); // Délai entre chaque lettre
+        } else {
 
-        if (countdownValue <= 0) {
-            clearInterval(countdownInterval); // Arrête le décompte quand il atteint 0
-            countdownElement.innerText = "Go!"; // Affiche "Go!" avant de lancer le jeu
-
-            // Supprimer le décompte après un court délai
-            setTimeout(() => {
-                countdownElement.remove();
-                gameNameElement.remove();
-                play(); // Appelle la fonction `play` pour démarrer le jeu
-                // envoyer au back que le jeu commence avec la fonction sendGameStarted() du PongWebSocketManager
-                PongWebSocketManager.sendGameStarted();
-            }, 1000); // Affiche "Go!" pendant 1 seconde avant de l'enlever
+            document.body.appendChild(countdownElement);
+            startCountdownTimer();
         }
-    }, 1000); // Intervalle de 1 seconde
+    }
+    typeGameName();
+    window.addEventListener('beforeunload', () => {
+        countdownElement.remove();
+        gameNameElement.remove();
+    });
+        
+    function startCountdownTimer() {
+        countdownElement.innerText = countdownValue;
+        let countdownInterval = setInterval(() => {
+            countdownValue--;
+            countdownElement.innerText = countdownValue;
+
+            if (countdownValue <= 0) {
+                clearInterval(countdownInterval);
+                countdownElement.innerText = "Go!";
+
+                setTimeout(() => {
+                    countdownElement.remove();
+                    gameNameElement.remove();
+                    play();
+                    PongWebSocketManager.sendGameStarted();
+                }, 1000);
+            }
+        }, 1000);
+    }
 }
 
 // Fonction pour démarrer le jeu lorsque le serveur jumelle deux joueurs
-function startGame(stopButton, game_name)
+function startGame(container, stopButton, game_name)
 {
-    startCountdown(game_name); // Démarrer le décompte avant de lancer le jeu
-    stopButton.disabled = false; // Activer le bouton Stop
+    if (game_name === undefined) {
+        game_name = 'Pong';
+    }
+    else if (game_name === 'semi_finals1' || game_name === 'semi_finals2') {
+        game_name = 'Semi Final';
+    }
+    else if (game_name === 'finals') {
+        game_name = 'Final';
+    }
+    else if (game_name === 'small_final') {
+        game_name = 'Small Final';
+    }
+    startCountdown(container, game_name);
+    stopButton.disabled = false;
 }
 
 function updateState(data) {
@@ -215,6 +268,18 @@ function updateState(data) {
     updateBallPosition(data.game.ball_position);
     updateScores(data.game.player_1_score, data.game.player_2_score);
     draw();
+}
+
+async function update_Stats(data) {
+    const response = await fetch('/api/update_Stats/', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: JSON.stringify({data: data}),
+    });
 }
 
 function updatePlayerPositions(player1Y, player2Y) {
@@ -237,8 +302,41 @@ function updatePlayerName(player1_name, player2_name) {
     document.querySelector(`#player2-name`).textContent = player2_name;
 }
 
+function displayeWinner(winner) {
+    const canvas = document.getElementById('canvas');
+    const winnerElement = document.createElement('div');
+    winnerElement.id = 'winner-display';
 
+    loadPongCSS();
 
+    // Positionnement relatif au canvas
+    winnerElement.style.position = 'absolute';
+    winnerElement.style.top = `${canvas.offsetTop + canvas.height / 2}px`;
+    winnerElement.style.left = `${canvas.offsetLeft + canvas.width / 2}px`;
+    winnerElement.style.transform = 'translate(-50%, -50%)';
+
+    winnerElement.style.fontSize = '32px';
+    winnerElement.style.color = 'white';
+    winnerElement.style.textAlign = 'center';
+    winnerElement.style.zIndex = '1000';
+    winnerElement.innerText = `Winner ${winner}`;
+
+    winnerElement.style.opacity = '0';
+    winnerElement.style.transition = 'opacity 1s ease-in-out';
+
+    canvas.parentElement.appendChild(winnerElement);
+
+    setTimeout(() => {
+        winnerElement.style.opacity = '1';
+    }, 10); 
+
+    setTimeout(() => {
+        winnerElement.style.opacity = '0';  // Animation de disparition
+        setTimeout(() => {
+            winnerElement.remove();
+        }, 1000);  // Temps pour la transition de disparition
+    }, 3000);  // Laisser l'affichage pendant 3 secondes
+}
 
 // CSS Pong
 function loadPongCSS() {

@@ -71,17 +71,15 @@ export function play() {
 export function stop() {
 
     console.log("stop game");
-    PongWebSocketManager.sendStopGame();
+    PongWebSocketManager.sendStopGame(game.game_name);
     cancelAnimationFrame(anim);
     GameOn = false;
 }
 
-export function endOfGame(data) {
+export function endOfGame(winner) {
+    console.log("end of game");
     cancelAnimationFrame(anim);
     GameOn = false;
-    if (inTournament == false) {
-        // return to the main menu
-    }
 }
 
 // Key Down

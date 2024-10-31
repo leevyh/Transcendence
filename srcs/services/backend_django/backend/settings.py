@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-a4=7pox#i*0jn++(jt$dj+wrjp6+xucis%dy&pukjdj7qxan+4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.25.139.193", "made-f0cr6s4", "10.33.7.4"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.25.139.193", "made-f0cr6s4", "10.24.106.6"]
 
 
 
@@ -94,7 +94,7 @@ CORS_ALLOWED_ORIGINS = [
 
 # Autoriser les requêtes API
 CSRF_TRUSTED_ORIGINS = [
-    'http://made-f0cr11s4:8888', 'http://localhost:8888', 'http://10.33.7.4:8888'
+    'http://made-f0cr11s4:8888', 'http://localhost:8888', 'http://10.24.106.6:8888'
 ]
 
 LOGIN_URL = '/api/login'

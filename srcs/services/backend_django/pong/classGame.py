@@ -38,6 +38,7 @@ class PongGame:
         self.channel_loser = None
         self.id = 0
         self.status = 0
+        self.intournament = False
         self.created_at = datetime.now()
 
     #loop for the game
@@ -46,7 +47,7 @@ class PongGame:
         if (self.is_active == False):
             if(self.status == "ready"):
                 await self.start_game()
-        await asyncio.sleep(4.2)
+        await asyncio.sleep(5.6)
         while self.is_active:
             await self.move_ball()
             await self.move_player_loop()
@@ -60,6 +61,8 @@ class PongGame:
         self.reset_ball()
         print("game name : ", self.name)
         self.channel_layer = get_channel_layer()
+        print("channel player 1 : ", self.channel_player_1)
+        print("channel player 2 : ", self.channel_player_2)
         await self.channel_layer.group_send(
             f"game_{self.id}",
             {
@@ -188,7 +191,7 @@ class PongGame:
 
     #stop the game
     async def stop_game(self):
-        print("stop game")
+        print("stop game : ", self.name)
         self.is_active = False
         self.status = "finished"
         if self.winner is None or self.loser is None:
@@ -197,10 +200,17 @@ class PongGame:
         self.channel_winner = self.channel_player_1 if self.player_1_score >= self.player_2_score else self.channel_player_2
         self.channel_loser = self.channel_player_1 if self.player_1_score < self.player_2_score else self.channel_player_2
         await self.save_game()
+        print("winner : ", self.winner.nickname)
+        print("loser : ", self.loser.nickname)
         self.channel_layer = get_channel_layer()
         await self.channel_layer.group_send(
             f"game_{self.id}",
-            {'type': 'end_of_game'}
+            {
+                'type': 'end_of_game',
+                'winner': self.winner.nickname,
+                'score_winner': self.player_1_score if self.player_1_score >= self.player_2_score else self.player_2_score,
+                'score_loser': self.player_1_score if self.player_1_score < self.player_2_score else self.player_2_score
+            }
         )
 
     #save the game in the database
@@ -211,6 +221,7 @@ class PongGame:
         game_database.player_1_score = self.player_1_score
         game_database.player_2_score = self.player_2_score
         game_database.is_active = False
+        game_database.intournament = self.intournament
         await sync_to_async(game_database.save, thread_sensitive=True)()
 
         from api.models import MatchHistory

@@ -138,46 +138,48 @@ export function tournamentView(container) {
     }
 }
 
+// Fonction pour afficher la vue de fin de tournoi avec le ranking final
+export function endOfTournamentView(container, ranking) {
 
-export function endOfTournamentView(container, data) {
+    let tournamentContainer = container || document.getElementById('tournament-container');
 
-    // // Vérifier si le container est fourni ou essayer de récupérer par l'ID
-    // let endTournamentContainer = container || document.getElementById('end-tournament-container');
+    if (!tournamentContainer) {
+        tournamentContainer = document.createElement('div');
+        tournamentContainer.id = 'tournament-container';
+        document.body.appendChild(tournamentContainer);
+    }
+    tournamentContainer.innerHTML = '';
 
-    // // Si le container n'existe pas, le créer
-    // if (!endTournamentContainer) {
-    //     endTournamentContainer = document.createElement('div');
-    //     endTournamentContainer.id = 'end-tournament-container';
-    //     document.body.appendChild(endTournamentContainer);  // L'ajouter au body
-    // }
-    // else {
-    //     // Effacer tout contenu existant
-    //     endTournamentContainer.innerHTML = '';
-    // }
+    loadPongFinalCSS();
 
-    // // Créer un titre
-    // const title = document.createElement('h2');
-    // title.textContent = 'Final rankings';
-    // endTournamentContainer.appendChild(title);
+    const title = document.createElement('h2');
+    title.textContent = "Final Ranking";
+    title.classList.add('text-center', 'my-4');
+    tournamentContainer.appendChild(title);
 
-    // // Créer une liste pour afficher les classements
-    // const rankingList = document.createElement('ul');
-    // rankingList.className = 'ranking-list';
+    const rankingList = document.createElement('ol');
+    rankingList.classList.add('ranking-list');
+    tournamentContainer.appendChild(rankingList);
 
-    // // Utiliser les données de classement fournies dans l'événement WebSocket
-    // const rankings = data.ranking;  // Récupérer les classements des données
+    const players = [
+        { position: '1st', name: ranking.first },
+        { position: '2nd', name: ranking.second },
+        { position: '3rd', name: ranking.third },
+        { position: '4th', name: ranking.fourth }
+    ];
 
-    // rankings.forEach((player, index) => {
-    //     const listItem = document.createElement('li');
-    //     listItem.textContent = `${index + 1}. ${player}`;
-    //     rankingList.appendChild(listItem);
-    // });
-
-    // endTournamentContainer.appendChild(rankingList);
+    players.forEach((player, index) => {
+        setTimeout(() => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `${player.position} : ${player.name}`;
+            listItem.classList.add('ranking-item');
+            if (player.position === '1st') {
+                listItem.classList.add('first-place');
+            }
+            rankingList.appendChild(listItem);
+        }, index * 1000);
+    });
 }
-
-
-
 
 // CSS Pong
 function loadPongCSS() {
@@ -216,3 +218,35 @@ function loadPongCSS() {
     document.head.appendChild(style);
 }
 
+// Fonction pour charger les styles CSS pour la vue de fin de tournoi
+function loadPongFinalCSS() {
+    const style = document.createElement('style');
+    style.textContent = `
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .ranking-list {
+            font-size: 1.2em;
+            list-style-type: none;
+            padding: 0;
+            text-align: center;
+        }
+
+        .ranking-list li {
+            margin: 10px 0;
+        }
+
+        /* Style spécial pour le premier joueur */
+        .first-place {
+            font-size: 2em;
+            font-weight: bold;
+            color: yellow;
+        }
+    `;
+    document.head.appendChild(style);
+}

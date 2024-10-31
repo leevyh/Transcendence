@@ -64,7 +64,7 @@ export async function pongSoloView(container) {
 
     const scoreP = document.createElement('p');
     scoreP.className = 'd-flex justify-content-center';
-    scoreP.innerHTML = 'Joueur 1 : <em id="player-score">0</em> - Joueur 2 : <em id="computer-score">0</em>';
+    scoreP.innerHTML = 'Joueur 1 : <em id="player-score">0</em> - Computer : <em id="computer-score">0</em>';
 
     // main.appendChild(ul);
     // main.appendChild(canvasElement);
