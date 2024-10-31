@@ -261,7 +261,6 @@ export async function menuPongView(container) {
             setTimeout(() => {
                 modalGameSettings.style.display = 'none';
                 mainDivMenu.style.backdropFilter = 'none'; // Retire le flou via JS
-                modalGameSettings.setAttribute('aria-hidden', 'true');
             }, 100);
         });
 
@@ -272,7 +271,6 @@ export async function menuPongView(container) {
                 document.body.classList.remove('blur-background'); // Enlève l'effet de flou
                 setTimeout(() => {
                     modalGameSettings.style.display = 'none';
-                    modalGameSettings.setAttribute('aria-hidden', 'true');
                 }, 100);
             }
         });
@@ -361,6 +359,34 @@ export async function menuPongView(container) {
             }
         }
 
+        function verifySelectedThemeColors() {
+            // Vérifier si un thème est sélectionné
+            if (!selectTheme || !selectedThemeName) {
+                console.log("Aucun thème sélectionné.");
+                return false; // Aucun thème sélectionné
+            }
+
+            // Obtenir les couleurs du thème sélectionné
+            const themeColors = themeColorMapping[selectedThemeName];
+            if (!themeColors) {
+                console.log("Thème sélectionné non trouvé.");
+                return false; // Thème non trouvé
+            }
+
+            // Vérifier si les couleurs correspondent
+            const isBackgroundColorMatching = themeColors.background === tempBackgroundColor;
+            const isPadsColorMatching = themeColors.pads === tempPadsColor;
+            const isBallColorMatching = themeColors.ball === tempBallColor;
+
+            if (isBackgroundColorMatching && isPadsColorMatching && isBallColorMatching) {
+                console.log("Les couleurs sélectionnées correspondent au thème.");
+                return true; // Les couleurs correspondent
+            } else {
+                console.log("Les couleurs sélectionnées ne correspondent pas au thème.");
+                return false; // Les couleurs ne correspondent pas
+            }
+        }
+
         const modalGameSettingsBody = document.createElement('div');
         modalGameSettingsBody.className = 'modal-body mt-2';
         modalGameSettingsContent.appendChild(modalGameSettingsBody);
@@ -436,6 +462,21 @@ export async function menuPongView(container) {
                     });
                     if (!isSelected)
                         colorDiv.style.border = '4px solid #F4ED37';
+                    const colorsMatch = verifySelectedThemeColors();
+                    if (colorsMatch) {
+                        console.log("couleur correspondent");
+                    } else {
+                        selectTheme == false;
+                        selectedThemeName = null;
+                        localStorage.setItem('selectTheme', 'false');
+                        localStorage.setItem('selectedThemeName', 'null');
+                        const themeBlock = document.querySelector(`.theme-block[data-theme='${themeName}']`);
+                        if (themeBlock) {
+                            themeBlock.style.border = ''; // Retire la bordure
+                            console.log(`La bordure a été enlevée du thème: ${themeName}`);
+                        }
+                        // Les couleurs ne correspondent pas, avertir l'utilisateur
+                    }
                     // Stocker la couleur sélectionnée dans l'objet GameSettings
                     if (colorType === 'background') {
                         tempBackgroundColor = colorName; // Correspond au nom de la couleur
@@ -552,4 +593,70 @@ export async function menuPongView(container) {
     }
 }
 
+// function removeThemeBorder(themeName) {
+//     const themeBlock = document.querySelector(`.theme-block[data-theme='${themeName}']`);
+//     if (themeBlock) {
+//         themeBlock.style.border = ''; // Retire la bordure
+//         console.log(`La bordure a été enlevée du thème: ${themeName}`);
+//     }
+// }
 
+
+// colorDiv.addEventListener('click', () => {
+//     const isSelected = colorDiv.style.border === '4px solid #F4ED37';
+//     container.querySelectorAll('.color-option').forEach(option => {
+//         option.style.border = '2px solid transparent';
+//     });
+
+//     // Si la couleur n'est pas déjà sélectionnée, appliquez la bordure
+//     if (!isSelected) {
+//         colorDiv.style.border = '4px solid #F4ED37';
+//     }
+
+//     // Vérifiez si un thème est sélectionné
+//     if (selectTheme === true) {
+//         console.log("click color");
+
+//         // Obtenez les couleurs du thème actuel
+//         const themeColors = themeColorMapping[currentThemeName];
+//         console.log("themeColors", themeColors);
+
+//         if (themeColors) {
+//             console.log("themeColors ", themeColors);
+
+//             // Récupération des couleurs du thème
+//             let tempBackground = themeColors.background;
+//             let tempPads = themeColors.pads;
+//             let tempBall = themeColors.ball;
+
+//             // Logique de comparaison
+//             console.log("comp theme et color choose ", tempBackground,  themeColors.background);
+//             console.log("comp theme et color choose ", tempPads,  themeColors.pads);
+//             console.log("comp theme et color choose ", tempBall,  themeColors.ball);
+
+//             // Comparaison des couleurs
+//             if ((colorType === 'background' && colorName === tempBackground) ||
+//                 (colorType === 'pads' && colorName === tempPads) ||
+//                 (colorType === 'ball' && colorName === tempBall)) {
+//                 console.log("La couleur sélectionnée correspond à la couleur du thème.");
+//                 // Appliquer la bordure si les couleurs correspondent
+//                 colorDiv.style.border = '4px solid #F4ED37';
+//             } else {
+//                 console.log("La couleur sélectionnée ne correspond pas à la couleur du thème.");
+//                 // Enlever la bordure si les couleurs ne correspondent pas
+//                 colorDiv.style.border = ''; // Retirer la bordure de la couleur sélectionnée
+//                 // Enlever la bordure du bloc thème sélectionné si les couleurs ne correspondent pas
+//                 removeThemeBorder(selectedThemeName);
+//             }
+//         }
+//     }
+
+//     // Stocker la couleur sélectionnée dans l'objet GameSettings
+//     if (colorType === 'background') {
+//         tempBackgroundColor = colorName; // Correspond au nom de la couleur
+//     } else if (colorType === 'pads') {
+//         tempPadsColor = colorName;
+//     } else if (colorType === 'ball') {
+//         tempBallColor = colorName;
+//     }
+// });
