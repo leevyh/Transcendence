@@ -271,14 +271,21 @@ function updateState(data) {
 }
 
 async function update_Stats(data) {
-    const response = await fetch('/api/update_Stats/', {
+    console.log("data = ", data);
+    // data = {action_type: 'end_of_game', winner: 'rouge', result: 'win', nb_point_taken: 2, nb_point_given: 1}
+    const response = await fetch('/api/updateStats/', {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken'),
         },
-        body: JSON.stringify({data: data}),
+        body: JSON.stringify({
+            winner: data.winner,
+            result: data.result,
+            nb_point_taken: data.nb_point_taken,
+            nb_point_given: data.nb_point_given,
+        }),
     });
 }
 
