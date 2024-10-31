@@ -150,7 +150,6 @@ export async function menuPongView(container) {
 
     function openModal() {
         if (modalGameSettings.style.display === 'block') {
-            console.log("Modal is already open. Closing it first.");
             modalGameSettings.removeAttribute('aria-hidden'); // Supprimer aria-hidden quand la modale est visible
             modalGameSettings.focus(); // Donner le focus à la modale pour une meilleure accessibilité
         }
@@ -305,7 +304,6 @@ export async function menuPongView(container) {
             blockTheme.className = 'd-flex justify-content-around align-items-center flex-column w-25 h-100 rounded theme-block';
             blockTheme.id = textContent;
 
-            console.log("start createimage");
             const imgElement = document.createElement('img');
             imgElement.src = imagePath;
             imgElement.alt = `Image de ${textContent}`;
@@ -325,7 +323,7 @@ export async function menuPongView(container) {
                 selectBlock(blockTheme, textContent);
             });
 
-            console.log("create", selectTheme, selectedThemeName);
+
             if (selectTheme && selectedThemeName === textContent) {
                 blockTheme.style.border = '4px solid #F4ED37'; // Applique la bordure si ce thème est sélectionné
             }
@@ -340,13 +338,11 @@ export async function menuPongView(container) {
             'Autumn': { background: 'brown', pads: 'white', ball: 'white' }
         };
 
-        // let selectedThemeBlock = null;
         function selectBlock(block, themeName) {
             document.querySelectorAll('.theme-block').forEach(block => {
                 block.style.border = '';
             });
             block.style.border = '4px solid #F4ED37';
-            // selectedThemeBlock = block;
             selectTheme = true;
             selectedThemeName = themeName;
 
@@ -362,62 +358,45 @@ export async function menuPongView(container) {
                 tempPadsColor = themeColors.pads;
                 tempBallColor = themeColors.ball;
                 refreshColorOptions();
-                //verifySelectedThemeColors();
             }
         }
 
-        window.onload = () => {
-            const savedThemeName = localStorage.getItem('selectedThemeName');
-            const savedThemeBlockName = localStorage.getItem('selectedThemeBlockName');
-
-            if (savedThemeName) {
-                selectedThemeName = savedThemeName; // Met à jour le nom du thème
-
-                const themeBlocks = document.querySelectorAll('.theme-block');
-                themeBlocks.forEach(block => {
-                    // Comparez avec textContent.trim()
-                    console.log("window", block.textContent.trim(), savedThemeBlockName);
-                    if (block.textContent.trim() === savedThemeBlockName) {
-                        selectBlock(block, savedThemeName); // Sélectionnez le bloc si trouvé
-                    }
-                });
-            }
-        };
-
         function verifySelectedThemeColors() {
-            console.log("verifytheme");
-            //refreshColorOptions();
-            // Vérifier si un thème est sélectionné
-            if (!selectTheme || !selectedThemeName) {
-                console.log("Aucun thème sélectionné.");
-                return false; // Aucun thème sélectionné
-            }
-
+            if (!selectTheme || !selectedThemeName)
+                return false;
             // Obtenir les couleurs du thème sélectionné
             const themeColors = themeColorMapping[selectedThemeName];
-            if (!themeColors) {
-                console.log("Thème sélectionné non trouvé.");
-                return false; // Thème non trouvé
-            }
+            if (!themeColors)
+                return false;
 
             // Vérifier si les couleurs correspondent
             const isBackgroundColorMatching = themeColors.background === tempBackgroundColor;
             const isPadsColorMatching = themeColors.pads === tempPadsColor;
             const isBallColorMatching = themeColors.ball === tempBallColor;
 
-            console.log("back ", themeColors.background, tempBackgroundColor);
-            console.log("pads ", themeColors.pads, tempPadsColor);
-            console.log("ball ", themeColors.ball, tempBallColor);
-            console.log("isBackgroundColorMatching", isBackgroundColorMatching);
-            console.log("isPadsColorMatching", isPadsColorMatching);
-            console.log("isBallColorMatching", isBallColorMatching);
-            if (isBackgroundColorMatching && isPadsColorMatching && isBallColorMatching) {
-                console.log("Les couleurs sélectionnées correspondent au thème.");
-                return true; // Les couleurs correspondent
-            } else {
-                console.log("Les couleurs sélectionnées ne correspondent pas au thème.");
-                return false; // Les couleurs ne correspondent pas
-            }
+            if (isBackgroundColorMatching && isPadsColorMatching && isBallColorMatching)
+                return true;
+            return false;
+        }
+
+        function removeThemeBorder()
+        {
+            let elem = document.getElementById('Winter');
+            if (elem)
+                elem.style.border = '';
+            elem = document.getElementById('Spring');
+            if (elem)
+                elem.style.border = '';
+            elem = document.getElementById('Summer');
+            if (elem)
+                elem.style.border = '';
+            elem = document.getElementById('Autumn');
+            if (elem)
+                elem.style.border = '';
+            selectTheme == false;
+            selectedThemeName = null;
+            localStorage.setItem('selectTheme', 'false');
+            localStorage.setItem('selectedThemeName', '');
         }
 
         const modalGameSettingsBody = document.createElement('div');
@@ -480,57 +459,29 @@ export async function menuPongView(container) {
                     }
                 }
                 if (selectTheme == true) {
-                    console.log("selecttheme =true");
                     if ((colorType === 'background' && colorName === tempBackgroundColor) ||
                     (colorType === 'pads' && colorName === tempPadsColor) ||
                     (colorType === 'ball' && colorName === tempBallColor)) {
                         colorDiv.style.border = '4px solid #F4ED37';
                     }
-
                 }
                 colorDiv.addEventListener('click', () => {
                     const isSelected = colorDiv.style.border === '4px solid #F4ED37';
                     container.querySelectorAll('.color-option').forEach(option => {
                         option.style.border = '2px solid transparent';
                     });
-                    // refreshColorOptions();
                     if (!isSelected)
                         colorDiv.style.border = '4px solid #F4ED37';
-                    if (colorType === 'background') {
-                        tempBackgroundColor = colorName; // Correspond au nom de la couleur
-                    } else if (colorType === 'pads') {
+                    if (colorType === 'background')
+                        tempBackgroundColor = colorName;
+                    else if (colorType === 'pads')
                         tempPadsColor = colorName;
-                    } else if (colorType === 'ball') {
+                    else if (colorType === 'ball')
                         tempBallColor = colorName;
-                    }
                     const colorsMatch = verifySelectedThemeColors();
-                    console.log("colormap",colorsMatch);
-                    if (colorsMatch) {
-                        console.log("couleur correspondent");
-                    } else {
-                        let elem = document.getElementById('Winter');
-                        if (elem)
-                            elem.style.border = '';
-                        elem = document.getElementById('Spring');
-                        if (elem)
-                            elem.style.border = '';
-                        elem = document.getElementById('Summer');
-                        if (elem)
-                            elem.style.border = '';
-                        elem = document.getElementById('Autumn');
-                        if (elem)
-                            elem.style.border = '';
-                        selectTheme == false;
-                        selectedThemeName = null;
-                        // selectedThemeBlock= null;
-                        localStorage.setItem('selectTheme', 'false');
-                        localStorage.setItem('selectedThemeName', '');
-                        // localStorage.setItem('selectedThemeBlock', '');
-                        // Les couleurs ne correspondent pas, avertir l'utilisateur
-                    }
-
+                    if (!colorsMatch)
+                        removeThemeBorder();
                 });
-
                 container.appendChild(colorDiv);
             });
         };
