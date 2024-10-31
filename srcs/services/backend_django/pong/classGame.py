@@ -47,7 +47,7 @@ class PongGame:
         if (self.is_active == False):
             if(self.status == "ready"):
                 await self.start_game()
-        await asyncio.sleep(4.2)
+        await asyncio.sleep(5.6)
         while self.is_active:
             await self.move_ball()
             await self.move_player_loop()

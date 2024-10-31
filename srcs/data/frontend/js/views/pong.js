@@ -188,44 +188,60 @@ function startCountdown(container, game_name) {
     countdownElement.style.color = 'white';
     countdownElement.style.textAlign = 'center';
     countdownElement.style.zIndex = '1000';
-    countdownElement.innerText = countdownValue;
+    // countdownElement.innerText = countdownValue;
 
     let gameNameElement = document.createElement('div');
     gameNameElement.id = 'game-name';
     gameNameElement.style.position = 'absolute';
-    gameNameElement.style.top = `${canvas.offsetTop + canvas.height / 2 - 50}px`; // Ajustement pour le nom de la partie
+    gameNameElement.style.top = `${canvas.offsetTop + canvas.height / 2 - 50}px`;
     gameNameElement.style.left = `${canvas.offsetLeft + canvas.width / 2}px`;
     gameNameElement.style.transform = 'translate(-50%, -50%)';
     gameNameElement.style.fontSize = '32px';
     gameNameElement.style.color = 'white';
     gameNameElement.style.textAlign = 'center';
     gameNameElement.style.zIndex = '1000';
-    gameNameElement.innerText = `${game_name}`;
+    // gameNameElement.innerText = `${game_name}`;
 
-    document.body.appendChild(countdownElement);
+    // document.body.appendChild(countdownElement);
     document.body.appendChild(gameNameElement);
 
+    let index = 0;
+    function typeGameName() {
+        if (index < game_name.length) {
+            gameNameElement.innerText += game_name.charAt(index);
+            index++;
+            setTimeout(typeGameName, 150); // Délai entre chaque lettre
+        } else {
+
+            document.body.appendChild(countdownElement);
+            startCountdownTimer();
+        }
+    }
+    typeGameName();
     window.addEventListener('beforeunload', () => {
         countdownElement.remove();
         gameNameElement.remove();
     });
-
-    let countdownInterval = setInterval(() => {
-        countdownValue--;
+        
+    function startCountdownTimer() {
         countdownElement.innerText = countdownValue;
+        let countdownInterval = setInterval(() => {
+            countdownValue--;
+            countdownElement.innerText = countdownValue;
 
-        if (countdownValue <= 0) {
-            clearInterval(countdownInterval);
-            countdownElement.innerText = "Go!";
+            if (countdownValue <= 0) {
+                clearInterval(countdownInterval);
+                countdownElement.innerText = "Go!";
 
-            setTimeout(() => {
-                countdownElement.remove();
-                gameNameElement.remove();
-                play();
-                PongWebSocketManager.sendGameStarted();
-            }, 1000);
-        }
-    }, 1000);
+                setTimeout(() => {
+                    countdownElement.remove();
+                    gameNameElement.remove();
+                    play();
+                    PongWebSocketManager.sendGameStarted();
+                }, 1000);
+            }
+        }, 1000);
+    }
 }
 
 // Fonction pour démarrer le jeu lorsque le serveur jumelle deux joueurs
