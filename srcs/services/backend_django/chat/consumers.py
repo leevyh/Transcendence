@@ -168,25 +168,28 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if member.id != sender.id:  # Exclude the sender
                 # Check if the user is active in the chat, if not -> send a notification
                 if not await self.is_user_in_group(member.id):
+                    #Save the notification in database
+                    await database_sync_to_async(Notification.objects.create)(
+                        user=member,
+                        type='new_message',
+                        new_message=message,
+                        status='unread'
+                    )
+                    notification = await database_sync_to_async(Notification.objects.get)(user=member, new_message=message)
                     await self.channel_layer.group_send(
                         f"user_{member.id}",
                         {
                             "type": "send_notification",
                             "message": {
                                 "type": "new_message",
+                                "id": notification.id,
                                 "from_user": sender.id,
                                 "from_nickname": sender.nickname,
                                 "from_avatar": encode_avatar(sender),
                                 "message": message.content,
+                                "created_at": notification.created_at.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
                             },
                         }
-                    )
-                    # Save the notification in the database
-                    await database_sync_to_async(Notification.objects.create)(
-                        user=member,
-                        type='new_message',
-                        new_message=message,
-                        status='unread'
                     )
 
 

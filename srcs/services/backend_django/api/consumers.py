@@ -29,7 +29,6 @@ class StatusConsumer(AsyncJsonWebsocketConsumer):
             "status": message['status'],
             "avatar": encoded_avatar
         })
-        # await self.send_json(event["message"])
 
 
 class NotificationConsumer(AsyncJsonWebsocketConsumer):
@@ -95,24 +94,24 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
                 status='unread'
             )
 
-
-            print(f"Friend request from {user.nickname} to {friend.nickname} created and saved in database")
+            notification = await database_sync_to_async(Notification.objects.get)(friend_request=friend_request)
             await self.channel_layer.group_send(
                 f"user_{friend.id}",
                 {
                     "type": "send_notification",
                     "message": {
                         "type": "friend_request",
+                        "id": notification.id,
                         "from_user": user.id,
                         "from_nickname": user.nickname,
                         "from_avatar": encode_avatar(user),
+                        "created_at": notification.created_at.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
                     },
                 },
             )
 
 
         elif type == 'accept_friend_request' or type == 'reject_friend_request':
-            print(f"data: {data}")
             friend = await database_sync_to_async(User_site.objects.get)(nickname=data['nickname'])
 
             try:
@@ -150,8 +149,6 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
                         }
                     }
                 )
-
-            print(f"Friendship created between {user.nickname} and {friend.nickname}")
 
             await database_sync_to_async(lambda: Notification.objects.filter(friend_request=friend_request).delete())()
             await database_sync_to_async(friend_request.delete)()

@@ -1,8 +1,11 @@
 import wsManager from "../../views/wsManager.js";
+import { removeNotification } from "../../views/notifications.js";
 
 export function displayFriendRequests(notification, offcanvas_body) {
+
     const notification_type_div = document.createElement('div');
     notification_type_div.className = `notification_type_notification_${notification.type} d-flex flex-column gap-2`;
+    notification_type_div.id = `notification_${notification.id}`;
 
     const notification_type_header = document.createElement('div');
     notification_type_header.className = 'd-flex gap-2';
@@ -32,9 +35,8 @@ export function displayFriendRequests(notification, offcanvas_body) {
     const notification_type_close_button = document.createElement('button');
     notification_type_close_button.className = 'btn-close ms-auto';
     notification_type_close_button.setAttribute('aria-label', 'Close');
-    // remove the div of the notification and delete it from the database
     notification_type_close_button.onclick = async function() {
-        //             await deleteNotification(notification.id);
+        removeNotification(notification.id);
         let hr = notification_type_div.nextElementSibling;
         hr.remove();
         notification_type_div.remove();
@@ -57,7 +59,7 @@ export function displayFriendRequests(notification, offcanvas_body) {
     notification_type_body_accept_button.className = 'btn btn-success';
     notification_type_body_accept_button.textContent = 'Accept';
     notification_type_body_accept_button.onclick = async function() {
-        //await acceptFriendRequest(notification.sender.id);
+        removeNotification(notification.id);
         wsManager.send({
             type: 'accept_friend_request',
             nickname:  notification.from_nickname,
@@ -71,8 +73,7 @@ export function displayFriendRequests(notification, offcanvas_body) {
     notification_type_body_decline_button.className = 'btn btn-danger';
     notification_type_body_decline_button.textContent = 'Decline';
     notification_type_body_decline_button.onclick = async function() {
-        //await declineFriendRequest(notification.sender.id); //TODO CHECK IF THIS IS THE RIGHT FUNCTION
-        //Get the hr element after the notifications
+        removeNotification(notification.id);
         wsManager.send({
             type: 'reject_friend_request',
             nickname:  notification.from_nickname,
@@ -93,5 +94,4 @@ export function displayFriendRequests(notification, offcanvas_body) {
     const line = document.createElement('hr');
     line.className = 'w-100 separator_line_notifs';
     offcanvas_body.appendChild(line);
-    // return offcanvas_body;
 }
