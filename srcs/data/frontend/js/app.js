@@ -6,7 +6,7 @@ import { getCookie, getAccessibility, applyAccessibilitySettings, isAuthenticate
 import { homeView } from './views/home.js';
 import { notFoundView } from './views/404.js';
 import { friendsView } from './views/users.js';
-import { pongView } from './views/pong.js';
+import { inGame, pongView, disconnectPlayer } from './views/pong.js';
 import { pongSoloView } from './views/pongSolo.js';
 import { tournamentView } from './views/tournament.js';
 import { profileView } from './views/profile.js';
@@ -70,6 +70,9 @@ async function router() {
     if (DEBUG) {console.log(`Navigating to ${path}`);}
 
     if (chatWS) {chatWS.close();}
+    if (inGame) {
+        console.log('Disconnecting player in app');
+        disconnectPlayer();}
 
     // If the user is not authenticated and tries to access a private route, redirect to the home page
     const privateRoutes = ['/chat', '/users', '/pong', '/menuPong', '/profile', '/leaderboard'];

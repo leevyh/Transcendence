@@ -1,5 +1,5 @@
 import { navigationBar } from './navigation.js';
-import { pongView } from './pong.js';
+import { pongView, inGame, setInGame } from './pong.js';
 
 export let currentPlayer = null;
 
@@ -68,7 +68,7 @@ export function tournamentView(container) {
     tournamentSocket.onopen = function(event) {
         console.log('Connected to the tournament WebSocket');
     };
-
+    setInGame(true);
     tournamentSocket.onmessage = function(event) {
         const data = JSON.parse(event.data);
         console.log("Received message from tournament WebSocket:", data);
@@ -87,6 +87,7 @@ export function tournamentView(container) {
 
     // Gérer la fermeture de la connexion WebSocket
     tournamentSocket.onclose = function(event) {
+        setInGame(false);
         console.log('Tournament WebSocket closed.');
     };
 

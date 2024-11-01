@@ -21,6 +21,7 @@ import {
 import { GameOn } from './pong_game.js';
 export let canvas = 'null'
 export let inTournament = false;
+export let inGame = false;
 
 export async function pongView(container, tournamentSocket) {
     container.innerHTML = '';
@@ -96,7 +97,7 @@ export async function pongView(container, tournamentSocket) {
         console.log("PongWebSocketManager.socket");
         inTournament = true;
     }
-
+    setInGame(true);
     PongWebSocketManager.socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
 
@@ -106,7 +107,6 @@ export async function pongView(container, tournamentSocket) {
             var player_name = data.name_player;
             var game_name = data.game;
             console.log("data = ", data);
-            console.log("currentPlayer = ", currentPlayer);
             if (currentPlayer === 'player_1') {
                 document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_1', player_name, game_name));
                 document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_1', player_name, game_name));
@@ -149,6 +149,7 @@ export async function pongView(container, tournamentSocket) {
     };
 
     PongWebSocketManager.socket.onclose = (event) => {
+        setInGame(false);
         console.log("Pong WebSocket disconnected", event);
     };
     const stopGameButton = document.querySelector('#stop-game');
@@ -188,7 +189,6 @@ function startCountdown(container, game_name) {
     countdownElement.style.color = 'white';
     countdownElement.style.textAlign = 'center';
     countdownElement.style.zIndex = '1000';
-    // countdownElement.innerText = countdownValue;
 
     let gameNameElement = document.createElement('div');
     gameNameElement.id = 'game-name';
@@ -200,9 +200,7 @@ function startCountdown(container, game_name) {
     gameNameElement.style.color = 'white';
     gameNameElement.style.textAlign = 'center';
     gameNameElement.style.zIndex = '1000';
-    // gameNameElement.innerText = `${game_name}`;
 
-    // document.body.appendChild(countdownElement);
     document.body.appendChild(gameNameElement);
 
     let index = 0;
@@ -210,17 +208,25 @@ function startCountdown(container, game_name) {
         if (index < game_name.length) {
             gameNameElement.innerText += game_name.charAt(index);
             index++;
-            setTimeout(typeGameName, 150); // Délai entre chaque lettre
+            setTimeout(typeGameName, 150);
         } else {
 
             document.body.appendChild(countdownElement);
             startCountdownTimer();
         }
     }
+    typeGameName();
         
     function startCountdownTimer() {
         countdownElement.innerText = countdownValue;
         let countdownInterval = setInterval(() => {
+            if (getInGame() === false) {
+                console.log("countdown 1 inGame = ", inGame);
+                clearInterval(countdownInterval); 
+                countdownElement.remove();
+                gameNameElement.remove();
+                return;
+            }
             countdownValue--;
             countdownElement.innerText = countdownValue;
 
@@ -231,8 +237,11 @@ function startCountdown(container, game_name) {
                 setTimeout(() => {
                     countdownElement.remove();
                     gameNameElement.remove();
-                    play();
-                    PongWebSocketManager.sendGameStarted();
+                    if (getInGame() === true) {
+                        console.log("countdown 2 inGame = ", inGame);
+                        play();
+                        PongWebSocketManager.sendGameStarted();
+                    }
                 }, 1000);
             }
         }, 1000);
@@ -331,6 +340,19 @@ function displayeWinner(winner) {
             winnerElement.remove();
         }, 1000);  // Temps pour la transition de disparition
     }, 3000);  // Laisser l'affichage pendant 3 secondes
+}
+
+export function disconnectPlayer() {
+    PongWebSocketManager.sendDisconnect();
+    setInGame(false);
+}
+
+export function getInGame() {
+    return inGame;
+}
+
+export function setInGame(value) {
+    inGame = value;
 }
 
 // CSS Pong
