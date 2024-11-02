@@ -92,6 +92,15 @@ if [ ! -f config/certs/certs.zip ] && [ ! -f config/certs/ca.zip ]; then
   until curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/.ds-metrics-nginx*/_settings -d "{\"index\":{\"lifecycle\":{\"name\":\"default-policy\"}}}" | grep -q "^{\"acknowledged\":true}"; do
     sleep 1;
   done;
+
+  echo "Creating data views"
+  until curl -s -X POST --cacert /usr/share/kibana/config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" -H "kbn-xsrf: string" https://backend-kibana:5601/api/data_views/data_view -d "{\"data_view\":{\"name\":\"django-*\",\"title\":\"django-*\",\"id\":\"django-*\"}}" | grep -q "^{\"data_view\":{\"id\":"; do
+    sleep 1;
+  done;
+
+  until curl -s -X POST --cacert /usr/share/kibana/config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" -H "kbn-xsrf: string" https://backend-kibana:5601/api/data_views/data_view -d "{\"data_view\":{\"name\":\"postgresql-*\",\"title\":\"postgresql-*\",\"id\":\"postgresql-*\"}}" | grep -q "^{\"data_view\":{\"id\":"; do
+    sleep 1;
+  done;
 fi;
 
 until false; do
