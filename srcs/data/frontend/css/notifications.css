@@ -1,3 +1,17 @@
+.body_notifications::-webkit-scrollbar {
+    width: 6px;
+}
+
+.body_notifications::-webkit-scrollbar-thumb {
+    background-color: #1d2d45;
+    border-radius: 10px;
+}
+
+.body_notifications::-webkit-scrollbar-track {
+    background-color: #435574;
+    border-radius: 10px;
+}
+
 .notifications_button
 {
     background-color: #3a4250;

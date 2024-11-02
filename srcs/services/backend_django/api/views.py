@@ -7,6 +7,7 @@ from django.contrib.auth.hashers import make_password, check_password
 
 from .forms import UserRegistrationForm, AccessibilityUpdateForm
 from .models import User_site, Accessibility, Stats_user, FriendRequest, Notification, Game_Settings, MatchHistory
+from chat.models import Message
 from pong.models import Game
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -33,7 +34,6 @@ def register(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            # print(data)
             # language = data.pop('language', None)
             form = UserRegistrationForm(data)
             if form.is_valid():
@@ -52,7 +52,6 @@ def register(request):
                 game_settings.save()
                 return JsonResponse({'message': 'User registered successfully'}, status=201)
             else:
-                print("DEBUG")
                 return JsonResponse({'errors': form.errors}, status=400)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
@@ -131,7 +130,6 @@ def get_friend_request(request, nickname):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-
 def get_Notification(request):
     if request.method == 'GET':
         try:
@@ -150,10 +148,23 @@ def get_Notification(request):
             for notification in notifications:
                 if notification.type == 'friend_request':
                     avatar = base64.b64encode(notification.friend_request.user.avatar.read()).decode('utf-8')
-                    notifications_list.append({'type': notification.type,
+                    notifications_list.append({
+                                'id': notification.id,
+                                'type': notification.type,
                                 'from_nickname': notification.friend_request.user.nickname,
                                 'from_avatar': avatar,
                                 'created_at': notification.created_at})
+                elif notification.type == 'new_message':
+                    #Get the content, the avatar of the sender, the nickname of the sender and the created_at
+                    message = Message.objects.get(id=notification.new_message_id)
+                    avatar = base64.b64encode(message.sender.avatar.read()).decode('utf-8')
+                    notifications_list.append({
+                                'id': notification.id,
+                                'type': notification.type,
+                                'from_nickname': message.sender.nickname,
+                                'from_avatar': avatar,
+                                'message': message.content,
+                                'created_at': message.timestamp})
 
             return JsonResponse(notifications_list, status=200, safe=False)
         except User_site.DoesNotExist:
@@ -167,13 +178,11 @@ def get_match_history(request, id):
     if request.method == 'GET':
         try:
             user = User_site.objects.get(id=id)
-            print("user:", user.nickname)         # DEBUG
             match_histories = MatchHistory.objects.filter(player=user)
             data = []
 
             for match in match_histories:
                 game = Game.objects.get(id=match.game_id)
-                print(f"game player 1: {game.player_1_id} -> user nickname : {user.id}")         # DEBUG
                 if game.player_1_id == user.id:       # DEBUG
                     opponent = User_site.objects.get(id=game.player_2_id).nickname
                     opponent_avatar = base64.b64encode(User_site.objects.get(id=game.player_2_id).avatar.read()).decode('utf-8')
@@ -253,13 +262,83 @@ def get_notificationUnread(request):
             for notification in notifications:
                 if notification.type == 'friend_request':
                     avatar = base64.b64encode(notification.friend_request.user.avatar.read()).decode('utf-8')
-                    notifications_list.append({'type': notification.type,
+                    notifications_list.append({
+                                'id': notification.id,
+                                'type': notification.type,
                                 'from_user': notification.friend_request.user.nickname,
                                 'from_avatar': avatar,
                                 'created_at': notification.created_at})
+                elif notification.type == 'new_message':
+                    #Get the content, the avatar of the sender, the nickname of the sender and the created_at
+                    message = Message.objects.get(id=notification.new_message_id)
+                    avatar = base64.b64encode(message.sender.avatar.read()).decode('utf-8')
+                    notifications_list.append({
+                                'id': notification.id,
+                                'type': notification.type,
+                                'from_user': message.sender.nickname,
+                                'from_avatar': avatar,
+                                'message': message.content,
+                                'created_at': message.timestamp})
             return JsonResponse(notifications_list, status=200, safe=False)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def delete_Notification(request, id):
+    if request.method == 'DELETE':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            if (token_user == 'null'):
+                return JsonResponse({'error': 'Invalid token'}, status=401)
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            user = User_site.objects.get(username=username)
+            user_id = user.id
+            notification = Notification.objects.get(id=id)
+            #check if notification has been friend_request, if yes, delete the friend_request before notification
+            if notification.type == 'friend_request':
+                friend_request = FriendRequest.objects.get(id=notification.friend_request.id)
+                friend_request.delete()
+            if notification.user.id == user_id:
+                notification.delete()
+                return JsonResponse({'message': 'Notification deleted successfully'}, status=200)
+            else:
+                return JsonResponse({'error': 'Notification not found'}, status=404)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except Notification.DoesNotExist:
+            return JsonResponse({'error': 'Notification not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def read_Notification(request, id):
+    if request.method == 'PUT':
+        try:
+            token_user = request.headers.get('Authorization').split(' ')[1]
+            if (token_user == 'null'):
+                return JsonResponse({'error': 'Invalid token'}, status=401)
+            try:
+                payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return JsonResponse({'error': 'Token expired'}, status=307)
+            username = payload['username']
+            user = User_site.objects.get(username=username)
+            user_id = user.id
+            notification = Notification.objects.get(id=id)
+            if notification.user.id == user_id:
+                notification.status = 'read'
+                notification.save()
+                return JsonResponse({'message': 'Notification read successfully'}, status=200)
+            else:
+                return JsonResponse({'error': 'Notification not found'}, status=404)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except Notification.DoesNotExist:
+            return JsonResponse({'error': 'Notification not found'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
@@ -358,7 +437,6 @@ def all_users(request):
                 data = []
                 i = 0
                 for user in users:
-                    # print(i)         # DEBUG
                     i += 1
                     #get the avatar of the user and encode it in base64 to send it in the response + nickname
                     avatar_image = user.avatar
@@ -386,7 +464,6 @@ def updateSettings(request):
                 return JsonResponse({'error': 'Token expired'}, status=307)
             username = payload['username']
             data = json.loads(request.body)
-            # print('settings_data:', data)         # DEBUG
             user = User_site.objects.get(username=username)
             #update user settings. If data[nickname] is not empty, update the nickname else let the nickname as it is
             if data['nickname']:
@@ -515,7 +592,6 @@ def updateAccessibility(request):
             token_user = request.headers.get('Authorization').split(' ')[1]
             payload = jwt.decode(token_user, 'secret', algorithms=['HS256'])
             data = json.loads(request.body)
-            print(f'data: {data}')         # DEBUG
             username = payload['username']
             user_id = User_site.objects.get(username=username).id
             accessibility_id = Accessibility.objects.get(user=user_id)
@@ -544,7 +620,6 @@ def updatePassword(request):
                 return JsonResponse({'error': 'Token expired'}, status=307)
             nickname = payload['username']
             data = json.loads(request.body)
-            # print('password_data:', data)         # DEBUG
             user = User_site.objects.get(nickname=nickname)
             if check_password(data['old_password'], user.password):
                 user.set_password(data['new_password'])
@@ -696,14 +771,9 @@ def token_42(request):
         redirect_uri = os.getenv('REDIRECT_URI')
         data = json.loads(request.body)
         code = data['code']
-        print(f"code: {code}")         # DEBUG
-        # print(f"code: {code}")         # DEBUG
-        # print(f"client_id: {client_id}")         # DEBUG
-        # print(f"client_secret: {client_secret}")         # DEBUG
         url = f"https://api.intra.42.fr/oauth/token?client_id={client_id}&client_secret={client_secret}&code={code}&redirect_uri={redirect_uri}&grant_type=authorization_code"
         r = requests.post(url)
         if r.status_code == 200:
-            # print('OKI MA GUEULE')         # DEBUG
             user = create_user42(r, code)
             if user != 401:
 
