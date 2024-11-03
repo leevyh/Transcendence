@@ -72,7 +72,8 @@ async function router() {
     if (chatWS) {chatWS.close();}
     if (inGame) {
         console.log('Disconnecting player in app');
-        disconnectPlayer();}
+        disconnectPlayer();
+    }
 
     // If the user is not authenticated and tries to access a private route, redirect to the home page
     const privateRoutes = ['/chat', '/users', '/pong', '/menuPong', '/profile', '/leaderboard'];

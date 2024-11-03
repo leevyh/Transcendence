@@ -61,8 +61,8 @@ class PongGame:
         self.reset_ball()
         print("game name : ", self.name)
         self.channel_layer = get_channel_layer()
-        print("channel player 1 : ", self.channel_player_1)
-        print("channel player 2 : ", self.channel_player_2)
+        print("channel player 1 : ", self.channel_player_1, "username : ", self.player_1.nickname)
+        print("channel player 2 : ", self.channel_player_2, "username : ", self.player_2.nickname)
         await self.channel_layer.group_send(
             f"game_{self.id}",
             {
@@ -86,7 +86,6 @@ class PongGame:
     #send all the informations about the game to the players
     async def broadcastState(self):
         # print("broadcast state")
-        self.channel_layer = get_channel_layer()
         await self.channel_layer.group_send(
             f"game_{self.id}",
             {
@@ -195,15 +194,15 @@ class PongGame:
         print("stop game : ", self.name)
         self.is_active = False
         self.status = "finished"
-        if self.winner is None or self.loser is None:
-            self.winner = self.player_1 if self.player_1_score >= self.player_2_score else self.player_2
+        if self.winner is None :
+            self.winner = self.player_1 if self.player_1_score > self.player_2_score else self.player_2
+        if self.loser is None :
             self.loser = self.player_1 if self.player_1_score < self.player_2_score else self.player_2
-        self.channel_winner = self.channel_player_1 if self.player_1_score >= self.player_2_score else self.channel_player_2
-        self.channel_loser = self.channel_player_1 if self.player_1_score < self.player_2_score else self.channel_player_2
+        self.channel_winner = self.channel_player_1 if self.winner == self.player_1 else self.channel_player_2
+        self.channel_loser = self.channel_player_1 if self.loser == self.player_1 else self.channel_player_2
         await self.save_game()
         print("winner : ", self.winner.nickname)
         print("loser : ", self.loser.nickname)
-        self.channel_layer = get_channel_layer()
         await self.channel_layer.group_send(
             f"game_{self.id}",
             {

@@ -77,7 +77,7 @@ class Tournament:
         await self.channel_layer.group_add(f"game_{self.semi_finals1.id}", self.channel_layer_player[player_indices[1]])
         self.semi_finals1.status = "ready"
 
-        # print("semi_finals1", self.semi_finals1.player_1, self.semi_finals1.player_2)
+        print("semi_finals1", self.semi_finals1.player_1, self.semi_finals1.player_2)
 
         self.semi_finals2 = PongGame(self.player[player_indices[2]])
         self.semi_finals2.player_1 = self.player[player_indices[2]]
@@ -259,6 +259,7 @@ class Tournament:
         print("final winner", self.final.winner)
         print("final loser", self.final.loser)
 
+        self.status = "finished"
         #send the winner to the front
         await self.channel_layer.group_send(
             f"tournament_{self.id}",

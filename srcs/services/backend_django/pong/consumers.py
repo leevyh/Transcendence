@@ -135,6 +135,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             await self.game.broadcastState()
             await self.game.stop_game()
         if data['type'] == 'disconnect_player' :
+            print("disconnect player in consumer pong : ", self.scope['user'])
             await self.disconnect(1000)
 
     async def end_of_game(self, event):
@@ -178,9 +179,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=text_data)
 
     async def findTournament(self, player):
-        # if player.status == 'intournament':
-        #     print("player already in tournament")
-            # return
         if (len(list_of_tournaments) == 0) :
             # print("create tournament with user : ", player)
             tournament = Tournament()
@@ -237,15 +235,16 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                             break
                     await self.update_player_list(self.tournament)
                 elif self.tournament.status == "semi_finals" or self.tournament.status == "finals":
-                    print("consumer tournament disconnect player in semi final or final")
-                    if player == self.tournament.semi_finals1.player_1 or player == self.tournament.semi_finals1.player_2:
-                        game = self.tournament.semi_finals1
-                    elif player == self.tournament.semi_finals2.player_1 or player == self.tournament.semi_finals2.player_2:
-                        game = self.tournament.semi_finals2
-                    elif player == self.tournament.final.player_1 or player == self.tournament.final.player_2:
-                        game = self.tournament.final
-                    elif player == self.tournament.small_final.player_1 or player == self.tournament.small_final.player_2:
-                        game = self.tournament.small_final
+                    if self.tournament.status == "semi_finals" :
+                        if player == self.tournament.semi_finals1.player_1 or player == self.tournament.semi_finals1.player_2:
+                            game = self.tournament.semi_finals1
+                        elif player == self.tournament.semi_finals2.player_1 or player == self.tournament.semi_finals2.player_2:
+                            game = self.tournament.semi_finals2
+                    elif self.tournament.status == "finals" :
+                        if player == self.tournament.final.player_1 or player == self.tournament.final.player_2:
+                            game = self.tournament.final
+                        elif player == self.tournament.small_final.player_1 or player == self.tournament.small_final.player_2:
+                            game = self.tournament.small_final
                     print("consumer disconnect game : ", game)
                     if game.player_1 == player:
                         game.winner = game.player_2
@@ -253,6 +252,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     else:
                         game.winner = game.player_1
                         game.loser = game.player_2
+                    game.reset_ball()
                     await self.channel_layer.group_discard(f"game_{game.id}", self.channel_name)
                     await game.broadcastState()
                     await game.stop_game()
@@ -328,6 +328,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if data['type'] == 'stop_game' :
             await self.tournament.stop_game(data['game'])
         if data['type'] == 'disconnect_player' :
+            print("disconnect player in consumer tournament : ", self.scope['user'])
             await self.disconnect(1000)
 
     async def end_of_game(self, event):
@@ -361,6 +362,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'action_type': 'end_of_tournament',
             }))
         self.tournament = None
+        # self.disconnect(1000)
 
 @sync_to_async
 def create_tournament(player_1, player_2, player_3, player_4):
