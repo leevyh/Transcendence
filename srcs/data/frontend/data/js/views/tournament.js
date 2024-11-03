@@ -62,8 +62,7 @@ export function tournamentView(container) {
     tournamentContainer.appendChild(playerList);
     
     // Connexion WebSocket
-    const wsUrl = 'ws://' + window.location.host + '/ws/tournament/';
-    const tournamentSocket = new WebSocket(wsUrl);
+    const tournamentSocket = new WebSocket(`wss://${window.location.host}/ws/tournament/`);
 
     tournamentSocket.onopen = function(event) {
         console.log('Connected to the tournament WebSocket');

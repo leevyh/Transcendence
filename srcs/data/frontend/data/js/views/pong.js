@@ -88,7 +88,7 @@ export async function pongView(container, tournamentSocket) {
 
     // WebSocket
     if (tournamentSocket == null) {
-        const wsUrl = 'ws://' + window.location.host + `/ws/pong/`;
+        const wsUrl = `wss://${window.location.host}/ws/pong/`;
         PongWebSocketManager.init(wsUrl);
     } 
     else {

@@ -32,7 +32,7 @@ export async function navigationBar(container) {
                     avatar: data.avatar,
                 };
 
-                const friends_websocket = new WebSocket(`ws://${window.location.host}/ws/friends/`);
+                const friends_websocket = new WebSocket(`wss://${window.location.host}/ws/friends/`);
                 friends_websocket.onopen = () => {
                     if (DEBUG) console.log('Friends WebSocket connection established');
                     friends_websocket.send(JSON.stringify({type: 'get_friends'}));

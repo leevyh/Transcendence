@@ -18,7 +18,7 @@ export async function chatView(container) {
     div.appendChild(viewContainer);
 
     // Create the WebSocket for user status
-    const statusSocket = new WebSocket('ws://' + window.location.host + '/ws/status/');
+    const statusSocket = new WebSocket(`wss://${window.location.host}/ws/status/`);
     // Onopen event
     statusSocket.onopen = function(event) {
         if (DEBUG) {console.log('Status WebSocket opened (in Chat)');}

@@ -73,7 +73,7 @@ class WebSocketManager {
     }
 }
 
-const wsManager = new WebSocketManager('ws://' + window.location.host + '/ws/notifications/');
+const wsManager = new WebSocketManager(`wss://${window.location.host}/ws/notifications/`);
 
 export default wsManager;
 wsManager.connect();

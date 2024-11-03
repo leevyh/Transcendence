@@ -86,7 +86,7 @@ async function openConversation(conversationID, otherUser) {
         console.log('Invite to play (TODO)');
     });
 
-    chatWS = new WebSocket('ws://' + window.location.host + `/ws/chat/${conversationID}/`);
+    chatWS = new WebSocket(`wss://${window.location.host}/ws/chat/${conversationID}/`);
 
     chatWS.onopen = function() {
         if (DEBUG) {console.log('Chat WebSocket OPEN - conversationID:', conversationID);}
