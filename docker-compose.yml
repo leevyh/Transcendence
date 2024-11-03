@@ -72,7 +72,7 @@ services:
     container_name: backend-postgresql
     build: ./srcs/services/backend_postgresql
     volumes:
-      - backend-postgresql:/var/lib/postgresql/
+      - backend-postgresql:/var/lib/postgresql/data/pgdata/
       - backend-postgresql-logs:/var/log/postgresql/
     networks:
       - default
@@ -227,8 +227,8 @@ services:
       - backend-pga-certs:/pga/certs/
     networks:
       - default
-    ports:
-      - 9090:9090
+    expose:
+      - 9090
     healthcheck:
       test: ["CMD-SHELL", "[ -f /pga/certs/status/prometheus.done ]"]
       interval: 10s
