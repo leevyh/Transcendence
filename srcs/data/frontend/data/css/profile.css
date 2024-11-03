@@ -24,6 +24,14 @@
 	display: flex;
 	align-items: center;
 }
+.ScoreGame {
+    height: 75%;
+}
+
+.SvgisTournament  {
+    height: 25%;
+    color :#f4b237;
+}
 
 .ContainerHistorical {
     width: 55%;
@@ -38,6 +46,7 @@
 .ContenerHistoriqueGame {
     height: 150px;
 }
+
 
 .YourUsername,
 .HisUsername {

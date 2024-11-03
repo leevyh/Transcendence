@@ -3,17 +3,20 @@ from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from django.db.models.signals import post_save
 
 class User_site(AbstractUser):
     class Status(models.TextChoices):
         ONLINE = "online"
         OFFLINE = "offline"
         INGAME = "ingame"
+        INTOURNAMENT = "intournament"
 
     nickname = models.CharField(max_length=10, unique=True)
     created_at = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=255, default=Status.OFFLINE, choices=Status.choices)
     avatar = models.ImageField(upload_to='avatar/', default='media/default.jpg')
+    user_school = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
@@ -34,6 +37,23 @@ class User_site(AbstractUser):
                 },
             },
         )
+        friends = Friendship.objects.filter(models.Q(user1=self) | models.Q(user2=self))
+        for friend in friends:
+            friend_user = friend.user1 if friend.user1 != self else friend.user2
+            async_to_sync(channel_layer.group_send)(
+                f"user_{friend_user.id}_friends",
+                {
+                    "type": "send_friend_status_update",
+                    "message": {
+                        "type": "friends_status_update",
+                        "user_id": self.id,
+                        "nickname": self.nickname,
+                        "status": self.status,
+                        "avatar": encode_avatar(self),
+                    },
+                },
+            )
+
 
 
 class Accessibility(models.Model):
@@ -56,6 +76,26 @@ class Stats_user(models.Model):
     nb_point_given = models.IntegerField(default=0)
     win_rate = models.FloatField(default=0.0)
 
+
+class Game_Settings(models.Model):
+    class Color(models.TextChoices):
+        BLACK = "black"
+        WHITE = "white"
+        PURPLE = "purple"
+        PINK = "pink"
+        YELLOW = "yellow"
+        GREEN = "green"
+        GRAY = "gray"
+        BLUE = "blue"
+        LILA = "lila"
+        RED = "red"
+        BROWN = "brown"
+        GREEN_LIGHT = "green_light"
+        BLUE_LIGHT = "blue_light"
+    user = models.OneToOneField(User_site, on_delete=models.CASCADE, primary_key=True)
+    background_game = models.CharField(default=Color.BLACK, choices=Color.choices)
+    pads_color = models.CharField(default=Color.WHITE, choices=Color.choices)
+    ball_color = models.CharField(default=Color.WHITE, choices=Color.choices)
 
 class FriendRequest(models.Model):
     STATUS = (
@@ -102,12 +142,16 @@ class Friendship(models.Model):
 
 
 class MatchHistory(models.Model):
-    player1 = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='player1')
-    opponent = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='player2')
-    player_1_score = models.IntegerField()
-    player_2_score = models.IntegerField()
+    from pong.models import Game
+    player = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='match_histories')
+    game = models.ForeignKey('pong.Game', on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
 
+class TournamentHistory(models.Model):
+    from pong.models import Tournament
+    player = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='tournament_histories')
+    tournament = models.ForeignKey('pong.Tournament', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
 
 class Notification(models.Model):
     user = models.ForeignKey(User_site, on_delete=models.CASCADE)

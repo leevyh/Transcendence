@@ -12,12 +12,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-import os, sys
 from pathlib import Path
-from pythonjsonlogger import jsonlogger
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -28,18 +27,18 @@ SECRET_KEY = 'django-insecure-a4=7pox#i*0jn++(jt$dj+wrjp6+xucis%dy&pukjdj7qxan+4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'backend-django']
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.25.139.193", "made-f0cr6s4", "10.24.106.6"]
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8888', 'https://localhost:8888']
 
-CORS_ALLOWED_ORIGINS = ['http://localhost:8888', 'https://localhost:8888']
 
+# Application definition
 AUTH_USER_MODEL = 'api.User_site'
 
 INSTALLED_APPS = [
     'daphne',
     'channels',
     'chat',
+    'pong',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -49,7 +48,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'api',
-    'django_prometheus',
 ]
 
 REST_FRAMEWORK = {
@@ -60,7 +58,6 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
-    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -70,7 +67,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'api.middleware.AuthenticationMiddleware',
-    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -91,22 +87,34 @@ TEMPLATES = [
     },
 ]
 
+# Ajouter ces paramètres pour autoriser les requêtes depuis votre SPA
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8888",
+]
+
+# Autoriser les requêtes API
+CSRF_TRUSTED_ORIGINS = [
+    'http://made-f0cr11s4:8888', 'http://localhost:8888', 'http://10.24.106.6:8888'
+]
+
 LOGIN_URL = '/api/login'
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-ASGI_APPLICATION = 'backend.asgi.application'
 
+ASGI_APPLICATION = 'backend.asgi.application'
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     }
 }
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_NAME = 'sessionid'
+# Backend de session par défaut
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Utilisation de la base de données pour stocker les sessions
+SESSION_COOKIE_NAME = 'sessionid'  # Nom du cookie de session
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False  # True si HTTPS
 
+# Autres backends possibles
 # SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 # SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 # SESSION_ENGINE = 'django.contrib.sessions.backends.file'
@@ -142,6 +150,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
@@ -161,47 +170,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DATABASES = {
 	'default': {
-		'ENGINE': 'django_prometheus.db.backends.postgresql',
+		'ENGINE': 'django.db.backends.postgresql',
 		'NAME': 'transcendence',
 		'USER': 'postgres',
 		'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-		'HOST': 'backend-postgresql',
+		'HOST': 'postgresql',
 		'PORT': 5432,
 	}
-}
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'logstash': {
-            'level': 'DEBUG',
-            'class': 'logstash.LogstashHandler',
-            'host': 'backend-logstash',
-            'port': 5959,
-            'version': 1,
-        },
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'stream': sys.stdout,
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['logstash', 'console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-    },
-}
-
-PROMETHEUS_LATENCY_BUCKETS = (0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10.0, 25.0, 50.0, 75.0, float("inf"),)
-PROMETHEUS_METRIC_NAMESPACE = "project"
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django_prometheus.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/var/tmp/django_cache',
-    }
 }

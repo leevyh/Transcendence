@@ -2,7 +2,12 @@ import { DEBUG, navigateTo } from '../../app.js';
 
 // Refresh actual page without reload (SPA)
 export function actualPage() {
-    console.log('window.location.href:', window.location.href);
+    // If I am on a profile page, I want to refresh the page
+    if (window.location.href.includes('profile')) {
+        const id = window.location.href.split('/').pop();
+        return '/profile/' + id;
+    }
+
     let location = window.location.href;
     const str_split = location.split('/');
     const length = str_split.length;
@@ -28,8 +33,15 @@ export function createNavButton(text, onClick) {
     listItem.appendChild(button);
 
     button.addEventListener('click', () => {
-        if (DEBUG) {console.log(`Navigating to ${text}`, 'actual:', window.location.pathname);}
-        if (window.location.pathname === `/${text.toLowerCase()}`) {
+        if (DEBUG) {
+            console.log(`Navigating to ${text}`, 'actual:', window.location.pathname);
+        }
+
+        // Check if the text is "pong" and redirect to "/menuPong"
+        const targetPath = text.toLowerCase() === 'pong' ? '/menuPong' : `/${text.toLowerCase()}`;
+
+        console.log("targetPath:", targetPath);
+        if (window.location.pathname === targetPath) {
             return;
         }
         onClick();

@@ -1,17 +1,19 @@
 export const DEBUG = true;
 
 import { chatWS } from './components/chat/functions.js';
-import { getAccessibility, applyAccessibilitySettings, isAuthenticated } from './views/utils.js';
+import { getCookie, getAccessibility, applyAccessibilitySettings, isAuthenticated } from './views/utils.js';
 
 import { homeView } from './views/home.js';
 import { notFoundView } from './views/404.js';
 import { friendsView } from './views/users.js';
 import { pongView } from './views/pong.js';
+import { pongSoloView } from './views/pongSolo.js';
+import { tournamentView } from './views/tournament.js';
 import { profileView } from './views/profile.js';
 import { callback42 } from './views/callback42.js';
 import { chatView } from './views/chat.js';
 import { leaderboardView } from './views/leaderboard.js';
-
+import { menuPongView } from './views/menuPong.js';
 
 const appDiv = document.getElementById('app');
 
@@ -36,6 +38,14 @@ const routes = {
         title: 'Pong',
         view: pongView,
     },
+    '/pongSolo': {
+        title: 'Pong Solo',
+        view: pongSoloView,
+    },
+    '/tournament': {
+        title: 'Tournament',
+        view: tournamentView,
+    },
     '/callback42': {
         title: 'Authentification 42',
         view: callback42,
@@ -44,8 +54,12 @@ const routes = {
         title: 'Leaderboard',
         view: leaderboardView,
     },
+    '/menuPong': {
+        title: 'menuPong',
+        view: menuPongView,
+    },
     '/profile': {
-        title: 'profile',
+        title: 'Profile',
         view: profileView,
     },
 };
@@ -54,37 +68,47 @@ async function router() {
     const pageTitle = "Transcendence";
     let path = location.pathname;
     if (DEBUG) {console.log(`Navigating to ${path}`);}
-    
+
     if (chatWS) {chatWS.close();}
 
     // If the user is not authenticated and tries to access a private route, redirect to the home page
-    const privateRoutes = ['/chat', '/users', '/pong', '/profile', '/leaderboard'];
-    if (privateRoutes.includes(path) && await isAuthenticated() === false) {
-        if (DEBUG) {console.log(`Trying to access ${path} but user is not authenticated`);}
-        history.pushState(null, null, path); // Change the URL without reloading the page
-        path = '/'; // Redirect to the home page
-    }
+    const privateRoutes = ['/chat', '/users', '/pong', '/menuPong', '/profile', '/leaderboard'];
+    const ProfileRegex = /^\/profile\/([a-zA-Z0-9_-]+)$/; // Regex to match /profile/:user_id
+    const match = path.match(ProfileRegex);
 
-    // Check if the URL is a user profile corresponding to /user/:nickname
-    const userProfileRegex = /^\/user\/([a-zA-Z0-9_-]+)$/;
-    const match = path.match(userProfileRegex);
+    const isPrivateRoute = privateRoutes.includes(path) || match; // Consider profile/:user_id as a private route
+
+    if (isPrivateRoute && await isAuthenticated() === false) {
+        if (DEBUG) { console.log(`Trying to access ${path} but user is not authenticated`); }
+        path = '/'; // Redirect to 404 if not authenticated
+        // Change the URL to the new path
+        history.pushState(null, null, path);
+    }
 
     // Get user's accessibility settings
     const userSettings = await getAccessibility();
     if (userSettings) {
         applyAccessibilitySettings(userSettings);
-    }
-    else {
+    } else {
         if (DEBUG) console.log('No user settings found');
     }
 
-    if (match) {
-        const nickname = match[1]; // Extract the nickname from the URL
-        document.title = `${pageTitle} | ${nickname}'s profile`;
+    if (path === '/profile') {
+        // Load the current user's profile if no specific ID is provided
+        const currentUser = await getCurrentUser();
+        document.title = `${pageTitle} | My Profile`;
+
+        history.pushState(null, null, `/profile/${currentUser.id}`);
+        profileView(appDiv, currentUser.id);
+    } else if (match) { // TODO: Need to fix the path in every link that leads to a profile
+        // Load a specific user's profile
+        const userId = match[1]; // Extract the user ID from the URL
+        document.title = `${pageTitle} | User ${userId}'s Profile`;
 
         appDiv.innerHTML = '';
-        profileView(appDiv, nickname);
+        profileView(appDiv, userId); // Load the profile view with the specific user ID
     } else {
+        // Handle other routes
         const view = routes[path] || routes['/404'];
         document.title = `${pageTitle} | ${view.title}`;
         appDiv.innerHTML = '';
@@ -92,11 +116,13 @@ async function router() {
     }
 }
 
+// Function to navigate to a specific route
 export function navigateTo(path) {
     history.pushState(null, null, path);
     router();
 }
 
+// Event listeners for history change and DOM load
 window.addEventListener("popstate", router);
 window.addEventListener("DOMContentLoaded", () => {
     document.body.addEventListener("click", (e) => {
@@ -109,6 +135,29 @@ window.addEventListener("DOMContentLoaded", () => {
     });
     router();
 });
+
+
+// Function to get the current user
+export async function getCurrentUser() {
+    try {
+        const response = await fetch('/api/current_user/', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        });
+        if (response.ok) {
+            const data = await response.json();
+            if (DEBUG) console.log('current user:', data);
+            return data;
+        }
+    } catch (error) {
+        if (DEBUG) console.error('Error getting current user:', error);
+        return null;
+    }
+}
 
 
 // OLD METHOD FOR MULTILANGUAGE
@@ -182,10 +231,3 @@ window.addEventListener("DOMContentLoaded", () => {
 //         history.pushState(null, '', `/${currentLanguage}${url}`);
 //     }
 // }
-
-// window.addEventListener('popstate', () => {
-//     navigateTo(location.pathname);
-// });
-
-// // Initial load test
-// navigateTo(location.pathname || '/home');

@@ -54,12 +54,30 @@ async function openConversation(conversationID, otherUser) {
     const chatTitle = document.querySelector('.chat-title');
     chatTitle.textContent = `Chat with ${otherUser}`;
 
-
     // Display the view profile button and the invite game button
     const profileButton = document.getElementById('view-profile-button');
     profileButton.style.display = 'block';
     profileButton.addEventListener('click', () => {
-        navigateTo(`/user/${otherUser}`);
+        // Call API to get the list of users and find the user we want to see the profile
+        fetch(`/api/users/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Get the user we want to see the profile
+            const otherUser_id = data.find(user => user.nickname === otherUser).user_id;
+            if (!otherUser_id) {
+                console.error('User not found');
+                navigateTo('/404');
+            }
+            // Redirect to the profile page of the user
+            navigateTo(`/profile/${otherUser_id}`);
+        });
     });
 
     const inviteGameButton = document.querySelector('.invite-game-button');
@@ -71,12 +89,12 @@ async function openConversation(conversationID, otherUser) {
     chatWS = new WebSocket('ws://' + window.location.host + `/ws/chat/${conversationID}/`);
 
     chatWS.onopen = function() {
-        if (DEBUG) {console.log('WebSocket OPEN - conversationID:', conversationID);}
+        if (DEBUG) {console.log('Chat WebSocket OPEN - conversationID:', conversationID);}
     }
 
     chatWS.onmessage = function(event) {
         const receivedMessage = JSON.parse(event.data);
-        if (DEBUG) {console.log('WebSocket MESSAGE:', receivedMessage);}
+        if (DEBUG) {console.log('Chat WebSocket MESSAGE:', receivedMessage);}
 
         if (receivedMessage.type === 'chat_history') {
             // Get the conversation data: Users info (nickname, avatar, blocked_status)
@@ -129,11 +147,11 @@ async function openConversation(conversationID, otherUser) {
     }
 
     chatWS.onclose = function() {
-        if (DEBUG) {console.log('WebSocket CLOSE - conversationID:', conversationID);}
+        if (DEBUG) {console.log('Chat WebSocket CLOSE - conversationID:', conversationID);}
     }
 
     chatWS.onerror = function(event) {
-        if (DEBUG) {console.error('WebSocket ERROR:', event);}
+        if (DEBUG) {console.error('Chat WebSocket ERROR:', event);}
     }
 }
 
@@ -162,7 +180,7 @@ function displayMessage(messageData) {
         messageDiv.appendChild(imgAvatar);
     } else {
         imgAvatar.alt = 'Other user avatar';
-        messageDiv.className = 'd-flex justify-content-start mb-4 ml-2'; 
+        messageDiv.className = 'd-flex justify-content-start mb-4 ml-2';
         messageContent.className = 'chat-msg position-relative received-msg';
         messageContent.innerHTML = `
             ${messageData.message}
@@ -183,9 +201,9 @@ export function handleMessage(message) {
             message: message,
             timestamp: new Date().toISOString()
         };
-        chatWS.send(JSON.stringify(messageData)); 
+        chatWS.send(JSON.stringify(messageData));
     } else {
-        if (DEBUG) {console.error('WebSocket is not open.');}
+        if (DEBUG) {console.error('Chat WebSocket is not open.');}
     }
 }
 
@@ -218,7 +236,7 @@ function enableChat(otherUser) {
     const chatSendButton = document.querySelector('.chat-send-button');
     const inviteGameButton = document.querySelector('.invite-game-button');
     const blockUserButton = document.getElementById(otherUser).querySelector('.block-button')
-    
+
     if (chatInput && chatSendButton) {
         chatInput.disabled = false;
         chatSendButton.disabled = false;
@@ -233,10 +251,15 @@ export function displayUsers(users, search = '') {
     const userList = document.getElementById('user-list');
     let usersArray = Array.from(users);
 
-    let filteredUsers = usersArray.filter(user => user.id.toLowerCase().startsWith(search.toLowerCase()));
+    // Filter users according to the search (by their nickname in userCard.textContent)
+    let filteredUsers = usersArray.filter(user =>
+        user.textContent.toLowerCase().startsWith(search.toLowerCase())
+    );
 
     // Sort users by alphabetical order
-    filteredUsers.sort((a, b) => a.id.toLowerCase().localeCompare(b.id.toLowerCase()));
+    filteredUsers.sort((a, b) => 
+        a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase())
+    );
 
     // Display or hide users according to the search
     usersArray.forEach(user => {

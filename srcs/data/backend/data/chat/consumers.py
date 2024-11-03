@@ -89,13 +89,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'nickname': user.nickname,
                     'id': user.id,
                     'avatar': encode_avatar(user),
-                    'blocked': await database_sync_to_async(lambda: UserBlock.objects.filter(blocked=user).exists())(),
+                    'blocked': await database_sync_to_async(lambda: UserBlock.objects.filter(blocker=other, blocked=user).exists())(),
                 },
                 'other': {
                     'nickname': other.nickname,
                     'id': other.id,
                     'avatar': encode_avatar(other),
-                    'blocked': await database_sync_to_async(lambda: UserBlock.objects.filter(blocked=other).exists())(),
+                    'blocked': await database_sync_to_async(lambda: UserBlock.objects.filter(blocker=user, blocked=other).exists())(),
                 },
             },
             'messages': [
@@ -164,37 +164,38 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Send message notifications to the members of the conversation
     async def send_message_notifications(self, sender, members, message):
         from api.models import Notification
-        from .models import Message
         for member in members:
             if member.id != sender.id:  # Exclude the sender
                 # Check if the user is active in the chat, if not -> send a notification
                 if not await self.is_user_in_group(member.id):
-                    await self.channel_layer.group_send(
-                        f"user_{member.id}",
-                        {
-                            "type": "send_notification",
-                            "message": {
-                                "type": "new_message",
-                                "from_user": sender.id,
-                                "from_nickname": sender.nickname,
-                                "from_avatar": encode_avatar(sender),
-                                "message": message.content,
-                            },
-                        }
-                    )
-                    # Save the notification in the database
+                    #Save the notification in database
                     await database_sync_to_async(Notification.objects.create)(
                         user=member,
                         type='new_message',
                         new_message=message,
                         status='unread'
                     )
+                    notification = await database_sync_to_async(Notification.objects.get)(user=member, new_message=message)
+                    await self.channel_layer.group_send(
+                        f"user_{member.id}",
+                        {
+                            "type": "send_notification",
+                            "message": {
+                                "type": "new_message",
+                                "id": notification.id,
+                                "from_user": sender.id,
+                                "from_nickname": sender.nickname,
+                                "from_avatar": encode_avatar(sender),
+                                "message": message.content,
+                                "created_at": notification.created_at.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+                            },
+                        }
+                    )
 
 
     # Remove notifications from the database
     async def remove_notifications(self, user, conversation_id):
         from api.models import Notification
-
         # Fetch all unread notifications related to this conversation for the user
         notifications = await sync_to_async(list)(Notification.objects.filter(
             user=user,
@@ -206,7 +207,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Delete them from the database
         for notification in notifications:
             await sync_to_async(notification.delete)()
-
 
 
     # Check if the user is active in the chat
@@ -267,6 +267,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
             return
 
+
     # Receive information about blocked users
     async def block_user(self, event):
         await self.send(text_data=json.dumps({
@@ -275,6 +276,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'blocker': event['blocker'],
             'user': self.scope['user'].nickname # Who am I
         }))
+
 
     # Receive information about unblocked users
     async def unblock_user(self, event):

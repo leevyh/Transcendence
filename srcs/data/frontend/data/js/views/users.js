@@ -1,6 +1,6 @@
 import wsManager  from './wsManager.js';
 import { getCookie } from './utils.js';
-import { DEBUG } from '../app.js';
+import { DEBUG, navigateTo, getCurrentUser } from '../app.js';
 import { navigationBar } from './navigation.js';
 import { notifications } from './notifications.js';
 
@@ -20,7 +20,7 @@ async function sendFriendRequestToServer(nickname) {
             nickname: nickname,
         });
     } else {
-        if (DEBUG) {console.log("Websocket is not open friend request cannot be sent");}
+        if (DEBUG) {console.log("Friends Websocket is not open, friend request cannot be sent");}
     }
 }
 
@@ -77,12 +77,26 @@ function createUserRow(user_list_row, data) {
         user_status.textContent = data.status;
         user_info_name_status.appendChild(user_status);
 
+        // Add a container for the buttons
+        const user_buttons = document.createElement('div');
+        user_buttons.className = 'd-flex flex-row';
+        user_global_info.appendChild(user_buttons);
+
         const friends_button = document.createElement('button');
-        user_global_info.appendChild(friends_button);
         friends_button.className = 'btn btn-sm btn-primary';
         friends_button.textContent = 'Add friend';
-        friends_button.addEventListener('click', (event) => {
+        user_buttons.appendChild(friends_button);
+        friends_button.addEventListener('click', () => {
             sendFriendRequest(data.nickname);
+        });
+
+        // Add a button to see the user's profile
+        const profile_button = document.createElement('button');
+        profile_button.className = 'btn btn-sm btn-light bi-person-lines-fill';
+        user_buttons.appendChild(profile_button);
+        profile_button.addEventListener('click', () => {
+            // Redirect to the profile page of the user
+            navigateTo(`/profile/${data.user_id}`);
         });
     }
 
@@ -102,25 +116,29 @@ function createUserRow(user_list_row, data) {
 export async function friendsView(container) {
     container.innerHTML = '';
 
+    const me = await getCurrentUser(); // Current user
+
     const token = localStorage.getItem('token');
     console.log(token);
 
-    const url = window.location.href.split('/').pop();
+    // const url = window.location.href.split('/').pop();
 
     const statusSocket = new WebSocket('ws://' + window.location.host + '/ws/status/');
     statusSocket.onopen = function (event) {
-        if (DEBUG) {console.log('Status socket opened');}
+        if (DEBUG) {console.log('Status WebSocket opened (in Users)');}
     }
 
     statusSocket.onmessage = function (event) {
         if (DEBUG) {console.log('Message received:', event.data);}
         const data = JSON.parse(event.data);
-        const user_list_row = document.querySelector('.user_list_row');
-        createUserRow(user_list_row, data);
+        if (data.user_id !== me.id) {
+            const user_list_row = document.querySelector('.user_list_row');
+            createUserRow(user_list_row, data);
+        }
     };
 
     statusSocket.onclose = function (event) {
-        if (DEBUG) {console.error('Status socket closed', event);}
+        if (DEBUG) {console.error('Status WebSocket closed (in Users)', event);}
     }
 
     container.innerHTML = '';
@@ -134,12 +152,44 @@ export async function friendsView(container) {
 
     const user_list = document.createElement('div');
     user_list.className = 'user_list container-fluid';
+    global_div.appendChild(user_list);
+
+    // Add a search bar to search for users
+    const inputGroup = document.createElement('div');
+    inputGroup.className = 'input-group p-2';
+    user_list.appendChild(inputGroup);
+
+    const inputGroupPrepend = document.createElement('div');
+    inputGroupPrepend.className = 'input-group-prepend';
+    inputGroup.appendChild(inputGroupPrepend);
+    
+    const searchIcon = document.createElement('span');
+    searchIcon.className = 'btn search-btn';
+    searchIcon.innerHTML = '<i class="bi bi-search text-white"></i>';
+    inputGroupPrepend.appendChild(searchIcon);
+    
+    const searchInputLabel = document.createElement('label');
+    searchInputLabel.setAttribute('for', 'search');
+    searchInputLabel.textContent = 'Search for users...'; // Text for screen readers
+    searchInputLabel.className = 'visually-hidden'; // Hide the label but keep it for screen readers
+    inputGroup.appendChild(searchInputLabel);
+
+    const searchInput = document.createElement('input');
+    searchInput.id = 'search';
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Search for users...';
+    searchInput.className = 'form-control border-0 search';
+    inputGroup.appendChild(searchInput);
+
+    searchInput.addEventListener('input', () => {
+        const search = searchInput.value.trim();
+        displayUserCards(search);
+    });
 
     const user_list_row = document.createElement('div');
     user_list_row.className = 'row p-4 user_list_row';
-
+    user_list_row.id = 'user-list-row';
     user_list.appendChild(user_list_row);
-    global_div.appendChild(user_list);
 
     fetch('/api/users/', {
         method: 'GET',
@@ -150,7 +200,7 @@ export async function friendsView(container) {
         },
     })
     .then(response => response.json())
-    .then(data => { // FIXME: if it's about me, don't display me
+    .then(data => {
         data.forEach(user => {
             createUserRow(user_list_row, user);
         });
@@ -158,4 +208,30 @@ export async function friendsView(container) {
 
     const notifications_div = await notifications();
     global_div.appendChild(notifications_div);
+}
+
+
+// Display the user cards that match the search query
+function displayUserCards(search = '') {
+    const userListRow = document.getElementById('user-list-row');
+    const userCols = Array.from(userListRow.children);
+
+    // Filter the `user_col` containing a `userCard` matching the search query
+    const matchingUserCols = userCols.filter(userCol => {
+        const nickname = userCol.querySelector('.user_nickname').textContent;
+        return nickname.toLowerCase().startsWith(search.toLowerCase());
+    });
+
+    // Display the matching user cards
+    matchingUserCols.forEach(userCol => {
+        userCol.classList.remove('invisible'); // Rendre visibles les cartes correspondantes
+        userListRow.appendChild(userCol); // Ajouter les cartes triées au conteneur
+    });
+
+    // Hide the non-matching user cards
+    userCols.forEach(userCol => {
+        if (!matchingUserCols.includes(userCol)) {
+            userCol.classList.add('invisible'); // Masquer les cartes non correspondantes
+        }
+    });
 }

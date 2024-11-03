@@ -112,6 +112,11 @@ async function createSettingsForm() {
         const nickname = data.get('newNicknameModify');
         const email = data.get('newEmailModify');
 
+        // TODO: ATTENTION, si le nickname est vide et qu'on veut changer que l'email, le nickname sera vide 
+        // et donc le serveur renverra une erreur car le nickname est obligatoire
+        // Il faudrait donc vérifier si le nickname est vide et si c'est le cas, le remplacer par l'ancien nickname
+        // et ne pas envoyer le nickname au serveur si il est vide
+
         // Check the size of the nickname (between 3 and 10 characters)
         if (nickname.length < 3 || nickname.length > 10) {
             const errorMessage = document.createElement('p');
@@ -148,11 +153,15 @@ async function createSettingsForm() {
             else {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'Error while modifying parameters';
-                settingsForm.insertBefore(errorMessage, settingsSubmitButton);
+                return response.json().then(data => {
+                    errorMessage.textContent = data.error;
+                    settingsForm.insertBefore(errorMessage, settingsSubmitButton);
+                    settingsForm.reset();
+                });
+                // errorMessage.textContent = 'Error while modifying parameters';
+                // settingsForm.insertBefore(errorMessage, settingsSubmitButton);
 
                 // Reset the form after success
-                settingsForm.reset();
             }
         } catch (error) {
             if (DEBUG) {console.error(error);}

@@ -1,7 +1,7 @@
 import { DEBUG, navigateTo } from '../app.js';
 import { getCookie } from './utils.js';
 import { createNavigationBar } from '../components/navigationBar/visual.js';
-import { displayFriends } from '../components/navigationBar/friends.js';
+import {displayFriends, updateFriendStatus, addNewFriend} from '../components/navigationBar/friends.js';
 
 export async function navigationBar(container) {
     const div = document.createElement('div');
@@ -34,25 +34,28 @@ export async function navigationBar(container) {
 
                 const friends_websocket = new WebSocket(`ws://${window.location.host}/ws/friends/`);
                 friends_websocket.onopen = () => {
-                    if (DEBUG) console.log('WebSocket connection established');
-                    friends_websocket.send(JSON.stringify({ type: 'get_friends' }));
+                    if (DEBUG) console.log('Friends WebSocket connection established');
+                    friends_websocket.send(JSON.stringify({type: 'get_friends'}));
                 }
 
                 friends_websocket.onmessage = event => {
                     const message = JSON.parse(event.data);
                     if (message.type === 'get_friends') {
-                        // Display the list of friends
                         displayFriends(message.friends);
+                    } else if (message.type === 'friends_status_update') {
+                        updateFriendStatus(message.user_id, message.nickname, message.status);
+                    } else if (message.type === 'new_friend_added') {
+                        addNewFriend(message.user_id, message.nickname, message.status, message.avatar);
                     }
                 };
 
                 friends_websocket.onclose = () => {
-                    if (DEBUG) console.error('WebSocket connection closed.');
+                    if (DEBUG) console.error('Friends WebSocket connection closed.');
                 };
 
                 // On WebSocket error
                 friends_websocket.onerror = error => {
-                    if (DEBUG) console.error('WebSocket error:', error);
+                    if (DEBUG) console.error('Friends WebSocket error:', error);
                 };
 
                 // Creation of the navigation bar
