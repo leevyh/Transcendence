@@ -45,9 +45,7 @@ body.large-font {
 .base {
     display: flex;
     justify-content: center;
-    /* align-items: center; */
     flex-direction: column;
-    /* background-color: aqua; */
     width: 100%; /*100vh*/
     height: 100%;
 }
@@ -82,7 +80,6 @@ body.large-font {
     top: 0;
     left: 0;
     z-index: 1050;
-    backdrop-filter: blur(10px);
 }
 
 
@@ -90,10 +87,8 @@ body.large-font {
     opacity: 1;
 }
 
-.ModalLogin{
-
-    background-color: rgba(255, 234, 234, 0.5);
-    backdrop-filter: blur(10px);
+.ModalLogin {
+    background-color: #9b9797;
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
@@ -114,7 +109,8 @@ body.large-font {
 
 .modalLoginContent{
     width: auto;
-    background-color: rgba(255, 234, 234, 0.5);
+    background-color: #9b9797;
+    /* background-color: rgba(255, 234, 234, 0.5); */
 }
 
 .ModalLoginBase-show .ModalLogin .ModalRegister .modalGameSettingsBase{
@@ -135,7 +131,6 @@ body.large-font {
 .modalLoginHeader{
     display: flex;
     justify-content: space-between;
-
 }
 
 .modalLoginDialog {
@@ -153,7 +148,6 @@ body.large-font {
     cursor: pointer;
 }
 
-
 .ButtonLogin {
     padding: 5px;
     background-color: #3a4250;
@@ -161,49 +155,32 @@ body.large-font {
     box-shadow: #6f87b1 0px 4px 12px;
 }
 
-
-.ButtonLogin:hover,
-.ButtonLogin:focus {
+.ButtonLogin:hover {
     background-color: #000;
     box-shadow: #435574 0px 4px 12px;
 }
 
 /*=====================Modal-Register========*/
 .ModalRegisterBase {
-
-    backdrop-filter: blur(10px);
     margin: auto;
     padding: 20px;
     width: 100%;
-    opacity: 96%;
-
+    opacity: 1;
 }
 
 .modalRegisterDialog {
     width: 100%;
     display: flex;
     justify-content: center;
-
-}
-.ModalRegisterContent{
-
-    opacity: 0; /* Commence par être invisible */
-    transform: translateY(-20px); /* Décale légèrement vers le haut */
-    transition: opacity 0.5s ease, transform 0.5s ease; /* Durée de l'animation */
-    background-color: rgba(255, 234, 234, 0.5) !important;
-    padding: 5px;
-    width: auto;
 }
 
 .modalRegisterBase-show .ModalRegisterContent {
-    opacity: 1; /* Rendre visible */
-    transform: translateY(0); /* Remet à sa position d'origine */
+    opacity: 1;
+    transform: translateY(0);
 }
-
 
 .modalRegister {
     background-color: rgba(255, 234, 234, 0.5) !important;
-    backdrop-filter: blur(10px);
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
@@ -215,6 +192,14 @@ body.large-font {
     opacity: 0;
 }
 
+.ModalRegisterContent{
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    padding: 5px;
+    width: auto;
+    background-color: #9b9797;
+}
 
 .formRegister {
     padding: 15px;
@@ -233,11 +218,19 @@ body.large-font {
     cursor: pointer;
 }
 
-.closeRegisterButton:hover,
-.closeRegisterButton:focus {
+.closeRegisterButton:hover {
     color: #000;
     text-decoration: none;
     cursor: pointer;
+}
+
+.ButtonRegisterSubmit:focus,
+.ButtonLogin:focus,
+.ButtonLogin42:focus,
+.ButtonsHome:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.4);
+    transform: scale(1.05);
 }
 
 #error404 {
