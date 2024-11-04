@@ -213,7 +213,7 @@ export async function menuPongView(container) {
         // ModalGameSettings
 
         const modalGameSettings = document.createElement('div');
-        modalGameSettings.className = 'modal modalGameSettingsBase ';
+        modalGameSettings.className = 'modal modalGameSettingsBase';
         modalGameSettings.setAttribute('tabindex', '-1');
         modalGameSettings.setAttribute('aria-labelledby', 'modalGameSettingsLabel');
         modalGameSettings.setAttribute('aria-hidden', 'true');
@@ -315,7 +315,7 @@ export async function menuPongView(container) {
             const textElement = document.createElement('p');
             textElement.className = 'w-100 d-flex justify-content-center align-items-center';
             textElement.textContent = textContent;
-
+            //ADD textElement.style.color = couleur que tu veux
             blockTheme.appendChild(textElement);
 
             blockTheme.addEventListener('click', (event) => {
@@ -530,6 +530,62 @@ export async function menuPongView(container) {
         playButton.id = 'playButton';
         form.appendChild(playButton);
 
+        function checkColorMatching(tempBackgroundColor, tempPadsColor, tempBallColor)
+        {
+            if (tempBackgroundColor == tempPadsColor || tempBackgroundColor == tempBallColor)
+                return false;
+            if (tempBackgroundColor == 'white' && (tempPadsColor === 'pink' || tempBallColor === 'pink') ||
+                tempBackgroundColor == 'white' && (tempPadsColor === 'gray' || tempBallColor === 'gray') ||
+                tempBackgroundColor == 'white' && (tempPadsColor === 'lila' || tempBallColor === 'lila') ||
+                tempBackgroundColor == 'white' && (tempPadsColor === 'blue_light' || tempBallColor === 'blue_light'))
+                return false;
+            if (tempBackgroundColor == 'purple' && (tempPadsColor === 'blue' || tempBallColor === 'blue') ||
+                tempBackgroundColor == 'purple' && (tempPadsColor === 'pink' || tempBallColor === 'pink') ||
+                tempBackgroundColor == 'purple' && (tempPadsColor === 'lila' || tempBallColor === 'lila'))
+                return false;
+            if (tempBackgroundColor == 'pink' && (tempPadsColor === 'lila' || tempBallColor === 'lila') ||
+                tempBackgroundColor == 'pink' && (tempPadsColor === 'yellow' || tempBallColor === 'yellow') ||
+                tempBackgroundColor == 'pink' && (tempPadsColor === 'blue_light' || tempBallColor === 'blue_light'))
+                return false;
+            if (tempBackgroundColor == 'yellow' && (tempPadsColor === 'pink' || tempBallColor === 'pink') ||
+                tempBackgroundColor == 'yellow' && (tempPadsColor === 'lila' || tempBallColor === 'lila') ||
+                tempBackgroundColor == 'yellow' && (tempPadsColor === 'green_light' || tempBallColor === 'green_light') ||
+                tempBackgroundColor == 'yellow' && (tempPadsColor === 'blue_light' || tempBallColor === 'blue_light'))
+                return false;
+            if (tempBackgroundColor == 'green' && (tempPadsColor === 'green_light' || tempBallColor === 'green_light'))
+                return false;
+            if (tempBackgroundColor == 'gray' && (tempPadsColor === 'green_light' || tempBallColor === 'green_light') ||
+                tempBackgroundColor == 'gray' && (tempPadsColor === 'blue_light' || tempBallColor === 'blue_light') ||
+                tempBackgroundColor == 'gray' && (tempPadsColor === 'lila' || tempBallColor === 'lila') ||
+                tempBackgroundColor == 'gray' && (tempPadsColor === 'pink' || tempBallColor === 'pink'))
+                return false;
+            if (tempBackgroundColor == 'blue' && (tempPadsColor === 'purple' || tempBallColor === 'purple') ||
+                tempBackgroundColor == 'blue' && (tempPadsColor === 'green_light' || tempBallColor === 'green_light'))
+                return false;
+            if (tempBackgroundColor == 'lila' && (tempPadsColor === 'white' || tempBallColor === 'white') ||
+                tempBackgroundColor == 'lila' && (tempPadsColor === 'pink' || tempBallColor === 'pink') ||
+                tempBackgroundColor == 'lila' && (tempPadsColor === 'gray' || tempBallColor === 'gray') ||
+                tempBackgroundColor == 'lila' && (tempPadsColor === 'blue_light' || tempBallColor === 'blue_light') ||
+                tempBackgroundColor == 'lila' && (tempPadsColor === 'green_light' || tempBallColor === 'green_light'))
+                return false;
+            if (tempBackgroundColor == 'red' && (tempPadsColor === 'brown' || tempBallColor === 'brown'))
+                return false;
+            if (tempBackgroundColor == 'brown' && (tempPadsColor === 'red' || tempBallColor === 'red'))
+                return false;
+            if (tempBackgroundColor == 'green_light' && (tempPadsColor === 'pink' || tempBallColor === 'pink') ||
+                tempBackgroundColor == 'green_light' && (tempPadsColor === 'green' || tempBallColor === 'green') ||
+                tempBackgroundColor == 'green_light' && (tempPadsColor === 'yellow' || tempBallColor === 'yellow') ||
+                tempBackgroundColor == 'green_light' && (tempPadsColor === 'gray' || tempBallColor === 'gray') ||
+                tempBackgroundColor == 'green_light' && (tempPadsColor === 'lila' || tempBallColor === 'lila') ||
+                tempBackgroundColor == 'green_light' && (tempPadsColor === 'blue_light' || tempBallColor === 'blue_light'))
+                return false;
+            if (tempBackgroundColor == 'blue_light' && (tempPadsColor === 'pink' || tempBallColor === 'pink') ||
+                tempBackgroundColor == 'blue_light' && (tempPadsColor === 'gray' || tempBallColor === 'gray') ||
+                tempBackgroundColor == 'blue_light' && (tempPadsColor === 'lila' || tempBallColor === 'lila') ||
+                tempBackgroundColor == 'blue_light' && (tempPadsColor === 'green_light' || tempBallColor === 'green_light'))
+                return false;
+            return true;
+        }
 
         form.addEventListener('submit', async (event) => {
 
@@ -554,7 +610,7 @@ export async function menuPongView(container) {
                     },
                     body: JSON.stringify(GameSettings),
                 });
-                if (response.ok) {
+                if (response.ok && checkColorMatching(tempBackgroundColor, tempPadsColor, tempBallColor)) {
 
                     const successMessage = document.createElement('p');
                     successMessage.className = 'text-success';
@@ -563,6 +619,15 @@ export async function menuPongView(container) {
                     navigateTo(redirectTo);
                     form.reset();
 
+                }
+                if (!checkColorMatching(tempBackgroundColor, tempPadsColor, tempBallColor))
+                {
+                    const errorMessage = document.createElement('p');
+                    errorMessage.className = 'text-danger';
+                    errorMessage.textContent = 'Low visibility, try again.';
+                    form.insertBefore(errorMessage, playButton);
+                    setTimeout(() => errorMessage.remove(), 3000);
+                    form.reset();
                 }
                 else {
                     const errorMessage = document.createElement('p');
@@ -574,8 +639,9 @@ export async function menuPongView(container) {
             } catch (error) {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'An error has occurred. Please try again.';
+                errorMessage.textContent = 'An error has occurred, try again.';
                 form.insertBefore(errorMessage, playButton);
+                setTimeout(() => errorMessage.remove(), 3000);
                 // Reset the form after success
                 form.reset();
             }
