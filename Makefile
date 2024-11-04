@@ -58,9 +58,9 @@ status:
 prune:
 	@docker system prune -af
 
-re: d-lite a-lite
+re: down all
 
-r-full: down all
+r-full: d-full a-full
 
 .PHONY: all down clean force logs status prune re
 .SILENT: all down clean force logs status prune re
