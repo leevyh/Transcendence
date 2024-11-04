@@ -1,5 +1,5 @@
 import { navigationBar } from './navigation.js';
-import { pongView } from './pong.js';
+import { pongView, inGame, setInGame } from './pong.js';
 
 export let currentPlayer = null;
 
@@ -68,7 +68,7 @@ export function tournamentView(container) {
     tournamentSocket.onopen = function(event) {
         console.log('Connected to the tournament WebSocket');
     };
-
+    setInGame(true);
     tournamentSocket.onmessage = function(event) {
         const data = JSON.parse(event.data);
         console.log("Received message from tournament WebSocket:", data);
@@ -87,6 +87,7 @@ export function tournamentView(container) {
 
     // Gérer la fermeture de la connexion WebSocket
     tournamentSocket.onclose = function(event) {
+        setInGame(false);
         console.log('Tournament WebSocket closed.');
     };
 
@@ -150,7 +151,7 @@ export function endOfTournamentView(container, ranking) {
     }
     tournamentContainer.innerHTML = '';
 
-    loadPongFinalCSS();
+    loadPongCSS();
 
     const title = document.createElement('h2');
     title.textContent = "Final Ranking";
@@ -186,67 +187,55 @@ function loadPongCSS() {
     const style = document.createElement('style');
     style.textContent = `
 
-        body, h2, ul, li {
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
         color: white;
-        }
-
-		body {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			min-height: 100vh;
-			margin: 0;
-		}
-
-		ul {
-			margin: 0;
-			padding: 0;
-			list-style-type: none;
-		}
-
-		li {
-			padding: 5px;
-		}
-
-		.canvas {
-			max-width: 100%;
-			height: auto;
-            border-style: groove;
-            border-color: black;
-		}
-    `;
-    document.head.appendChild(style);
-}
-
-// Fonction pour charger les styles CSS pour la vue de fin de tournoi
-function loadPongFinalCSS() {
-    const style = document.createElement('style');
-    style.textContent = `
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        .ranking-list {
-            font-size: 1.2em;
-            list-style-type: none;
-            padding: 0;
-            text-align: center;
-        }
-
-        .ranking-list li {
-            margin: 10px 0;
-        }
-
-        /* Style spécial pour le premier joueur */
-        .first-place {
-            font-size: 2em;
-            font-weight: bold;
-            color: yellow;
-        }
+    }
+    
+    h2, ul, li {
+        color: white;
+    }
+    
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+    }
+    
+    li {
+        padding: 5px;
+    }
+    
+    /* Styles spécifiques pour le canvas */
+    .canvas {
+        max-width: 100%;
+        height: auto;
+        border-style: groove;
+        border-color: black;
+    }
+    
+    /* Styles spécifiques pour la vue de fin de tournoi */
+    .ranking-list {
+        font-size: 1.2em;
+        list-style-type: none;
+        padding: 0;
+        text-align: center;
+    }
+    
+    .ranking-list li {
+        margin: 10px 0;
+    }
+    
+    /* Style spécial pour le premier joueur */
+    .first-place {
+        font-size: 2em;
+        font-weight: bold;
+        color: yellow;
+    }
     `;
     document.head.appendChild(style);
 }

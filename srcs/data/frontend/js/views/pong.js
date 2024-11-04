@@ -22,6 +22,7 @@ import {
 import { GameOn } from './pong_game.js';
 export let canvas = 'null'
 export let inTournament = false;
+export let inGame = false;
 
 export async function pongView(container, tournamentSocket) {
     container.innerHTML = '';
@@ -45,15 +46,6 @@ export async function pongView(container, tournamentSocket) {
     ul.className = 'd-flex justify-content-center';
 
 
-    const stopButtonLi = document.createElement('li');
-    const stopButton = document.createElement('button');
-    stopButton.className = 'btn btn-outline-danger';
-    stopButton.id = 'stop-game';
-    stopButton.textContent = 'Stop';
-    stopButtonLi.appendChild(stopButton);
-
-    ul.appendChild(stopButtonLi);
-
     const canvasElement = document.createElement('canvas');
     canvasElement.className = 'canvas';
     canvasElement.id = 'canvas';
@@ -62,7 +54,13 @@ export async function pongView(container, tournamentSocket) {
 
     const scoreP = document.createElement('p');
     scoreP.className = 'd-flex justify-content-center';
-    scoreP.innerHTML = '<em id="player1-name"></em> : <em id="player1-score">0</em> - <em id="player2-score">0</em> : <em id="player2-name"></em>';
+
+    scoreP.innerHTML = `
+    <span style="font-size: 24px; font-weight: bold; margin-right: 40px;" id="player1-name"></span> 
+    <span style="font-size: 24px; margin-right: 60px;" id="player1-score">0</span> - 
+    <span style="font-size: 24px; margin-left: 60px;" id="player2-score">0</span> 
+    <span style="font-size: 24px; font-weight: bold; margin-left: 40px;" id="player2-name"></span>
+`;
 
     // const buttonGameSettingsContainer = document.createElement('div');
     // buttonGameSettingsContainer.className = "buttonGameSettingsContainer";
@@ -98,27 +96,33 @@ export async function pongView(container, tournamentSocket) {
         inTournament = true;
     }
 
+    setInGame(true);
+
     PongWebSocketManager.socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-
-
         if (data.action_type === 'define_player') {
             var currentPlayer = data.current_player;
             var player_name = data.name_player;
             var game_name = data.game;
             console.log("data = ", data);
-            console.log("currentPlayer = ", currentPlayer);
             if (currentPlayer === 'player_1') {
-                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_1', player_name, game_name));
+                document.addEventListener('keydown', (event) => handleKeyDown(event, 'player_1', player_name, game_name));
                 document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_1', player_name, game_name));
             } else if (currentPlayer === 'player_2') {
-                document.addEventListener('keydown', (event) => handleKeyDown(event, stopButton, 'player_2', player_name, game_name));
+                document.addEventListener('keydown', (event) => handleKeyDown(event, 'player_2', player_name, game_name));
                 document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_2', player_name, game_name));
             }
         }
         if (data.action_type === 'start_game') {
             updatePlayerName(data.game.player1_name, data.game.player2_name);
-            startGame(container, stopButton, data.game.game_name);
+            startGame(container, data.game.game_name);
+        }
+        if (data.action_type === 'waiting_for_player') {
+            console.log("waiting for player");
+            updatePlayerPositions(data.game.player_1_position, data.game.player_2_position);
+            updateBallPosition(data.game.ball_position);
+            // displayWaiting(container);
+            draw();
         }
         // if(data.action_type === 'show_game') {
         //     console.log("show game");
@@ -132,8 +136,6 @@ export async function pongView(container, tournamentSocket) {
             endOfGame(data);
             displayeWinner(data.winner);
             update_Stats(data);
-            //wait 3 seconds before going back to the menu
-            stopButton.disabled = true;
             if (inTournament == false) {
                 setTimeout(() => {
                     navigateTo('/menuPong');
@@ -150,25 +152,19 @@ export async function pongView(container, tournamentSocket) {
     };
 
     PongWebSocketManager.socket.onclose = (event) => {
+        setInGame(false);
         console.log("Pong WebSocket disconnected", event);
     };
-    const stopGameButton = document.querySelector('#stop-game');
-
-    stopGameButton.addEventListener('click', () => {
-        if (GameOn) {
-            stop();
-            stopGameButton.disabled = true; // Désactiver le bouton Stop
-        }
-    });
-
-    stopGameButton.disabled = true; // Le bouton Stop est désactivé au début
-
     const notifications_div = await notifications();
     div.appendChild(notifications_div);
 }
 
 // Fonction pour démarrer le décompte
 function startCountdown(container, game_name) {
+    
+    // clearInterval(checkInGame);
+    // waitingElement.remove();
+    
     let countdownValue = 3;
 
     const gameContainer = container.querySelector('.PongDiv');
@@ -177,7 +173,7 @@ function startCountdown(container, game_name) {
         return;
     }
 
-    const canvas = document.getElementById('canvas'); // Assurez-vous que l'ID correspond bien à celui de votre canvas
+    const canvas = document.getElementById('canvas');
 
     let countdownElement = document.createElement('div');
     countdownElement.id = 'countdown';
@@ -189,7 +185,6 @@ function startCountdown(container, game_name) {
     countdownElement.style.color = 'white';
     countdownElement.style.textAlign = 'center';
     countdownElement.style.zIndex = '1000';
-    // countdownElement.innerText = countdownValue;
 
     let gameNameElement = document.createElement('div');
     gameNameElement.id = 'game-name';
@@ -201,9 +196,7 @@ function startCountdown(container, game_name) {
     gameNameElement.style.color = 'white';
     gameNameElement.style.textAlign = 'center';
     gameNameElement.style.zIndex = '1000';
-    // gameNameElement.innerText = `${game_name}`;
 
-    // document.body.appendChild(countdownElement);
     document.body.appendChild(gameNameElement);
 
     let index = 0;
@@ -211,7 +204,7 @@ function startCountdown(container, game_name) {
         if (index < game_name.length) {
             gameNameElement.innerText += game_name.charAt(index);
             index++;
-            setTimeout(typeGameName, 150); // Délai entre chaque lettre
+            setTimeout(typeGameName, 150);
         } else {
 
             document.body.appendChild(countdownElement);
@@ -219,14 +212,17 @@ function startCountdown(container, game_name) {
         }
     }
     typeGameName();
-    window.addEventListener('beforeunload', () => {
-        countdownElement.remove();
-        gameNameElement.remove();
-    });
         
     function startCountdownTimer() {
         countdownElement.innerText = countdownValue;
         let countdownInterval = setInterval(() => {
+            if (getInGame() === false) {
+                console.log("countdown 1 inGame = ", inGame);
+                clearInterval(countdownInterval); 
+                countdownElement.remove();
+                gameNameElement.remove();
+                return;
+            }
             countdownValue--;
             countdownElement.innerText = countdownValue;
 
@@ -237,16 +233,28 @@ function startCountdown(container, game_name) {
                 setTimeout(() => {
                     countdownElement.remove();
                     gameNameElement.remove();
-                    play();
-                    PongWebSocketManager.sendGameStarted();
+                    if (getInGame() === true) {
+                        console.log("countdown 2 inGame = ", inGame);
+                        play();
+                        PongWebSocketManager.sendGameStarted();
+                    }
                 }, 1000);
             }
         }, 1000);
+        const checkInGame = setInterval(() => {
+            if (getInGame() === false) {
+                console.log("countdown 3 inGame = ", inGame);
+                clearInterval(countdownInterval);
+                clearInterval(checkInGame);
+                countdownElement.remove();
+                gameNameElement.remove();
+            }
+        }, 10);
     }
 }
 
 // Fonction pour démarrer le jeu lorsque le serveur jumelle deux joueurs
-function startGame(container, stopButton, game_name)
+function startGame(container, game_name)
 {
     if (game_name === undefined) {
         game_name = 'Pong';
@@ -261,7 +269,6 @@ function startGame(container, stopButton, game_name)
         game_name = 'Small Final';
     }
     startCountdown(container, game_name);
-    stopButton.disabled = false;
 }
 
 function updateState(data) {
@@ -317,7 +324,6 @@ function displayeWinner(winner) {
 
     loadPongCSS();
 
-    // Positionnement relatif au canvas
     winnerElement.style.position = 'absolute';
     winnerElement.style.top = `${canvas.offsetTop + canvas.height / 2}px`;
     winnerElement.style.left = `${canvas.offsetLeft + canvas.width / 2}px`;
@@ -338,12 +344,71 @@ function displayeWinner(winner) {
         winnerElement.style.opacity = '1';
     }, 10); 
 
+    const displayDuration = 3000;
+    const disappearDelay = 1000;
+
+    const checkInGame = setInterval(() => {
+        if (getInGame() === false) {
+            console.log("displayWinner: inGame = ", inGame);
+            clearInterval(checkInGame);
+            winnerElement.style.opacity = '0';
+            setTimeout(() => {
+                winnerElement.remove();
+            }, disappearDelay);
+        }
+    }, 100);
+
     setTimeout(() => {
-        winnerElement.style.opacity = '0';  // Animation de disparition
-        setTimeout(() => {
-            winnerElement.remove();
-        }, 1000);  // Temps pour la transition de disparition
-    }, 3000);  // Laisser l'affichage pendant 3 secondes
+        if (getInGame() === true) {
+            winnerElement.style.opacity = '0';
+            setTimeout(() => {
+                winnerElement.remove();
+            }, disappearDelay);
+        }
+    }, displayDuration);
+}
+
+//ecris "waiting another player..." jusqu'a ce que le deuxieme joueur se connecte
+function displayWaiting(container) {
+    const canvas = document.getElementById('canvas');
+    const waitingElement = document.createElement('div');
+    waitingElement.id = 'waiting-display';
+
+    loadPongCSS();
+
+    waitingElement.style.position = 'absolute';
+    waitingElement.style.top = `${canvas.offsetTop + canvas.height / 2}px`;
+    waitingElement.style.left = `${canvas.offsetLeft + canvas.width / 2}px`;
+    waitingElement.style.transform = 'translate(-50%, -50%)';
+
+    waitingElement.style.fontSize = '24px';
+    waitingElement.style.color = 'white';
+    waitingElement.style.textAlign = 'center';
+    waitingElement.style.zIndex = '1000';
+    waitingElement.innerText = 'Waiting for another player...';
+
+    canvas.parentElement.appendChild(waitingElement);
+
+    const checkInGame = setInterval(() => {
+        if (getInGame() === false) {
+            console.log("displayWaiting: inGame = ", inGame);
+            clearInterval(checkInGame);
+            waitingElement.remove();
+        }
+    }, 100);
+}
+
+export function disconnectPlayer() {
+    PongWebSocketManager.sendDisconnect();
+    setInGame(false);
+}
+
+export function getInGame() {
+    return inGame;
+}
+
+export function setInGame(value) {
+    inGame = value;
 }
 
 // CSS Pong
