@@ -94,16 +94,16 @@ if [ ! -f config/certs/certs.zip ] && [ ! -f config/certs/ca.zip ]; then
   done;
 
   echo "Creating data views"
-  until curl -s -X POST --cacert /usr/share/kibana/config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" -H "kbn-xsrf: string" https://backend-kibana:5601/api/data_views/data_view -d "{\"data_view\":{\"name\":\"django-*\",\"title\":\"django-*\",\"id\":\"django-*\"}}" | grep -q "^{\"data_view\":{\"id\":"; do
+  until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" -H "kbn-xsrf: string" https://backend-kibana:5601/api/data_views/data_view -d "{\"data_view\":{\"name\":\"django-*\",\"title\":\"django-*\",\"id\":\"django-*\"}}" | grep -q "^{\"data_view\":{\"id\":"; do
     sleep 1;
   done;
 
-  until curl -s -X POST --cacert /usr/share/kibana/config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" -H "kbn-xsrf: string" https://backend-kibana:5601/api/data_views/data_view -d "{\"data_view\":{\"name\":\"postgresql-*\",\"title\":\"postgresql-*\",\"id\":\"postgresql-*\"}}" | grep -q "^{\"data_view\":{\"id\":"; do
+  until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" -H "kbn-xsrf: string" https://backend-kibana:5601/api/data_views/data_view -d "{\"data_view\":{\"name\":\"postgresql-*\",\"title\":\"postgresql-*\",\"id\":\"postgresql-*\"}}" | grep -q "^{\"data_view\":{\"id\":"; do
     sleep 1;
   done;
 
   echo "Importing custom dashboard"
-  until curl -s -X POST --cacert /usr/share/kibana/config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "kbn-xsrf: true" https://backend-kibana:5601/api/saved_objects/_import?overwrite=true --form file=@/usr/share/kibana/config/dashboard.ndjson | grep -q "^{\"title\":{\"ft_transcendence\""; do
+  until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "kbn-xsrf: true" https://backend-kibana:5601/api/saved_objects/_import?overwrite=true --form file=@/usr/share/kibana/config/dashboard.ndjson | grep -q "^{\"title\":{\"ft_transcendence\""; do
     sleep 1;
   done;
 fi;
