@@ -95,7 +95,7 @@ export async function profileView(container, userID) {
         userPosition.appendChild(ContentPosition);
 
         const podiumContener = document.createElement('div');
-        podiumContener.className = 'podiumContener d-flex flex-column w-100 h-100';
+        podiumContener.className = 'podiumContener d-flex flex-column w-100 h-100 Hide_when_small';
         ContentPosition.appendChild(podiumContener);
 
         const firstplace = document.createElement('div');
@@ -262,7 +262,7 @@ export async function profileView(container, userID) {
         userStatsProfile.appendChild(ContentuserStatsProfile);
 
         const CharWinRateContener = document.createElement('div');
-        CharWinRateContener.className = 'CharWinRateContener d-flex flex-column justify-content-center align-items-center w-100';
+        CharWinRateContener.className = 'CharWinRateContener d-flex flex-column justify-content-center align-items-center w-100 Hide_small ';
         ContentuserStatsProfile.appendChild(CharWinRateContener);
 
         const winRate = stats.win_rate; // Récupère le taux de victoire en pourcentage (ex: 75 pour 75%)
@@ -325,7 +325,7 @@ export async function profileView(container, userID) {
                     Math.min(canvas.width / 2, canvas.height / 2) - 10,
                     0, winRateAngle
                 );
-                
+
                 content.closePath();
                 content.fillStyle = "rgb(6,42,81)"; // Couleur pour la portion de victoire
                 content.fill();
@@ -355,7 +355,7 @@ export async function profileView(container, userID) {
         createWinRateChart(winRate, totalGames);
 
         const UserStatsContener = document.createElement('div');
-        UserStatsContener.className = 'UserStatsContener w-100 d-flex align-items-end p-2';
+        UserStatsContener.className = 'UserStatsContener w-100 d-flex align-items-end p-2 Hide_when_small_second';
         ContentuserStatsProfile.appendChild(UserStatsContener);
 
         const UserStats = document.createElement('div');
