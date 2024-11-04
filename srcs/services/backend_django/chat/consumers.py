@@ -112,6 +112,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'timestamp': str(message['timestamp'])
                 } for message in messages
             ],
+            # TODO: Ajouter les game invites
         }))
 
 
@@ -140,7 +141,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         # Notify the other members of the conversation (except the sender)
-        await self.send_invite_notifications(sender, members, event['timestamp'])
+        # await self.send_invite_notifications(sender, members, event['timestamp']) # TODO: Fix les notifications
 
     # Send message notifications to the members of the conversation
     async def send_invite_notifications(self, sender, members, timestamp):
