@@ -103,12 +103,22 @@ export function createUserCard(user, userList) {
         const userInfo = document.createElement('div');
         userInfo.className = 'mt-auto mb-auto user-info';
         userInfo.innerHTML = `<span>${user.nickname}</span>`;
+        userInfo.setAttribute('role', 'button'); // Make it focusable for accessibility
+        userInfo.setAttribute('tabindex', '0'); // Make it focusable for accessibility
         userCard.appendChild(userInfo);
+
+        // Make it clickable with the keyboard
+        userInfo.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                userInfo.click();
+            }
+        });
         
         const userStatus = document.createElement('div');
         userStatus.className = 'user-status';
         userStatus.textContent = 'offline';
         userInfo.appendChild(userStatus);
+    
         userInfo.addEventListener('click', () => {
             const chatTitle = document.querySelector('.chat-title');
             if (chatTitle.textContent === `Chat with ${user.nickname}`) {
@@ -164,12 +174,6 @@ export function createUserCard(user, userList) {
     const userInfo = userCard.querySelector('.user-info');
     if (userInfo.children[0].textContent !== user.nickname) {
         userInfo.children[0].textContent = user.nickname;
-
-        // if the conversation is open with this user, update the chat title and the user image
-        const chatTitle = document.querySelector('.chat-title');
-        if (chatTitle.textContent === `Chat with ${user.nickname}`) {
-            chatTitle.textContent = `Chat with ${user.nickname}`;
-        }
     }
 
     // Update the user status

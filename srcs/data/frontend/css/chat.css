@@ -47,6 +47,12 @@
     cursor: pointer;
 }
 
+.user-info:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.4);
+    transform: scale(1.05);
+}
+
 .user-status {
     font-size: inherit;
     color: rgba(255, 255, 255, 0.6);
@@ -80,7 +86,8 @@
 .search {
     font-size: inherit;
     border-radius: 15px 0 0 15px !important;
-    background-color: rgba(0, 0, 0, 0.3) !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
 }
 
 .search::placeholder {
@@ -95,7 +102,8 @@
 
 .search-btn {
     border-radius: 0 15px 15px 0 !important;
-    background-color: rgba(0, 0, 0, 0.3) !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
 }
 
 /* CHAT-DIV */
@@ -173,7 +181,8 @@
 /* CHAT FOOTER */
 .chat-input {
     border-radius: 15px 0 0 15px !important;
-    background-color: rgba(0, 0, 0, 0.3) !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
 }
 
 .chat-input::placeholder {
@@ -189,7 +198,8 @@
 
 .send-btn {
     border-radius: 0 15px 15px 0 !important;
-    background-color: rgba(0, 0, 0, 0.3) !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
 }
 
 /* MEDIA QUERIES */
