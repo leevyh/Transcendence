@@ -69,13 +69,13 @@ export async function leaderboardView(container) {
     imgContainer.appendChild(imgAv);
 
     const FirstUserName = document.createElement('div');
-    FirstUserName.className = 'thirdUserName m-0 text-center fs-6 d-none d-sm-block';
+    FirstUserName.className = 'thirdUserName m-0 text-center fs-6 d-none d-sm-block Hide_when_small_second';
     FirstUserName.textContent = 'firstname';
     FirstUserName.style.color = '#f5b041';
     firstplaceContainer.appendChild(FirstUserName);
 
     const otherplace = document.createElement('div');
-    otherplace.className = 'otherplace w-100 d-flex flex-row ';
+    otherplace.className = 'otherplace w-100 d-flex flex-row Hide_when_small_second';
     podiumContener.appendChild(otherplace);
 
     const secplace = document.createElement('div');
