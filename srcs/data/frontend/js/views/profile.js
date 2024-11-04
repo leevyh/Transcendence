@@ -1,7 +1,7 @@
 import { navigationBar } from './navigation.js';
 import { notifications } from './notifications.js';
 import { getCookie } from './utils.js';
-
+import { get_leaderboard} from "./leaderboard.js";
 
 
 async function fetchUserStats(userID) {
@@ -47,6 +47,21 @@ export async function profileView(container, userID) {
     try {
         const stats = await fetchUserStats(userID);
 
+        const leaderboard = await get_leaderboard();
+
+        let first = leaderboard[0];
+        let second = leaderboard[1];
+        let third = leaderboard[2];
+
+        // if (second === undefined) {
+        //     second = {nickname: 'No user', win_rate: 0, avatar: ''};
+        // }
+        // if (third === undefined) {
+        //     third = {nickname: 'No user', win_rate: 0, avatar: ''};
+        // }
+        const userProfile = leaderboard.find((user) => user.id === parseInt(userID, 10));
+
+
         const mainDiv = document.createElement('div');
         mainDiv.className = 'd-flex flex-grow-1 m-4';
         div.appendChild(mainDiv);
@@ -71,7 +86,7 @@ export async function profileView(container, userID) {
 
         const TitlePosition = document.createElement('h5');
         TitlePosition.className = 'TitlePosition py-3';
-        TitlePosition.textContent = '58';
+        TitlePosition.textContent = `${userProfile.rank}`;
         TitlePosition.style.display = 'inline-block';
         HeaderUser.appendChild(TitlePosition);
 
@@ -80,7 +95,7 @@ export async function profileView(container, userID) {
         userPosition.appendChild(ContentPosition);
 
         const podiumContener = document.createElement('div');
-        podiumContener.className = 'podiumContener d-flex flex-column w-100 h-100';
+        podiumContener.className = 'podiumContener d-flex flex-column w-100 h-100 Hide_when_small';
         ContentPosition.appendChild(podiumContener);
 
         const firstplace = document.createElement('div');
@@ -114,7 +129,7 @@ export async function profileView(container, userID) {
         imgContainer.appendChild(Laurier);
 
         const imgAv = document.createElement('img');
-        imgAv.src = '/js/img/women.svg';
+        imgAv.src = `data:image/png;base64,${first.avatar}`;
         imgAv.alt = 'Avatar First Place';
         imgAv.className = 'imgAv rounded-circle';
         imgAv.style.width = '50px';
@@ -127,7 +142,7 @@ export async function profileView(container, userID) {
 
         const FirstUserName = document.createElement('div');
         FirstUserName .className = 'thirdUserName m-0 text-center fs-6 d-none d-lg-block';
-        FirstUserName .textContent = 'firstname';
+        FirstUserName .textContent = `${first.nickname}`;
         FirstUserName.style.color = '#f5b041';
         firstplaceContainer.appendChild(FirstUserName);
 
@@ -144,32 +159,43 @@ export async function profileView(container, userID) {
         secplaceContainer.className = 'd-flex flex-column justify-content-center align-items-center w-100 h-100';
         secplace.appendChild(secplaceContainer);
 
-        const TextSecPos = document.createElement('h6');
-        TextSecPos.className = 'TextSecPos text-center w-100 mb-2';
-        TextSecPos.textContent = '2nd';
-        TextSecPos.style.margin = '0';
-        TextSecPos.style.color = '#95a5a6';
-        secplaceContainer.appendChild(TextSecPos);
+        if (second !== undefined) {
+            const TextSecPos = document.createElement('h6');
+            TextSecPos.className = 'TextSecPos text-center w-100 mb-2';
+            TextSecPos.textContent = '2nd';
+            TextSecPos.style.margin = '0';
+            TextSecPos.style.color = '#95a5a6';
+            secplaceContainer.appendChild(TextSecPos);
 
-        const imgContainerSecPos = document.createElement('div');
-        imgContainerSecPos.className = 'img-container d-flex justify-content-center align-items-start w-100 h-50';
-        imgContainerSecPos.style.width = '90px';
-        imgContainerSecPos.style.height = '90px';
-        secplaceContainer.appendChild(imgContainerSecPos);
+            const imgContainerSecPos = document.createElement('div');
+            imgContainerSecPos.className = 'img-container d-flex justify-content-center align-items-start w-100 h-50';
+            imgContainerSecPos.style.width = '90px';
+            imgContainerSecPos.style.height = '90px';
+            secplaceContainer.appendChild(imgContainerSecPos);
 
-        const img2Av = document.createElement('img');
-        img2Av.src = '/js/img/women.svg';
-        img2Av.alt = 'Avatar Second Place';
-        img2Av.className = 'img2Av rounded-circle';
-        img2Av.style.width = '50px';
-        img2Av.style.height = '50px';
-        imgContainerSecPos.appendChild(img2Av);
 
-        const SecUserName = document.createElement('div');
-        SecUserName.className = 'SecUserName m-0 text-center fs-6 d-none d-lg-block';
-        SecUserName.textContent = 'secondname';
-        SecUserName.style.color = '#95a5a6';
-        secplaceContainer.appendChild(SecUserName);
+
+            const img2Av = document.createElement('img');
+            img2Av.src = `data:image/png;base64,${second.avatar}`;
+            img2Av.alt = 'Avatar Second Place';
+            img2Av.className = 'img2Av rounded-circle';
+            img2Av.style.width = '50px';
+            img2Av.style.height = '50px';
+            imgContainerSecPos.appendChild(img2Av);
+
+            const SecUserName = document.createElement('div');
+            SecUserName.className = 'SecUserName m-0 text-center fs-6 d-none d-lg-block';
+            SecUserName.textContent = `${second.nickname}`;
+            SecUserName.style.color = '#95a5a6';
+            secplaceContainer.appendChild(SecUserName);
+        }
+        else {
+            const SecUserName = document.createElement('div');
+            SecUserName.className = 'SecUserName m-0 text-center fs-6 d-none d-md-block';
+            SecUserName.textContent = 'No user';
+            SecUserName.style.color = '#95a5a6';
+            secplaceContainer.appendChild(SecUserName);
+        }
 
         const thirdplace = document.createElement('div');
         thirdplace.className = 'thirdplace d-flex justify-content-center align-items-start flex-column w-50 h-100 d-none d-md-block';  // Ajout de overflow-hidden ici
@@ -179,32 +205,43 @@ export async function profileView(container, userID) {
         thirdplaceContainer.className = 'd-flex flex-column justify-content-center align-items-center w-100 h-100';
         thirdplace.appendChild(thirdplaceContainer);
 
-        const TextThirdPos = document.createElement('h6');
-        TextThirdPos.className = 'TextThirdPos text-center w-100 mb-2';
-        TextThirdPos.textContent = '3rd';
-        TextThirdPos.style.margin = '0';
-        TextThirdPos.style.color = '#6e2c00';
-        thirdplaceContainer.appendChild(TextThirdPos);
 
-        const imgContainerThirdPos = document.createElement('div');
-        imgContainerThirdPos.className = 'img-container d-flex justify-content-center align-items-start w-100 h-50';
-        imgContainerThirdPos.style.width = '90px';
-        imgContainerThirdPos.style.height = '90px';
-        thirdplaceContainer.appendChild(imgContainerThirdPos);
+        if (third !== undefined) {
+            const TextThirdPos = document.createElement('h6');
+            TextThirdPos.className = 'TextThirdPos text-center w-100 mb-2';
+            TextThirdPos.textContent = '3rd';
+            TextThirdPos.style.margin = '0';
+            TextThirdPos.style.color = '#6e2c00';
+            thirdplaceContainer.appendChild(TextThirdPos);
 
-        const img3Av = document.createElement('img');
-        img3Av.src = '/js/img/women.svg';
-        img3Av.alt = 'Avatar Third Place';
-        img3Av.className = 'img3Av rounded-circle';
-        img3Av.style.width = '50px';
-        img3Av.style.height = '50px';
-        imgContainerThirdPos.appendChild(img3Av);
+            const imgContainerThirdPos = document.createElement('div');
+            imgContainerThirdPos.className = 'img-container d-flex justify-content-center align-items-start w-100 h-50';
+            imgContainerThirdPos.style.width = '90px';
+            imgContainerThirdPos.style.height = '90px';
+            thirdplaceContainer.appendChild(imgContainerThirdPos);
 
-        const thirdUserName = document.createElement('div');
-        thirdUserName.className = 'thirdUserName m-0 text-center fs-6 d-none d-lg-block';
-        thirdUserName.textContent = 'thirdname';
-        thirdUserName.style.color = '#6e2c00';
-        thirdplaceContainer.appendChild(thirdUserName);
+            const img3Av = document.createElement('img');
+            img3Av.src = `data:image/png;base64,${third.avatar}`;
+            img3Av.alt = 'Avatar Third Place';
+            img3Av.className = 'img3Av rounded-circle';
+            img3Av.style.width = '50px';
+            img3Av.style.height = '50px';
+            imgContainerThirdPos.appendChild(img3Av);
+
+            const thirdUserName = document.createElement('div');
+            thirdUserName.className = 'thirdUserName m-0 text-center fs-6 d-none d-lg-block';
+            thirdUserName.textContent = `${third.nickname}`;
+            thirdUserName.style.color = '#6e2c00';
+            thirdplaceContainer.appendChild(thirdUserName);
+        }
+        else {
+            const thirdUserName = document.createElement('div');
+            thirdUserName.className = 'thirdUserName m-0 text-center fs-6 d-none d-md-block';
+            thirdUserName.textContent = 'No user';
+            thirdUserName.style.color = '#6e2c00';
+            thirdplaceContainer.appendChild(thirdUserName);
+        }
+
 
 
         const userStatsProfile = document.createElement('div');
@@ -225,80 +262,100 @@ export async function profileView(container, userID) {
         userStatsProfile.appendChild(ContentuserStatsProfile);
 
         const CharWinRateContener = document.createElement('div');
-        CharWinRateContener.className = 'CharWinRateContener d-flex justify-content-center align-items-center  w-100';
+        CharWinRateContener.className = 'CharWinRateContener d-flex flex-column justify-content-center align-items-center w-100 Hide_small ';
         ContentuserStatsProfile.appendChild(CharWinRateContener);
 
-        const wins = stats.nb_wins;
-        const losse = stats.nb_losses;
+        const winRate = stats.win_rate; // Récupère le taux de victoire en pourcentage (ex: 75 pour 75%)
         const totalGames = stats.nb_games;
         console.log("totalGames", totalGames);
 
-        function createPieChart(wins, losse, totalGames) {
+        function createWinRateChart(winRate, totalGames) {
+
+            // Créer un élément de texte pour afficher le win rate au-dessus du graphique
+            const winRateDiv = document.createElement('div');
+            //Div containe winrate text with p element
+            winRateDiv.className = 'winRateDiv d-flex justify-content-center align-items-center w-100';
+            const winRateText = document.createElement('p');
+            winRateText.className = 'winRateText m-0';
+            winRateText.textContent = `Win Rate: ${winRate}%`;
+            if (winRate < 50) {
+                winRateText.style.color = 'rgb(199, 49, 49)';
+            }
+            else {
+                winRateText.style.color = 'rgb(0,26,71)';
+            }
+            winRateDiv.appendChild(winRateText);
+
+
+
+            CharWinRateContener.appendChild(winRateText);
 
             const canvas = document.createElement('canvas');
             canvas.id = 'myCanvas';
             canvas.className = 'h-100 p-1';
             CharWinRateContener.appendChild(canvas);
 
-            const data = [wins, losse]; // Victoires et pertes
-            const colors = ["rgba(0, 123, 255, 0.3)", "rgba(255, 0, 0, 0.3)"]; // Vert pour victoires, Rouge pour pertes
-            const labels = ["Wins", "Defeats"];
-
-            // Fonction pour dessiner un cercle rempli de blanc
+            // Fonction pour dessiner le cercle blanc de fond
             function drawFilledWhiteCircle(canvasId) {
                 console.log("round blanc");
                 const canvas = document.getElementById(canvasId);
                 const content = canvas.getContext('2d');
 
-                // Dessiner un cercle plein blanc
+                content.clearRect(0, 0, canvas.width, canvas.height); // Nettoie le canvas
                 content.beginPath();
                 content.arc(canvas.width / 2, canvas.height / 2, Math.min(canvas.width / 2, canvas.height / 2) - 10, 0, 2 * Math.PI);
                 content.closePath();
-                content.fillStyle = "#ffffff"; // Remplir le cercle de blanc
+                content.fillStyle = "#ffffff"; // Remplit le cercle de blanc
                 content.fill();
             }
 
-            // Fonction pour dessiner le diagramme circulaire
-            function drawPieChart(canvasId, data, colors, labels) {
+            // Fonction pour dessiner le diagramme en utilisant le winRate
+            function drawWinRateChart(canvasId, winRate) {
                 const canvas = document.getElementById(canvasId);
                 const content = canvas.getContext('2d');
-                const total = data.reduce((acc, value) => acc + value, 0); // Total des valeurs
 
-                let startAngle = 0;
-                for (let i = 0; i < data.length; i++) {
-                    const sliceAngle = (data[i] / total) * 2 * Math.PI;
+                const totalAngle = 2 * Math.PI; // Cercle complet en radians
+                const winRateAngle = (winRate / 100) * totalAngle; // Angle correspondant au taux de victoire
 
-                    // Dessiner chaque portion du cercle
-                    content.beginPath();
-                    content.moveTo(canvas.width / 2, canvas.height / 2); // Centre du cercle
-                    content.arc(canvas.width / 2, canvas.height / 2, Math.min(canvas.width / 2, canvas.height / 2) - 10, startAngle, startAngle + sliceAngle);
-                    content.closePath();
+                // Dessiner la portion de victoire
+                content.beginPath();
+                content.moveTo(canvas.width / 2, canvas.height / 2);
+                content.arc(
+                    canvas.width / 2, canvas.height / 2,
+                    Math.min(canvas.width / 2, canvas.height / 2) - 10,
+                    0, winRateAngle
+                );
 
-                    content.fillStyle = colors[i];
-                    content.fill();
+                content.closePath();
+                content.fillStyle = "rgb(6,42,81)"; // Couleur pour la portion de victoire
+                content.fill();
 
-                    const labelX = canvas.width / 2 + (Math.min(canvas.width / 2, canvas.height / 4) / 2) * Math.cos(startAngle + sliceAngle / 2);
-                    const labelY = canvas.height / 2 + (Math.min(canvas.width / 2, canvas.height / 4) / 2) * Math.sin(startAngle + sliceAngle / 2);
-                    content.fillStyle = "white";
-                    content.font = "14px Arial";
-                    content.fillText(labels[i], labelX, labelY);
-
-                    startAngle += sliceAngle;
-                }
+                // Dessiner la portion de défaite
+                content.beginPath();
+                content.moveTo(canvas.width / 2, canvas.height / 2);
+                content.arc(
+                    canvas.width / 2, canvas.height / 2,
+                    Math.min(canvas.width / 2, canvas.height / 2) - 10,
+                    winRateAngle, totalAngle
+                );
+                content.closePath();
+                content.fillStyle = "rgba(168,5,5,0.61)"; // Couleur pour la portion restante (défaite)
+                content.fill();
             }
+
             console.log("in function totalGames", totalGames);
             if (totalGames === 0) {
-                console.log("partie totalGames", totalGames);
+                console.log("Aucun match joué", totalGames);
                 drawFilledWhiteCircle('myCanvas');
             } else {
-                drawPieChart('myCanvas', data, colors, labels);
+                drawWinRateChart('myCanvas', winRate);
             }
         }
 
-        createPieChart(wins, losse, totalGames);
+        createWinRateChart(winRate, totalGames);
 
         const UserStatsContener = document.createElement('div');
-        UserStatsContener.className = 'UserStatsContener w-100 d-flex align-items-end p-2';
+        UserStatsContener.className = 'UserStatsContener w-100 d-flex align-items-end p-2 Hide_when_small_second';
         ContentuserStatsProfile.appendChild(UserStatsContener);
 
         const UserStats = document.createElement('div');
@@ -339,6 +396,8 @@ export async function profileView(container, userID) {
             // Création de ContenerHistoriqueGame
             const ContenerHistoriqueGame = document.createElement('div');
             ContenerHistoriqueGame.className = 'ContenerHistoriqueGame d-flex flex-row w-100';
+            ContenerHistoriqueGame.classList.add('mb-2', 'px-3');
+            ContenerHistoriqueGame.style.borderRadius = '10px';
 
             // Conteneur pour le premier joueur (player 1)
             const ContenerYourAvatar = document.createElement('div');

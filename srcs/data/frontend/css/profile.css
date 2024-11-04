@@ -43,6 +43,21 @@
     background-color: #435574;
 }
 
+.historical::-webkit-scrollbar {
+    width: 10px;
+}
+
+.historical::-webkit-scrollbar-thumb {
+    background-color: #1d2d45;
+    border-radius: 10px;
+}
+
+.historical::-webkit-scrollbar-track {
+    background-color: #435574;
+    border-radius: 10px;
+}
+
+
 .ContenerHistoriqueGame {
     height: 150px;
 }
@@ -79,4 +94,22 @@
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	cursor: pointer;
+}
+
+@media screen and (max-height: 800px) {
+	.Hide_when_small {
+		display: none !important; /* Cache complètement la liste d'amis */
+	}
+}
+
+@media screen and (max-height: 750px) {
+	.Hide_when_small_second {
+		display: none !important; /* Cache complètement la liste d'amis */
+	}
+}
+
+@media screen and (max-height: 500px) {
+	.Hide_small {
+		display: none !important; /* Cache complètement la liste d'amis */
+	}
 }

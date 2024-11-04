@@ -1,0 +1,604 @@
+[
+  {
+    "model": "api.user_site",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$31x3E9gkMYg37JV5CXD1a8$5FUPf9EkQWE1WHKNgWegBxJUOy1HapEovNN+0rWrMnY=",
+      "last_login": "2024-09-12T11:52:06.515Z",
+      "is_superuser": false,
+      "username": "user01",
+      "first_name": "",
+      "last_name": "",
+      "email": "user01@user01.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T09:42:25.615Z",
+      "nickname": "user01",
+      "created_at": "2024-09-12T09:42:25.615Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user_site",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$b46xxKMQxLkMInV1Ali4Nl$Y8bLStK4nJ276BmHrlKyoEhbhK7grAo0oTl/dB6iWUs=",
+      "last_login": "2024-09-12T13:29:42.166Z",
+      "is_superuser": false,
+      "username": "Pierre",
+      "first_name": "",
+      "last_name": "",
+      "email": "pierre@pierre.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T13:29:37.618Z",
+      "nickname": "Lara",
+      "created_at": "2024-09-12T13:29:37.618Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user_site",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$31x3E9gkMYg37JV5CXD1a8$5FUPf9EkQWE1WHKNgWegBxJUOy1HapEovNN+0rWrMnY=",
+      "last_login": "2024-09-12T13:29:42.166Z",
+      "is_superuser": false,
+      "username": "Livia",
+      "first_name": "",
+      "last_name": "",
+      "email": "Henry@Henry.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T13:29:37.618Z",
+      "nickname": "Livia",
+      "created_at": "2024-09-12T13:29:37.618Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user_site",
+    "pk": 4,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$31x3E9gkMYg37JV5CXD1a8$5FUPf9EkQWE1WHKNgWegBxJUOy1HapEovNN+0rWrMnY=",
+      "last_login": "2024-09-12T11:52:06.515Z",
+      "is_superuser": false,
+      "username": "user04",
+      "first_name": "",
+      "last_name": "",
+      "email": "user04@user04.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T09:42:25.615Z",
+      "nickname": "user04",
+      "created_at": "2024-09-12T09:42:25.615Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user_site",
+    "pk": 5,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$31x3E9gkMYg37JV5CXD1a8$5FUPf9EkQWE1WHKNgWegBxJUOy1HapEovNN+0rWrMnY=",
+      "last_login": "2024-09-12T11:52:06.515Z",
+      "is_superuser": false,
+      "username": "user05",
+      "first_name": "",
+      "last_name": "",
+      "email": "user05@user05.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T09:42:25.615Z",
+      "nickname": "user05",
+      "created_at": "2024-09-12T09:42:25.615Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user_site",
+    "pk": 6,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$31x3E9gkMYg37JV5CXD1a8$5FUPf9EkQWE1WHKNgWegBxJUOy1HapEovNN+0rWrMnY=",
+      "last_login": "2024-09-12T13:29:42.166Z",
+      "is_superuser": false,
+      "username": "Clement",
+      "first_name": "",
+      "last_name": "",
+      "email": "clement@clement.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T13:29:37.618Z",
+      "nickname": "Clement",
+      "created_at": "2024-09-12T13:29:37.618Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user_site",
+    "pk": 7,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$31x3E9gkMYg37JV5CXD1a8$5FUPf9EkQWE1WHKNgWegBxJUOy1HapEovNN+0rWrMnY=",
+      "last_login": "2024-09-12T11:52:06.515Z",
+      "is_superuser": false,
+      "username": "user07",
+      "first_name": "",
+      "last_name": "",
+      "email": "user07@user07.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T09:42:25.615Z",
+      "nickname": "user07",
+      "created_at": "2024-09-12T09:42:25.615Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user_site",
+    "pk": 8,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$31x3E9gkMYg37JV5CXD1a8$5FUPf9EkQWE1WHKNgWegBxJUOy1HapEovNN+0rWrMnY=",
+      "last_login": "2024-09-12T11:52:06.515Z",
+      "is_superuser": false,
+      "username": "user08",
+      "first_name": "",
+      "last_name": "",
+      "email": "user08@user08.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T09:42:25.615Z",
+      "nickname": "user08",
+      "created_at": "2024-09-12T09:42:25.615Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user_site",
+    "pk": 9,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$31x3E9gkMYg37JV5CXD1a8$5FUPf9EkQWE1WHKNgWegBxJUOy1HapEovNN+0rWrMnY=",
+      "last_login": "2024-09-12T11:52:06.515Z",
+      "is_superuser": false,
+      "username": "user09",
+      "first_name": "",
+      "last_name": "",
+      "email": "user09@user09.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T09:42:25.615Z",
+      "nickname": "user09",
+      "created_at": "2024-09-12T09:42:25.615Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user_site",
+    "pk": 10,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$31x3E9gkMYg37JV5CXD1a8$5FUPf9EkQWE1WHKNgWegBxJUOy1HapEovNN+0rWrMnY=",
+      "last_login": "2024-09-12T11:52:06.515Z",
+      "is_superuser": false,
+      "username": "user10",
+      "first_name": "",
+      "last_name": "",
+      "email": "user10@user10.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T09:42:25.615Z",
+      "nickname": "user10",
+      "created_at": "2024-09-12T09:42:25.615Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user_site",
+    "pk": 11,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$31x3E9gkMYg37JV5CXD1a8$5FUPf9EkQWE1WHKNgWegBxJUOy1HapEovNN+0rWrMnY=",
+      "last_login": "2024-09-12T11:52:06.515Z",
+      "is_superuser": false,
+      "username": "user011",
+      "first_name": "",
+      "last_name": "",
+      "email": "user011@user011.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T09:42:25.615Z",
+      "nickname": "user011",
+      "created_at": "2024-09-12T09:42:25.615Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user_site",
+    "pk": 12,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$31x3E9gkMYg37JV5CXD1a8$5FUPf9EkQWE1WHKNgWegBxJUOy1HapEovNN+0rWrMnY=",
+      "last_login": "2024-09-12T11:52:06.515Z",
+      "is_superuser": false,
+      "username": "user012",
+      "first_name": "",
+      "last_name": "",
+      "email": "user012@user012.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T09:42:25.615Z",
+      "nickname": "user012",
+      "created_at": "2024-09-12T09:42:25.615Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user_site",
+    "pk": 13,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$31x3E9gkMYg37JV5CXD1a8$5FUPf9EkQWE1WHKNgWegBxJUOy1HapEovNN+0rWrMnY=",
+      "last_login": "2024-09-12T11:52:06.515Z",
+      "is_superuser": false,
+      "username": "user013",
+      "first_name": "",
+      "last_name": "",
+      "email": "user013@user013.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T09:42:25.615Z",
+      "nickname": "user013",
+      "created_at": "2024-09-12T09:42:25.615Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user_site",
+    "pk": 14,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$31x3E9gkMYg37JV5CXD1a8$5FUPf9EkQWE1WHKNgWegBxJUOy1HapEovNN+0rWrMnY=",
+      "last_login": "2024-09-12T11:52:06.515Z",
+      "is_superuser": false,
+      "username": "user014",
+      "first_name": "",
+      "last_name": "",
+      "email": "user014@user014.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-09-12T09:42:25.615Z",
+      "nickname": "user014",
+      "created_at": "2024-09-12T09:42:25.615Z",
+      "status": "online",
+      "avatar": "media/default.jpg",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 1,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 2,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 3,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 4,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 5,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 6,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 7,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 8,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 9,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 10,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 11,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 12,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 13,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.accessibility",
+    "pk": 14,
+    "fields": {
+      "language": "en",
+      "font_size": 2,
+      "dark_mode": false
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 1,
+    "fields": {
+      "nb_games": 30,
+      "nb_wins": 17,
+      "nb_losses": 13,
+      "nb_point_taken": 26,
+      "nb_point_given": 34,
+        "win_rate": 56.67
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 2,
+    "fields": {
+      "nb_games": 45,
+      "nb_wins": 25,
+      "nb_losses": 20,
+      "nb_point_taken": 45,
+      "nb_point_given": 55,
+      "win_rate": 55.56
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 3,
+    "fields": {
+      "nb_games": 20,
+      "nb_wins": 10,
+      "nb_losses": 10,
+      "nb_point_taken": 20,
+      "nb_point_given": 20,
+      "win_rate": 50
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 4,
+    "fields": {
+      "nb_games": 20,
+      "nb_wins": 10,
+      "nb_losses": 10,
+      "nb_point_taken": 20,
+      "nb_point_given": 20,
+      "win_rate": 50
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 5,
+    "fields": {
+      "nb_games": 20,
+      "nb_wins": 10,
+      "nb_losses": 10,
+      "nb_point_taken": 20,
+      "nb_point_given": 20,
+      "win_rate": 50
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 6,
+    "fields": {
+      "nb_games": 20,
+      "nb_wins": 10,
+      "nb_losses": 10,
+      "nb_point_taken": 20,
+      "nb_point_given": 20,
+      "win_rate": 50
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 7,
+    "fields": {
+      "nb_games": 20,
+      "nb_wins": 10,
+      "nb_losses": 10,
+      "nb_point_taken": 20,
+      "nb_point_given": 20,
+      "win_rate": 50
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 8,
+    "fields": {
+      "nb_games": 20,
+      "nb_wins": 10,
+      "nb_losses": 10,
+      "nb_point_taken": 20,
+      "nb_point_given": 20,
+      "win_rate": 50
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 9,
+    "fields": {
+      "nb_games": 20,
+      "nb_wins": 10,
+      "nb_losses": 10,
+      "nb_point_taken": 20,
+      "nb_point_given": 20,
+      "win_rate": 50
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 10,
+    "fields": {
+      "nb_games": 20,
+      "nb_wins": 10,
+      "nb_losses": 10,
+      "nb_point_taken": 20,
+      "nb_point_given": 20,
+      "win_rate": 50
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 11,
+    "fields": {
+      "nb_games": 20,
+      "nb_wins": 10,
+      "nb_losses": 10,
+      "nb_point_taken": 20,
+      "nb_point_given": 20,
+      "win_rate": 50
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 12,
+    "fields": {
+      "nb_games": 20,
+      "nb_wins": 10,
+      "nb_losses": 10,
+      "nb_point_taken": 20,
+      "nb_point_given": 20,
+      "win_rate": 50
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 13,
+    "fields": {
+      "nb_games": 20,
+      "nb_wins": 10,
+      "nb_losses": 10,
+      "nb_point_taken": 20,
+      "nb_point_given": 20,
+      "win_rate": 50
+    }
+  },
+  {
+    "model": "api.stats_user",
+    "pk": 14,
+    "fields": {
+      "nb_games": 20,
+      "nb_wins": 10,
+      "nb_losses": 10,
+      "nb_point_taken": 20,
+      "nb_point_given": 20,
+      "win_rate": 50
+    }
+  }
+]
