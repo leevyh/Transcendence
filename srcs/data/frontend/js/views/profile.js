@@ -1,7 +1,7 @@
 import { navigationBar } from './navigation.js';
 import { notifications } from './notifications.js';
 import { getCookie } from './utils.js';
-
+import { get_leaderboard} from "./leaderboard.js";
 
 
 async function fetchUserStats(userID) {
@@ -47,6 +47,14 @@ export async function profileView(container, userID) {
     try {
         const stats = await fetchUserStats(userID);
 
+        const leaderboard = await get_leaderboard();
+
+        const first = leaderboard[0];
+        const second = leaderboard[1];
+        const third = leaderboard[2];
+        const userProfile = leaderboard.find((user) => user.id === parseInt(userID, 10));
+
+
         const mainDiv = document.createElement('div');
         mainDiv.className = 'd-flex flex-grow-1 m-4';
         div.appendChild(mainDiv);
@@ -71,7 +79,7 @@ export async function profileView(container, userID) {
 
         const TitlePosition = document.createElement('h5');
         TitlePosition.className = 'TitlePosition py-3';
-        TitlePosition.textContent = '58';
+        TitlePosition.textContent = `${userProfile.rank}`;
         TitlePosition.style.display = 'inline-block';
         HeaderUser.appendChild(TitlePosition);
 
@@ -114,7 +122,7 @@ export async function profileView(container, userID) {
         imgContainer.appendChild(Laurier);
 
         const imgAv = document.createElement('img');
-        imgAv.src = '/js/img/women.svg';
+        imgAv.src = `data:image/png;base64,${first.avatar}`;
         imgAv.alt = 'Avatar First Place';
         imgAv.className = 'imgAv rounded-circle';
         imgAv.style.width = '50px';
@@ -127,7 +135,7 @@ export async function profileView(container, userID) {
 
         const FirstUserName = document.createElement('div');
         FirstUserName .className = 'thirdUserName m-0 text-center fs-6 d-none d-lg-block';
-        FirstUserName .textContent = 'firstname';
+        FirstUserName .textContent = `${first.nickname}`;
         FirstUserName.style.color = '#f5b041';
         firstplaceContainer.appendChild(FirstUserName);
 
@@ -158,7 +166,7 @@ export async function profileView(container, userID) {
         secplaceContainer.appendChild(imgContainerSecPos);
 
         const img2Av = document.createElement('img');
-        img2Av.src = '/js/img/women.svg';
+        img2Av.src = `data:image/png;base64,${second.avatar}`;
         img2Av.alt = 'Avatar Second Place';
         img2Av.className = 'img2Av rounded-circle';
         img2Av.style.width = '50px';
@@ -167,7 +175,7 @@ export async function profileView(container, userID) {
 
         const SecUserName = document.createElement('div');
         SecUserName.className = 'SecUserName m-0 text-center fs-6 d-none d-lg-block';
-        SecUserName.textContent = 'secondname';
+        SecUserName.textContent = `${second.nickname}`;
         SecUserName.style.color = '#95a5a6';
         secplaceContainer.appendChild(SecUserName);
 
@@ -193,7 +201,7 @@ export async function profileView(container, userID) {
         thirdplaceContainer.appendChild(imgContainerThirdPos);
 
         const img3Av = document.createElement('img');
-        img3Av.src = '/js/img/women.svg';
+        img3Av.src = `data:image/png;base64,${third.avatar}`;
         img3Av.alt = 'Avatar Third Place';
         img3Av.className = 'img3Av rounded-circle';
         img3Av.style.width = '50px';
@@ -202,7 +210,7 @@ export async function profileView(container, userID) {
 
         const thirdUserName = document.createElement('div');
         thirdUserName.className = 'thirdUserName m-0 text-center fs-6 d-none d-lg-block';
-        thirdUserName.textContent = 'thirdname';
+        thirdUserName.textContent = `${third.nickname}`;
         thirdUserName.style.color = '#6e2c00';
         thirdplaceContainer.appendChild(thirdUserName);
 
@@ -359,6 +367,8 @@ export async function profileView(container, userID) {
             // Création de ContenerHistoriqueGame
             const ContenerHistoriqueGame = document.createElement('div');
             ContenerHistoriqueGame.className = 'ContenerHistoriqueGame d-flex flex-row w-100';
+            ContenerHistoriqueGame.classList.add('mb-2', 'px-3');
+            ContenerHistoriqueGame.style.borderRadius = '10px';
 
             // Conteneur pour le premier joueur (player 1)
             const ContenerYourAvatar = document.createElement('div');

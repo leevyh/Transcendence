@@ -29,6 +29,7 @@ urlpatterns = [
 	path('notifications/read', views.read_All_Notification, name='read_All_Notifications'),
 	path('notification/read_notification/<int:id>/', views.read_Notification, name='read_Notification'),
 	path('notification/delete_notification/<int:id>/', views.delete_Notification, name='delete_Notification'),
+	path('leaderboard/', views.getLeaderboard, name='get_leaderboard'),
 	# path('request_friend/', views.send_notification, name='friends'),
 	# path('game_invite/', views.send_notification, name='game_invite'),
 	# path('notifications/', views.get_notifications, name='get_notifications'),

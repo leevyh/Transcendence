@@ -449,7 +449,30 @@ def all_users(request):
                 return JsonResponse({'error': 'Invalid token'}, status=401)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
-            
+
+def getLeaderboard(request):
+    if request.method == 'GET':
+        try:
+            users = User_site.objects.all().order_by('-stats_user__win_rate', '-stats_user__nb_games')
+            data = []
+            i = 0
+            for user in users:
+                i += 1
+                avatar = base64.b64encode(user.avatar.read()).decode('utf-8')
+                data.append({'rank': i,
+                            'id': user.id,
+                            'nickname': user.nickname,
+                            'win_rate': user.stats_user.win_rate,
+                            'nb_games': user.stats_user.nb_games,
+                            'nb_wins': user.stats_user.nb_wins,
+                            'nb_losses': user.stats_user.nb_losses,
+                            'avatar': avatar})
+
+                print (f"data nickname and rank: {data[i-1]['nickname']} and {data[i-1]['rank']}")         # DEBUG
+
+            return JsonResponse(data, status=200, safe=False)
+        except User_site.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
 
 @login_required(login_url='/api/login')
 @csrf_protect

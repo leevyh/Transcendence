@@ -1,6 +1,17 @@
 import { navigationBar } from './navigation.js';
 import { notifications } from './notifications.js';
 
+export function get_leaderboard() {
+    return fetch('/api/leaderboard', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }).then((response) => response.json());
+}
+
+
+
 
 export async function leaderboardView(container) {
     container.innerHTML = '';
@@ -21,6 +32,15 @@ export async function leaderboardView(container) {
     ContentPosition.style.height = "40%";
     ContentPosition.style.backgroundColor = '#435574';
     mainDiv.appendChild(ContentPosition);
+
+    const leaderboard = await get_leaderboard();
+
+    console.log("LeaderBoard :", leaderboard);
+
+    //Get the first 3 users by the leaderboard.rank + leaderboard.nickname + leaderboard.win_rate
+    const first = leaderboard[0];
+    const second = leaderboard[1];
+    const third = leaderboard[2];
 
     const podiumContener = document.createElement('div');
     podiumContener.className = 'podiumContener d-flex flex-column w-100 h-100';
@@ -57,7 +77,7 @@ export async function leaderboardView(container) {
     imgContainer.appendChild(Laurier);
 
     const imgAv = document.createElement('img');
-    imgAv.src = '/js/img/women.svg';
+    imgAv.src = `data:image/png;base64,${first.avatar}`;
     imgAv.alt = 'Avatar First Place';
     imgAv.className = 'imgAv rounded-circle';
     imgAv.style.width = '50px';
@@ -70,8 +90,15 @@ export async function leaderboardView(container) {
 
     const FirstUserName = document.createElement('div');
     FirstUserName.className = 'thirdUserName m-0 text-center fs-6 d-none d-sm-block';
-    FirstUserName.textContent = 'firstname';
+    FirstUserName.textContent = `${first.nickname}`
     FirstUserName.style.color = '#f5b041';
+
+    const FirstUserWinRate = document.createElement('div');
+    FirstUserWinRate.className = 'thirdUserWinRate m-0 text-center d-none d-sm-block';
+    FirstUserWinRate.textContent = ` ${first.win_rate}% WIN`;
+    FirstUserWinRate.style.fontSize = '0.8rem';
+
+    FirstUserName.appendChild(FirstUserWinRate);
     firstplaceContainer.appendChild(FirstUserName);
 
     const otherplace = document.createElement('div');
@@ -100,7 +127,7 @@ export async function leaderboardView(container) {
     secplaceContainer.appendChild(imgContainerSecPos);
 
     const img2Av = document.createElement('img');
-    img2Av.src = '/js/img/women.svg';
+    img2Av.src = `data:image/png;base64,${second.avatar}`;
     img2Av.alt = 'Avatar Second Place';
     img2Av.className = 'img2Av rounded-circle';
     img2Av.style.width = '50px';
@@ -109,8 +136,15 @@ export async function leaderboardView(container) {
 
     const SecUserName = document.createElement('div');
     SecUserName.className = 'SecUserName m-0 text-center fs-6 d-none d-md-block';
-    SecUserName.textContent = 'secondname';
+    SecUserName.textContent = `${second.nickname}`;
     SecUserName.style.color = '#95a5a6';
+
+    const SecUserWinRate = document.createElement('div');
+    SecUserWinRate.className = 'SecUserWinRate m-0 text-center d-none d-md-block';
+    SecUserWinRate.textContent = ` ${second.win_rate}% WIN`;
+    SecUserWinRate.style.fontSize = '0.8rem';
+
+    SecUserName.appendChild(SecUserWinRate);
     secplaceContainer.appendChild(SecUserName);
 
     const thirdplace = document.createElement('div');
@@ -125,7 +159,7 @@ export async function leaderboardView(container) {
     TextThirdPos.className = 'TextThirdPos text-center w-100 mb-2 d-none d-sm-block';
     TextThirdPos.textContent = '3rd';
     TextThirdPos.style.margin = '0';
-    TextThirdPos.style.color = '#6e2c00';
+    TextThirdPos.style.color = '#b24d05';
     thirdplaceContainer.appendChild(TextThirdPos);
 
     const imgContainerThirdPos = document.createElement('div');
@@ -135,7 +169,7 @@ export async function leaderboardView(container) {
     thirdplaceContainer.appendChild(imgContainerThirdPos);
 
     const img3Av = document.createElement('img');
-    img3Av.src = '/js/img/women.svg';
+    img3Av.src = `data:image/png;base64,${third.avatar}`;
     img3Av.alt = 'Avatar Third Place';
     img3Av.className = 'img3Av rounded-circle';
     img3Av.style.width = '50px';
@@ -144,61 +178,42 @@ export async function leaderboardView(container) {
 
     const thirdUserName = document.createElement('div');
     thirdUserName.className = 'thirdUserName m-0 text-center fs-6 d-none d-md-block';
-    thirdUserName.textContent = 'thirdname';
-    thirdUserName.style.color = '#6e2c00';
+    thirdUserName.textContent = `${third.nickname}`; //Add win_rate below the nickname
+    thirdUserName.style.color = '#b24d05';
+
+    const thirdUserWinRate = document.createElement('div');
+    thirdUserWinRate.className = 'thirdUserWinRate m-0 text-center d-none d-md-block';
+    thirdUserWinRate.textContent = ` ${third.win_rate}% WIN`;
+    thirdUserWinRate.style.fontSize = '0.8rem';
+
+    thirdUserName.appendChild(thirdUserWinRate);
     thirdplaceContainer.appendChild(thirdUserName);
 
     const ContenerListLead = document.createElement('div');
-    ContenerListLead.className = 'ContenerListLead d-flex flex-column p-3  w-100 overflow-y-auto';
+    ContenerListLead.className = 'ContenerListLead d-flex flex-column p-3  w-100 overflow-auto';
     ContenerListLead.style.backgroundColor = '#435574';
     ContenerListLead.style.height = "60%";
     mainDiv.appendChild(ContenerListLead);
 
-    const ContenerRankingPos = document.createElement('div');
-    ContenerRankingPos.className = 'ContenerRankingPos d-flex justify-content-between flex-row align-items-center w-100 mb-1 overflow-x-hidden overflow-y-hidden';
-    ContenerRankingPos.style.position = 'relative';
-    ContenerRankingPos.style.height = '50px';
-    ContenerRankingPos.style.backgroundColor = '#2874a6';
-    ContenerListLead.appendChild(ContenerRankingPos);
+    for (let i = 3; i < leaderboard.length; i++) {
+        AddUserToLeaderboard(leaderboard[i], i + 1);
+    }
 
-    const HeaderRankPos = document.createElement('div');
-    HeaderRankPos.classList = 'HeaderRankPos d-flex align-items-center h-100 p-1 mb-2 d-none d-md-block';
-    HeaderRankPos.style.color = '#F4ED37';
-    ContenerRankingPos.appendChild(HeaderRankPos);
+    const notifications_div = await notifications();
+    div.appendChild(notifications_div);
+}
 
-    const RankPosHash = document.createElement('h6');
-    RankPosHash.className = 'RankPosHash  fst-italic py-3 m-0';
-    RankPosHash.textContent = '#';
-    RankPosHash.style.display = 'inline-block';
-    HeaderRankPos.appendChild(RankPosHash);
-
-    const RankingPosition = document.createElement('h6');
-    RankingPosition.className = 'RankingPosition py-3 m-0';
-    RankingPosition.textContent = '58';
-
-    RankingPosition.style.display = 'inline-block';
-    HeaderRankPos.appendChild(RankingPosition);
-
-
-    const RankPosUsername = document.createElement('div');
-    RankPosUsername.classList = 'RankPosUsername d-flex align-items-center h-100 p-1 overflow-x-hidden';
-    RankPosUsername.style.position = 'absolute';
-    RankPosUsername.style.left = '50%';
-    RankPosUsername.style.transform = 'translateX(-50%)';
-    RankPosUsername.textContent = "Username";
-    ContenerRankingPos.appendChild(RankPosUsername);
-
-    const RankPosScore = document.createElement('div');
-    RankPosScore.classList = 'RankPosScore d-flex align-items-center h-100 p-1 mt-3 d-none d-lg-block';
-    RankPosScore.textContent = "17456";
-    ContenerRankingPos.appendChild(RankPosScore);
-
+function AddUserToLeaderboard(user, rank) {
+    const ContenerRankingPos = document.querySelector('.ContenerListLead');
     const ContenerRankingPosBis = document.createElement('div');
-    ContenerRankingPosBis.className = 'ContenerRankingPos d-flex justify-content-between flex-row align-items-center w-100 overflow-x-hidden overflow-y-hidden';
+    // ContenerRankingPosBis.className = 'ContenerRankingPos d-flex justify-content-between flex-row align-items-center w-100 overflow-x-hidden overflow-y-hidden';
+    ContenerRankingPosBis.className = 'ContenerRankingPos d-flex justify-content-between align-items-center w-100';
+    ContenerRankingPosBis.classList.add('mt-2', 'px-3'); // Ajout de marge entre les utilisateurs
+    ContenerRankingPosBis.style.borderRadius = '5px'; // Ajoute un léger arrondi pour un aspect visuel plus doux
     ContenerRankingPosBis.style.position = 'relative';
     ContenerRankingPosBis.style.height = '50px';
     ContenerRankingPosBis.style.backgroundColor = '#2874a6';
-    ContenerListLead.appendChild(ContenerRankingPosBis);
+    ContenerRankingPos.appendChild(ContenerRankingPosBis);
 
     const HeaderRankPosBis = document.createElement('div');
     HeaderRankPosBis.classList = 'HeaderRankPos d-flex flex-row align-items-center p-1 mb-2  h-100 p-1 d-none d-md-block';
@@ -213,7 +228,7 @@ export async function leaderboardView(container) {
 
     const RankingPositionBis = document.createElement('h6');
     RankingPositionBis.className = 'RankingPosition py-3 m-0';
-    RankingPositionBis.textContent = '581';
+    RankingPositionBis.textContent = rank;
     RankingPositionBis.style.display = 'inline-block';
     HeaderRankPosBis.appendChild(RankingPositionBis);
 
@@ -222,15 +237,11 @@ export async function leaderboardView(container) {
     RankPosUsernameBis.style.position = 'absolute';
     RankPosUsernameBis.style.left = '50%';
     RankPosUsernameBis.style.transform = 'translateX(-50%)';
-    RankPosUsernameBis.textContent = "Usernamedsdas";
+    RankPosUsernameBis.textContent = user.nickname;
     ContenerRankingPosBis.appendChild(RankPosUsernameBis);
 
     const RankPosScoreBis = document.createElement('div');
-    RankPosScoreBis.classList = 'RankPosScore d-flex align-items-center h-100 p-1 mt-3 d-none d-lg-block';
-    RankPosScoreBis.textContent = "445417456";
-
+    RankPosScoreBis.classList = 'RankPosScore d-flex align-items-center h-100 p-1';
+    RankPosScoreBis.textContent = user.win_rate;
     ContenerRankingPosBis.appendChild(RankPosScoreBis);
-
-    const notifications_div = await notifications();
-    div.appendChild(notifications_div);
 }
