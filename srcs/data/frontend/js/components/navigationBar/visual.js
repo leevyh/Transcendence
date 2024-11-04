@@ -49,16 +49,20 @@ export async function createNavigationBar(container, userData) {
 }
 
 async function createTitleNickname(userData) {
-    const TitleNickname = document.createElement('h4');
-    TitleNickname.className = 'TitleNickname mt-2 pb-4';
-    TitleNickname.textContent = `${userData.nickname}`;
-    TitleNickname.setAttribute('role', 'button'); // To make the element clickable
-    TitleNickname.setAttribute('tabindex', '0'); // To make the element focusable
+    const TitleNicknameDiv = document.createElement('div');
+    TitleNicknameDiv.className = 'TitleNickname';
 
-    // Add event listener for keyboard accessibility
+    const TitleNickname = document.createElement('button');
+    TitleNickname.className = 'TitleNicknameButton btn';
+    TitleNickname.textContent = `${userData.nickname}`;
+    TitleNickname.setAttribute('aria-label', 'Click to open user information/settings');
+    TitleNicknameDiv.appendChild(TitleNickname);
+
+    // Event listener to handle keyboard interaction
     TitleNickname.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            openModal(document.getElementById('modalInfo'));
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault(); // Prevents default space scrolling
+            TitleNickname.click(); // Triggers click event programmatically
         }
     });
 
@@ -67,7 +71,7 @@ async function createTitleNickname(userData) {
         openModal(document.getElementById('modalInfo'));
     });
 
-    return TitleNickname;
+    return TitleNicknameDiv;
 }
 
 

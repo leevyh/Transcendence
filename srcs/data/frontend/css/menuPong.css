@@ -69,43 +69,6 @@
     backdrop-filter: blur(10px);
 }
 
-
-.modalGameSettingsBase-show {
-    opacity: 1;
-}
-
-.ModalLogin{
-
-    background-color: rgba(255, 234, 234, 0.5);
-    backdrop-filter: blur(10px);
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 30%;
-    border-radius: 10px;
-    position: relative;
-    transition: transform 0.5s ease, opacity 0.5s ease ;
-    transform: translateY(-100vh);
-    opacity: 0;
-}
-
-.modalRegisterBody {
-    display: none;
-}
-.modalLoginTitle {
-    color : #F4ED37;
-}
-
-.modalLoginContent{
-    width: auto;
-    background-color: rgba(255, 234, 234, 0.5);
-}
-
-.modalGameSettingsBase-show .ModalLogin .ModalRegister .modalGameSettingsBase{
-    transform: translateY(0);
-    opacity: 1;
-}
-
 .closeButtonMenuPong {
     color: #aaa;
     position: absolute;
@@ -114,16 +77,6 @@
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
-}
-
-.modalLoginHeader{
-    display: flex;
-    justify-content: space-between;
-
-}
-
-.modalLoginDialog {
-    width: auto;
 }
 
 .closeButtonMenuPong {
@@ -137,22 +90,6 @@
     cursor: pointer;
 }
 
-
-.ButtonLogin {
-    padding: 5px;
-    background-color: #3a4250;
-    border: none;
-    box-shadow: #6f87b1 0px 4px 12px;
-}
-
-
-.ButtonLogin:hover,
-.ButtonLogin:focus {
-    background-color: #000;
-    box-shadow: #435574 0px 4px 12px;
-}
-
 .ContenerThemes {
     height: 150px;
 }
-
