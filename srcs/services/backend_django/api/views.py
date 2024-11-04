@@ -661,6 +661,8 @@ def update_Stats(request): #TODO without form and with json.loads. Need to chang
             nb_point_given = stats_id.nb_point_given
             nb_point_given += data['nb_point_given']
             win_rate = nb_wins / nb_games * 100.00
+            #reduce the win_rate to 2 decimal
+            win_rate = round(win_rate, 2)
             stats_id.nb_games = nb_games
             stats_id.nb_wins = nb_wins
             stats_id.nb_losses = nb_losses
