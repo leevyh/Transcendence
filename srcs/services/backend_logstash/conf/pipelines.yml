@@ -1,0 +1,5 @@
+- pipeline.id: pipeline-django-1
+  path.config: "/usr/share/logstash/pipeline/django"
+
+- pipeline.id: pipeline-postgresql-1
+  path.config: "/usr/share/logstash/pipeline/postgresql"

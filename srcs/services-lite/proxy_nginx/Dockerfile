@@ -1,4 +1,4 @@
-FROM elastic/elastic-agent:8.15.0
+FROM nginx:1.27
 
 USER root
 ENV NON_INTERACTIVE=true
@@ -13,6 +13,3 @@ RUN openssl req -x509 -nodes \
  	-subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=localhost"
 
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
-COPY ./conf/elastic-agent.sh /elastic-agent.sh
-
-ENTRYPOINT ["/elastic-agent.sh"]

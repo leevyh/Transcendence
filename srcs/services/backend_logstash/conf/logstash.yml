@@ -1,0 +1,2 @@
+node.name: backend-logstash
+monitoring.elasticsearch.hosts: ["https://backend-elastic:9200"]

@@ -12,7 +12,6 @@ COPY ./conf/requirements.txt /usr/lib/python3/packages/pip.txt
 RUN pip3 install --upgrade pip
 RUN pip3 install --no-cache-dir -r /usr/lib/python3/packages/pip.txt
 
-COPY ./conf/data.json /var/app/tools/data.json
 COPY ./conf/setup.sh /var/app/setup.sh
 
 ENTRYPOINT ["/var/app/setup.sh"]

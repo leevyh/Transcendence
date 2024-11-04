@@ -1,0 +1,21 @@
+outputs:
+  default:
+    type: elasticsearch
+    hosts: [https://backend-elastic:9200]
+    username: "kibana_system"
+    password: "KIBANA_PASSWORD"
+    preset: balanced
+
+fleet:
+  agent:
+    id: fleet-server-agent
+  hosts:
+    id: fleet-server-host
+    name: Fleet Server
+
+agent.monitoring:
+ http:
+     enabled: true
+     host: localhost
+     port: 6791
+     buffer.enabled: false

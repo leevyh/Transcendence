@@ -1,0 +1,3 @@
+plugins:
+  - id: prometheus-exporter
+    location: https://github.com/mindw/elasticsearch-prometheus-exporter/releases/download/8.15.0.0/prometheus-exporter-8.15.0.0.zip

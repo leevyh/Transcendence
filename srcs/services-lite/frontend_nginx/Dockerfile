@@ -1,4 +1,4 @@
-FROM elastic/elastic-agent:8.15.0
+FROM nginx:1.27
 
 USER root
 ENV NON_INTERACTIVE=true
@@ -12,7 +12,8 @@ RUN openssl req -x509 -nodes \
  	-keyout /etc/nginx/ssl/ssl.key \
  	-subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=localhost"
 
-COPY ./conf/nginx.conf /etc/nginx/nginx.conf
-COPY ./conf/elastic-agent.sh /elastic-agent.sh
+RUN mkdir -p /var/www/ft_transcendence
+RUN chmod 777 /var/www/ft_transcendence
+RUN chown -R www-data:www-data /var/www/ft_transcendence
 
-ENTRYPOINT ["/elastic-agent.sh"]
+COPY ./conf/nginx.conf /etc/nginx/nginx.conf
