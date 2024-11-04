@@ -15,6 +15,7 @@ import {
     handleKeyUp,
     draw,
     game,
+    initialize_color_duo,
 } from './pong_game.js'; // Importation des fonctions et variables du jeu Pong
 
 
@@ -83,14 +84,14 @@ export async function pongView(container, tournamentSocket) {
     div.appendChild(viewContainer);
 
     canvas = document.getElementById('canvas');
-
+    await initialize_color_duo();///
     draw();
 
     // WebSocket
     if (tournamentSocket == null) {
         const wsUrl = 'ws://' + window.location.host + `/ws/pong/`;
         PongWebSocketManager.init(wsUrl);
-    } 
+    }
     else {
         PongWebSocketManager.socket = tournamentSocket;
         console.log("PongWebSocketManager.socket");
@@ -100,7 +101,7 @@ export async function pongView(container, tournamentSocket) {
     PongWebSocketManager.socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
 
-        
+
         if (data.action_type === 'define_player') {
             var currentPlayer = data.current_player;
             var player_name = data.name_player;

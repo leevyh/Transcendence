@@ -1,6 +1,27 @@
-export { canvas } from './pongSolo.js'; // space game
+export { canvas } from './pong.js'; // space game
+import {fetchUserGameSettings} from './menuPong.js';
+import { getCookie } from './utils.js';
+
+
 // export var game; // statut game
 export var anim;
+
+const colorMapping = {
+	'black': '#000000',
+	'white': '#fdfefe',
+	'purple': '#7d3c98',
+	'pink': '#FFC0CB',
+	'yellow': '#f4d03f',
+	'green': '#229954',
+	'gray': '#a6acaf',
+	'blue': '#1a5276',
+	'lila': '#d7bde2',
+	'red': '#c0392b',
+	'brown': '#873600',
+	'green_light': '#58d68d',
+	'blue_light': '#85c1e9'
+};
+
 
 var game = {
 	player: {
@@ -27,28 +48,61 @@ var escapeDown = false;
 export let GameOn = false;
 var spaceDown = false;
 
-export function draw() {
+var background_color_key;
+var pads_color_key;
+var ball_color_key;
+
+async function get_gameSettings_drawing() {
+    const response = await fetch('/api/game_settings/', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    background_color_key = data.background_game;
+    pads_color_key = data.pads_color;
+    ball_color_key = data.ball_color;
+}
+
+export async function initialize_color() {
+    await get_gameSettings_drawing();
+
+}
+
+
+export async function draw() {
     var context = canvas.getContext('2d');
 
-    // Draw field
-    context.fillStyle = 'black';
+	const background_color  = colorMapping[background_color_key] || "#000";
+    const pads_color = colorMapping[pads_color_key] || "#fdfefe";
+    const ball_color =colorMapping[ball_color_key] || "#fdfefe";
+
+	context.fillStyle = background_color;
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw middle line
-    context.strokeStyle = 'white';
+    context.strokeStyle = 'white'; //Line middle
     context.beginPath();
     context.moveTo(canvas.width / 2, 0);
     context.lineTo(canvas.width / 2, canvas.height);
     context.stroke();
 
     // draw player
-    context.fillStyle = 'white';
+    context.fillStyle = pads_color; //Pads
     context.fillRect(0, game.player.y, PLAYER_WIDTH, PLAYER_HEIGHT);
     context.fillRect(canvas.width - PLAYER_WIDTH, game.computer.y, PLAYER_WIDTH, PLAYER_HEIGHT);
 
     // Draw ball
     context.beginPath();
-    context.fillStyle = 'white';
+    context.fillStyle = ball_color; // balls
     context.arc(game.ball.x, game.ball.y, game.ball.r, 0, Math.PI * 2, false);
     context.fill();
 }
@@ -122,7 +176,7 @@ export function ballMove() {
     game.ball.y += game.ball.speed.y;
 }
 
-export function play() {
+export async function play() {
 
     if (GameOn == false)
         GameOn = true;
@@ -147,7 +201,6 @@ export function reset() {
 
 export function stop() {
 
-    console.log("start of stop");
     cancelAnimationFrame(anim);
     reset();
 
@@ -170,7 +223,6 @@ export function handleKeyDown(event, startButton, stopButton) {
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
 		playerMovingDown = true;
     if (event.key === ' ' && GameOn == false) {
-        console.log("key down gamone = ", GameOn);
         play();
         spaceDown = true;
         startButton.disabled = true;
@@ -181,7 +233,6 @@ export function handleKeyDown(event, startButton, stopButton) {
     {
         spaceDown = true;
         stop();
-        console.log("ESPACE key down gamone = ", GameOn);
         startButton.disabled = false;
         stopButton.disabled = true;
     }
@@ -189,7 +240,6 @@ export function handleKeyDown(event, startButton, stopButton) {
     {
         escapeDown = true;
         stop();
-        console.log("ECHAP key down gamone = ", GameOn);
         startButton.disabled = false;
         stopButton.disabled = true;
     }

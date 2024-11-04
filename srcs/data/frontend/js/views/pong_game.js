@@ -2,6 +2,8 @@ export { canvas } from './pong.js'; // space game
 import { inTournament } from './pong.js';
 // export var game; // statut game
 import { PongWebSocketManager } from './wsPongManager.js';
+import {fetchUserGameSettings} from './menuPong.js';
+import { getCookie } from './utils.js';
 export var anim;
 
 const GAME_HEIGHT = 240
@@ -33,15 +35,65 @@ export var game = {
     }
 };
 
+const colorMapping = {
+	'black': '#000000',
+	'white': '#fdfefe',
+	'purple': '#7d3c98',
+	'pink': '#FFC0CB',
+	'yellow': '#f4d03f',
+	'green': '#229954',
+	'gray': '#a6acaf',
+	'blue': '#1a5276',
+	'lila': '#d7bde2',
+	'red': '#c0392b',
+	'brown': '#873600',
+	'green_light': '#58d68d',
+	'blue_light': '#85c1e9'
+};
+
+
 var escapeDown = false;
 export let GameOn = false;
 var spaceDown = false;
 
+var background_color_key;
+var pads_color_key;
+var ball_color_key;
+
+async function get_gameSettings_drawing_duo() {
+    const response = await fetch('/api/game_settings/', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    background_color_key = data.background_game;
+    pads_color_key = data.pads_color;
+    ball_color_key = data.ball_color;
+}
+
+export async function initialize_color_duo() {
+    await get_gameSettings_drawing_duo();
+
+}
+
 export function draw() {
     var context = canvas.getContext('2d');
 
+    const background_color  = colorMapping[background_color_key] || "#000";
+    const pads_color = colorMapping[pads_color_key] || "#fdfefe";
+    const ball_color =colorMapping[ball_color_key] || "#fdfefe";
+
     // Draw field
-    context.fillStyle = 'black';
+    context.fillStyle = background_color;
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw middle line
@@ -52,13 +104,13 @@ export function draw() {
     context.stroke();
 
     // draw players
-    context.fillStyle = 'white';
+    context.fillStyle = pads_color;
     context.fillRect(0, game.player1.y, PLAYER_WIDTH, PLAYER_HEIGHT);
     context.fillRect(canvas.width - PLAYER_WIDTH, game.player2.y, PLAYER_WIDTH, PLAYER_HEIGHT);
 
     // Draw ball
     context.beginPath();
-    context.fillStyle = 'white';
+    context.fillStyle = ball_color;
     context.arc(game.ball.x, game.ball.y, game.ball.r, 0, Math.PI * 2, false);
     context.fill();
 }

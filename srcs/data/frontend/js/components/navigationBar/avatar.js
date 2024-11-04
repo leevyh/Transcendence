@@ -278,9 +278,9 @@ async function createAvatarModal() {
 
             if (response.ok) {
                 // Update the avatar image path by the default avatar path
-                // const avatarImage = document.querySelector('.avatarImage');                
+                // const avatarImage = document.querySelector('.avatarImage');
                 // avatarImage.src = '/path/to/default-avatar.png'; // FIXME: Update the path to the default avatar
-                
+
                 const successMessage = document.createElement('p');
                 successMessage.className = 'text-success';
                 successMessage.textContent = 'Avatar successfully removed';
@@ -310,7 +310,7 @@ async function createAvatarModal() {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'An error occurred while removing the avatar.';
-                avatarForm.insertBefore(errorMessage, removeAvatarButton);
+               avatarForm.insertBefore(errorMessage, removeAvatarButton);
             }
         } catch (error) {
             if (DEBUG) console.error('Error during the avatar removal', error);

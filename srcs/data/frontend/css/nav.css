@@ -53,7 +53,7 @@
 }
 
 .border-custom-color {
-    border-color: #000000 !important;		
+    border-color: #000000 !important;
 }
 
 .divListFriends {
@@ -355,3 +355,8 @@ button.buttonLogOut:active {
 	border-radius: 10px;
 }
 
+@media (max-height: 550px) {
+	.hide-on-short {
+	  display: none !important; /* !important pour être sûr de l'application */
+	}
+  }
