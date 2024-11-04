@@ -225,77 +225,97 @@ export async function profileView(container, userID) {
         userStatsProfile.appendChild(ContentuserStatsProfile);
 
         const CharWinRateContener = document.createElement('div');
-        CharWinRateContener.className = 'CharWinRateContener d-flex justify-content-center align-items-center  w-100';
+        CharWinRateContener.className = 'CharWinRateContener d-flex flex-column justify-content-center align-items-center w-100';
         ContentuserStatsProfile.appendChild(CharWinRateContener);
 
-        const wins = stats.nb_wins;
-        const losse = stats.nb_losses;
+        const winRate = stats.win_rate; // Récupère le taux de victoire en pourcentage (ex: 75 pour 75%)
         const totalGames = stats.nb_games;
         console.log("totalGames", totalGames);
 
-        function createPieChart(wins, losse, totalGames) {
+        function createWinRateChart(winRate, totalGames) {
+
+            // Créer un élément de texte pour afficher le win rate au-dessus du graphique
+            const winRateDiv = document.createElement('div');
+            //Div containe winrate text with p element
+            winRateDiv.className = 'winRateDiv d-flex justify-content-center align-items-center w-100';
+            const winRateText = document.createElement('p');
+            winRateText.className = 'winRateText m-0';
+            winRateText.textContent = `Win Rate: ${winRate}%`;
+            if (winRate < 50) {
+                winRateText.style.color = 'rgb(199, 49, 49)';
+            }
+            else {
+                winRateText.style.color = 'rgb(0,26,71)';
+            }
+            winRateDiv.appendChild(winRateText);
+
+
+
+            CharWinRateContener.appendChild(winRateText);
 
             const canvas = document.createElement('canvas');
             canvas.id = 'myCanvas';
             canvas.className = 'h-100 p-1';
             CharWinRateContener.appendChild(canvas);
 
-            const data = [wins, losse]; // Victoires et pertes
-            const colors = ["rgba(0, 123, 255, 0.3)", "rgba(255, 0, 0, 0.3)"]; // Vert pour victoires, Rouge pour pertes
-            const labels = ["Wins", "Defeats"];
-
-            // Fonction pour dessiner un cercle rempli de blanc
+            // Fonction pour dessiner le cercle blanc de fond
             function drawFilledWhiteCircle(canvasId) {
                 console.log("round blanc");
                 const canvas = document.getElementById(canvasId);
                 const content = canvas.getContext('2d');
 
-                // Dessiner un cercle plein blanc
+                content.clearRect(0, 0, canvas.width, canvas.height); // Nettoie le canvas
                 content.beginPath();
                 content.arc(canvas.width / 2, canvas.height / 2, Math.min(canvas.width / 2, canvas.height / 2) - 10, 0, 2 * Math.PI);
                 content.closePath();
-                content.fillStyle = "#ffffff"; // Remplir le cercle de blanc
+                content.fillStyle = "#ffffff"; // Remplit le cercle de blanc
                 content.fill();
             }
 
-            // Fonction pour dessiner le diagramme circulaire
-            function drawPieChart(canvasId, data, colors, labels) {
+            // Fonction pour dessiner le diagramme en utilisant le winRate
+            function drawWinRateChart(canvasId, winRate) {
                 const canvas = document.getElementById(canvasId);
                 const content = canvas.getContext('2d');
-                const total = data.reduce((acc, value) => acc + value, 0); // Total des valeurs
 
-                let startAngle = 0;
-                for (let i = 0; i < data.length; i++) {
-                    const sliceAngle = (data[i] / total) * 2 * Math.PI;
+                const totalAngle = 2 * Math.PI; // Cercle complet en radians
+                const winRateAngle = (winRate / 100) * totalAngle; // Angle correspondant au taux de victoire
 
-                    // Dessiner chaque portion du cercle
-                    content.beginPath();
-                    content.moveTo(canvas.width / 2, canvas.height / 2); // Centre du cercle
-                    content.arc(canvas.width / 2, canvas.height / 2, Math.min(canvas.width / 2, canvas.height / 2) - 10, startAngle, startAngle + sliceAngle);
-                    content.closePath();
+                // Dessiner la portion de victoire
+                content.beginPath();
+                content.moveTo(canvas.width / 2, canvas.height / 2);
+                content.arc(
+                    canvas.width / 2, canvas.height / 2,
+                    Math.min(canvas.width / 2, canvas.height / 2) - 10,
+                    0, winRateAngle
+                );
+                
+                content.closePath();
+                content.fillStyle = "rgb(6,42,81)"; // Couleur pour la portion de victoire
+                content.fill();
 
-                    content.fillStyle = colors[i];
-                    content.fill();
-
-                    const labelX = canvas.width / 2 + (Math.min(canvas.width / 2, canvas.height / 4) / 2) * Math.cos(startAngle + sliceAngle / 2);
-                    const labelY = canvas.height / 2 + (Math.min(canvas.width / 2, canvas.height / 4) / 2) * Math.sin(startAngle + sliceAngle / 2);
-                    content.fillStyle = "white";
-                    content.font = "14px Arial";
-                    content.fillText(labels[i], labelX, labelY);
-
-                    startAngle += sliceAngle;
-                }
+                // Dessiner la portion de défaite
+                content.beginPath();
+                content.moveTo(canvas.width / 2, canvas.height / 2);
+                content.arc(
+                    canvas.width / 2, canvas.height / 2,
+                    Math.min(canvas.width / 2, canvas.height / 2) - 10,
+                    winRateAngle, totalAngle
+                );
+                content.closePath();
+                content.fillStyle = "rgba(168,5,5,0.61)"; // Couleur pour la portion restante (défaite)
+                content.fill();
             }
+
             console.log("in function totalGames", totalGames);
             if (totalGames === 0) {
-                console.log("partie totalGames", totalGames);
+                console.log("Aucun match joué", totalGames);
                 drawFilledWhiteCircle('myCanvas');
             } else {
-                drawPieChart('myCanvas', data, colors, labels);
+                drawWinRateChart('myCanvas', winRate);
             }
         }
 
-        createPieChart(wins, losse, totalGames);
+        createWinRateChart(winRate, totalGames);
 
         const UserStatsContener = document.createElement('div');
         UserStatsContener.className = 'UserStatsContener w-100 d-flex align-items-end p-2';

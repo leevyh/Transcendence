@@ -216,25 +216,24 @@ def get_stats(request, id):
         try:
             user = User_site.objects.get(id=id)
             stats = Stats_user.objects.get(user=user)
+#             data = {
+#                 "nickname": user.nickname,
+#                 "nb_games": 27,
+#                 "nb_wins": 12,
+#                 "nb_losses": 15,
+#                 "win_rate": 44.44,
+#                 "nb_point_taken": 36,
+#                 "nb_point_given": 24,
+#             }
             data = {
-                "nickname": user.nickname,
-                "nb_games": 27,
-                "nb_wins": 12,
-                "nb_losses": 15,
-                "win_rate": 44.44,
-                "nb_point_taken": 36,
-                "nb_point_given": 24,
+                'nickname': user.nickname,
+                'nb_games': stats.nb_games,
+                'nb_wins': stats.nb_wins,
+                'nb_losses': stats.nb_losses,
+                'win_rate': stats.win_rate,
+                'nb_point_taken': stats.nb_point_taken,
+                'nb_point_given': stats.nb_point_given,
             }
-            #TODO : GET THE GOOD STATS
-            # data = {
-            #     'nickname': user.nickname,
-            #     'nb_games': stats.nb_games,
-            #     'nb_wins': stats.nb_wins,
-            #     'nb_losses': stats.nb_losses,
-            #     'win_rate': stats.win_rate,
-            #     'nb_point_taken': stats.nb_point_taken,
-            #     'nb_point_given': stats.nb_point_given,
-            # }
             return JsonResponse(data, status=200)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
@@ -650,6 +649,7 @@ def update_Stats(request): #TODO without form and with json.loads. Need to chang
             stats_id = Stats_user.objects.get(user=user_id)
             nb_wins = stats_id.nb_wins
             nb_losses = stats_id.nb_losses
+            print(f"data: {data}")         # DEBUG
             if data['result'] == 'win':
                 nb_wins += 1
             else:
@@ -661,6 +661,8 @@ def update_Stats(request): #TODO without form and with json.loads. Need to chang
             nb_point_given = stats_id.nb_point_given
             nb_point_given += data['nb_point_given']
             win_rate = nb_wins / nb_games * 100.00
+            #reduce the win_rate to 2 decimal
+            win_rate = round(win_rate, 2)
             stats_id.nb_games = nb_games
             stats_id.nb_wins = nb_wins
             stats_id.nb_losses = nb_losses
