@@ -49,6 +49,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if message_type == 'block_user':
             blocked = data.get('blocked')
             await self.handle_block_user(blocked)
+        if message_type == 'inviteUserToPlay':
+            print('inviteUserToPlay')
+            await self.handle_game_invite(data)
         else:
             message = {
                 'message': data['message'],
@@ -109,7 +112,66 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'timestamp': str(message['timestamp'])
                 } for message in messages
             ],
+            # TODO: Ajouter les game invites
         }))
+
+
+    # Handle invite to play
+    async def handle_game_invite(self, event):
+        from chat.models import Conversation
+        from api.models import User_site as User
+        user = self.scope['user']
+
+        print('handle_game_invite function')
+
+        # Get the current conversation and the members
+        conversation = await database_sync_to_async(Conversation.objects.get)(id=self.conversation_id)
+        sender = await database_sync_to_async(User.objects.get)(nickname=user.nickname)
+        members = await database_sync_to_async(list)(conversation.members.all())
+
+        # Send a message to the conversation group
+        await self.channel_layer.group_send(
+            self.conversation_group_name,
+            {
+                'type': 'game_invite',
+                'from_id': sender.id,
+                'to_id': members[0].id if members[0].id != sender.id else members[1].id,
+                'timestamp': event['timestamp'],
+            }
+        )
+
+        # Notify the other members of the conversation (except the sender)
+        # await self.send_invite_notifications(sender, members, event['timestamp']) # TODO: Fix les notifications
+
+    # Send message notifications to the members of the conversation
+    async def send_invite_notifications(self, sender, members, timestamp):
+        from api.models import Notification
+        for member in members:
+            if member.id != sender.id:
+                # Check if the user is active in the chat, if not -> send a notification
+                if not await self.is_user_in_group(member.id):
+                    # Save the notification in the database
+                    await database_sync_to_async(Notification.objects.create)(
+                        user=member,
+                        type='game_invite',
+                        status='unread'
+                    )
+                    notification = await database_sync_to_async(Notification.objects.get)(type='game_invite', user=member) #Add game_invite_id, find a way to get the id
+                    await self.channel_layer.group_send(
+                        f"user_{member.id}",
+                        {
+                            "type": "send_notification",
+                            "message": {
+                                "type": "game_invite",
+                                "id": notification.id,
+                                "from_user": sender.id,
+                                "from_nickname": sender.nickname,
+                                "from_avatar": encode_avatar(sender),
+                                "message": "invited you to play a game",
+                                "created_at": timestamp,
+                            },
+                        }
+                    )
         
 
     # Handle message in the database
@@ -149,6 +211,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'timestamp': str(message.timestamp)
         }
 
+        # Send message to the conversation group
         await self.channel_layer.group_send(
             self.conversation_group_name,
             {
