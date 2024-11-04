@@ -28,15 +28,19 @@
 .TitleNickname {
 	display: flex;
 	justify-content: center;
-	color : #F4ED37;
-	cursor: pointer;
+	padding-bottom: 15px;
 }
 
-.TitleNickname:focus {
-    outline: 2px solid #007bff; /* Contour bleu pour indiquer le focus */
-    outline-offset: 4px; /* Espacement entre le titre et le contour */
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Ombre pour rendre le focus plus visible */
-} /* Not working */
+.TitleNicknameButton {
+	color: #F4ED37;
+	font-size: 1.5rem;
+}
+
+.TitleNicknameButton:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.4);
+    transform: scale(1.05);
+}
 
 .ElemListNavBar {
 	background: linear-gradient(to right, #F4ED37, #cecec3);
@@ -47,13 +51,13 @@
 }
 
 .ElemListNavBar button:focus {
-    outline: 2px solid #007bff;
-    outline-offset: 2px;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.4);
+    transform: scale(1.05);
 }
 
 .border-custom-color {
-    border-color: #000000 !important;		
+    border-color: #000000 !important;
 }
 
 .divListFriends {
@@ -61,7 +65,6 @@
 	display: flex;
 	justify-content: center;
 }
-
 
 button.buttonLogOut {
     transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -355,3 +358,8 @@ button.buttonLogOut:active {
 	border-radius: 10px;
 }
 
+@media (max-height: 550px) {
+	.hide-on-short {
+	  display: none !important; /* !important pour être sûr de l'application */
+	}
+  }

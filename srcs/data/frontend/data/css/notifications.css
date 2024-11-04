@@ -40,8 +40,13 @@
     box-shadow: #435574 0px 4px 12px;
 }
 
-.badge_notifs
-{
+.notifications_button:focus {
+    outline: 2px solid #ffcccb;
+    outline-offset: 2px;
+    box-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
+}
+
+.badge_notifs {
     font-size: 0.5em;
     background-color: #3a4250;
     border: none;

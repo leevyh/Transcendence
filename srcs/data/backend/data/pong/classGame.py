@@ -46,8 +46,11 @@ class PongGame:
         print("game loop")
         if (self.is_active == False):
             if(self.status == "ready"):
+                await self.broadcastState()
                 await self.start_game()
-        await asyncio.sleep(5.6)
+        await asyncio.sleep(4.8)
+        if self.intournament == True:
+            await asyncio.sleep(0.8)
         while self.is_active:
             await self.move_ball()
             await self.move_player_loop()
@@ -58,11 +61,12 @@ class PongGame:
     async def start_game(self):
         print("start game")
         self.is_active = True
+        await self.send_define_player('player_1', 'player_2')
         self.reset_ball()
         print("game name : ", self.name)
         self.channel_layer = get_channel_layer()
-        print("channel player 1 : ", self.channel_player_1)
-        print("channel player 2 : ", self.channel_player_2)
+        print("channel player 1 : ", self.channel_player_1, "username : ", self.player_1.nickname)
+        print("channel player 2 : ", self.channel_player_2, "username : ", self.player_2.nickname)
         await self.channel_layer.group_send(
             f"game_{self.id}",
             {
@@ -103,7 +107,29 @@ class PongGame:
                 }
             }
         )
-    
+
+    async def send_define_player(self, current_player_1, current_player_2):
+        print("send define player")
+        self.channel_layer = get_channel_layer()
+        await self.channel_layer.send(
+            self.channel_player_1,
+            {
+                'type': 'define_player',
+                'name_player': self.player_1.nickname,
+                'current_player': current_player_1,
+                'game': self.name
+            }
+        )
+        await self.channel_layer.send(
+            self.channel_player_2,
+            {
+                'type': 'define_player',
+                'name_player': self.player_2.nickname,
+                'current_player': current_player_2,
+                'game': self.name
+            }
+        )
+
     #reset the ball position
     def reset_ball(self):
         print("reset ball")
@@ -149,8 +175,9 @@ class PongGame:
     def inverse_direction(self, paddle_position):
         self.ball_speed_x *= -1
         impact = self.ball_position_y - paddle_position - iv.PADDLE_HEIGHT / 2
-        ratio = 30 / (iv.PADDLE_HEIGHT / 2)
-        self.ball_speed_y = round(impact * ratio / 20)
+        ratio = 35 / (iv.PADDLE_HEIGHT / 2)
+        self.ball_speed_y = round(impact * ratio / 10)
+        self.ball_speed_x *= 1.2
     
     #move the player
     def move_player(self, player, move):
@@ -194,15 +221,15 @@ class PongGame:
         print("stop game : ", self.name)
         self.is_active = False
         self.status = "finished"
-        if self.winner is None or self.loser is None:
-            self.winner = self.player_1 if self.player_1_score >= self.player_2_score else self.player_2
+        if self.winner is None :
+            self.winner = self.player_1 if self.player_1_score > self.player_2_score else self.player_2
+        if self.loser is None :
             self.loser = self.player_1 if self.player_1_score < self.player_2_score else self.player_2
-        self.channel_winner = self.channel_player_1 if self.player_1_score >= self.player_2_score else self.channel_player_2
-        self.channel_loser = self.channel_player_1 if self.player_1_score < self.player_2_score else self.channel_player_2
+        self.channel_winner = self.channel_player_1 if self.winner == self.player_1 else self.channel_player_2
+        self.channel_loser = self.channel_player_1 if self.loser == self.player_1 else self.channel_player_2
         await self.save_game()
         print("winner : ", self.winner.nickname)
         print("loser : ", self.loser.nickname)
-        self.channel_layer = get_channel_layer()
         await self.channel_layer.group_send(
             f"game_{self.id}",
             {

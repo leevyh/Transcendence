@@ -1,3 +1,4 @@
+
 export const PongWebSocketManager = {
     socket: null,
 
@@ -41,5 +42,15 @@ export const PongWebSocketManager = {
             };
             this.socket.send(JSON.stringify(data));
         }
-    }
+    },
+
+    sendDisconnect() {
+        console.log('disconnecting');
+        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            const data = {
+                type: 'disconnect_player',
+            };
+            this.socket.send(JSON.stringify(data));
+        }
+    },
 };

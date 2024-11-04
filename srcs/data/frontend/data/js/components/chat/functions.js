@@ -1,4 +1,5 @@
 import { DEBUG, navigateTo } from '../../app.js';
+import { play } from '../../views/pong_game.js';
 import { getCookie } from '../../views/utils.js';
 
 export let chatWS = null;
@@ -84,9 +85,19 @@ async function openConversation(conversationID, otherUser) {
     inviteGameButton.style.display = 'block';
     inviteGameButton.addEventListener('click', () => {
         console.log('Invite to play (TODO)');
+        // Send a message to the other user to invite him to play
+        if (chatWS && chatWS.readyState === WebSocket.OPEN) {
+            // Send the message to invite the user to play
+            const messageData = {
+                type: 'inviteUserToPlay',
+                // gameID: TODO: Implement a way to create a game with two users and get the gameID
+                timestamp: new Date().toISOString()
+            };
+            chatWS.send(JSON.stringify(messageData));
+        }
     });
 
-    chatWS = new WebSocket(`wss://${window.location.host}/ws/chat/${conversationID}/`);
+    chatWS = new WebSocket('ws://' + window.location.host + `/ws/chat/${conversationID}/`);
 
     chatWS.onopen = function() {
         if (DEBUG) {console.log('Chat WebSocket OPEN - conversationID:', conversationID);}
@@ -143,7 +154,48 @@ async function openConversation(conversationID, otherUser) {
             } else if (receivedMessage.blocked !== receivedMessage.user) {
                 enableChat(receivedMessage.blocked);
             }
+        } else if (receivedMessage.type === 'game_invite') {
+            if (DEBUG) {console.log('Game invite received from:', receivedMessage.user);}
+            // Get the gameID and the id of the user who sent the invite
+            const gameID = receivedMessage.gameID;
+            const otherUser = receivedMessage.user;
+            // Create the accept and decline buttons and add them to the chat
+            const acceptButton = document.createElement('button');
+            acceptButton.className = 'btn btn-success accept-button';
+            acceptButton.textContent = 'Accept';
+            acceptButton.addEventListener('click', () => {
+                // Send a message to the other user to accept the game
+                if (chatWS && chatWS.readyState === WebSocket.OPEN) {
+                    // Send the message to accept the game
+                    const messageData = {
+                        type: 'acceptGameInvite',
+                        gameID: gameID,
+                        timestamp: new Date().toISOString()
+                    };
+                    chatWS.send(JSON.stringify(messageData));
+                }
+                // Accept the game invite
+                play(gameID);
+            });
+
+            const declineButton = document.createElement('button');
+            declineButton.className = 'btn btn-danger decline-button';
+            declineButton.textContent = 'Decline';
+            declineButton.addEventListener('click', () => {
+                // Decline the game invite
+                // Send a message to the other user to decline the game
+                if (chatWS && chatWS.readyState === WebSocket.OPEN) {
+                    // Send the message to decline the game
+                    const messageData = {
+                        type: 'declineGameInvite',
+                        gameID: gameID,
+                        timestamp: new Date().toISOString()
+                    };
+                    chatWS.send(JSON.stringify(messageData));
+                }
+            });
         }
+
     }
 
     chatWS.onclose = function() {

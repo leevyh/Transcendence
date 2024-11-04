@@ -96,19 +96,27 @@ export async function notifications() {
     notifications_button.setAttribute('data-bs-toggle', 'offcanvas');
     notifications_button.setAttribute('data-bs-target', '#offcanvasRight');
     notifications_button.setAttribute('aria-controls', 'offcanvasRight');
+    notifications_button.setAttribute('role', 'button'); // Make it focusable for accessibility
+    notifications_button.setAttribute('tabindex', '0'); // Make it focusable for accessibility
 
     // Get Notifications with status and count them. And create a badge only if there are notifications not read
     const unread_notification = await getUnreadNotifications();
-
     if (DEBUG) console.log("Unread notifications", unread_notification);
+
+    // Set the aria-label attribute to inform the user about the number of unread notifications
+    notifications_button.setAttribute('aria-label', unread_notification.length > 0 
+        ? `You have ${unread_notification.length} unread notifications` 
+        : 'You have no unread notifications');
 
     const notifications_badge = document.createElement('span');
     notifications_badge.className = 'badge badge_notifs bg-danger position-absolute top-0 end-0';
+
+    // Display or hide the badge depending on the number of unread notifications
     if (unread_notification.length > 0) {
         notifications_badge.textContent = unread_notification.length;
-        notifications_badge.style.display = 'inline-block'; // Afficher le badge
+        notifications_badge.style.display = 'inline-block'; // Display the badge if there are unread notifications
     } else {
-        notifications_badge.style.display = 'none'; // Masquer le badge s'il n'y a pas de notifications
+        notifications_badge.style.display = 'none'; // Hide the badge if there are no notifications
     }
     notifications_button.appendChild(notifications_badge);
 

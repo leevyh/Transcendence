@@ -23,7 +23,7 @@ export async function createNavigationBar(container, userData) {
 
     // Navigation list
     const divNav = document.createElement('div');
-    divNav.className = 'divNav border-top border-2 border-bottom border-custom-color py-3 w-100';
+    divNav.className = 'divNav border-top border-2 border-bottom border-custom-color py-3 w-100 hide-on-short';
     nav.appendChild(divNav);
 
     const NavBarList = createNavBarList();
@@ -31,7 +31,7 @@ export async function createNavigationBar(container, userData) {
 
     // Friends list
     const divListFriends = document.createElement('div');
-    divListFriends.className = 'divListFriends d-flex justify-content-center w-100 py-3';
+    divListFriends.className = 'divListFriends d-flex justify-content-center w-100 py-3 hide-on-short';
     // divListFriends.textContent = 'Friends list';
     nav.appendChild(divListFriends);
 
@@ -49,16 +49,20 @@ export async function createNavigationBar(container, userData) {
 }
 
 async function createTitleNickname(userData) {
-    const TitleNickname = document.createElement('h4');
-    TitleNickname.className = 'TitleNickname mt-2 pb-4';
-    TitleNickname.textContent = `${userData.nickname}`;
-    TitleNickname.setAttribute('role', 'button'); // To make the element clickable
-    TitleNickname.setAttribute('tabindex', '0'); // To make the element focusable
+    const TitleNicknameDiv = document.createElement('div');
+    TitleNicknameDiv.className = 'TitleNickname';
 
-    // Add event listener for keyboard accessibility
+    const TitleNickname = document.createElement('button');
+    TitleNickname.className = 'TitleNicknameButton btn';
+    TitleNickname.textContent = `${userData.nickname}`;
+    TitleNickname.setAttribute('aria-label', 'Click to open user information/settings');
+    TitleNicknameDiv.appendChild(TitleNickname);
+
+    // Event listener to handle keyboard interaction
     TitleNickname.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            openModal(document.getElementById('modalInfo'));
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault(); // Prevents default space scrolling
+            TitleNickname.click(); // Triggers click event programmatically
         }
     });
 
@@ -67,7 +71,7 @@ async function createTitleNickname(userData) {
         openModal(document.getElementById('modalInfo'));
     });
 
-    return TitleNickname;
+    return TitleNicknameDiv;
 }
 
 

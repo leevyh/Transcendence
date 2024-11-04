@@ -30,9 +30,10 @@ export function homeView(container) {
         modalLogin.style.display = 'block'; // Display the modal
         setTimeout(() => {
             modalLogin.classList.add('ModalLoginBase-show');
+            modalLogin.setAttribute('tabindex', '-1'); // Make the modal focusable
+            modalLogin.focus();
         }, 10); // Slight delay for the animation effect
     });
-
 
     const ButtonRegisterHome = document.createElement('button');
     ButtonRegisterHome.className = 'btn btn-primary btn-lg m-3 px-5 py-3 ButtonsHome';
@@ -42,6 +43,8 @@ export function homeView(container) {
         modalRegister.style.display = 'block'; // Display the modal
         setTimeout(() => {
             modalRegister.classList.add('modalRegisterBase-show');
+            modalRegister.setAttribute('tabindex', '-1'); // Make the modal focusable
+            modalRegister.focus();
         }, 10); // Slight delay for the animation effect
     });
 
@@ -49,10 +52,9 @@ export function homeView(container) {
     // Modal-Login
     const modalLogin = document.createElement('div');
     modalLogin.className = 'modal ModalLoginBase';
-    modalLogin.setAttribute('tabindex', '-1');
     modalLogin.setAttribute('aria-labelledby', 'modalLoginLabel');
     modalLogin.setAttribute('aria-hidden', 'true');
-    modalLogin.style.display = 'none'; // Initialement caché
+    modalLogin.style.display = 'none'; // Initially hide the modal
     container.appendChild(modalLogin);
 
     const modalLoginDialog = document.createElement('div');
@@ -147,7 +149,7 @@ export function homeView(container) {
         if (!username || !password) {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
-            errorMessage.textContent = 'All fields are required';
+            errorMessage.textContent = 'All fields are required.';
             formLogin.insertBefore(errorMessage, submitLoginButton);
             return;
         }
@@ -169,11 +171,11 @@ export function homeView(container) {
                     setTimeout(() => {
                         modalLogin.style.display = 'none';
                     }, 500);
-                    navigateTo('/profile');///////////
+                    navigateTo('/profile');
                 } else if (data.error) {
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'text-danger';
-                    errorMessage.textContent = 'Bad password or Username';
+                    errorMessage.textContent = 'Bad password or Username.';
                     formLogin.insertBefore(errorMessage, submitLoginButton);
                 }
             })
@@ -212,27 +214,20 @@ export function homeView(container) {
                 formLogin.appendChild(errorMessage);
             });
     });
-    // // Ajout de l'événement pour afficher la modal
-    ButtonLoginHome.addEventListener('mousedown', () => {
-        modalLogin.style.display = 'block'; // Affiche la modal
-        setTimeout(() => {
-            modalLogin.classList.add('ModalLoginBase-show'); // Ajoute la classe pour l'animation
-        }, 10); // Légère temporisation pour l'effet d'animation
-    });
 
     /////////////////////////////////////////////////////////////////
 
     // Modal-Register
     const modalRegister = document.createElement('div');
     modalRegister.className = 'modal ModalRegisterBase';
-    modalRegister.style.display = 'none'; // Cachée par défaut
+    modalRegister.style.display = 'none'; // Hide the modal initially
     container.appendChild(modalRegister);
 
     const modalRegisterDialog = document.createElement('div');
     modalRegisterDialog.className = 'modal-dialog-centered d-flex justify-content-center align-items-center modal-md modalRegisterDialog';
     modalRegister.appendChild(modalRegisterDialog);
 
-    // Créer le contenu de la modale
+    // Create the register modal content
     const modalRegisterContent = document.createElement('div');
     modalRegisterContent.className = 'modal-content text-body w-auto ModalRegisterContent';
     modalRegisterDialog.appendChild(modalRegisterContent);
@@ -241,13 +236,13 @@ export function homeView(container) {
     modalRegisterHeader.className = 'modal-header pb-2 border border-0 modalLoginHeader';
     modalRegisterContent.appendChild(modalRegisterHeader);
 
-        // Titre du formulaire
+    // Title of the register modal
     const modalRegisterTitle = document.createElement('h2');
     modalRegisterTitle.textContent = 'Register';
     modalRegisterTitle.className = 'modalLoginTitle'
     modalRegisterHeader.appendChild(modalRegisterTitle);
 
-    // Bouton pour fermer la modale
+    // Close button for the register modal
     const closeRegisterButton = document.createElement('span');
     closeRegisterButton.setAttribute('aria-label', 'Close');
     closeRegisterButton.setAttribute('role', 'button'); // Make it focusable for accessibility
@@ -276,11 +271,12 @@ export function homeView(container) {
     modalRegisterBody.className = 'modal-body modalRegisterBody';
     modalRegisterContent.appendChild(modalRegisterBody);
 
-    // Créer le formulaire
+    // Create the register form
     const formRegister = document.createElement('form');
     formRegister.className = 'formRegister';
-    modalRegisterBody.appendChild(formRegister);
-    // Champs du formulaire
+    modalRegisterContent.appendChild(formRegister);
+
+    // Create the register form's fields
     const fieldsRegister = [
         { label: 'Username' , type: 'text', id: 'usernameRe', placeholder: 'Your username' },
         { label: 'Nickname', type: 'text', id: 'nicknameRe', placeholder: 'Your nickname' },
@@ -307,11 +303,9 @@ export function homeView(container) {
         input.placeholder = fieldRegister.placeholder;
 
         formGroup.appendChild(input);
-
     });
 
-
-    // Bouton de soumission
+    // Submit button
     const submitRegisterButton = document.createElement('button');
     submitRegisterButton.setAttribute('type', 'submit');
     submitRegisterButton.className = 'btn btn-primary w-100 submit ButtonLogin ButtonRegisterSubmit';
@@ -321,11 +315,11 @@ export function homeView(container) {
     formRegister.addEventListener('submit', (event) => {
         event.preventDefault();
 
-        // Suppression des messages d'erreur précédents
+        // Delete previous error messages
         const errorMessages = formRegister.querySelectorAll('.text-danger');
         errorMessages.forEach(message => message.remove());
 
-        // Récupérer les valeurs des champs ajoutés dans le formulaire
+        // Get the values from the form
         const usernameRe = document.getElementById('usernameRe').value;
         const nicknameRe = document.getElementById('nicknameRe').value;
         const emailRe = document.getElementById('emailRe').value;
@@ -333,33 +327,33 @@ export function homeView(container) {
         const confirmPasswordRe = document.getElementById('confirmpasswordRe').value;
 
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,12}$/;
-        // Si un champ est vide
+        // If all fields are not filled
         if (!usernameRe || !nicknameRe || !emailRe || !passwordRe || !confirmPasswordRe) {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
-            errorMessage.textContent = 'All fields are required';
+            errorMessage.textContent = 'All fields are required.';
             formRegister.insertBefore(errorMessage, submitRegisterButton);
             return;
         }
-        // Si Passwords don't match
+        // If the password and the confirm password are not the same
         else if (passwordRe !== confirmPasswordRe) {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
-            errorMessage.textContent = 'Password do not match';
+            errorMessage.textContent = 'Password do not match.';
             formRegister.insertBefore(errorMessage, submitRegisterButton);
             return;
         }
-        // Si le nouveau mot de passe a la bonne forme
+        // If the password does not match the regex
         // else if (!passwordRegex.test(password)) {
         //     const errorMessage = document.createElement('p');
         //     errorMessage.className = 'text-danger';
-        //     errorMessage.textContent = 'Le mot de passe doit contenir entre 8 et 12 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre';
+        //     errorMessage.textContent = 'The password must contain between 8 and 12 characters, at least one uppercase letter, one lowercase letter and one digit';
         //     formRegister.insertBefore(errorMessage, submitRegisterButton);
         //     return;
         // }
 
 
-        // Envoi des données du formulaire
+        // Send the data to the server
         fetch('/api/register/', {
             method: 'POST',
             headers: {
@@ -372,7 +366,6 @@ export function homeView(container) {
                     password: passwordRe,
                     nickname: nicknameRe,
                     email: emailRe,
-                    // language: 'en'
                 }
             )
         })
@@ -381,52 +374,35 @@ export function homeView(container) {
                 formRegister.reset();
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
-                errorMessage.textContent = 'Error while registering, please try again';
+                errorMessage.textContent = 'Error while registering, please try again.';
                 formRegister.insertBefore(errorMessage, submitRegisterButton);
             }
             else {
                 formRegister.reset();
-                // Si l'inscription est réussie, on ferme la modale et on ouvre la modale de connexion
+                // If the registration is successful, close the modal and open the login modal
                 modalRegister.classList.remove('ModalLoginBase-show');
                 setTimeout(() => {
                     modalRegister.style.display = 'none';
-                }, 500); // Même délai pour l'animation de fermeture
+                }, 500);
                 modalRegister.classList.add('ModalLoginBase-show');
                 setTimeout(() => {
                     modalRegister.style.display = 'flex';
-                }, 10); // Petit délai pour activer la transition après l'affichage
+                }, 10);
 
-                // Afficher la modale de connexion (modalLogin)
+                // Display the login modal
                 setTimeout(() => {
                     modalLogin.classList.add('ModalLoginBase-show');
                     modalLogin.style.display = 'flex';
-                }, 500); // Délai pour que la modale de connexion apparaisse après la fermeture de la modale d'inscription
-
-                // event.preventDefault();
-                // navigateTo('/login');
+                }, 500);
             }
         })
         .catch(error => {
             if (DEBUG) {console.error('Error while registering', error);}
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
-            errorMessage.textContent = 'Error while registering, please try again';
+            errorMessage.textContent = 'Error while registering, please try again.';
             formRegister.insertBefore(errorMessage, submitRegisterButton);
             formRegister.reset();
             });
-
     });
-    modalRegisterBody.appendChild(formRegister);
-
-    modalRegisterContent.appendChild(formRegister);
-
-    ButtonRegisterHome.addEventListener('mousedown', () => {
-        // Affiche la modal
-        modalRegister.style.display = 'block';
-        setTimeout(() => {
-            modalRegister.classList.add('modalRegisterBase-show'); // Ajoute la classe pour l'animation
-        }, 10); // Légère temporisation pour l'effet d'animation
-
-    });
-
 }
