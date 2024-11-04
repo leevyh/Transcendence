@@ -192,19 +192,31 @@ class Tournament:
         tasks = []
 
         #if a resigned player is not null
-        if self.resigned_players:
-            if self.resigned_players[0] == self.small_final.player_1:
-                self.small_final.winner = self.small_final.player_2
-                self.small_final.loser = self.small_final.player_1
-            elif self.resigned_players[0] == self.small_final.player_2:
-                self.small_final.winner = self.small_final.player_1
-                self.small_final.loser = self.small_final.player_2
-        else:
+        for player in self.resigned_players:
+            if player == self.small_final.player_1:
+                if self.small_final.winner == None:
+                    self.small_final.winner = self.small_final.player_2
+                    self.small_final.loser = self.small_final.player_1
+            elif player == self.small_final.player_2:
+                if self.small_final.winner == None:
+                    self.small_final.winner = self.small_final.player_1
+                    self.small_final.loser = self.small_final.player_2
+            if player == self.final.player_1:
+                if self.final.winner == None:
+                    self.final.winner = self.final.player_2
+                    self.final.loser = self.final.player_1
+            elif player == self.final.player_2:
+                if self.final.winner == None:
+                    self.final.winner = self.final.player_1
+                    self.final.loser = self.final.player_2
+
+        if self.small_final.winner == None:
             await self.send_define_player(self.small_final, 'player_1', 'player_2')
             tasks.append(self.small_final.game_loop())
-            
-        await self.send_define_player(self.final, 'player_1', 'player_2')
-        tasks.append(self.final.game_loop())
+
+        if self.final.winner == None:  
+            await self.send_define_player(self.final, 'player_1', 'player_2')
+            tasks.append(self.final.game_loop())
        
         await asyncio.gather(*tasks)
 

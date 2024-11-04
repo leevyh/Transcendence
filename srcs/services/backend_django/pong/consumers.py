@@ -9,6 +9,7 @@ from . import initValues as iv
 
 # File d'attente pour le matchmaking
 waiting_players = []
+invitational_games = []
 
 @sync_to_async
 def create_game(player_1, player_2):
@@ -30,25 +31,33 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     # cree une partie si le joueur est le premier a se connecter ou rejoint une partie si un autre joueur est deja connecte. return cette partie
     async def findMatch(self, player):
-        # if player.status == 'ingame':
-        #     return
+        for game in invitational_games:
+            if game.player_2 == player:
+                print("consumer join invitation game with user : ", player)
+                game.channel_player_2 = self.channel_name
+                self.game = game
+                self.game.nbPlayers = 2
+                game_database = await create_game(game.player_1, game.player_2)
+                game.id = game_database.id
+                game_database.is_active = True
+                await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_1)
+                await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_2)
+                game.status = "ready"
+                invitational_games.remove(game)
+                self.task = asyncio.create_task(self.game.game_loop())
+                return game
+
         if (len(list_of_games) == 0) :
             print("consumer create game with user : ", player)
             game = PongGame(player)
             list_of_games.append(game)
             game.status = "waiting"
             game.player_1 = player
-            # player.status = 'ingame'
             game.nbPlayers += 1
             game.channel_player_1 = self.channel_name
-            if self.channel_name is not None:
-                await self.send(text_data=json.dumps({
-                    'action_type': 'define_player',
-                    'current_player': 'player_1'
-                }))
             self.game = game
+            await self.send_waiting()
         else :
-            #si player est dans une partie de liste de games alors return
             for game in list_of_games:
                 if game.player_1 == player or game.player_2 == player:
                     return
@@ -57,11 +66,6 @@ class PongConsumer(AsyncWebsocketConsumer):
             game.player_2 = player
             game.nbPlayers += 1   
             game.channel_player_2 = self.channel_name
-            if self.channel_name is not None:
-                await self.send(text_data=json.dumps({
-                    'action_type': 'define_player',
-                    'current_player': 'player_2'
-                }))
             self.game = game
 
         if(game.nbPlayers == 2) :
@@ -75,11 +79,35 @@ class PongConsumer(AsyncWebsocketConsumer):
             self.task = asyncio.create_task(self.game.game_loop())
         return game
 
+    async def send_waiting(self):
+        print("consumer send waiting for player")
+        if self.channel_name is not None:
+            await self.send(text_data=json.dumps({
+                'action_type': 'waiting_for_player',
+                'game': {
+                    'ball_position': {
+                        'x': self.game.ball_position_x,
+                        'y': self.game.ball_position_y
+                    },
+                    'player_1_position': self.game.player_1_position,
+                    'player_2_position': self.game.player_2_position
+                }
+            }))
+
     async def game_state(self, event):
         # print("game state user : ", self.scope['user'])
         if self.channel_name is not None:
             await self.send(text_data=json.dumps({
                 'action_type': 'game_state',
+                'game': event['game']
+            }))
+
+    async def define_player(self, event):
+        if self.channel_name is not None:
+            await self.send(text_data=json.dumps({
+                'action_type': 'define_player',
+                'name_player': event['name_player'],
+                'current_player': event['current_player'],
                 'game': event['game']
             }))
 
@@ -100,16 +128,20 @@ class PongConsumer(AsyncWebsocketConsumer):
             waiting_players.remove(player)
         
         if hasattr(self, 'game') and self.game is not None:
-            if self.game.nbPlayers == 2:
-                if self.game.player_1 == player:
-                    self.game.winner = self.game.player_2
-                    self.game.loser = self.game.player_1
-                else:
-                    self.game.winner = self.game.player_1
-                    self.game.loser = self.game.player_2
-                await self.game.broadcastState()
-                await self.game.stop_game()
-                await self.channel_layer.group_discard(f"game_{self.game.id}", self.channel_name)
+            if self.game.status == "ready":
+                if self.game.winner is None:
+                    if self.game.player_1 == player:
+                        self.game.winner = self.game.player_2
+                        self.game.loser = self.game.player_1
+                    else:
+                        self.game.winner = self.game.player_1
+                        self.game.loser = self.game.player_2
+                    await self.channel_layer.group_discard(f"game_{self.game.id}", self.channel_name)
+                    self.game.reset_ball()
+                    await self.game.broadcastState()
+                    await self.game.stop_game()
+            await self.channel_layer.group_discard(f"game_{self.game.id}", self.channel_name)
+            
             if self.game in list_of_games :
                 list_of_games.remove(self.game)
             self.game = None
@@ -246,12 +278,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                         elif player == self.tournament.small_final.player_1 or player == self.tournament.small_final.player_2:
                             game = self.tournament.small_final
                     print("consumer disconnect game : ", game)
-                    if game.player_1 == player:
-                        game.winner = game.player_2
-                        game.loser = game.player_1
-                    else:
-                        game.winner = game.player_1
-                        game.loser = game.player_2
+                    if game.winner is None:
+                        if game.player_1 == player:
+                            game.winner = game.player_2
+                            game.loser = game.player_1
+                        else:
+                            game.winner = game.player_1
+                            game.loser = game.player_2
                     game.reset_ball()
                     await self.channel_layer.group_discard(f"game_{game.id}", self.channel_name)
                     await game.broadcastState()

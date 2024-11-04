@@ -83,35 +83,35 @@ export function endOfGame(winner) {
 }
 
 // Key Down
-export function handleKeyDown(event, stopButton, currentPlayer, player_name, game_name) {
+export function handleKeyDown(event, currentPlayer, player_name, game_name) {
 	if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W')
         PongWebSocketManager.sendPlayerPosition(currentPlayer, 'up', player_name, game_name);
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
 		PongWebSocketManager.sendPlayerPosition(currentPlayer, 'down', player_name, game_name);
-    if (event.key === ' ' && GameOn == false) {
-        //play();
-        spaceDown = true;
-        stopButton.disabled = false;
-        GameOn = true;
-    }
-    else if (event.key === ' ' && GameOn == true )
-    {
-        spaceDown = true;
-        stop();
-        console.log("ESPACE key down gamone = ", GameOn);
-        stopButton.disabled = true;
-    }
-    if (event.key === "Escape")
-    {
-        escapeDown = true;
-        stop();
-        console.log("ECHAP key down gamone = ", GameOn);
-        stopButton.disabled = true;
-    }
-    if (event.key === ' ' && !GameOn) {
-        play();
-        GameOn = true;
-    }
+    // if (event.key === ' ' && GameOn == false) {
+    //     //play();
+    //     spaceDown = true;
+    //     // stopButton.disabled = false;
+    //     GameOn = true;
+    // }
+    // else if (event.key === ' ' && GameOn == true )
+    // {
+    //     spaceDown = true;
+    //     stop();
+    //     console.log("ESPACE key down gamone = ", GameOn);
+    //     stopButton.disabled = true;
+    // }
+    // if (event.key === "Escape")
+    // {
+    //     escapeDown = true;
+    //     stop();
+    //     console.log("ECHAP key down gamone = ", GameOn);
+    //     stopButton.disabled = true;
+    // }
+    // if (event.key === ' ' && !GameOn) {
+    //     play();
+    //     GameOn = true;
+    // }
 }
 
 // Key Up

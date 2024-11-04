@@ -46,8 +46,11 @@ class PongGame:
         print("game loop")
         if (self.is_active == False):
             if(self.status == "ready"):
+                await self.broadcastState()
                 await self.start_game()
-        await asyncio.sleep(5)
+        await asyncio.sleep(4.8)
+        if self.intournament == True:
+            await asyncio.sleep(0.8)
         while self.is_active:
             await self.move_ball()
             await self.move_player_loop()
@@ -58,6 +61,7 @@ class PongGame:
     async def start_game(self):
         print("start game")
         self.is_active = True
+        await self.send_define_player('player_1', 'player_2')
         self.reset_ball()
         print("game name : ", self.name)
         self.channel_layer = get_channel_layer()
@@ -86,6 +90,7 @@ class PongGame:
     #send all the informations about the game to the players
     async def broadcastState(self):
         # print("broadcast state")
+        self.channel_layer = get_channel_layer()
         await self.channel_layer.group_send(
             f"game_{self.id}",
             {
@@ -102,7 +107,29 @@ class PongGame:
                 }
             }
         )
-    
+
+    async def send_define_player(self, current_player_1, current_player_2):
+        print("send define player")
+        self.channel_layer = get_channel_layer()
+        await self.channel_layer.send(
+            self.channel_player_1,
+            {
+                'type': 'define_player',
+                'name_player': self.player_1.nickname,
+                'current_player': current_player_1,
+                'game': self.name
+            }
+        )
+        await self.channel_layer.send(
+            self.channel_player_2,
+            {
+                'type': 'define_player',
+                'name_player': self.player_2.nickname,
+                'current_player': current_player_2,
+                'game': self.name
+            }
+        )
+
     #reset the ball position
     def reset_ball(self):
         print("reset ball")
