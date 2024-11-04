@@ -187,14 +187,17 @@ async function createAvatarModal() {
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Error: You need to select a file.';
             avatarForm.insertBefore(errorMessage, avatarSubmitButton);
+            setTimeout(() => errorMessage.remove(), 3000);
             return;
         }
         // Check if the file is an image, otherwise display an error message
-        if (!avatarFile.type.startsWith('image/')) { // Accept only images (jpg, jpeg, png, gif)
+        const acceptedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!acceptedTypes.includes(avatarFile.type)) {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Error: File type not supported.';
             avatarForm.insertBefore(errorMessage, avatarSubmitButton);
+            setTimeout(() => errorMessage.remove(), 3000);
             return;
         }
         // Check if the file size is less than 1 MB, otherwise display an error message
@@ -203,6 +206,7 @@ async function createAvatarModal() {
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Error: File too large (1MB max).';
             avatarForm.insertBefore(errorMessage, avatarSubmitButton);
+            setTimeout(() => errorMessage.remove(), 3000);
             return;
         }
 
@@ -278,9 +282,9 @@ async function createAvatarModal() {
 
             if (response.ok) {
                 // Update the avatar image path by the default avatar path
-                // const avatarImage = document.querySelector('.avatarImage');                
+                // const avatarImage = document.querySelector('.avatarImage');
                 // avatarImage.src = '/path/to/default-avatar.png'; // FIXME: Update the path to the default avatar
-                
+
                 const successMessage = document.createElement('p');
                 successMessage.className = 'text-success';
                 successMessage.textContent = 'Avatar successfully removed';
@@ -310,7 +314,7 @@ async function createAvatarModal() {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'An error occurred while removing the avatar.';
-                avatarForm.insertBefore(errorMessage, removeAvatarButton);
+               avatarForm.insertBefore(errorMessage, removeAvatarButton);
             }
         } catch (error) {
             if (DEBUG) console.error('Error during the avatar removal', error);

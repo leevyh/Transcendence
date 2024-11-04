@@ -1,1 +1,13 @@
+.ContenerListLead::-webkit-scrollbar {
+    width: 10px;
+}
 
+.ContenerListLead::-webkit-scrollbar-thumb {
+    background-color: #1d2d45;
+    border-radius: 10px;
+}
+
+.ContenerListLead::-webkit-scrollbar-track {
+    background-color: #435574;
+    border-radius: 10px;
+}

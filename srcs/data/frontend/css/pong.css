@@ -1,0 +1,49 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    color: white;
+}
+
+h2, ul, li {
+    color: white;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+li {
+    padding: 5px;
+}
+
+/* Styles spécifiques pour le canvas */
+.canvas {
+    max-width: 100%;
+    height: auto;
+    border-style: groove;
+    border-color: black;
+}
+
+/* Styles spécifiques pour la vue de fin de tournoi */
+.ranking-list {
+    font-size: 1.2em;
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+}
+
+.ranking-list li {
+    margin: 10px 0;
+}
+
+/* Style spécial pour le premier joueur */
+.first-place {
+    font-size: 2em;
+    font-weight: bold;
+    color: yellow;
+}
