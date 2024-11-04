@@ -35,12 +35,13 @@ export async function leaderboardView(container) {
 
     const leaderboard = await get_leaderboard();
 
-    console.log("LeaderBoard :", leaderboard);
 
     //Get the first 3 users by the leaderboard.rank + leaderboard.nickname + leaderboard.win_rate
-    const first = leaderboard[0];
-    const second = leaderboard[1];
-    const third = leaderboard[2];
+    let first = leaderboard[0];
+    let second = leaderboard[1];
+    let third = leaderboard[2];
+
+
 
     const podiumContener = document.createElement('div');
     podiumContener.className = 'podiumContener d-flex flex-column w-100 h-100';
@@ -113,39 +114,50 @@ export async function leaderboardView(container) {
     secplaceContainer.className = 'd-flex flex-column justify-content-center align-items-center w-100 h-100';
     secplace.appendChild(secplaceContainer);
 
-    const TextSecPos = document.createElement('h6');
-    TextSecPos.className = 'TextSecPos text-center w-100 mb-2 d-none d-sm-block';
-    TextSecPos.textContent = '2nd';
-    TextSecPos.style.margin = '0';
-    TextSecPos.style.color = '#95a5a6';
-    secplaceContainer.appendChild(TextSecPos);
+    if (second !== undefined) {
+        const TextSecPos = document.createElement('h6');
+        TextSecPos.className = 'TextSecPos text-center w-100 mb-2 d-none d-sm-block';
+        TextSecPos.textContent = '2nd';
+        TextSecPos.style.margin = '0';
+        TextSecPos.style.color = '#95a5a6';
+        secplaceContainer.appendChild(TextSecPos);
 
-    const imgContainerSecPos = document.createElement('div');
-    imgContainerSecPos.className = 'img-container d-flex justify-content-center align-items-start w-100 h-50';
-    imgContainerSecPos.style.width = '90px';
-    imgContainerSecPos.style.height = '90px';
-    secplaceContainer.appendChild(imgContainerSecPos);
+        const imgContainerSecPos = document.createElement('div');
+        imgContainerSecPos.className = 'img-container d-flex justify-content-center align-items-start w-100 h-50';
+        imgContainerSecPos.style.width = '90px';
+        imgContainerSecPos.style.height = '90px';
+        secplaceContainer.appendChild(imgContainerSecPos);
+        const img2Av = document.createElement('img');
+        img2Av.src = `data:image/png;base64,${second.avatar}`;
+        img2Av.alt = 'Avatar Second Place';
+        img2Av.className = 'img2Av rounded-circle';
+        img2Av.style.width = '50px';
+        img2Av.style.height = '50px';
+        imgContainerSecPos.appendChild(img2Av);
 
-    const img2Av = document.createElement('img');
-    img2Av.src = `data:image/png;base64,${second.avatar}`;
-    img2Av.alt = 'Avatar Second Place';
-    img2Av.className = 'img2Av rounded-circle';
-    img2Av.style.width = '50px';
-    img2Av.style.height = '50px';
-    imgContainerSecPos.appendChild(img2Av);
+        const SecUserName = document.createElement('div');
+        SecUserName.className = 'SecUserName m-0 text-center fs-6 d-none d-md-block';
+        SecUserName.textContent = `${second.nickname}`;
+        SecUserName.style.color = '#95a5a6';
 
-    const SecUserName = document.createElement('div');
-    SecUserName.className = 'SecUserName m-0 text-center fs-6 d-none d-md-block';
-    SecUserName.textContent = `${second.nickname}`;
-    SecUserName.style.color = '#95a5a6';
+        const SecUserWinRate = document.createElement('div');
+        SecUserWinRate.className = 'SecUserWinRate m-0 text-center d-none d-md-block';
+        SecUserWinRate.textContent = ` ${second.win_rate}% WIN`;
+        SecUserWinRate.style.fontSize = '0.8rem';
 
-    const SecUserWinRate = document.createElement('div');
-    SecUserWinRate.className = 'SecUserWinRate m-0 text-center d-none d-md-block';
-    SecUserWinRate.textContent = ` ${second.win_rate}% WIN`;
-    SecUserWinRate.style.fontSize = '0.8rem';
 
-    SecUserName.appendChild(SecUserWinRate);
-    secplaceContainer.appendChild(SecUserName);
+        SecUserName.appendChild(SecUserWinRate);
+        secplaceContainer.appendChild(SecUserName);
+    }
+    else {
+        //Just diplay no user if there is no user in the second place
+        const SecUserName = document.createElement('div');
+        SecUserName.className = 'SecUserName m-0 text-center fs-6 d-none d-md-block';
+        SecUserName.textContent = 'No user';
+        SecUserName.style.color = '#95a5a6';
+        secplaceContainer.appendChild(SecUserName);
+
+    }
 
     const thirdplace = document.createElement('div');
     thirdplace.className = 'thirdplace d-flex justify-content-center align-items-start flex-column w-50 h-100 ';  // Ajout de overflow-hidden ici
@@ -155,39 +167,50 @@ export async function leaderboardView(container) {
     thirdplaceContainer.className = 'd-flex flex-column justify-content-center align-items-center w-100 h-100';
     thirdplace.appendChild(thirdplaceContainer);
 
-    const TextThirdPos = document.createElement('h6');
-    TextThirdPos.className = 'TextThirdPos text-center w-100 mb-2 d-none d-sm-block';
-    TextThirdPos.textContent = '3rd';
-    TextThirdPos.style.margin = '0';
-    TextThirdPos.style.color = '#b24d05';
-    thirdplaceContainer.appendChild(TextThirdPos);
+    if (third !== undefined){
+        const TextThirdPos = document.createElement('h6');
+        TextThirdPos.className = 'TextThirdPos text-center w-100 mb-2 d-none d-sm-block';
+        TextThirdPos.textContent = '3rd';
+        TextThirdPos.style.margin = '0';
+        TextThirdPos.style.color = '#b24d05';
+        thirdplaceContainer.appendChild(TextThirdPos);
 
-    const imgContainerThirdPos = document.createElement('div');
-    imgContainerThirdPos.className = 'img-container d-flex justify-content-center align-items-start w-100 h-50 ';
-    imgContainerThirdPos.style.width = '90px';
-    imgContainerThirdPos.style.height = '90px';
-    thirdplaceContainer.appendChild(imgContainerThirdPos);
+        const imgContainerThirdPos = document.createElement('div');
+        imgContainerThirdPos.className = 'img-container d-flex justify-content-center align-items-start w-100 h-50 ';
+        imgContainerThirdPos.style.width = '90px';
+        imgContainerThirdPos.style.height = '90px';
+        thirdplaceContainer.appendChild(imgContainerThirdPos);
 
-    const img3Av = document.createElement('img');
-    img3Av.src = `data:image/png;base64,${third.avatar}`;
-    img3Av.alt = 'Avatar Third Place';
-    img3Av.className = 'img3Av rounded-circle';
-    img3Av.style.width = '50px';
-    img3Av.style.height = '50px';
-    imgContainerThirdPos.appendChild(img3Av);
+        const img3Av = document.createElement('img');
+        img3Av.src = `data:image/png;base64,${third.avatar}`;
+        img3Av.alt = 'Avatar Third Place';
+        img3Av.className = 'img3Av rounded-circle';
+        img3Av.style.width = '50px';
+        img3Av.style.height = '50px';
+        imgContainerThirdPos.appendChild(img3Av);
 
-    const thirdUserName = document.createElement('div');
-    thirdUserName.className = 'thirdUserName m-0 text-center fs-6 d-none d-md-block';
-    thirdUserName.textContent = `${third.nickname}`; //Add win_rate below the nickname
-    thirdUserName.style.color = '#b24d05';
+        const thirdUserName = document.createElement('div');
+        thirdUserName.className = 'thirdUserName m-0 text-center fs-6 d-none d-md-block';
+        thirdUserName.textContent = `${third.nickname}`; //Add win_rate below the nickname
+        thirdUserName.style.color = '#b24d05';
 
-    const thirdUserWinRate = document.createElement('div');
-    thirdUserWinRate.className = 'thirdUserWinRate m-0 text-center d-none d-md-block';
-    thirdUserWinRate.textContent = ` ${third.win_rate}% WIN`;
-    thirdUserWinRate.style.fontSize = '0.8rem';
+        const thirdUserWinRate = document.createElement('div');
+        thirdUserWinRate.className = 'thirdUserWinRate m-0 text-center d-none d-md-block';
+        thirdUserWinRate.textContent = ` ${third.win_rate}% WIN`;
+        thirdUserWinRate.style.fontSize = '0.8rem';
 
-    thirdUserName.appendChild(thirdUserWinRate);
-    thirdplaceContainer.appendChild(thirdUserName);
+        thirdUserName.appendChild(thirdUserWinRate);
+        thirdplaceContainer.appendChild(thirdUserName);
+    }
+    else {
+        //Just diplay no user if there is no user in the third place
+        const thirdUserName = document.createElement('div');
+        thirdUserName.className = 'thirdUserName m-0 text-center fs-6 d-none d-md-block';
+        thirdUserName.textContent = 'No user';
+        thirdUserName.style.color = '#b24d05';
+        thirdplaceContainer.appendChild(thirdUserName);
+    }
+
 
     const ContenerListLead = document.createElement('div');
     ContenerListLead.className = 'ContenerListLead d-flex flex-column p-3  w-100 overflow-auto';
@@ -195,6 +218,16 @@ export async function leaderboardView(container) {
     ContenerListLead.style.height = "60%";
     mainDiv.appendChild(ContenerListLead);
 
+    if (leaderboard.length < 3) {
+        console.log('leaderboard.length', leaderboard.length);
+        //Display a message : Not enough users to display the leaderboard in center of the div leaderboard
+        const NotEnoughUsers = document.createElement('div');
+        NotEnoughUsers.className = 'NotEnoughUsers d-flex justify-content-center align-items-center w-100 h-100';
+        NotEnoughUsers.textContent = 'Not enough users to display the leaderboard';
+        NotEnoughUsers.style.color = '#f5b041';
+        NotEnoughUsers.style.fontSize = '1.5rem';
+        ContenerListLead.appendChild(NotEnoughUsers);
+    }
     for (let i = 3; i < leaderboard.length; i++) {
         AddUserToLeaderboard(leaderboard[i], i + 1);
     }
