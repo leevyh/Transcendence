@@ -159,10 +159,32 @@ class Notification(models.Model):
     status = models.CharField(max_length=255, default='unread', choices=[('unread', 'unread'), ('read', 'read')])
     friend_request = models.ForeignKey(FriendRequest, on_delete=models.CASCADE, null=True)
     new_message = models.ForeignKey('chat.Message', on_delete=models.CASCADE, null=True)
+    game_invite = models.ForeignKey('pong.Game', on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(default=timezone.now)
 
 
-# class PrivateGameInvite(model.Model):
+# class PrivateGameInvite(models.Model):
+#     from pong.models import Game
+#     user = models.ForeignKey(User_site, on_delete=models.CASCADE, related_name='private_game_invites')
+#     game = models.ForeignKey('pong.Game', on_delete=models.CASCADE)
+#     created_at = models.DateTimeField(default=timezone.now)
+
+#     def save(self, *args, **kwargs):
+#         super(PrivateGameInvite, self).save(*args, **kwargs)
+#         channel_layer = get_channel_layer()
+#         async_to_sync(channel_layer.group_send)(
+#             f"user_{self.user.id}_invites",
+#             {
+#                 "type": "send_invite_to_play",
+#                 "message": {
+#                     "type": "invite_to_play",
+#                     "user_id": self.user.id,
+#                     "game_id": self.game.id,
+#                 },
+#             },
+#         )
+
+# game_invite = await database_sync_to_async(PrivateGameInvite.objects.create)(user=user, friend=friend)
 
 
 # class TournamentInvite(model.Model):

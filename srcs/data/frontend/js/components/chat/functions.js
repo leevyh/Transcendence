@@ -1,4 +1,5 @@
 import { DEBUG, navigateTo } from '../../app.js';
+import { play } from '../../views/pong_game.js';
 import { getCookie } from '../../views/utils.js';
 
 export let chatWS = null;
@@ -84,6 +85,16 @@ async function openConversation(conversationID, otherUser) {
     inviteGameButton.style.display = 'block';
     inviteGameButton.addEventListener('click', () => {
         console.log('Invite to play (TODO)');
+        // Send a message to the other user to invite him to play
+        if (chatWS && chatWS.readyState === WebSocket.OPEN) {
+            // Send the message to invite the user to play
+            const messageData = {
+                type: 'inviteUserToPlay',
+                // gameID: TODO: Implement a way to create a game with two users and get the gameID
+                timestamp: new Date().toISOString()
+            };
+            chatWS.send(JSON.stringify(messageData));
+        }
     });
 
     chatWS = new WebSocket('ws://' + window.location.host + `/ws/chat/${conversationID}/`);
