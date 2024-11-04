@@ -40,23 +40,23 @@ down:
 a-full:
 	@${ECHK} ${ENVV}
 	@${DSTP} ${DATA}
-	docker compose -f ${COMPOSE} up -d --build
+	@docker compose -f ${COMPOSE} up -d --build
 
 d-full:
-	docker compose -f ${COMPOSE} down
+	@docker compose -f ${COMPOSE} down
 
 clean:
-	docker compose -f ${COMPOSE} down --rmi all
+	@docker compose -f ${COMPOSE} down --rmi all
 	@${DCPF} ${DATA}
 
 logs:
-	docker compose logs -f
+	@docker compose logs -f
 
 status:
-	docker compose ps
+	@docker compose ps
 
 prune:
-	docker system prune -af
+	@docker system prune -af
 
 re: d-lite a-lite
 
