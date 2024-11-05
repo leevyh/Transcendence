@@ -83,7 +83,7 @@ function createNavBarList() {
     navBarList.appendChild(createNavButton('Chat', () => navigateTo('/chat')));
     navBarList.appendChild(createNavButton('Users', () => navigateTo('/users')));
     navBarList.appendChild(createNavButton('Leaderboard', () => navigateTo('/leaderboard')));
-
+    navBarList.appendChild(createNavButton('Profile', () => navigateTo('/profile')));
     return navBarList;
 }
 
