@@ -28,7 +28,6 @@ export async function navigationBar(container) {
                     email: data.email,
                     language: data.language,
                     font_size: data.font_size,
-                    theme: data.dark_mode,
                     avatar: data.avatar,
                 };
 
