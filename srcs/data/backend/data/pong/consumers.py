@@ -16,6 +16,179 @@ def create_game(player_1, player_2):
     from pong.models import Game
     return Game.objects.create(player_1=player_1, player_2=player_2, is_active=True)
 
+
+class CLIPongConsumer(AsyncWebsocketConsumer):
+    
+    async def connect(self):
+        # Accept the WebSocket connection
+        await self.accept()
+        from api.models import User_site
+        player = User_site
+        player.nickname = 'anonymous'
+        #envoyer juste un signal 'connected' pour dire que le joueur est connecte
+        await self.send(text_data=json.dumps({
+            'connected': 'connected'}))
+        await self.findMatch(player)
+
+    # cree une partie si le joueur est le premier a se connecter ou rejoint une partie si un autre joueur est deja connecte. return cette partie
+    async def findMatch(self, player):
+        if (len(list_of_games) == 0) :
+            await self.send(text_data=json.dumps({
+                'game created': 'game first player'}))
+            game = PongGame(player)
+            list_of_games.append(game)
+            game.status = "waiting"
+            game.player_1 = player
+            game.nbPlayers += 1
+            game.channel_player_1 = self.channel_name
+            self.game = game
+        else :
+            game = list_of_games.pop(0)
+            game.player_2 = player
+            game.nbPlayers += 1   
+            game.channel_player_2 = self.channel_name
+            self.game = game
+
+        if(game.nbPlayers == 2) :
+            await self.send(text_data=json.dumps({
+                'game created' :  self.game.player_1.nickname + ' and ' + self.game.player_2.nickname}))
+            await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_1)
+            await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_2)
+            game.status = "ready"
+            await asyncio.gather(
+                self.periodic_state_update()
+                self.game.game_loop(),
+            )
+
+        return game
+
+    async def periodic_state_update(self):
+        while self.game.is_active:
+            await asyncio.sleep(3)
+            await self.state_of_the_game()
+       
+    async def game_state(self, event):
+        pass
+    # if self.channel_name is not None:
+    #     await self.send(text_data=json.dumps({
+    #         'action_type': 'game_state',
+    #         'game': event['game']
+    #     }))
+
+    async def state_of_the_game(self):
+        await self.send(text_data=json.dumps({
+            'action_type': 'state_of_the_game',
+            'game': {
+                'ball_position': {
+                    'x': self.game.ball_position_x,
+                    'y': self.game.ball_position_y
+                },
+                'players': {
+                    'player_1': {
+                        'name': self.game.player_1.nickname,
+                        'position': self.game.player_1_position,
+                        'score': self.game.player_1_score
+                    },
+                    'player_2': {
+                        'name': self.game.player_2.nickname,
+                        'position': self.game.player_2_position,
+                        'score': self.game.player_2_score
+                    }
+                }
+            }
+        }))
+
+    async def define_player(self, event):
+        pass
+        # if self.channel_name is not None:
+        #     await self.send(text_data=json.dumps({
+        #         'action_type': 'define_player',
+        #         'name_player': event['name_player'],
+        #         'current_player': event['current_player'],
+        #         'game': event['game']
+        #     }))
+
+    async def start_game(self, event):
+        pass
+        # if self.channel_name is not None:
+        #     await self.send(text_data=json.dumps({
+        #         'action_type': 'start_game',
+        #         'game': event['game']
+        #     }))
+    
+    async def disconnect(self, code):
+        # Retirer le joueur de la file d'attente s'il quitte la connexion
+        from api.models import User_site
+        player = User_site
+        player.nickname = 'anonymous'
+        if player in waiting_players:
+            waiting_players.remove(player)
+        
+        if hasattr(self, 'game') and self.game is not None:
+            if self.game.status == "ready":
+                if self.game.winner is None:
+                    if self.game.player_1 == player:
+                        self.game.winner = self.game.player_2
+                        self.game.loser = self.game.player_1
+                    else:
+                        self.game.winner = self.game.player_1
+                        self.game.loser = self.game.player_2
+                    await self.channel_layer.group_discard(f"game_{self.game.id}", self.channel_name)
+                    self.game.reset_ball()
+                    await self.game.broadcastState()
+                    await self.game.stop_game()
+            await self.channel_layer.group_discard(f"game_{self.game.id}", self.channel_name)
+            
+            if self.game in list_of_games :
+                list_of_games.remove(self.game)
+            self.game = None
+            
+        await self.close()
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        # Update player positions or handle key events
+        if data['type'] == 'update_player_position':
+            if hasattr(self, 'game') and self.game is not None and self.game.is_active:
+                self.game.move_player(data['player'], data['move'])
+        if data['type'] == 'state_of_the_game':
+            await self.state_of_the_game()
+        if data['type'] == 'stop_game' :
+            from api.models import User_site
+            player = User_site
+            player.nickname = 'anonymous'
+            if self.game.player_1 == player:
+                self.game.winner = self.game.player_2
+                self.game.loser = self.game.player_1
+            else:
+                self.game.winner = self.game.player_1
+                self.game.loser = self.game.player_2
+            await self.game.broadcastState()
+            await self.game.stop_game()
+        if data['type'] == 'disconnect_player' :
+            await self.disconnect(1000)
+
+    async def end_of_game(self, event):
+        pass
+        # if event['winner'] == 'anonymous':
+        #     result = 'win'
+        #     nb_point_taken = event['score_winner']
+        #     nb_point_given = event['score_loser']
+        # else :
+        #     result = 'lose'
+        #     nb_point_taken = event['score_loser']
+        #     nb_point_given = event['score_winner']
+        # if self.channel_name is not None:
+        #     await self.send(text_data=json.dumps({
+        #         'action_type': 'end_of_game',
+        #         'winner': event['winner'],
+        #         'result': result,
+        #         'nb_point_taken' : nb_point_taken,
+        #         'nb_point_given' : nb_point_given
+        #     }))
+        # self.game = None
+
+
 class PongConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
@@ -79,9 +252,10 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         if(game.nbPlayers == 2) :
             print("consumer game with 2 players")
-            game_database = await create_game(game.player_1, game.player_2)
-            game.id = game_database.id
-            game_database.is_active = True
+            if game.player_1.nickname != 'anonymous' and game.player_2.nickname != 'anonymous':
+                game_database = await create_game(game.player_1, game.player_2)
+                game.id = game_database.id
+                game_database.is_active = True
             await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_1)
             await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_2)
             game.status = "ready"
