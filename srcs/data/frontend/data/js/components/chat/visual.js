@@ -141,6 +141,7 @@ export function createUserCard(user, userList) {
 
                 const chatBody = document.querySelector('.chat-body');
                 chatBody.innerHTML = '';
+                chatTitle.textContent = `Chat Window`;
                 openChatWithUser(user.nickname);
             }
         });
@@ -239,6 +240,7 @@ function createChatContainerHeader() {
 
     const div2 = document.createElement('div');
     div2.className = 'd-flex align-items-center';
+    div2.id = 'chat-header-buttons';
     chatHeader.appendChild(div2);
 
     const profileButton = document.createElement('button');
