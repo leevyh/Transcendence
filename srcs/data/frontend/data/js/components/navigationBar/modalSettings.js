@@ -114,13 +114,13 @@ async function createSettingsForm() {
         const nickname = data.get('newNicknameModify');
         const email = data.get('newEmailModify');
 
-        // TODO: ATTENTION, si le nickname est vide et qu'on veut changer que l'email, le nickname sera vide 
+        // TODO: ATTENTION, si le nickname est vide et qu'on veut changer que l'email, le nickname sera vide
         // et donc le serveur renverra une erreur car le nickname est obligatoire
         // Il faudrait donc vérifier si le nickname est vide et si c'est le cas, le remplacer par l'ancien nickname
         // et ne pas envoyer le nickname au serveur si il est vide
 
         // Check the size of the nickname (between 3 and 10 characters)
-        if (nickname.length < 3 || nickname.length > 10) {
+        if (nickname && nickname.length < 3 || nickname.length > 10) {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Nickname must be between 3 and 10 characters';
