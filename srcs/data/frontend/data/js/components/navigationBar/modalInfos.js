@@ -4,7 +4,6 @@ export async function createModalInfo(userData) {
     const modalInfo = document.createElement('div');
     modalInfo.className = 'modal fade modalInfo';
     modalInfo.id = 'modalInfo';
-    modalInfo.setAttribute('tabindex', '-1');
     modalInfo.setAttribute('aria-labelledby', 'modalInfoLabel');
     modalInfo.setAttribute('aria-hidden', 'true');
 
@@ -23,6 +22,7 @@ export async function createModalInfo(userData) {
     const modalInfoTitle = document.createElement('h2');
     modalInfoTitle.textContent = 'Settings';
     modalInfoTitle.className = 'modal-title modalInfoTitle';
+    modalInfoTitle.id = 'modalInfoLabel';
     modalInfoHeader.appendChild(modalInfoTitle);
 
     // Close button
@@ -53,39 +53,45 @@ export async function createModalInfo(userData) {
     });
 
     const modalInfoBody = document.createElement('div');
-    modalInfoBody.className = 'modal-body';
+    modalInfoBody.className = 'modal-body modalInfoBody text-body';
     modalInfoContent.appendChild(modalInfoBody);
 
-    const SvgModify = document.createElement('li');
-    SvgModify.className = 'SvgModify bi bi-pencil-fill d-flex justify-content-end text-center';
-    SvgModify.setAttribute('xmlns', "http://www.w3.org/2000/svg");
-    SvgModify.setAttribute('width', '16');
-    SvgModify.setAttribute('height', '16');
-    SvgModify.setAttribute('fill', 'currentColor');
-    SvgModify.setAttribute('viewBox', '0 0 16 16');
-    SvgModify.setAttribute('role', 'button'); // To make the element clickable
-    SvgModify.setAttribute('tabindex', '0'); // To make the element focusable
-    modalInfoBody.appendChild(SvgModify);
+    const modalInfoColumn = document.createElement('div');
+    modalInfoColumn.className = 'd-flex flex-column';
+    modalInfoBody.appendChild(modalInfoColumn);
+
+    const modalInfoRow = document.createElement('div');
+    modalInfoRow.className = 'd-flex flex-row';
+    modalInfoColumn.appendChild(modalInfoRow);
+
+    const modalInfoColumnInfos = document.createElement('div');
+    modalInfoColumnInfos.className = 'd-flex flex-column';
+    modalInfoRow.appendChild(modalInfoColumnInfos);
+
+    const modalInfoColumnModify = document.createElement('div');
+    modalInfoColumnModify.className = 'd-flex flex-column';
+    modalInfoRow.appendChild(modalInfoColumnModify);
+
+    // Add a button to modify user information
+    const modifyIcon = document.createElement('div');
+    modifyIcon.className = 'btn d-flex justify-content-end text-center modifyIcon';
+    modifyIcon.innerHTML = '<i class="bi bi-pencil-fill"></i>';
+    modifyIcon.setAttribute('aria-label', 'Click to modify user information');
+    modifyIcon.setAttribute('tabindex', '0');
+    modifyIcon.setAttribute('role', 'button');
+    modalInfoColumnModify.appendChild(modifyIcon);
 
 // KEYBOARD ACCESSIBILITY
     // Event listener for keyboard accessibility: when the button is focused and we press Enter, the modalSettings opens
-    SvgModify.addEventListener('keydown', (event) => {
+    modifyIcon.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
-            // We close modalInfo before opening modalSettings
-            const modalInfoElement = document.getElementById('modalInfo');
-            if (modalInfoElement) {
-                const bootstrapModalInfo = bootstrap.Modal.getInstance(modalInfoElement); // Get the instance of "modalInfo"
-                if (bootstrapModalInfo) {
-                    bootstrapModalInfo.hide(); // Close "modalInfo"
-                }
-            }
-            openModal(document.getElementById('modalSettings'));
+            modifyIcon.click();
         }
     });
 
 // MOUSE ACCESSIBILITY
     // Event listener for mouse click: when the button is focused and we click on it, the modalSettings opens
-    SvgModify.addEventListener('click', () => {
+    modifyIcon.addEventListener('click', () => {
         // We close modalInfo before opening modalSettings
         const modalInfoElement = document.getElementById('modalInfo');
         if (modalInfoElement) {
@@ -100,37 +106,37 @@ export async function createModalInfo(userData) {
     const ModalUsernameElem = document.createElement('div');
     ModalUsernameElem.className = 'ModalUsernameElem';
     ModalUsernameElem.textContent = `Username : ${userData.username}`;
-    modalInfoBody.appendChild(ModalUsernameElem);
+    modalInfoColumnInfos.appendChild(ModalUsernameElem);
 
     const ModalNicknameElem = document.createElement('div');
     ModalNicknameElem.className = 'ModalNicknameElem';
     ModalNicknameElem.textContent = `Nickname : ${userData.nickname}`;
-    modalInfoBody.appendChild(ModalNicknameElem);
+    modalInfoColumnInfos.appendChild(ModalNicknameElem);
 
     const ModalEmailElem = document.createElement('div');
     ModalEmailElem.className = 'ModalEmailElem';
     ModalEmailElem.textContent = `Email : ${userData.email}`;
-    modalInfoBody.appendChild(ModalEmailElem);
+    modalInfoColumnInfos.appendChild(ModalEmailElem);
 
     const ModalMDPElem = document.createElement('div');
     ModalMDPElem.className = 'ModalMDPElem';
     ModalMDPElem.textContent = `Password : *******`;
-    modalInfoBody.appendChild(ModalMDPElem);
+    modalInfoColumnInfos.appendChild(ModalMDPElem);
 
     const ModalLanguageElem = document.createElement('div');
     ModalLanguageElem.className = 'ModalLanguageElem';
     ModalLanguageElem.textContent = `Language : ${userData.language}`;
-    modalInfoBody.appendChild(ModalLanguageElem);
+    modalInfoColumnInfos.appendChild(ModalLanguageElem);
 
     const ModalPoliceElem = document.createElement('div');
     ModalPoliceElem.className = 'ModalPoliceElem';
     ModalPoliceElem.textContent = `Font size : ${userData.font_size}`;
-    modalInfoBody.appendChild(ModalPoliceElem);
+    modalInfoColumnInfos.appendChild(ModalPoliceElem);
 
     const ModalModeElem = document.createElement('div');
     ModalModeElem.className = 'ModalModeElem';
     ModalModeElem.textContent = `Dark Mode : ${userData.theme}`;
-    modalInfoBody.appendChild(ModalModeElem);
+    modalInfoColumnInfos.appendChild(ModalModeElem);
 
     return modalInfo;
 }

@@ -62,7 +62,7 @@ export function homeView(container) {
     modalLogin.appendChild(modalLoginDialog);
 
     const modalLoginContent = document.createElement('div');
-    modalLoginContent.className = 'modal-content modalLoginContent';
+    modalLoginContent.className = 'modal-content text-body modalLoginContent';
     modalLoginDialog.appendChild(modalLoginContent);
 
     const modalLoginHeader = document.createElement('div');
@@ -72,6 +72,7 @@ export function homeView(container) {
     const modalLoginTitle = document.createElement('h2');
     modalLoginTitle.textContent = 'Login';
     modalLoginTitle.className = 'modal-title modalLoginTitle';
+    modalLoginTitle.id = 'modalLoginLabel';
     modalLoginHeader.appendChild(modalLoginTitle);
 
     const closeButtonLogin = document.createElement('span');
@@ -115,7 +116,7 @@ export function homeView(container) {
         formGroup.className = 'mb-3';
 
         const label = document.createElement('label');
-        label.className = 'form-label titleLabelRegister';
+        label.className = 'form-label';
         label.htmlFor = field.id;
         label.textContent = field.label;
 
@@ -220,6 +221,8 @@ export function homeView(container) {
     // Modal-Register
     const modalRegister = document.createElement('div');
     modalRegister.className = 'modal ModalRegisterBase';
+    modalRegister.setAttribute('aria-labelledby', 'modalRegisterLabel');
+    modalRegister.setAttribute('aria-hidden', 'true');
     modalRegister.style.display = 'none'; // Hide the modal initially
     container.appendChild(modalRegister);
 
@@ -240,6 +243,7 @@ export function homeView(container) {
     const modalRegisterTitle = document.createElement('h2');
     modalRegisterTitle.textContent = 'Register';
     modalRegisterTitle.className = 'modalLoginTitle'
+    modalRegisterTitle.id = 'modalRegisterLabel';
     modalRegisterHeader.appendChild(modalRegisterTitle);
 
     // Close button for the register modal
@@ -291,7 +295,7 @@ export function homeView(container) {
         formRegister.appendChild(formGroup);
 
         const label = document.createElement('label');
-        label.className = 'form-label titleLabelRegister';
+        label.className = 'form-label';
         label.htmlFor = fieldRegister.id;
         label.textContent = fieldRegister.label;
         formGroup.appendChild(label);

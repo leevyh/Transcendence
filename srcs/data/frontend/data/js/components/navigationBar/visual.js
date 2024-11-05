@@ -76,8 +76,8 @@ async function createTitleNickname(userData) {
 
 
 function createNavBarList() {
-    const navBarList = document.createElement('ul');
-    navBarList.className = 'navBarList list-unstyled d-flex flex-column';
+    const navBarList = document.createElement('div');
+    navBarList.className = 'navBarList d-flex flex-column';
 
     navBarList.appendChild(createNavButton('Pong', () => navigateTo('/menuPong')));
     navBarList.appendChild(createNavButton('Chat', () => navigateTo('/chat')));
