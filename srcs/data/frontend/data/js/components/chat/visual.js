@@ -103,6 +103,7 @@ export function createUserCard(user, userList) {
         const userInfo = document.createElement('div');
         userInfo.className = 'mt-auto mb-auto user-info';
         userInfo.innerHTML = `<span>${user.nickname}</span>`;
+        userInfo.setAttribute('aria-label', `Chat with ${user.nickname}`);
         userInfo.setAttribute('role', 'button'); // Make it focusable for accessibility
         userInfo.setAttribute('tabindex', '0'); // Make it focusable for accessibility
         userCard.appendChild(userInfo);
@@ -148,6 +149,7 @@ export function createUserCard(user, userList) {
         const blockButton = document.createElement('button');
         blockButton.className = "bi bi-slash-circle border-0 block-button";
         blockButton.style.color = 'red';
+        blockButton.setAttribute('aria-label', `Block/Unblock ${user.nickname}`);
         blockButton.style.display = 'none'; // Hide the button when the chat is not open
         blockButton.addEventListener('click', () => {
             blockUnblockUser(user.nickname);
