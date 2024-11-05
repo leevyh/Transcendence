@@ -78,7 +78,10 @@ export async function menuPongView(container) {
             twoButtons.appendChild(buttonContainer);
 
             const button = document.createElement('button');
-            button.className = buttonClassName + ' btn p-4 w-75 bg-black';
+            button.className = buttonClassName + ' btn p-4 w-75 bg-black gameButton';
+            button.setAttribute('role', 'button');
+            button.setAttribute('tabindex', '0');
+            button.setAttribute('aria-label', `Play ${buttonText} mode`);
             buttonContainer.appendChild(button);
 
             const buttonContent = document.createElement('p');
@@ -89,6 +92,12 @@ export async function menuPongView(container) {
             // Création de l'image statique (PNG)
             const staticImage = document.createElement('img');
             staticImage.src = pngSrc;
+            if (buttonClassName === 'DuoButton') {
+                staticImage.alt = '1v1 mode';
+            }
+            else {
+                staticImage.alt = 'Solo mode';
+            }
             staticImage.classList.add('static-img');
             button.appendChild(staticImage);
 
@@ -96,6 +105,11 @@ export async function menuPongView(container) {
             const hoverGif = document.createElement('img');
             hoverGif.src = gifSrc;
             hoverGif.className = 'hoverGif';
+            if (buttonClassName === 'DuoButton') {
+                hoverGif.alt = '1v1 mode (GIF)';
+            } else {
+                hoverGif.alt = 'Play Solo mode (GIF)';
+            }
             hoverGif.classList.add('hover-gif');
             button.appendChild(hoverGif);
 
@@ -110,103 +124,107 @@ export async function menuPongView(container) {
         }
 
         // Fonction pour créer un bouton Tournament (s'il y a des différences, on peut ajouter ici)
-    function createAnimatedButtonTournament(buttonClassName, buttonText, pngSrc, gifSrc, container) {
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = container;
-        ContenerTournament.appendChild(buttonContainer);
+        function createAnimatedButtonTournament(buttonClassName, buttonText, pngSrc, gifSrc, container) {
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = container;
+            ContenerTournament.appendChild(buttonContainer);
 
-        const button = document.createElement('button');
-        button.className = buttonClassName + ' btn p-4 w-75 bg-black';
-        buttonContainer.appendChild(button);
+            const button = document.createElement('button');
+            button.className = buttonClassName + ' btn p-4 w-75 bg-black gameButton';
+            button.setAttribute('role', 'button');
+            button.setAttribute('tabindex', '0');
+            button.setAttribute('aria-label', `Play ${buttonText} mode`);
+            buttonContainer.appendChild(button);
 
-        const buttonContent = document.createElement('p');
-        buttonContent.textContent = buttonText;
-        buttonContent.className = buttonClassName + 'Content m-0 w-100 h-100 d-flex justify-content-center align-items-center';
-        button.appendChild(buttonContent);
+            const buttonContent = document.createElement('p');
+            buttonContent.textContent = buttonText;
+            buttonContent.className = buttonClassName + 'Content m-0 w-100 h-100 d-flex justify-content-center align-items-center';
+            button.appendChild(buttonContent);
 
-        // Création de l'image statique (PNG)
-        const staticImage = document.createElement('img');
-        staticImage.src = pngSrc;
-        staticImage.classList.add('static-img');
-        button.appendChild(staticImage);
+            // Création de l'image statique (PNG)
+            const staticImage = document.createElement('img');
+            staticImage.src = pngSrc;
+            staticImage.alt = 'Tournament mode';
+            staticImage.classList.add('static-img');
+            button.appendChild(staticImage);
 
-        // Création de l'image GIF pour l'animation
-        const hoverGif = document.createElement('img');
-        hoverGif.src = gifSrc;
-        hoverGif.className = 'hoverGif';
-        hoverGif.classList.add('hover-gif');
-        button.appendChild(hoverGif);
+            // Création de l'image GIF pour l'animation
+            const hoverGif = document.createElement('img');
+            hoverGif.src = gifSrc;
+            hoverGif.className = 'hoverGif';
+            hoverGif.alt = 'Tournament mode (GIF)';
+            hoverGif.classList.add('hover-gif');
+            button.appendChild(hoverGif);
 
-    // Réinitialisation du GIF au survol
-        button.addEventListener('mouseenter', () => {
-            hoverGif.src = ''; // Vider le chemin de l'image temporairement
-            hoverGif.src = gifSrc; // Remettre le même chemin pour redémarrer le GIF
-        });
-        return button;
-    }
+        // Réinitialisation du GIF au survol
+            button.addEventListener('mouseenter', () => {
+                hoverGif.src = ''; // Vider le chemin de l'image temporairement
+                hoverGif.src = gifSrc; // Remettre le même chemin pour redémarrer le GIF
+            });
+            return button;
+        }
 
     let redirectTo = '';
 
 
     function openModal() {
         if (modalGameSettings.style.display === 'block') {
-            console.log("ALO BRO");
             modalGameSettings.removeAttribute('aria-hidden'); // Supprimer aria-hidden quand la modale est visible
             modalGameSettings.focus(); // Donner le focus à la modale pour une meilleure accessibilité
         }
 
-        // Ouvre la modal
-        modalGameSettings.style.display = 'block';
-        setTimeout(() => {
-            modalGameSettings.classList.add('modalGameSettingsBase-show');
-            mainDivMenu.style.backdropFilter = 'blur(10px)';
-            mainDivMenu.style.transition = 'backdrop-filter 0.3s ease';
-        }, 10);
-    }
+            // Ouvre la modal
+            modalGameSettings.style.display = 'block';
+            setTimeout(() => {
+                modalGameSettings.classList.add('modalGameSettingsBase-show');
+                modalGameSettings.setAttribute('tabindex', '-1'); // Make the modal focusable
+                modalGameSettings.focus();
+                mainDivMenu.style.backdropFilter = 'blur(10px)';
+                mainDivMenu.style.transition = 'backdrop-filter 0.3s ease';
+            }, 10);
+        }
 
+        // Bouton Solo
+        const soloButton = createAnimatedButton(
+            'soloButton',               // Classe du bouton
+            'Solo',                     // Texte du bouton
+            '/js/img/pong1.png',       // PNG pour Solo
+            '/js/img/pong.gif',        // GIF pour Solo
+            'ContenerSoloButton w-50 h-100 d-flex justify-content-center align-items-end' // Classe du conteneur
+        );
 
-    // Bouton Solo
-    const soloButton = createAnimatedButton(
-        'soloButton',               // Classe du bouton
-        'Solo',                     // Texte du bouton
-        '/js/img/pong1.png',       // PNG pour Solo
-        '/js/img/pong.gif',        // GIF pour Solo
-        'ContenerSoloButton w-50 h-100 d-flex justify-content-center align-items-end' // Classe du conteneur
-    );
+        soloButton.addEventListener('click', () => {
+            redirectTo = '/pongSolo';
+            openModal();
+        });
 
-    soloButton.addEventListener('click', () => {
+        // Bouton Duo
+        const duoButton = createAnimatedButton(
+            'DuoButton',               // Classe du bouton
+            'Duo',                     // Texte du bouton
+            '/js/img/pong1.png',      // PNG pour Duo
+            '/js/img/pong.gif',       // GIF pour Duo
+            'ContenerDuoButton w-50 h-100 d-flex justify-content-center align-items-end'
+        );
 
-        redirectTo = '/pongSolo';
-        openModal();
-    });
+        duoButton.addEventListener('click', () => {
+            redirectTo = '/pong';
+            openModal();
+        });
 
-    // Bouton Duo
-    const duoButton = createAnimatedButton(
-        'DuoButton',               // Classe du bouton
-        'Duo',                     // Texte du bouton
-        '/js/img/pong1.png',      // PNG pour Duo
-        '/js/img/pong.gif',       // GIF pour Duo
-        'ContenerDuoButton w-50 h-100 d-flex justify-content-center align-items-end'
-    );
+        // Bouton Tournament
+        const tournamentButton = createAnimatedButtonTournament(
+            'TournamentButton',        // Classe du bouton
+            'Tournament',              // Texte du bouton
+            '/js/img/pong1.png',      // PNG pour Tournament
+            '/js/img/pong.gif',       // GIF pour Tournament
+            'ContenerTournamentButton w-50 h-100 d-flex justify-content-center align-items-center'
+        );
 
-    duoButton.addEventListener('click', () => {
-        redirectTo = '/pong';
-        openModal();
-    });
-
-    // Bouton Tournament
-    const tournamentButton = createAnimatedButtonTournament(
-        'TournamentButton',        // Classe du bouton
-        'Tournament',              // Texte du bouton
-        '/js/img/pong1.png',      // PNG pour Tournament
-        '/js/img/pong.gif',       // GIF pour Tournament
-        'ContenerTournamentButton w-50 h-100 d-flex justify-content-center align-items-center'
-    );
-
-    tournamentButton.addEventListener('click', () => {
-        redirectTo = '/tournament';
-        openModal();
-    });
+        tournamentButton.addEventListener('click', () => {
+            redirectTo = '/tournament';
+            openModal();
+        });
 
 
 
@@ -304,13 +322,15 @@ export async function menuPongView(container) {
             const blockTheme = document.createElement('div');
             blockTheme.className = 'd-flex justify-content-around align-items-center flex-column w-25 h-100 rounded theme-block';
             blockTheme.id = textContent;
+            // Make it focusable for accessibility
+            blockTheme.setAttribute('tabindex', '0');
+            blockTheme.setAttribute('aria-label', `Select ${textContent} theme`);
 
             const imgElement = document.createElement('img');
             imgElement.src = imagePath;
-            imgElement.alt = `Image de ${textContent}`;
+            imgElement.alt = `${textContent} theme`;
             imgElement.className = 'ImgSeason';
             imgElement.style.width = imageSize;
-
             blockTheme.appendChild(imgElement);
 
             const textElement = document.createElement('p');
@@ -319,11 +339,16 @@ export async function menuPongView(container) {
             //ADD textElement.style.color = couleur que tu veux
             blockTheme.appendChild(textElement);
 
+            blockTheme.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault(); // Disable the default action
+                    blockTheme.click(); // Simulate a click on the button
+                }
+            });
             blockTheme.addEventListener('click', (event) => {
                 event.stopPropagation();
                 selectBlock(blockTheme, textContent);
             });
-
 
             if (selectTheme && selectedThemeName === textContent) {
                 blockTheme.style.border = '4px solid #F4ED37'; // Applique la bordure si ce thème est sélectionné
@@ -447,6 +472,8 @@ export async function menuPongView(container) {
                 colorDiv.style.margin = '0 5px';
                 colorDiv.style.cursor = 'pointer';
                 colorDiv.style.border = '2px solid transparent'; // Bordure initialement transparente
+                colorDiv.setAttribute('tabindex', '0');
+                colorDiv.setAttribute('aria-label', `Select ${colorName} color`);
 
                 if (selectTheme == false) {
                     if (colorType === 'background' && GameSettings.background_game == colorName) {
@@ -466,6 +493,13 @@ export async function menuPongView(container) {
                         colorDiv.style.border = '4px solid #F4ED37';
                     }
                 }
+
+                colorDiv.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault(); // Disable the default action
+                        colorDiv.click(); // Simulate a click on the button
+                    }
+                });
                 colorDiv.addEventListener('click', () => {
                     const isSelected = colorDiv.style.border === '4px solid #F4ED37';
                     container.querySelectorAll('.color-option').forEach(option => {

@@ -32,6 +32,15 @@ async function createUsersContainer() {
     inputGroup.className = 'input-group p-2';
     contactsCard.appendChild(inputGroup);
 
+    const inputGroupPrepend = document.createElement('div');
+    inputGroupPrepend.className = 'input-group-prepend';
+    inputGroup.appendChild(inputGroupPrepend);
+    
+    const searchIcon = document.createElement('span');
+    searchIcon.className = 'btn search-btn';
+    searchIcon.innerHTML = '<i class="bi bi-search text-white"></i>';
+    inputGroupPrepend.appendChild(searchIcon);
+
     const searchInputLabel = document.createElement('label');
     searchInputLabel.setAttribute('for', 'search');
     searchInputLabel.textContent = 'Search for users...'; // Text for screen readers
@@ -44,15 +53,6 @@ async function createUsersContainer() {
     searchInput.placeholder = 'Search...';
     searchInput.className = 'form-control border-0 search';
     inputGroup.appendChild(searchInput);
-
-    const inputGroupPrepend = document.createElement('div');
-    inputGroupPrepend.className = 'input-group-prepend';
-    inputGroup.appendChild(inputGroupPrepend);
-
-    const searchIcon = document.createElement('span');
-    searchIcon.className = 'btn search-btn';
-    searchIcon.innerHTML = '<i class="bi bi-search text-white"></i>';
-    inputGroupPrepend.appendChild(searchIcon);
 
     searchInput.addEventListener('input', () => {
         const search = searchInput.value.trim();
@@ -67,7 +67,7 @@ async function createUsersContainer() {
     contactsBody.className = 'card-body w-100 h-100 overflow-auto contacts-body';
     contactsCard.appendChild(contactsBody);
 
-    const usersList = document.createElement('ul');
+    const usersList = document.createElement('div');
     usersList.className = 'p-2 user-list';
     usersList.id = 'user-list';
     contactsBody.appendChild(usersList);
@@ -244,6 +244,7 @@ function createChatContainerHeader() {
     profileButton.id = 'view-profile-button';
     profileButton.className = 'btn btn-outline-light view-profile-button';
     profileButton.innerHTML = '<i class="bi bi-person-lines-fill"></i>';
+    profileButton.setAttribute('aria-label', 'View profile');
     div2.appendChild(profileButton);
 
     const inviteGameButton = document.createElement('button');
@@ -251,6 +252,7 @@ function createChatContainerHeader() {
     inviteGameButton.id = 'invite-game-button';
     inviteGameButton.className = 'btn btn-outline-primary invite-game-button';
     inviteGameButton.innerHTML = '<i class="bi bi-controller"></i>';
+    inviteGameButton.setAttribute('aria-label', 'Invite to game');
     div2.appendChild(inviteGameButton);
 
     return chatHeader;
@@ -285,6 +287,7 @@ function createChatContainerFooter() {
 
     const chatSendButton = document.createElement('button');
     chatSendButton.className = 'btn send-btn chat-send-button';
+    chatSendButton.setAttribute('aria-label', 'Send message');
     chatSendButton.innerHTML = '<i class="bi bi-chevron-up text-white"></i>';
     inputGroup.appendChild(chatSendButton);
     chatSendButton.addEventListener('click', () => {

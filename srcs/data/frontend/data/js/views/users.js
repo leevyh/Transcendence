@@ -85,6 +85,7 @@ function createUserRow(user_list_row, data) {
         const friends_button = document.createElement('button');
         friends_button.className = 'btn btn-sm btn-primary';
         friends_button.textContent = 'Add friend';
+        friends_button.setAttribute('aria-label', `Add ${data.nickname} as a friend`);
         user_buttons.appendChild(friends_button);
         friends_button.addEventListener('click', () => {
             sendFriendRequest(data.nickname);
@@ -93,6 +94,7 @@ function createUserRow(user_list_row, data) {
         // Add a button to see the user's profile
         const profile_button = document.createElement('button');
         profile_button.className = 'btn btn-sm btn-light bi-person-lines-fill';
+        profile_button.setAttribute('aria-label', `View ${data.nickname}'s profile`);
         user_buttons.appendChild(profile_button);
         profile_button.addEventListener('click', () => {
             // Redirect to the profile page of the user

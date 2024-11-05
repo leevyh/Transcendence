@@ -1,6 +1,5 @@
 .nav {
 	padding: 15px;
-	/* width: min-content; */
     height: 100%;
 	background-color: #435574;
 	border-top-right-radius: 35px;
@@ -15,14 +14,14 @@
 	padding: 0;
 }
 
+.avatarImage {
+	border-radius: 50%;
+}
+
 .SVGModifyAvatar {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-}
-
-.avatarImage {
-	border-radius: 50%;
 }
 
 .TitleNickname {
@@ -38,7 +37,6 @@
 
 .TitleNicknameButton:focus {
     outline: none;
-    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.4);
     transform: scale(1.05);
 }
 
@@ -50,10 +48,10 @@
 	cursor: pointer
 }
 
-.ElemListNavBar button:focus {
-    outline: none;
-    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.4);
-    transform: scale(1.05);
+.ElemListBtn:focus {
+	outline: none;
+	-webkit-text-fill-color: white;
+	transform: scale(1.05);
 }
 
 .border-custom-color {
@@ -71,22 +69,21 @@ button.buttonLogOut {
 }
 
 button.buttonLogOut:active {
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Ombre plus forte au clic */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
 }
 
 /*MODAL AVATAR*/
 .modalAvatarContent {
-	background-color: rgba(255, 234, 234, 0.5);
-	transition: transform 0.5s ease, opacity 0.5s ease; /* S'assurer que la transition est appliquée */
-	transform: translateX(-100vw); /* Part de la gauche en dehors de l'écran */
-	opacity: 0 ; /* Initialement invisible */
-	/* transition: transform 0.5s ease, opacity 0.5s ease ; */
-	/* transform: translateY(-1000px); Départ de l'animation, hors écran */
+	background-color: #9b9797;
+	/* background-color: rgba(255, 234, 234, 0.5); */
+	transition: transform 0.5s ease, opacity 0.5s ease;
+	transform: translateX(-100vw);
+	opacity: 0 ;
 }
 
 .modalAvatar.fade.show .modalAvatarContent {
-	transform: translateX(0); /* Ramener à la position d'origine */
-	opacity: 1 ; /* Rendre visible */
+	transform: translateX(0);
+	opacity: 1 ;
 }
 
 .modalAvatarHeader {
@@ -124,11 +121,9 @@ button.buttonLogOut:active {
 }
 
 
-
-
 /*MODAL INFOS*/
 .modalInfoContent {
-	background-color: rgba(255, 234, 234, 0.5);
+	background-color: #9b9797;
 	transition: transform 0.5s ease, opacity 0.5s ease; /* S'assurer que la transition est appliquée */
 	transform: translateX(-100vw); /* Part de la gauche en dehors de l'écran */
 	opacity: 0 ; /* Initialement invisible */
@@ -175,9 +170,15 @@ button.buttonLogOut:active {
     cursor: pointer;
 }
 
+.modifyIcon:focus {
+	outline: none;
+	box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.4);
+	transform: scale(1.05);
+}
+
 /*MODAL SETTINGS*/
 .modalSettingsContent {
-	background-color: rgba(255, 234, 234, 0.5);
+	background-color: #9b9797;
 	transition: transform 0.5s ease, opacity 0.5s ease; /* S'assurer que la transition est appliquée */
 	transform: translateX(-100vw); /* Part de la gauche en dehors de l'écran */
 	opacity: 0 ; /* Initialement invisible */

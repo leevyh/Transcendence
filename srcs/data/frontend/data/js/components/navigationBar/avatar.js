@@ -11,53 +11,39 @@ export async function createAvatarDiv(container, userData) {
     avatarImage.className = 'avatarImage w-100 h-auto pb-2';
     avatarImage.src = `data:image/png;base64, ${userData.avatar}`;
     avatarImage.alt = 'Avatar';
+    avatarImage.setAttribute('aria-label', 'User avatar');
+    avatarImage.setAttribute('role', 'img');
+    avatarImage.setAttribute('tabindex', '0');
     avatarDiv.appendChild(avatarImage);
 
     // Create a modal to modify the avatar
     const modalAvatar = await createAvatarModal();
     container.appendChild(modalAvatar);
 
-    // Create a SVG element to modify the avatar
-    const SVGModifyAvatar = document.createElement('svg');
-    SVGModifyAvatar.className = 'SVGModifyAvatar bi bi-pencil-fill position-absolute';
-    SVGModifyAvatar.setAttribute('xmlns', "http://www.w3.org/2000/svg");
-    SVGModifyAvatar.setAttribute('width', '32');
-    SVGModifyAvatar.setAttribute('height', '32');
-    SVGModifyAvatar.setAttribute('fill', 'white');
-    SVGModifyAvatar.setAttribute('viewBox', '0 0 16 16');
-    SVGModifyAvatar.setAttribute('role', 'button'); // To make the SVG clickable
-    SVGModifyAvatar.setAttribute('tabindex', '0'); // To make the image focusable
-    SVGModifyAvatar.style.opacity = '0';
-    SVGModifyAvatar.innerHTML = `
-        <path d="M12.146.854a.5.5 0 0 1 .708 0l2.292 2.292a.5.5 0 0 1 0 .708l-9.146 9.146L5 13.5l.5-.5 9.146-9.146zM4 13.5V15h1.5l.146-.146L4 13.5zm-3.5.5a.5.5 0 0 1 0-1H1V12.5H.5a.5.5 0 0 1 0-1H1V11H.5a.5.5 0 0 1 0-1H1V9.5H.5a.5.5 0 0 1 0-1H1V8.5H.5a.5.5 0 0 1 0-1H1V7.5H.5a.5.5 0 0 1 0-1H1V6.5H.5a.5.5 0 0 1 0-1H1V5.5H.5a.5.5 0 0 1 0-1H1V4.5H.5a.5.5 0 0 1 0-1H1V3.5H.5a.5.5 0 0 1 0-1H1V2.5H.5a.5.5 0 0 1 0-1H1V1.5H.5a.5.5 0 0 1 0-1H1V.5H.5a.5.5 0 0 1 0-1H1V0h-.5a.5.5 0 0 1 0 1H1V.5H.5z"/>
-    `;
-    avatarDiv.appendChild(SVGModifyAvatar);
+    // Add a button to modify user information
+    const modifyAvatarIcon = document.createElement('div');
+    modifyAvatarIcon.className = 'SVGModifyAvatar position-absolute';
+    modifyAvatarIcon.innerHTML = '<i class="bi bi-pencil-fill"></i>';
+    modifyAvatarIcon.setAttribute('aria-label', 'Click to modify user avatar');
+    modifyAvatarIcon.setAttribute('role', 'button');
+    modifyAvatarIcon.style.opacity = '0'; // Hidden by default
+    avatarDiv.appendChild(modifyAvatarIcon);
 
 // KEYBOARD ACCESSIBILITY
     // Add event listener for keyboard accessibility: when the image is focused, show that it's focused
     avatarImage.addEventListener('focus', () => {
+        avatarImage.style.boxShadow = '0 0 0 4px rgba(0, 123, 255, 0.4)';
+        avatarImage.style.transform = 'scale(1.05)';
         avatarImage.style.filter = 'blur(5px)';
-        SVGModifyAvatar.style.opacity = '1';
+        modifyAvatarIcon.style.opacity = '1';
     });
 
-    // Add event listener for keyboard accessibility: when the image is not focused, remove the blur effect
-    avatarImage.addEventListener('mouseout', (event) => {
-        if (!SVGModifyAvatar.contains(event.relatedTarget)) {
-            avatarImage.style.filter = 'none';
-            SVGModifyAvatar.style.opacity = '0';
-        }
-    });
-
-    SVGModifyAvatar.addEventListener('mouseover', () => {
-        avatarImage.style.filter = 'blur(5px)';
-        SVGModifyAvatar.style.opacity = '1';
-    });
-
-    SVGModifyAvatar.addEventListener('mouseout', (event) => {
-        if (!avatarImage.contains(event.relatedTarget)) {
-            avatarImage.style.filter = 'none';
-            SVGModifyAvatar.style.opacity = '0';
-        }
+    // Delete the styles when the image is not focused
+    avatarImage.addEventListener('blur', () => {
+        avatarImage.style.boxShadow = 'none';
+        avatarImage.style.transform = 'none';
+        avatarImage.style.filter = 'none';
+        modifyAvatarIcon.style.opacity = '0';
     });
 
     // Event listener for keyboard accessibility: when the image is focused and the Enter key is pressed, open the modal
@@ -68,20 +54,26 @@ export async function createAvatarDiv(container, userData) {
     });
 
 // MOUSE ACCESSIBILITY
-    // Event listener for mouse accessibility: when the mouse is over the image, add a blur effect
+    // Add event listener for mouse accessibility: when the image is hovered, show the modify icon
     avatarImage.addEventListener('mouseover', () => {
         avatarImage.style.filter = 'blur(5px)';
-        SVGModifyAvatar.style.opacity = '1';
+        modifyAvatarIcon.style.opacity = '1';
     });
-
-    // Event listener for mouse accessibility: when the mouse is not over the image, remove the blur effect
+    
+    // Delete the styles when the mouse is not on the image
     avatarImage.addEventListener('mouseout', () => {
         avatarImage.style.filter = 'none';
-        SVGModifyAvatar.style.opacity = '0';
+        modifyAvatarIcon.style.opacity = '0';
+    });
+
+    // Event listener for mouse accessibility: when the pencil icon is hovered, continue showing the modify icon
+    modifyAvatarIcon.addEventListener('mouseover', () => {
+        avatarImage.style.filter = 'blur(5px)';
+        modifyAvatarIcon.style.opacity = '1';
     });
 
     // Event listener for mouse accessibility: when the image is clicked, open the modal
-    SVGModifyAvatar.addEventListener('click', () => {
+    modifyAvatarIcon.addEventListener('click', () => {
         openModal(document.getElementById('modalAvatar'));
     });
 
@@ -93,7 +85,6 @@ async function createAvatarModal() {
     const modalAvatar = document.createElement('div');
     modalAvatar.className = 'modal fade modalAvatar';
     modalAvatar.id = 'modalAvatar';
-    modalAvatar.setAttribute('tabindex', '-1');
     modalAvatar.setAttribute('aria-labelledby', 'modalAvatarLabel');
     modalAvatar.setAttribute('aria-hidden', 'true');
 
@@ -112,6 +103,7 @@ async function createAvatarModal() {
     const modalAvatarTitle = document.createElement('h2');
     modalAvatarTitle.textContent = 'Avatar';
     modalAvatarTitle.className = 'modal-title modalAvatarTitle';
+    modalAvatarTitle.id = 'modalAvatarLabel';
     modalAvatarHeader.appendChild(modalAvatarTitle);
 
     const modalAvatarCloseButton = document.createElement('span');
@@ -152,6 +144,7 @@ async function createAvatarModal() {
     newAvatar.type = 'file';
     newAvatar.id = 'avatar';
     newAvatar.name = 'newAvatar';
+    newAvatar.setAttribute('aria-label', 'Select a new avatar');
     newAvatar.className = 'form-control mb-4';
     avatarForm.appendChild(newAvatar);
 
