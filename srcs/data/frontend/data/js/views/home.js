@@ -184,6 +184,7 @@ export function homeView(container) {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'An error has occurred. Please try again.';
+                console.log(error); // TODO: REMOVE LOG
                 formLogin.insertBefore(errorMessage, submitLoginButton);
             });
     });

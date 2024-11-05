@@ -44,7 +44,7 @@ class WebSocketManager {
             this.socket.onclose = () => {
                 if (DEBUG) {console.log('WSManager WebSocket connection closed');}
                 this.isConnected = false;
-                setTimeout(() => this.connect(), 5000);
+                setTimeout(() => this.connect(), 1000);
             };
             this.socket.onerror = error => {
                 if (DEBUG) {console.error('WSManager WebSocket error:', error);}

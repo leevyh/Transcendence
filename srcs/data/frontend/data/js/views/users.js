@@ -1,8 +1,11 @@
 import wsManager  from './wsManager.js';
 import { getCookie } from './utils.js';
 import { DEBUG, navigateTo, getCurrentUser } from '../app.js';
-import { navigationBar } from './navigation.js';
+import {friends_websocket, navigationBar} from './navigation.js';
 import { notifications } from './notifications.js';
+
+// export let statusSocket = new WebSocket('wss://' + window.location.host + '/ws/status/');
+export let statusSocket = null;
 
 function sendFriendRequest(nickname) {
     sendFriendRequestToServer(nickname).then(r => {
@@ -125,10 +128,16 @@ export async function friendsView(container) {
 
     // const url = window.location.href.split('/').pop();
 
-    const statusSocket = new WebSocket(`wss://${window.location.host}/ws/status/`);
-    statusSocket.onopen = function (event) {
-        if (DEBUG) {console.log('Status WebSocket opened (in Users)');}
+     if (statusSocket === null) {
+        statusSocket = new WebSocket('wss://' + window.location.host + '/ws/status/');
+        statusSocket.onopen = function (event) {
+            if (DEBUG) {
+                console.log('Status WebSocket opened (in Users)');
+            }
+        }
     }
+
+
 
     statusSocket.onmessage = function (event) {
         if (DEBUG) {console.log('Message received:', event.data);}
