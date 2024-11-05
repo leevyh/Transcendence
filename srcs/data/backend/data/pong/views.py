@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,7 +9,7 @@ import asyncio
 # Vues pour rendre les pages HTML
 def pong_view(request):
     # Retourner une page de jeu Pong
-    return render(request, 'index.html')
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def tournament_view(request):
     # Retourner une page de tournoi
@@ -33,9 +34,9 @@ class StopGameView(APIView):
         # Logique pour arrêter le jeu
         return Response({"message": "Game stopped"}, status=status.HTTP_200_OK)
 
-class TestView(APIView):
-    def get(self, request):
-        return Response({"message": "Test endpoint working!"}, status=status.HTTP_200_OK)
+# class TestView(APIView):
+#     def get(self, request):
+#         return Response({"message": "Test endpoint working!"}, status=status.HTTP_200_OK)
         
-     def post(self, request):
-        return Response({"message": "Post request received!"}, status=status.HTTP_200_OK)
+#     def post(self, request):
+#         return Response({"message": "Post request received!"}, status=status.HTTP_200_OK)

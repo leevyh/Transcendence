@@ -21,5 +21,6 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('api_chat/', include('chat.urls')),
     path('pong/', include('pong.urls')),
+    path('api_pong/', include('pong.urls')),
     path('', include('django_prometheus.urls')),
 ]
