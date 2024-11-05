@@ -32,11 +32,19 @@ class PongConsumer(AsyncWebsocketConsumer):
     # cree une partie si le joueur est le premier a se connecter ou rejoint une partie si un autre joueur est deja connecte. return cette partie
     async def findMatch(self, player):
         for game in invitational_games:
+            if game.player_1 == player:
+                print("consumer create invitation game with user : ", player)
+                game.channel_player_1 = self.channel_name
+                self.game = game
+                self.game.nbPlayers += 1
+                self.game.status = "waiting"
             if game.player_2 == player:
                 print("consumer join invitation game with user : ", player)
                 game.channel_player_2 = self.channel_name
                 self.game = game
-                self.game.nbPlayers = 2
+                self.game.nbPlayers += 1
+                self.game.status = "waiting"
+            if game.nbPlayers == 2:
                 game_database = await create_game(game.player_1, game.player_2)
                 game.id = game_database.id
                 game_database.is_active = True
@@ -128,6 +136,15 @@ class PongConsumer(AsyncWebsocketConsumer):
             waiting_players.remove(player)
         
         if hasattr(self, 'game') and self.game is not None:
+            if self.game.status == "waiting":
+                if self.game.player_1 == player:
+                    self.game.player_1 = None
+                    self.game.nbPlayers -= 1
+                    self.game.channel_player_1 = None
+                elif self.game.player_2 == player:
+                    self.game.player_2 = None
+                    self.game.nbPlayers -= 1
+                    self.game.channel_player_2 = None
             if self.game.status == "ready":
                 if self.game.winner is None:
                     if self.game.player_1 == player:
@@ -144,6 +161,8 @@ class PongConsumer(AsyncWebsocketConsumer):
             
             if self.game in list_of_games :
                 list_of_games.remove(self.game)
+            if self.game in invitational_games :
+                invitational_games.remove(self.game)
             self.game = None
             
         await self.close()
