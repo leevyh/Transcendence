@@ -59,14 +59,12 @@ body.large-font {
     background-color: #435574;
     border: none;
     box-shadow: #6f87b1 0px 4px 12px;
-
 }
 
 .ButtonsHome:hover {
     background-color: #6f87b1;
     box-shadow: #435574 0px 4px 12px;
 }
-
 
 /* =======================MODAL-LOGIN===========================*/
 .ModalLoginBase {
@@ -113,9 +111,7 @@ body.large-font {
 
 .ModalLoginBase-show
 .ModalLogin
-.ModalRegister
-.modalGameSettingsBase-show
-.modalGameSettingsBase {
+.ModalRegister {
     transform: translateY(0);
     opacity: 1;
 }

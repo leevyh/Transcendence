@@ -6,9 +6,10 @@ export async function createModalSettings(userData) {
     const modalSettings = document.createElement('div');
     modalSettings.className = 'modal fade modalSettings';
     modalSettings.id = 'modalSettings';
-    modalSettings.setAttribute('tabindex', '-1');
     modalSettings.setAttribute('aria-labelledby', 'modalSettingsLabel');
     modalSettings.setAttribute('aria-hidden', 'true');
+    modalSettings.setAttribute('tabindex', '-1');
+    modalSettings.setAttribute('role', 'dialog');
 
     const modalSettingsDialog = document.createElement('div');
     modalSettingsDialog.className = 'modal-dialog modalSettingsDialog';
@@ -25,6 +26,7 @@ export async function createModalSettings(userData) {
     const modalSettingsTitle = document.createElement('h2');
     modalSettingsTitle.textContent = 'Modify Settings ';
     modalSettingsTitle.className = 'modal-title modalSettingsTitle';
+    modalSettingsTitle.id = 'modalSettingsLabel';
     modalSettingsHeader.appendChild(modalSettingsTitle);
 
     // Close button

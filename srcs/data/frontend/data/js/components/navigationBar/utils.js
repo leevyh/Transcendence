@@ -18,29 +18,19 @@ export function actualPage() {
 
 // Function to create a navigation button from a text and an onClick function
 export function createNavButton(text, onClick) {
-    const listItem = document.createElement('li');
+    const listItem = document.createElement('div');
     listItem.className = 'ElemListNavBar text-center py-2';
 
     const button = document.createElement('button');
-    button.className = 'btn text-primary';
+    button.className = 'ElemListBtn btn';
     button.textContent = text;
-
-    // Remove the outline when the button loses focus
-    button.addEventListener('blur', () => {
-        button.style.outline = 'none';
-    });
 
     listItem.appendChild(button);
 
     button.addEventListener('click', () => {
-        if (DEBUG) {
-            console.log(`Navigating to ${text}`, 'actual:', window.location.pathname);
-        }
-
         // Check if the text is "pong" and redirect to "/menuPong"
         const targetPath = text.toLowerCase() === 'pong' ? '/menuPong' : `/${text.toLowerCase()}`;
-
-        console.log("targetPath:", targetPath);
+        if (DEBUG) console.log(`Navigating to ${text}`, 'actual:', window.location.pathname);
         if (window.location.pathname === targetPath) {
             return;
         }

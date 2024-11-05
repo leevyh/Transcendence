@@ -90,7 +90,7 @@ export function loginView(container) {
       formGroup.className = 'mb-3';
 
       const label = document.createElement('label');
-      label.className = 'form-label titleLabelRegister';
+      label.className = 'form-label';
       label.htmlFor = field.id;
       label.textContent = field.label;
 

@@ -69,6 +69,15 @@
     backdrop-filter: blur(10px);
 }
 
+.modalGameSettingsBase-show {
+	opacity: 1;
+}
+
+.modalGameSettingsBase-show .modalGameSettingsBase{
+	transform: translateY(0);
+	opacity: 1;
+}
+
 .closeButtonMenuPong {
     color: #aaa;
     position: absolute;
@@ -92,4 +101,10 @@
 
 .ContenerThemes {
     height: 150px;
+}
+
+.gameButton:focus {
+	outline: none;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.4);
+    transform: scale(1.05);
 }
