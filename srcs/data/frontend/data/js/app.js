@@ -3,6 +3,7 @@ export const DEBUG = true;
 import { chatWS } from './components/chat/functions.js';
 import { getCookie, getAccessibility, applyAccessibilitySettings, isAuthenticated } from './views/utils.js';
 import { statusSocket } from './views/users.js';
+import { statusChatSocket } from './views/chat.js';
 import wsManager from "./views/wsManager.js";
 import { friends_websocket } from "./views/navigation.js";
 import { homeView } from './views/home.js';
@@ -127,14 +128,16 @@ async function router() {
 // Function to navigate to a specific route
 export function navigateTo(path) {
     history.pushState(null, null, path);
-    if (statusSocket !== null && statusSocket.readyState === WebSocket.OPEN && path !== '/users') {
+    if (statusSocket !== null && statusSocket.readyState === WebSocket.OPEN) {
         statusSocket.close();
+    }
+    if (statusChatSocket !== null && statusChatSocket.readyState === WebSocket.OPEN) {
+        statusChatSocket.close();
     }
     if (friends_websocket !== null && friends_websocket.readyState === WebSocket.OPEN && path === '/') {
         friends_websocket.close();
     }
     if (wsManager.socket !== null && wsManager.socket.readyState === WebSocket.OPEN && path === '/') {
-        console.log("Alors peut etre ????");
         wsManager.socket.close();
     }
 

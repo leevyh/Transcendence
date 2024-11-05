@@ -1,4 +1,4 @@
-import { isAuthenticated} from "./utils.js";
+import { isAuthenticated } from "./utils.js";
 import { DEBUG } from "../app.js";
 
 class WebSocketManager {

@@ -1,12 +1,9 @@
 import { DEBUG, navigateTo } from '../app.js';
-import {getCookie} from './utils.js';
+import { getCookie } from './utils.js';
 import { createNavigationBar } from '../components/navigationBar/visual.js';
-import {displayFriends, updateFriendStatus, addNewFriend} from '../components/navigationBar/friends.js';
-// import {friendsView} from "./users.js";
+import { displayFriends, updateFriendStatus, addNewFriend } from '../components/navigationBar/friends.js';
 
-//OPEN WEBSOCKET CONNECTION ONLY IF USER IS AUTHENTICATED
 
-// export let friends_websocket = new WebSocket('wss://' + window.location.host + '/ws/friends/');
 export let friends_websocket = null;
 
 export async function navigationBar(container) {
@@ -40,15 +37,15 @@ export async function navigationBar(container) {
 
                 console.log("friends_websocket", friends_websocket);
                 if (friends_websocket === null) {
-                    friends_websocket = new WebSocket('wss://' + window.location.host + '/ws/friends/');
+                    friends_websocket = new WebSocket(`wss://${window.location.host}/ws/friends/`);
                     friends_websocket.onopen = function (event) {
                         if (DEBUG) {console.log('Status WebSocket opened (in Navigation)');}
                         friends_websocket.send(JSON.stringify({type: 'get_friends'}));
 
                     }
                 }
-                else if ( friends_websocket.readyState === WebSocket.CLOSED) {
-                    friends_websocket = new WebSocket('wss://' + window.location.host + '/ws/friends/');
+                else if (friends_websocket.readyState === WebSocket.CLOSED) {
+                    friends_websocket = new WebSocket(`wss://${window.location.host}/ws/friends/`);
                     friends_websocket.onopen = function (event) {
                         if (DEBUG) {console.log('Status WebSocket opened (in Navigation)');}
                         friends_websocket.send(JSON.stringify({type: 'get_friends'}));

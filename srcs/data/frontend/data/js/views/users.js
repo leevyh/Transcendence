@@ -1,10 +1,9 @@
 import wsManager  from './wsManager.js';
 import { getCookie } from './utils.js';
 import { DEBUG, navigateTo, getCurrentUser } from '../app.js';
-import {friends_websocket, navigationBar} from './navigation.js';
+import { navigationBar } from './navigation.js';
 import { notifications } from './notifications.js';
 
-// export let statusSocket = new WebSocket('wss://' + window.location.host + '/ws/status/');
 export let statusSocket = null;
 
 function sendFriendRequest(nickname) {
@@ -31,13 +30,13 @@ function createUserRow(user_list_row, data) {
     // Utiliser user_id pour l'ID de la carte utilisateur
     let user_card_id = `user_card_${data.user_id}`;
     let user_card_element = document.getElementById(user_card_id);
-    
+
     if (!user_card_element) {
         console.log('data', data);
         const user_col = document.createElement('div');
         user_col.className = 'col-xl-4 col-md-6';
         user_list_row.appendChild(user_col);
-        
+
         const user_card = document.createElement('div');
         user_card.className = `user_card card special_card_${Math.floor(Math.random() * 12)}`;
         user_card.id = user_card_id;  // Utiliser user_id pour l'ID
@@ -129,15 +128,19 @@ export async function friendsView(container) {
     // const url = window.location.href.split('/').pop();
 
      if (statusSocket === null) {
-        statusSocket = new WebSocket('wss://' + window.location.host + '/ws/status/');
+        statusSocket = new WebSocket(`wss://${window.location.host}/ws/status/`);
         statusSocket.onopen = function (event) {
             if (DEBUG) {
                 console.log('Status WebSocket opened (in Users)');
             }
         }
     }
-
-
+     else if (statusSocket.readyState === WebSocket.CLOSED) {
+        statusSocket = new WebSocket(`wss://${window.location.host}/ws/status/`);
+        statusSocket.onopen = function (event) {
+            if (DEBUG) {console.log('Status WebSocket opened (in Users)');}
+        }
+    }
 
     statusSocket.onmessage = function (event) {
         if (DEBUG) {console.log('Message received:', event.data);}
