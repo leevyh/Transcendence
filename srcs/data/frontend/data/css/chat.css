@@ -172,6 +172,11 @@
     color: black;
 }
 
+.accept-msg {
+    background-color: #82dd82;
+    color: black;
+}
+
 .msg-time {
     bottom: -15px;
     color: rgba(255, 255, 255, 0.5);
