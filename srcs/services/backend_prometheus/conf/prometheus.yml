@@ -63,3 +63,10 @@ scrape_configs:
     - targets: ['export-proxy:9113']
     tls_config:
         insecure_skip_verify: true
+
+  - job_name: 'postgresql'
+    scrape_interval: 10s
+    static_configs:
+    - targets: ['export-postgresql:9187']
+    tls_config:
+        insecure_skip_verify: true
