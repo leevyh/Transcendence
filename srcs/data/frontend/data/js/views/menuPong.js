@@ -150,6 +150,7 @@ export async function menuPongView(container) {
 
     function openModal() {
         if (modalGameSettings.style.display === 'block') {
+            console.log("ALO BRO");
             modalGameSettings.removeAttribute('aria-hidden'); // Supprimer aria-hidden quand la modale est visible
             modalGameSettings.focus(); // Donner le focus à la modale pour une meilleure accessibilité
         }
@@ -565,8 +566,7 @@ export async function menuPongView(container) {
             if (tempBackgroundColor == 'lila' && (tempPadsColor === 'white' || tempBallColor === 'white') ||
                 tempBackgroundColor == 'lila' && (tempPadsColor === 'pink' || tempBallColor === 'pink') ||
                 tempBackgroundColor == 'lila' && (tempPadsColor === 'gray' || tempBallColor === 'gray') ||
-                tempBackgroundColor == 'lila' && (tempPadsColor === 'blue_light' || tempBallColor === 'blue_light') ||
-                tempBackgroundColor == 'lila' && (tempPadsColor === 'green_light' || tempBallColor === 'green_light'))
+                tempBackgroundColor == 'lila' && (tempPadsColor === 'blue_light' || tempBallColor === 'blue_light'))
                 return false;
             if (tempBackgroundColor == 'red' && (tempPadsColor === 'brown' || tempBallColor === 'brown'))
                 return false;
