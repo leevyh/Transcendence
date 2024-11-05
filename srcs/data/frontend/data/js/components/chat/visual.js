@@ -149,8 +149,8 @@ export function createUserCard(user, userList) {
         const blockButton = document.createElement('button');
         blockButton.className = "bi bi-slash-circle border-0 block-button";
         blockButton.style.color = 'red';
-        blockButton.setAttribute('aria-label', `Block/Unblock ${user.nickname}`);
         blockButton.style.display = 'none'; // Hide the button when the chat is not open
+        blockButton.setAttribute('aria-label', `Block/Unblock ${user.nickname}`);
         blockButton.addEventListener('click', () => {
             blockUnblockUser(user.nickname);
         });
