@@ -57,7 +57,7 @@ export async function createModalSettings(userData) {
     });
 
     const modalSettingsBody = document.createElement('div');
-    modalSettingsBody.className = 'modal-body modalSettingsBody';
+    modalSettingsBody.className = 'modal-body modalSettingsBody text-body';
     modalSettingsContent.appendChild(modalSettingsBody);
 
     // Creation of the settings form

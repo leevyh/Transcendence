@@ -127,6 +127,7 @@ async function openConversation(conversationID, otherUser) {
                     blockUserButton.style.display = 'none';
                 } else if (conversation.other.blocked === true) { // If the other user is blocked
                     blockUserButton.style.color = 'green';
+                    blockUserButton.setAttribute('aria-label', `Unblock ${conversation.other.nickname}`); // Change the tooltip
                     blockUserButton.style.display = 'block';
                 }
             }
@@ -146,6 +147,7 @@ async function openConversation(conversationID, otherUser) {
             } else if (receivedMessage.blocked !== receivedMessage.user) { // If the blocked user is the other user
                 const blockUserButton = document.getElementById(receivedMessage.blocked).querySelector('.block-button')
                 blockUserButton.style.color = 'green';
+                blockUserButton.setAttribute('aria-label', 'Unblock user'); // Change the tooltip
                 blockUserButton.style.display = 'block';
             }
         } else if (receivedMessage.type === 'user_unblocked') {
@@ -154,7 +156,7 @@ async function openConversation(conversationID, otherUser) {
             } else if (receivedMessage.blocked !== receivedMessage.user) {
                 enableChat(receivedMessage.blocked);
             }
-        } else if (receivedMessage.type === 'game_invite') {
+        } else if (receivedMessage.type === 'game_invite') { // TODO: Implement the game invite
             if (DEBUG) {console.log('Game invite received from:', receivedMessage.user);}
             // Get the gameID and the id of the user who sent the invite
             const gameID = receivedMessage.gameID;
@@ -195,7 +197,6 @@ async function openConversation(conversationID, otherUser) {
                 }
             });
         }
-
     }
 
     chatWS.onclose = function() {
@@ -294,6 +295,7 @@ function enableChat(otherUser) {
         chatSendButton.disabled = false;
         inviteGameButton.disabled = false;
         blockUserButton.style.color = 'red';
+        blockUserButton.setAttribute('aria-label', `Block ${otherUser}`); // Change the tooltip
         blockUserButton.style.display = 'block';
     }
 }
