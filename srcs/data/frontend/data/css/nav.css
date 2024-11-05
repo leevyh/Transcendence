@@ -299,37 +299,7 @@ button.buttonLogOut:active {
 	overflow-y: auto; /* Active le scroll si la liste dépasse la hauteur */
 	scrollbar-width: thin; /* Pour les navigateurs supportant cette propriété */
 	scrollbar-color: #F4ED37 #435574; /* Couleur personnalisée de la scrollbar */
-}
-
-@media screen and (max-height: 805px) {
-	.divListFriends {
-		max-height: 40%; /* Réduit la hauteur max */
-	}
-}
-
-@media screen and (max-height: 740px) {
-	.divListFriends {
-		max-height: 35%; /* Réduit encore un peu plus */
-	}
-}
-
-@media screen and (max-height: 685px) {
-	.divListFriends {
-		max-height: 25%; /* Continue de rétrécir */
-	}
-}
-
-@media screen and (max-height: 600px) {
-	.divListFriends {
-		max-height: 20%; /* Réduit encore plus */
-	}
-}
-
-/* Si la hauteur de la fenêtre est inférieure ou égale à 550px, la div disparaît */
-@media screen and (max-height: 565px) {
-	.divListFriends {
-		display: none !important; /* Cache complètement la liste d'amis */
-	}
+	height: 290px;
 }
 
 .friendItem .card-body h5 {
@@ -363,4 +333,10 @@ button.buttonLogOut:active {
 	.hide-on-short {
 	  display: none !important; /* !important pour être sûr de l'application */
 	}
-  }
+}
+
+@media (max-height: 850px) {
+	.hide {
+	  display: none !important; /* !important pour être sûr de l'application */
+	}
+}
