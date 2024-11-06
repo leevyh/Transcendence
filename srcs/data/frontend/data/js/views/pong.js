@@ -100,6 +100,7 @@ export async function pongView(container, tournamentSocket) {
     setInGame(true);
 
     PongWebSocketManager.socket.onmessage = (event) => {
+        // console.log("start websock redir");
         const data = JSON.parse(event.data);
         if (data.action_type === 'define_player') {
             var currentPlayer = data.current_player;
@@ -136,7 +137,10 @@ export async function pongView(container, tournamentSocket) {
             if (data.action_type === 'game_state')
                 updateState(data);
         }
+        // console.log("=>gameon", GameOn);
+        // console.log("before end_of_game", data.action_type);
         if (data.action_type === 'end_of_game') {
+            // console.log("inside end partie",  data.action_type)
             endOfGame(data);
             displayeWinner(data.winner);
             update_Stats(data);
@@ -148,11 +152,15 @@ export async function pongView(container, tournamentSocket) {
                 }, 3000);
             }
         }
+        // console.log ("=> coucou ", data.action_type);
         if (data.action_type === 'final_results') {
             endOfGame(data);
             endOfTournamentView(container, data.ranking);
         }
+        // console.log ("=> endtournament ", data.action_type);
         if (data.action_type === 'end_of_tournament') {
+            // console.log("inside end tournament");
+            inTournament = false;
             navigateTo('/menuPong');
         }
     };
