@@ -777,6 +777,8 @@ def create_user42(response, code):
             settings.save()
             stats = Stats_user(user=user)
             stats.save()
+            game_settings = Game_Settings(user=user)
+            game_settings.save()
         else:
             user = User_site.objects.get(username=username)
             user.set_password(code)

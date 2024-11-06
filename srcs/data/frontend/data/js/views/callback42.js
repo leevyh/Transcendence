@@ -21,7 +21,7 @@ export function callback42(container) {
                 if (DEBUG) {console.log(data);}
                 localStorage.setItem('token', data.token);
                 window.dispatchEvent(new Event('userAuthenticated'));
-                navigateTo(`/user/${data.nickname}`);
+                navigateTo('/profile');
             }
             else {
                 if (DEBUG) {console.log('No data');}
