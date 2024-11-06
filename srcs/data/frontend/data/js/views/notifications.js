@@ -235,6 +235,8 @@ function displayNotifications(notification, offcanvas_body) {
 
 export function removeNotification(notificationId) {
     notificationsArray = notificationsArray.filter(notification => notification.id !== notificationId);
+    const notification = document.getElementById(`notification_${notificationId}`);
+    notification.remove();
     deleteNotification(notificationId).then( () => {
         return;
     })
