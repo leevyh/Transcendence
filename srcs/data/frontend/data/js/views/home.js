@@ -26,8 +26,11 @@ export function homeView(container) {
     ButtonLoginHome.className = 'btn btn-primary btn-lg m-3 px-5 py-3 ButtonsHome';
     ButtonLoginHome.textContent = 'Login';
     cardHomeBody.appendChild(ButtonLoginHome);
-    ButtonLoginHome.addEventListener('click', () => {
+
+    ButtonLoginHome.addEventListener('click', (event) => {
+        event.stopPropagation(); // Empêche la propagation du clic d'ouverture
         modalLogin.style.display = 'block'; // Display the modal
+        modalLogin.setAttribute('aria-hidden', 'false'); // Rendre visible pour les technologies d'assistance
         setTimeout(() => {
             modalLogin.classList.add('ModalLoginBase-show');
             modalLogin.setAttribute('tabindex', '-1'); // Make the modal focusable
@@ -39,8 +42,11 @@ export function homeView(container) {
     ButtonRegisterHome.className = 'btn btn-primary btn-lg m-3 px-5 py-3 ButtonsHome';
     ButtonRegisterHome.textContent = 'Register';
     cardHomeBody.appendChild(ButtonRegisterHome);
-    ButtonRegisterHome.addEventListener('click', () => {
+
+    ButtonRegisterHome.addEventListener('click', (event) => {
+        event.stopPropagation(); // Empêche la propagation du clic d'ouverture
         modalRegister.style.display = 'block'; // Display the modal
+        modalRegister.setAttribute('aria-hidden', 'false'); // Rendre visible pour les technologies d'assistance
         setTimeout(() => {
             modalRegister.classList.add('modalRegisterBase-show');
             modalRegister.setAttribute('tabindex', '-1'); // Make the modal focusable
@@ -84,9 +90,20 @@ export function homeView(container) {
     closeButtonLogin.textContent = '×';
     modalLoginHeader.appendChild(closeButtonLogin);
 
+    let isMouseDownOutsideLogin = false;
+
+    // Sur mousedown, on vérifie si le clic commence en dehors de la modal
+    document.addEventListener('mousedown', (event) => {
+        if (modalLogin.style.display === 'block' && !modalLoginContent.contains(event.target)) {
+            isMouseDownOutsideLogin = true; // Marque qu'on a cliqué en dehors de la modal
+        } else {
+            isMouseDownOutsideLogin = false; // Si le clic commence dans la modal, on ignore
+        }
+    });
+
     // Add event listener for keyboard accessibility
     closeButtonLogin.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter' || event.key === ' ') {
+        if (event.key === 'Enter' || event.key === ' ' || event.key === 'Escape') {
             event.preventDefault(); // Disable the default action
             closeButtonLogin.click(); // Simulate a click on the button
         }
@@ -95,9 +112,32 @@ export function homeView(container) {
     // Add event listener for mouse accessibility
     closeButtonLogin.addEventListener('click', () => {
         modalLogin.classList.remove('ModalLoginBase-show');
+        modalLogin.setAttribute('aria-hidden', 'true'); // Masquer aux technologies d'assistance
         setTimeout(() => {
             modalLogin.style.display = 'none';
         }, 500);
+    });
+
+    document.addEventListener('click', (event) => {
+        // Si modalLogin est ouverte et le clic est en dehors, fermer
+        if (isMouseDownOutsideLogin && modalLogin.style.display === 'block' && !modalLoginContent.contains(event.target))
+        {
+            modalLogin.classList.remove('ModalLoginBase-show');
+            modalLogin.setAttribute('aria-hidden', 'true'); // Masquer aux technologies d'assistance
+            setTimeout(() => {
+                modalLogin.style.display = 'none';
+            }, 500);
+        }
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modalLogin.style.display === 'block') {
+            modalLogin.classList.remove('ModalLoginBase-show');
+            modalLogin.setAttribute('aria-hidden', 'true'); // Masquer aux technologies d'assistance
+            setTimeout(() => {
+                modalLogin.style.display = 'none';
+            }, 500);
+        }
     });
 
     const modalLoginBody = document.createElement('div');
@@ -169,15 +209,19 @@ export function homeView(container) {
                     localStorage.setItem('token', data.token);
                     window.dispatchEvent(new Event('userAuthenticated'));
                     modalLogin.classList.remove('ModalLoginBase-show');
+                    modalLogin.setAttribute('aria-hidden', 'true');
                     setTimeout(() => {
                         modalLogin.style.display = 'none';
                     }, 500);
+                    formLogin.reset();
                     navigateTo('/profile');
                 } else if (data.error) {
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'text-danger';
                     errorMessage.textContent = 'Bad password or Username.';
                     formLogin.insertBefore(errorMessage, submitLoginButton);
+                    setTimeout(() => errorMessage.remove(), 3000);
+                    formLogin.reset();
                 }
             })
             .catch(error => {
@@ -185,6 +229,8 @@ export function homeView(container) {
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'An error has occurred. Please try again.';
                 formLogin.insertBefore(errorMessage, submitLoginButton);
+                setTimeout(() => errorMessage.remove(), 3000);
+                formLogin.reset();
             });
     });
 
@@ -213,6 +259,8 @@ export function homeView(container) {
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'An error has occurred. Please try again.';
                 formLogin.appendChild(errorMessage);
+                setTimeout(() => errorMessage.remove(), 3000);
+                formLogin.reset();
             });
     });
 
@@ -255,6 +303,17 @@ export function homeView(container) {
     closeRegisterButton.textContent = '×';
     modalRegisterHeader.appendChild(closeRegisterButton);
 
+    let isMouseDownOutsideRegister = false;
+
+    // Sur mousedown, on vérifie si le clic commence en dehors de la modal
+    document.addEventListener('mousedown', (event) => {
+        if (modalRegister.style.display === 'block' && !modalRegisterContent.contains(event.target)) {
+            isMouseDownOutsideRegister = true; // Marque qu'on a cliqué en dehors de la modal
+        } else {
+            isMouseDownOutsideRegister = false; // Si le clic commence dans la modal, on ignore
+        }
+    });
+
     // Add event listener for keyboard accessibility
     closeRegisterButton.addEventListener('keydown', function(event) {
         if (event.key === 'Enter' || event.key === ' ') {
@@ -266,9 +325,32 @@ export function homeView(container) {
     // Add event listener for mouse accessibility
     closeRegisterButton.addEventListener('click', () => {
         modalRegister.classList.remove('modalRegisterBase-show');
+        modalRegister.setAttribute('aria-hidden', 'true'); // Masquer aux technologies d'assistance
         setTimeout(() => {
             modalRegister.style.display = 'none';
         }, 50);
+    });
+
+    document.addEventListener('click', (event) => {
+        // Si modalRegister est ouverte et le clic est en dehors, fermer
+        if (isMouseDownOutsideRegister && modalRegister.style.display === 'block' && !modalRegisterContent.contains(event.target))
+        {
+            modalRegister.classList.remove('modalRegisterBase-show');
+            modalRegister.setAttribute('aria-hidden', 'true'); // Masquer aux technologies d'assistance
+            setTimeout(() => {
+                modalRegister.style.display = 'none';
+            }, 500);
+        }
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modalRegister.style.display === 'block') {
+            modalRegister.classList.remove('modalRegisterBase-show');
+            modalRegister.setAttribute('aria-hidden', 'true'); // Masquer aux technologies d'assistance
+            setTimeout(() => {
+                modalRegister.style.display = 'none';
+            }, 500);
+        }
     });
 
     const modalRegisterBody = document.createElement('div');
@@ -337,6 +419,7 @@ export function homeView(container) {
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'All fields are required.';
             formRegister.insertBefore(errorMessage, submitRegisterButton);
+            setTimeout(() => errorMessage.remove(), 3000);
             return;
         }
         // If the password and the confirm password are not the same
@@ -345,6 +428,7 @@ export function homeView(container) {
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Password do not match.';
             formRegister.insertBefore(errorMessage, submitRegisterButton);
+            setTimeout(() => errorMessage.remove(), 3000);
             return;
         }
         // If the password does not match the regex
@@ -380,6 +464,7 @@ export function homeView(container) {
                 errorMessage.className = 'text-danger';
                 errorMessage.textContent = 'Error while registering, please try again.';
                 formRegister.insertBefore(errorMessage, submitRegisterButton);
+                setTimeout(() => errorMessage.remove(), 3000);
             }
             else {
                 formRegister.reset();
@@ -406,6 +491,7 @@ export function homeView(container) {
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Error while registering, please try again.';
             formRegister.insertBefore(errorMessage, submitRegisterButton);
+            setTimeout(() => errorMessage.remove(), 3000);
             formRegister.reset();
             });
     });
