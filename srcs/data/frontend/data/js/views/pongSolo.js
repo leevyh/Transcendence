@@ -109,6 +109,8 @@ export async function pongSoloView(container) {
     });
 
     stopGameButton.disabled = true; // Le bouton Stop est désactivé au début
+    const notifications_div = await notifications();
+    div.appendChild(notifications_div);
 }
 
 
