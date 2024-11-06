@@ -264,8 +264,7 @@ function handleWSMessage(receivedMessage, user) {
         const joinButton = messageContent.querySelector('.join-button');
         joinButton.addEventListener('click', () => {
             if (DEBUG) {console.log('Join game');}
-            // Join the game
-            // play(receivedMessage.gameID);
+                navigateTo('/pong');
         });
         messageDiv.appendChild(messageContent);
         chatBody.appendChild(messageDiv);
