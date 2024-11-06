@@ -184,6 +184,8 @@ async function createAccessibilityForm(userData) {
     const labelLanguage = document.createElement('label');
     labelLanguage.className = 'form-label';
     labelLanguage.textContent = 'Language';
+    labelLanguage.style.color = '#000';
+    labelLanguage.setAttribute('for', 'language'); // Associe le label avec le select
     accessibilityForm.appendChild(labelLanguage);
 
     const language = document.createElement('select');
@@ -288,6 +290,8 @@ async function createFontSizeDiv(userData) {
     const labelFontSize = document.createElement('label');
     labelFontSize.className = 'form-label labelFontSize';
     labelFontSize.textContent = 'Font size';
+    labelFontSize.style.color = '#000';
+    labelFontSize.setAttribute('for', 'font-size');  // Associe le label avec l'input
     divFontSize.appendChild(labelFontSize);
 
     const fontSize = document.createElement('input');
