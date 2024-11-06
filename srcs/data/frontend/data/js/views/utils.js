@@ -79,14 +79,14 @@ export function displayToast(data) {
     // Si le conteneur n'existe pas, le créer
     if (!toast_container) {
         toast_container = document.createElement('div');
-        toast_container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        toast_container.className = 'toast-container  position-fixed bottom-0 end-0 p-3';
         document.body.appendChild(toast_container);
     }
 
     // Limite de toasts
     const maxToasts = 3;
     const currentToasts = toast_container.querySelectorAll('.toast');
-    
+
     // Si le nombre de toasts dépasse la limite, supprimer le plus ancien
     if (currentToasts.length >= maxToasts) {
         currentToasts[0].remove();
