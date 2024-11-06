@@ -3,6 +3,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async
 import base64
+from pong.classGame import PongGame
+from pong.consumers import invitational_games
 
 active_connections = {}
 
@@ -62,14 +64,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             blocked = data.get('blocked')
             await self.handle_block_user(blocked)
         elif message_type == 'game_invite':
-            print('game_invite')
             message = {
                 'invited': data['invited'],
                 'timestamp': data['timestamp']
             }
             await self.handle_game_invite(message)
         elif message_type == 'accept_game_invite':
-            print('accept_game_invite')
             message = {
                 'invitation_from': data['invitation_from'],
                 'timestamp': data['timestamp']
@@ -288,6 +288,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         conversation = await database_sync_to_async(Conversation.objects.get)(id=self.conversation_id)
         sender = await database_sync_to_async(User.objects.get)(nickname=user.nickname)
         members = await database_sync_to_async(list)(conversation.members.all())
+
+        game = PongGame(sender)
+        game.player_1 = await database_sync_to_async(User.objects.get)(nickname=event['invitation_from'])
+        game.player_2 = user
+        game.nbPlayers = 0
+        invitational_games.append(game)
 
         message = await database_sync_to_async(Message.objects.create)(
             conversation=conversation,

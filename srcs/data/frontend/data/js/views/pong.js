@@ -23,6 +23,8 @@ import { GameOn } from './pong_game.js';
 export let canvas = 'null'
 export let inTournament = false;
 export let inGame = false;
+let keydownListener = null;
+let keyupListener = null;
 
 export async function pongView(container, tournamentSocket) {
     container.innerHTML = '';
@@ -104,13 +106,16 @@ export async function pongView(container, tournamentSocket) {
             var player_name = data.name_player;
             var game_name = data.game;
             console.log("data = ", data);
-            if (currentPlayer === 'player_1') {
-                document.addEventListener('keydown', (event) => handleKeyDown(event, 'player_1', player_name, game_name));
-                document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_1', player_name, game_name));
-            } else if (currentPlayer === 'player_2') {
-                document.addEventListener('keydown', (event) => handleKeyDown(event, 'player_2', player_name, game_name));
-                document.addEventListener('keyup', (event) => handleKeyUp(event, 'player_2', player_name, game_name));
+            if (keydownListener) {
+                document.removeEventListener('keydown', keydownListener);
             }
+            if (keyupListener) {
+                document.removeEventListener('keyup', keyupListener);
+            }
+            keydownListener = (event) => handleKeyDown(event, currentPlayer, player_name, game_name);
+            keyupListener = (event) => handleKeyUp(event, currentPlayer, player_name, game_name);
+            document.addEventListener('keydown', keydownListener);
+            document.addEventListener('keyup', keyupListener);
         }
         if (data.action_type === 'start_game') {
             updatePlayerName(data.game.player1_name, data.game.player2_name);
@@ -137,7 +142,9 @@ export async function pongView(container, tournamentSocket) {
             update_Stats(data);
             if (inTournament == false) {
                 setTimeout(() => {
-                    navigateTo('/menuPong');
+                    if (getInGame() === true) {
+                        navigateTo('/menuPong');
+                    }
                 }, 3000);
             }
         }
