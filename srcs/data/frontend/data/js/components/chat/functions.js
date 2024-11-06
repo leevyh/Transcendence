@@ -2,7 +2,7 @@ import { DEBUG, navigateTo } from '../../app.js';
 import { play } from '../../views/pong_game.js';
 import { getCookie } from '../../views/utils.js';
 import { createChatWindow } from './visual.js';
-import {decrementNotificationCount} from "../../views/notifications.js";
+import {decrementNotificationCount, removeNotification} from "../../views/notifications.js";
 
 
 export let chatWS = null;
@@ -91,8 +91,8 @@ export function getNotificationId(nickname) {
     });
     // Remove the notifications divs and decrement the badge
     notificationIds.forEach(notificationId => {
-        const notification = document.getElementById(notificationId);
-        notification.remove();
+        notificationId = notificationId.replace('notification_', '');
+        removeNotification(notificationId);
         decrementNotificationCount();
     });
     // return notificationIds;
