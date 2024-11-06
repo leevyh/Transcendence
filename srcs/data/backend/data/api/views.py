@@ -203,7 +203,8 @@ def get_match_history(request, id):
                             'opponent': opponent,
                             'opponent_score': opponent_score,
                             'opponent_avatar': opponent_avatar,
-                            'created_at': match.created_at})
+                            'created_at': match.created_at,
+                            'tournament': game.intournament})
             return JsonResponse(data, status=200, safe=False)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)

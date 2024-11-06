@@ -507,7 +507,7 @@ export async function profileView(container, userID) {
 
         // add the data to the view
         data.forEach((game) => {
-            historical.appendChild(createGameHistory(`${game.player_avatar}`, `${game.player}`, `${game.player_score}`, `${game.opponent_avatar}`, `${game.opponent}`, `${game.opponent_score}`, 0));
+            historical.appendChild(createGameHistory(`${game.player_avatar}`, `${game.player}`, `${game.player_score}`, `${game.opponent_avatar}`, `${game.opponent}`, `${game.opponent_score}`, game.tournament));
         }); //TODO CHANGE THE 0 TO 1 WHEN TOURNAMENT IS IMPLEMENTED
 
         const notifications_div = await notifications();
