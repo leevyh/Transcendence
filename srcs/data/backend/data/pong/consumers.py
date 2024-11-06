@@ -24,7 +24,7 @@ class CLIPongConsumer(AsyncWebsocketConsumer):
         await self.accept()
         from api.models import User_site
         player = User_site
-        player.nickname = 'anonymous'
+        player.nickname = 'anonymous_player'
         #envoyer juste un signal 'connected' pour dire que le joueur est connecte
         await self.send(text_data=json.dumps({
             'connected': 'connected'}))
@@ -42,12 +42,14 @@ class CLIPongConsumer(AsyncWebsocketConsumer):
             game.nbPlayers += 1
             game.channel_player_1 = self.channel_name
             self.game = game
+            self.periodic_state_update_task = asyncio.create_task(self.periodic_state_update())
         else :
             game = list_of_games.pop(0)
             game.player_2 = player
             game.nbPlayers += 1   
             game.channel_player_2 = self.channel_name
             self.game = game
+            self.periodic_state_update_task = asyncio.create_task(self.periodic_state_update())
 
         if(game.nbPlayers == 2) :
             await self.send(text_data=json.dumps({
@@ -55,25 +57,19 @@ class CLIPongConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_1)
             await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_2)
             game.status = "ready"
-            await asyncio.gather(
-                self.periodic_state_update(),
-                self.game.game_loop()
-            )
+            self.task = asyncio.create_task(self.game.game_loop())
 
         return game
 
     async def periodic_state_update(self):
-        while self.game.is_active:
+        while self.game.winner is None:
             await asyncio.sleep(3)
-            await self.state_of_the_game()
+            if hasattr(self, 'game') and self.game is not None:
+                if self.game.is_active:
+                    await self.state_of_the_game()
        
     async def game_state(self, event):
         pass
-    # if self.channel_name is not None:
-    #     await self.send(text_data=json.dumps({
-    #         'action_type': 'game_state',
-    #         'game': event['game']
-    #     }))
 
     async def state_of_the_game(self):
         await self.send(text_data=json.dumps({
@@ -100,27 +96,15 @@ class CLIPongConsumer(AsyncWebsocketConsumer):
 
     async def define_player(self, event):
         pass
-        # if self.channel_name is not None:
-        #     await self.send(text_data=json.dumps({
-        #         'action_type': 'define_player',
-        #         'name_player': event['name_player'],
-        #         'current_player': event['current_player'],
-        #         'game': event['game']
-        #     }))
 
     async def start_game(self, event):
         pass
-        # if self.channel_name is not None:
-        #     await self.send(text_data=json.dumps({
-        #         'action_type': 'start_game',
-        #         'game': event['game']
-        #     }))
     
     async def disconnect(self, code):
         # Retirer le joueur de la file d'attente s'il quitte la connexion
         from api.models import User_site
         player = User_site
-        player.nickname = 'anonymous'
+        player.nickname = 'anonymous_player'
         if player in waiting_players:
             waiting_players.remove(player)
         
@@ -153,48 +137,51 @@ class CLIPongConsumer(AsyncWebsocketConsumer):
             print(f"JSONDecodeError: {e}")
             return
    
-        # if text_data is not None:
-        #     data = json.loads(text_data)
-        # else:
-        #     data = None
         from api.models import User_site
         player = User_site
-        player.nickname = 'anonymous'
-        # print("data : ", data)
-        # Update player positions or handle key events
+        player.nickname = 'anonymous_player'
         if data['type'] == 'up':
-            print("up 1")
-            print("game : ", self.game)
-            print("game is active : ", self.game.is_active)
             if hasattr(self, 'game') and self.game is not None and self.game.is_active :
-                print("up 2")
                 if self.game.player_1 == player:
                     self.game.move_player('player_1', 'up')
                 else:
                     self.game.move_player('player_2', 'up')
         if data['type'] == 'down':
-            if hasattr(self, 'game') and self.game is not None and self.game.is_active and text_data:
+            if hasattr(self, 'game') and self.game is not None and self.game.is_active :
                 if self.game.player_1 == player:
                     self.game.move_player('player_1', 'down')
                 else:
                     self.game.move_player('player_2', 'down')
+        if data['type'] == 'stop up':
+            if hasattr(self, 'game') and self.game is not None and self.game.is_active :
+                if self.game.player_1 == player:
+                    self.game.move_player('player_1', 'stop up')
+                else:
+                    self.game.move_player('player_2', 'stop up')
+        if data['type'] == 'stop down':
+            if hasattr(self, 'game') and self.game is not None and self.game.is_active :
+                if self.game.player_1 == player:
+                    self.game.move_player('player_1', 'stop down')
+                else:
+                    self.game.move_player('player_2', 'stop down')
         if data['type'] == 'state_of_the_game':
             await self.state_of_the_game()
         if data['type'] == 'stop_game' :
-            if self.game.player_1 == player:
-                self.game.winner = self.game.player_2
-                self.game.loser = self.game.player_1
-            else:
-                self.game.winner = self.game.player_1
-                self.game.loser = self.game.player_2
-            await self.game.broadcastState()
-            await self.game.stop_game()
+            if hasattr(self, 'game') and self.game is not None and self.game.is_active :
+                if self.game.player_1 == player:
+                    self.game.winner = self.game.player_2
+                    self.game.loser = self.game.player_1
+                else:
+                    self.game.winner = self.game.player_1
+                    self.game.loser = self.game.player_2
+                await self.game.broadcastState()
+                await self.game.stop_game()
         if data['type'] == 'disconnect_player' :
             await self.disconnect(1000)
 
     async def end_of_game(self, event):
         pass
-        # if event['winner'] == 'anonymous':
+        # if event['winner'] == 'anonymous_player':
         #     result = 'win'
         #     nb_point_taken = event['score_winner']
         #     nb_point_given = event['score_loser']
@@ -262,7 +249,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             game.nbPlayers += 1
             game.channel_player_1 = self.channel_name
             self.game = game
-            await self.send_waiting()
+            # await self.send_waiting()
         else :
             for game in list_of_games:
                 if game.player_1 == player or game.player_2 == player:
@@ -276,7 +263,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         if(game.nbPlayers == 2) :
             print("consumer game with 2 players")
-            if game.player_1.nickname != 'anonymous' and game.player_2.nickname != 'anonymous':
+            if game.player_1.nickname != 'anonymous_player' and game.player_2.nickname != 'anonymous_player':
                 game_database = await create_game(game.player_1, game.player_2)
                 game.id = game_database.id
                 game_database.is_active = True
