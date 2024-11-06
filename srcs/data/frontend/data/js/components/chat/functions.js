@@ -10,7 +10,7 @@ export function openChatWithUser(user) {
     // Get the chat window of the user
     const chat_user_id = `chat_user_${user.user_id}`;
     let chatWindow = document.getElementById(chat_user_id);
-    
+
     // If the chat window already exists, show it and hide the others
     if (chatWindow) {
         if (DEBUG) {console.log('Chat window already exists for this user:', user.nickname);}
