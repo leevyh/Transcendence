@@ -48,21 +48,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print(data)
 
         if message_type == 'block_user':
+            print('block_user')
             blocked = data.get('blocked')
             await self.handle_block_user(blocked)
-        if message_type == 'game_invite':
+        elif message_type == 'game_invite':
+            print('game_invite')
             message = {
                 'invited': data['invited'],
                 'timestamp': data['timestamp']
             }
             await self.handle_game_invite(message)
-        if message_type == 'accept_game_invite':
+        elif message_type == 'accept_game_invite':
+            print('accept_game_invite')
             message = {
                 'invitation_from': data['invitation_from'],
                 'timestamp': data['timestamp']
             }
             await self.handle_accept_game_invite(message)
         else:
+            print('chat_message')
             message = {
                 'message': data['message'],
                 'timestamp': data['timestamp']
