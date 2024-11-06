@@ -16,7 +16,6 @@ export function openChatWithUser(user) {
         if (DEBUG) {console.log('Chat window already exists for this user:', user.nickname);}
         chatWindow.classList.add('active'); // Show the chat window
         close_chatWindows(chatWindow);
-        return;
     } else {
         if (DEBUG) {console.log('Chat window does not exist');}
 
@@ -70,10 +69,11 @@ export function openChatWithUser(user) {
 // Function to hide and clear chat windows
 function close_chatWindows(chatWindow) {
     if (DEBUG) {console.log('Hide and clear chat windows');}
-    if (chatWS) {chatWS.close();} // Close the previous chat WebSocket
     const chatWindows = document.querySelectorAll('.chat-window');
     chatWindows.forEach(window => {
         if (window !== chatWindow) {
+            // clear the chat body
+            window.querySelector('.chat-body').innerHTML = '';
             window.classList.remove('active');
         }
     });
