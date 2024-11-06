@@ -312,6 +312,23 @@ services:
       proxy-nginx:
         condition: service_healthy
     restart: on-failure
+  export-postgresql:
+    container_name: export-postgresql
+    build: ./srcs/services/export_postgresql
+    volumes:
+      - backend-pga-certs:/pga/certs/
+    networks:
+      - default
+    expose:
+      - 9187
+    env_file:
+      - ./env/postgresql.env
+    depends_on:
+      backend-prometheus:
+        condition: service_healthy
+      backend-postgresql:
+        condition: service_healthy
+    restart: on-failure
   export-elastic:
     container_name: export-elastic
     build: ./srcs/services/export_elastic
