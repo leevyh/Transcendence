@@ -4,15 +4,15 @@ from django.contrib.auth.decorators import login_required
 from .models import Conversation
 
 @login_required(login_url='/api/login')
-def conversationID(request, nickname):
+def conversationID(request, id):
     if request.method == 'GET':
         try:
             # Get the sender from the request
             sender = request.user
 
-            # Get the receiver by nickname
+            # Get the receiver by id
             try:
-                receiver = User.objects.get(nickname=nickname)
+                receiver = User.objects.get(id=id)
             except User.DoesNotExist:
                 return JsonResponse({'error': 'User not found'}, status=404)
 

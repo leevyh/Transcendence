@@ -4,7 +4,7 @@ import { removeNotification } from "../../views/notifications.js";
 export function displayFriendRequests(notification, offcanvas_body) {
 
     const notification_type_div = document.createElement('div');
-    notification_type_div.className = `notification_type_notification_${notification.type} d-flex flex-column gap-2`;
+    notification_type_div.className = `notification_type_notification_${notification.type} d-flex flex-column gap-2 mb-2`;
     notification_type_div.id = `notification_${notification.id}`;
 
     const notification_type_header = document.createElement('div');
@@ -37,8 +37,6 @@ export function displayFriendRequests(notification, offcanvas_body) {
     notification_type_close_button.setAttribute('aria-label', 'Close');
     notification_type_close_button.onclick = async function() {
         removeNotification(notification.id);
-        let hr = notification_type_div.nextElementSibling;
-        hr.remove();
         notification_type_div.remove();
     };
     notification_type_header.appendChild(notification_type_close_button);
@@ -64,8 +62,6 @@ export function displayFriendRequests(notification, offcanvas_body) {
             type: 'accept_friend_request',
             nickname:  notification.from_nickname,
         });
-        let hr = notification_type_div.nextElementSibling;
-        hr.remove();
         notification_type_div.remove();
     };
 
@@ -78,8 +74,6 @@ export function displayFriendRequests(notification, offcanvas_body) {
             type: 'reject_friend_request',
             nickname:  notification.from_nickname,
         });
-        let hr = notification_type_div.nextElementSibling;
-        hr.remove();
         notification_type_div.remove();
 
     };
@@ -91,7 +85,4 @@ export function displayFriendRequests(notification, offcanvas_body) {
     notification_type_div.appendChild(notification_type_body);
     offcanvas_body.appendChild(notification_type_div);
 
-    const line = document.createElement('hr');
-    line.className = 'w-100 separator_line_notifs';
-    offcanvas_body.appendChild(line);
 }

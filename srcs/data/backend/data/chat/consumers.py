@@ -33,7 +33,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # print(f"User {user.nickname} connected to conversation {self.conversation_id}.") # DEBUG
 
         # Check and remode any existing notifications for this conversation
-        await self.remove_notifications(user, self.conversation_id)
+#         await self.remove_notifications(user, self.conversation_id)
 
         # Send chat history
         await self.chat_history()
@@ -58,9 +58,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         message_type = data.get('type')
         # print(data)
-
+        # print('message_type: ', message_type)
         if message_type == 'block_user':
-            # print('block_user')
             blocked = data.get('blocked')
             await self.handle_block_user(blocked)
         elif message_type == 'game_invite':
@@ -76,7 +75,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
             await self.handle_accept_game_invite(message)
         else:
-            # print('chat_message')
             message = {
                 'message': data['message'],
                 'timestamp': data['timestamp']
@@ -412,7 +410,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 self.conversation_group_name,
                 {
                     'type': 'block_user',
-                    'blocked': blocked_user.id,
+                    'blocked': {
+                        'nickname': blocked_user.nickname,
+                        'id': blocked_user.id,
+                    },
                     'blocker': blocker.id,
                 }
             )
@@ -425,7 +426,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 self.conversation_group_name,
                 {
                     'type': 'unblock_user',
-                    'blocked': blocked_user.id,
+                    'blocked': {
+                        'nickname': blocked_user.nickname,
+                        'id': blocked_user.id,
+                    },
                     'blocker': blocker.id
                 }
             )

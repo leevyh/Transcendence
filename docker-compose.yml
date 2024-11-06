@@ -200,7 +200,7 @@ services:
       - ./srcs/services/backend_fleet/conf/elastic-agent.env
     healthcheck:
       test: ["CMD-SHELL", "curl -s -I http://localhost:6791/liveness | grep -q 'HTTP/1.1 200 OK'"]
-      interval: 10s
+      interval: 20s
       timeout: 10s
       retries: 120
     depends_on:
