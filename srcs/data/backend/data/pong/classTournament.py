@@ -44,8 +44,8 @@ class Tournament:
         await asyncio.sleep(2)
         await self.start_semi_finals()
         await self.wait_for_games()
-        if self.resigned_players:
-            print("resigned players", self.resigned_players[0].nickname)
+        # if self.resigned_players:
+        #     print("resigned players", self.resigned_players[0].nickname)
         await self.create_small_final()
         await self.create_final()
         await self.start_finals()
@@ -77,7 +77,7 @@ class Tournament:
         await self.channel_layer.group_add(f"game_{self.semi_finals1.id}", self.channel_layer_player[player_indices[1]])
         self.semi_finals1.status = "ready"
 
-        print("semi_finals1", self.semi_finals1.player_1, self.semi_finals1.player_2)
+        # print("semi_finals1", self.semi_finals1.player_1, self.semi_finals1.player_2)
 
         self.semi_finals2 = PongGame(self.player[player_indices[2]])
         self.semi_finals2.player_1 = self.player[player_indices[2]]
@@ -94,7 +94,7 @@ class Tournament:
         await self.channel_layer.group_add(f"game_{self.semi_finals2.id}", self.channel_layer_player[player_indices[3]])
         self.semi_finals2.status = "ready"
 
-        print("semi_finals2", self.semi_finals2.player_1, self.semi_finals2.player_2)
+        # print("semi_finals2", self.semi_finals2.player_1, self.semi_finals2.player_2)
 
     async def start_semi_finals(self):
         # print("start semi_finals")
@@ -121,7 +121,7 @@ class Tournament:
 
     #wait for the games to finish
     async def wait_for_games(self):
-        print("wait for games")
+        # print("wait for games")
         if self.status == "semi_finals":
             while self.semi_finals1.is_active or self.semi_finals2.is_active:
                 await asyncio.sleep(1)
@@ -149,7 +149,7 @@ class Tournament:
         await self.channel_layer.group_add(f"game_{self.small_final.id}", self.small_final.channel_player_2)
         self.small_final.status = "ready"
 
-        print("small final", self.small_final.player_1, self.small_final.player_2)
+        # print("small final", self.small_final.player_1, self.small_final.player_2)
 
     #create the final game
     async def create_final(self):
@@ -170,11 +170,11 @@ class Tournament:
         await self.channel_layer.group_add(f"game_{self.final.id}", self.final.channel_player_2)
         self.final.status = "ready"
 
-        print("final", self.final.player_1, self.final.player_2)
+        # print("final", self.final.player_1, self.final.player_2)
 
     #start the finals
     async def start_finals(self):
-        print("start finals")
+        # print("start finals")
         self.status = "finals"
         await self.channel_layer.group_send(
             f"game_{self.small_final.id}",
@@ -221,7 +221,7 @@ class Tournament:
         await asyncio.gather(*tasks)
 
     async def send_define_player(self, game, current_player_1, current_player_2):
-        print("send define player between", game.player_1, game.player_2)
+        # print("send define player between", game.player_1, game.player_2)
         await self.channel_layer.send(
             game.channel_player_1,
             {
@@ -252,7 +252,7 @@ class Tournament:
             self.final.move_player(player, move)
 
     async def stop_game(self, game):
-        print("stop game")
+        # print("stop game")
         if game == self.semi_finals1.name:
             await self.semi_finals1.stop_game()
         elif game == self.semi_finals2.name:
@@ -264,12 +264,12 @@ class Tournament:
 
     #end the tournament
     async def end_tournament(self):
-        print("end tournament")
+        # print("end tournament")
 
-        print("small final winner", self.small_final.winner)
-        print("small final loser", self.small_final.loser)
-        print("final winner", self.final.winner)
-        print("final loser", self.final.loser)
+        # print("small final winner", self.small_final.winner)
+        # print("small final loser", self.small_final.loser)
+        # print("final winner", self.final.winner)
+        # print("final loser", self.final.loser)
 
         self.status = "finished"
         #send the winner to the front
@@ -314,4 +314,4 @@ class Tournament:
         await sync_to_async(tournament_history_player_3.save, thread_sensitive=True)()
         await sync_to_async(tournament_history_player_4.save, thread_sensitive=True)()
 
-        print("tournament is finished")
+        # print("tournament is finished")

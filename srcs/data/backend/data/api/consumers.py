@@ -65,7 +65,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
         from chat.consumers import encode_avatar
         user = self.scope["user"]
         type = data['type']
-        print(f"Data received: {data}")
+        # print(f"Data received: {data}")
         #if type is friend_request -> Save friend request with from_user and to_user, status pending
         if type == 'friend_request':
             nickname = data['nickname']
