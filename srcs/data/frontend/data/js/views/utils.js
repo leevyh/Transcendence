@@ -1,6 +1,10 @@
 import { DEBUG, navigateTo } from '../app.js';
 import wsManager from './wsManager.js';
-import {readNotification, decrementNotificationCount, removeNotification} from "./notifications.js";
+import {
+    readNotification,
+    decrementNotificationCount,
+    removeNotification,
+} from "./notifications.js";
 
 // Helper function to get CSRF token from cookies
 export function getCookie(name) {
@@ -191,6 +195,7 @@ export function displayToast(data) {
         accept_button.textContent = 'Accept';
         accept_button.addEventListener('click', () => {
             removeNotification(data.id);
+            decrementNotificationCount();
             wsManager.send({
                 type: 'accept_friend_request',
                 nickname: data.from_nickname,
@@ -204,6 +209,7 @@ export function displayToast(data) {
         reject_button.textContent = 'Reject';
         reject_button.addEventListener('click', () => {
             removeNotification(data.id);
+            decrementNotificationCount();
             wsManager.send({
                 type: 'reject_friend_request',
                 nickname: data.from_nickname,
