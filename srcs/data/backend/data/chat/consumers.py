@@ -33,7 +33,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # print(f"User {user.nickname} connected to conversation {self.conversation_id}.") # DEBUG
 
         # Check and remode any existing notifications for this conversation
-        await self.remove_notifications(user, self.conversation_id)
+#         await self.remove_notifications(user, self.conversation_id)
 
         # Send chat history
         await self.chat_history()

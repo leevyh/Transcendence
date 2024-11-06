@@ -214,7 +214,11 @@ async function readAllNotifications() {
 let notificationsArray = [];
 
 function displayNotifications(notification, offcanvas_body) {
-    notificationsArray.push(notification);
+    //check if the notification is already in the notificationsArray by the id
+    if (!notificationsArray.find(notif => notif.id === notification.id)) {
+        notificationsArray.push(notification);
+    }
+    console.log(notificationsArray);
 
     // Sort notification by order
     notificationsArray.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -235,15 +239,25 @@ function displayNotifications(notification, offcanvas_body) {
 
 export function removeNotification(notificationId) {
     notificationsArray = notificationsArray.filter(notification => notification.id !== notificationId);
+    //remove notification from the notificationsArray
+    notificationsArray.pop();
+
+    console.log(notificationsArray);
     const notification = document.getElementById(`notification_${notificationId}`);
-    notification.remove();
-    deleteNotification(notificationId).then( () => {
-        return;
-    })
-    .catch( (error) => {
-        displayToast('Error while deleting notification', 'bg-danger');
-        console.error(error);
-    });
+    if (notification !== null) {
+
+        notification.remove();
+        // delete notification from the database but remove notification_ before the id
+        deleteNotification(notificationId).then( () => {
+            return;
+        })
+        .catch( (error) => {
+            displayToast('Error while deleting notification', 'bg-danger');
+            console.error(error);
+        });
+    }
+
+    // notification.remove();
 }
 
 async function deleteNotification(notificationId) {
