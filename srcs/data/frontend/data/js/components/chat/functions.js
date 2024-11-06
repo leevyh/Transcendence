@@ -4,6 +4,7 @@ import { getCookie } from '../../views/utils.js';
 import { createChatWindow } from './visual.js';
 import {decrementNotificationCount} from "../../views/notifications.js";
 
+
 export let chatWS = null;
 
 // Function to open a chat with a user
@@ -281,8 +282,7 @@ function handleWSMessage(receivedMessage, user) {
         const joinButton = messageContent.querySelector('.join-button');
         joinButton.addEventListener('click', () => {
             if (DEBUG) {console.log('Join game');}
-            // Join the game
-            // play(receivedMessage.gameID);
+                navigateTo('/pong');
         });
         messageDiv.appendChild(messageContent);
         chatBody.appendChild(messageDiv);
