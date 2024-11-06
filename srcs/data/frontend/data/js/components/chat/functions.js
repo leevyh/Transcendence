@@ -241,12 +241,9 @@ function displayMessage(messageData) {
             `;
             const acceptButton = messageContent.querySelector('.accept-button');
             acceptButton.addEventListener('click', () => {
-                // Action à effectuer lorsque le bouton est cliqué
-                console.log("Le bouton 'Accepter' a été cliqué");
                 acceptGameInvite(messageData.sender.nickname);
-                // Cacher le bouton accepter
+                // Hide the accept button
                 acceptButton.style.display = 'none';
-                // TODO: Call API to accept the game invite 
             });
         } else if (messageData.message == 'Game invite send to ' + messageData.user) {
             messageContent.innerHTML = `
@@ -256,12 +253,9 @@ function displayMessage(messageData) {
             `;
             const acceptButton = messageContent.querySelector('.accept-button');
             acceptButton.addEventListener('click', () => {
-                // Action à effectuer lorsque le bouton est cliqué
-                console.log("Le bouton 'Accepter' a été cliqué");
                 acceptGameInvite(messageData.sender.nickname);
-                // Cacher le bouton accepter
+                // Hide the accept button
                 acceptButton.style.display = 'none';
-                // TODO: Call API to accept the game invite 
             });
         } else {
             messageContent.innerHTML = `
