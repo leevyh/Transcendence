@@ -38,7 +38,7 @@ export async function pongView(container, tournamentSocket) {
     const navBarContainer = await navigationBar(container);
     div.appendChild(navBarContainer);
 
-	loadPongCSS();  // CSS
+	// loadPongCSS();  // CSS
 
     // HTML
     const viewContainer = document.createElement('div');
@@ -58,9 +58,9 @@ export async function pongView(container, tournamentSocket) {
     scoreP.className = 'd-flex justify-content-center';
 
     scoreP.innerHTML = `
-    <span style="font-size: 24px; font-weight: bold; margin-right: 40px;" id="player1-name"></span> 
-    <span style="font-size: 24px; margin-right: 60px;" id="player1-score">0</span> - 
-    <span style="font-size: 24px; margin-left: 60px;" id="player2-score">0</span> 
+    <span style="font-size: 24px; font-weight: bold; margin-right: 40px;" id="player1-name"></span>
+    <span style="font-size: 24px; margin-right: 60px;" id="player1-score">0</span> -
+    <span style="font-size: 24px; margin-left: 60px;" id="player2-score">0</span>
     <span style="font-size: 24px; font-weight: bold; margin-left: 40px;" id="player2-name"></span>
 `;
 
@@ -167,10 +167,10 @@ export async function pongView(container, tournamentSocket) {
 
 // Fonction pour démarrer le décompte
 function startCountdown(container, game_name) {
-    
+
     // clearInterval(checkInGame);
     // waitingElement.remove();
-    
+
     let countdownValue = 3;
 
     const gameContainer = container.querySelector('.PongDiv');
@@ -218,13 +218,13 @@ function startCountdown(container, game_name) {
         }
     }
     typeGameName();
-        
+
     function startCountdownTimer() {
         countdownElement.innerText = countdownValue;
         let countdownInterval = setInterval(() => {
             if (getInGame() === false) {
                 console.log("countdown 1 inGame = ", inGame);
-                clearInterval(countdownInterval); 
+                clearInterval(countdownInterval);
                 countdownElement.remove();
                 gameNameElement.remove();
                 return;
@@ -328,7 +328,7 @@ function displayeWinner(winner) {
     const winnerElement = document.createElement('div');
     winnerElement.id = 'winner-display';
 
-    loadPongCSS();
+    // loadPongCSS();
 
     winnerElement.style.position = 'absolute';
     winnerElement.style.top = `${canvas.offsetTop + canvas.height / 2}px`;
@@ -348,7 +348,7 @@ function displayeWinner(winner) {
 
     setTimeout(() => {
         winnerElement.style.opacity = '1';
-    }, 10); 
+    }, 10);
 
     const displayDuration = 3000;
     const disappearDelay = 1000;
@@ -380,7 +380,7 @@ function displayWaiting(container) {
     const waitingElement = document.createElement('div');
     waitingElement.id = 'waiting-display';
 
-    loadPongCSS();
+    // loadPongCSS();
 
     waitingElement.style.position = 'absolute';
     waitingElement.style.top = `${canvas.offsetTop + canvas.height / 2}px`;
