@@ -2,7 +2,7 @@ import {removeNotification} from "../../views/notifications.js";
 
 export function displayMessages(notification, offcanvas_body) {
     const notification_type_div = document.createElement('div');
-    notification_type_div.className = `notification_type_notification_${notification.type} d-flex flex-column gap-2`;
+    notification_type_div.className = `notification_type_notification_${notification.type} d-flex flex-column gap-2 nickname_${notification.from_nickname}`;
     notification_type_div.id = `notification_${notification.id}`;
 
     const notification_type_header = document.createElement('div');

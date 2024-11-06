@@ -2,6 +2,8 @@ import { DEBUG, navigateTo } from '../../app.js';
 import { play } from '../../views/pong_game.js';
 import { getCookie } from '../../views/utils.js';
 import { createChatWindow } from './visual.js';
+import {decrementNotificationCount} from "../../views/notifications.js";
+
 
 export let chatWS = null;
 
@@ -26,6 +28,7 @@ export function openChatWithUser(user) {
     }
 
     checkConversationID(user.nickname).then(conversationID => {
+        getNotificationId(user.nickname);
         openConversation(conversationID, user);
     });
 
@@ -78,6 +81,23 @@ function close_chatWindows(chatWindow) {
         }
     });
 }
+
+//Function to select all div with class .nickname_${nickname} inside notification and get the id for each notification with this class
+export function getNotificationId(nickname) {
+    const notifications = document.querySelectorAll(`.nickname_${nickname}`);
+    const notificationIds = [];
+    notifications.forEach(notification => {
+        notificationIds.push(notification.id);
+    });
+    // Remove the notifications divs and decrement the badge
+    notificationIds.forEach(notificationId => {
+        const notification = document.getElementById(notificationId);
+        notification.remove();
+        decrementNotificationCount();
+    });
+    // return notificationIds;
+}
+
 
 // Function to initialize the chat
 async function openConversation(conversationID, user) {
@@ -262,8 +282,7 @@ function handleWSMessage(receivedMessage, user) {
         const joinButton = messageContent.querySelector('.join-button');
         joinButton.addEventListener('click', () => {
             if (DEBUG) {console.log('Join game');}
-            // Join the game
-            // play(receivedMessage.gameID);
+                navigateTo('/pong');
         });
         messageDiv.appendChild(messageContent);
         chatBody.appendChild(messageDiv);
