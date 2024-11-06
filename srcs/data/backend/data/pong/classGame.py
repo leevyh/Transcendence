@@ -176,8 +176,9 @@ class PongGame:
         impact = self.ball_position_y - paddle_position - iv.PADDLE_HEIGHT / 2
         ratio = 35 / (iv.PADDLE_HEIGHT / 2)
         self.ball_speed_y = round(impact * ratio / 10)
-        self.ball_speed_x *= 1.2
-    
+        if self.ball_speed_x < iv.BALL_SPEED_MAX and self.ball_speed_x > -iv.BALL_SPEED_MAX:
+            self.ball_speed_x *= 1.2
+
     #move the player
     def move_player(self, player, move):
         print("move player : ", player, " ", move)

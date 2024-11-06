@@ -5,6 +5,7 @@ GAME_HEIGHT = 480
 # Vitesse de la balle
 BALL_SPEED_X = 2
 BALL_SPEED_Y = 2
+BALL_SPEED_MAX = 5
 
 # Vitesse des raquettes
 PADDLE_SPEED = 5
