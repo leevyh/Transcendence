@@ -183,9 +183,8 @@ LOGGING = {
             'version': 1,
         },
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'stream': sys.stdout,
         },
     },
     'loggers': {
