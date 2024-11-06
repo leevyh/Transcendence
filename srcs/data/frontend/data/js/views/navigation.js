@@ -29,7 +29,6 @@ export async function navigationBar(container) {
                     username: data.username,
                     nickname: data.nickname,
                     email: data.email,
-                    language: data.language,
                     font_size: data.font_size,
                     avatar: data.avatar,
                 };

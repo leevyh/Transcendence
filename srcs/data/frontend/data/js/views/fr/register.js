@@ -158,16 +158,6 @@ export async function registerView(container) {
         //     return;
         // }
 
-
-        // Si la langue est deja dans l'url, on la recupere
-        let url = window.location.pathname;
-        let language = null;
-        const splitPath = url.split('/');
-        if (splitPath.length > 2) {
-            url = `/${splitPath[2]}`;
-            language = splitPath[1];
-        }
-
         // Envoi des données du formulaire
         fetch('/api/register/', {
             method: 'POST',
@@ -181,7 +171,6 @@ export async function registerView(container) {
                     password: password,
                     nickname: nickname,
                     email: email,
-                    language: language
                 }
             )
         })

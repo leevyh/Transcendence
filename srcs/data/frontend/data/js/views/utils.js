@@ -22,52 +22,6 @@ export function getCookie(name) {
     return cookieValue;
 }
 
-const translations = {
-	en: {
-		// Home page
-		home: 'Welcome',
-		homeText: 'This is our transcendence homepage. This project involves creating a website for the mighty Pong competition! We hope you enjoy your visit to our site.',
-		login: "Login",
-		register: "Register",
-		logout: "Log out",
-		settings: "Settings",
-        language_selector: "Language: ",
-	},
-	fr: {
-		// Home page
-		home: 'Bienvenue',
-		homeText: 'Voici notre page d\'accueil transcendance. Ce projet consiste en la création d\'un site web pour le concours « Pong » ! Nous espérons que vous apprécierez votre visite sur notre site',
-		login: "Se connecter",
-		register: "S'inscrire",
-		logout: "Se déconnecter",
-		settings: "Paramètres",
-        language_selector: "Langue: ",
-	},
-	sp: {
-		// Home page
-		home: '¡Bienvenido!',
-		homeText: 'Esta es nuestra página web de trascendencia. Este proyecto consiste en crear un sitio web para la poderosa competición Pong. Esperamos que disfrute de su visita a nuestro sitio.',
-		login: "Iniciar sesión",
-		register: "Registrarse",
-		logout: "Cerrar sesión",
-		settings: "Ajustes",
-        language_selector: "Idioma: ",
-	},
-};
-
-// Change the language of the page
-export function changeLanguage(lang) {
-	const elements = document.querySelectorAll('[data-i18n]');
-	elements.forEach(element => {
-		const key = element.getAttribute('data-i18n');
-		const translation = translations[lang][key];
-
-		if (translation) {
-			element.childNodes[0].nodeValue = translation;
-		}
-	});
-}
-
 wsManager.AddNotificationListener((data) => {
         displayToast(data);
 })
@@ -268,7 +222,6 @@ export async function getAccessibility() {
             if (response.status === 200) {
                 const data = await response.json();
                 const userData = {
-                    language: data.language,
                     font_size: data.font_size,
                 };
                 return userData;
@@ -301,7 +254,6 @@ export async function getAccessibility() {
 export function applyAccessibilitySettings(userSettings) {
     const bodyElement = document.body;
     if (!userSettings) {
-        document.documentElement.setAttribute('lang', 'fr');
         bodyElement.style.fontSize = '16px';
         return;
     }
@@ -320,10 +272,5 @@ export function applyAccessibilitySettings(userSettings) {
             break;
         default:
             bodyElement.style.fontSize = '16px'; // Default value
-    }
-
-    // TODO: Apply the language
-    if (userSettings.language) {
-        document.documentElement.setAttribute('lang', userSettings.language);
     }
 }
