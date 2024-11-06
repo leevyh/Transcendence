@@ -316,7 +316,7 @@ export function homeView(container) {
 
     // Add event listener for keyboard accessibility
     closeRegisterButton.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter' || event.key === ' ') {
+        if (event.key === 'Enter' || event.key === ' ' || event.key === 'Escape') {
             event.preventDefault(); // Disable the default action
             closeRegisterButton.click(); // Simulate a click on the button
         }
