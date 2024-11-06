@@ -74,7 +74,7 @@ async function router() {
 
     if (chatWS) {chatWS.close();}
     if (inGame) {
-        console.log('Disconnecting player in app');
+        if (DEBUG) {console.log('Disconnecting player in app');}
         disconnectPlayer();
     }
 
@@ -100,6 +100,11 @@ async function router() {
         if (DEBUG) console.log('No user settings found');
     }
 
+    // Redirect to '/profile' if the user is authenticated and tries to access the home page
+    if (path === '/' && await isAuthenticated() === true) {
+        navigateTo('/profile');
+        return;
+    }
     if (path === '/profile') {
         // Load the current user's profile if no specific ID is provided
         const currentUser = await getCurrentUser();
