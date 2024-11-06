@@ -175,6 +175,17 @@ function displayMessage(messageData, otherUser) {
                 // Hide the accept button
                 acceptButton.style.display = 'none';
             });
+        } else if (messageData.message == 'Game invite accepted') {
+            messageContent.innerHTML = `
+                Game invite accepted.
+                <button class="btn btn-success join-button mt-2">Join the game</button>
+                <span class="msg-time position-absolute start-0">${new Date(messageData.timestamp).toLocaleTimeString()}</span>
+            `;
+            const joinButton = messageContent.querySelector('.join-button');
+            joinButton.addEventListener('click', () => {
+                if (DEBUG) {console.log('Join game');}
+                navigateTo('/pong');
+            });
         } else {
             messageContent.innerHTML = `
                 ${messageData.message}
