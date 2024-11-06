@@ -7,6 +7,9 @@ export let chatWS = null;
 // Function to open a chat with a user
 export function openChatWithUser(user) {
     checkConversationID(user).then(conversationID => {
+        // Reset the chat title
+        const chatTitle = document.querySelector('.chat-title');
+        chatTitle.textContent = 'Chat Window';
         openConversation(conversationID, user);
     });
 
@@ -84,17 +87,7 @@ async function openConversation(conversationID, otherUser) {
     const inviteGameButton = document.querySelector('.invite-game-button');
     inviteGameButton.style.display = 'block';
     inviteGameButton.addEventListener('click', () => {
-        console.log('Invite to play (TODO)');
-        // Send a message to the other user to invite him to play
-        if (chatWS && chatWS.readyState === WebSocket.OPEN) {
-            // Send the message to invite the user to play
-            const messageData = {
-                type: 'inviteUserToPlay',
-                // gameID: TODO: Implement a way to create a game with two users and get the gameID
-                timestamp: new Date().toISOString()
-            };
-            chatWS.send(JSON.stringify(messageData));
-        }
+        inviteUserToPlay();
     });
 
     chatWS = new WebSocket(`wss://${window.location.host}/ws/chat/${conversationID}/`);
@@ -108,7 +101,6 @@ async function openConversation(conversationID, otherUser) {
         if (DEBUG) {console.log('Chat WebSocket MESSAGE:', receivedMessage);}
 
         if (receivedMessage.type === 'chat_history') {
-            // Get the conversation data: Users info (nickname, avatar, blocked_status)
             const conversation = receivedMessage.conversation;
 
             // If chat history exists, display the messages
@@ -127,11 +119,13 @@ async function openConversation(conversationID, otherUser) {
                     blockUserButton.style.display = 'none';
                 } else if (conversation.other.blocked === true) { // If the other user is blocked
                     blockUserButton.style.color = 'green';
+                    blockUserButton.setAttribute('aria-label', `Unblock ${conversation.other.nickname}`); // Change the tooltip
                     blockUserButton.style.display = 'block';
                 }
             }
         } else if (receivedMessage.type === 'chat_message') {
             const messageData = {
+                type: 'chat_message',
                 sender: receivedMessage.sender,
                 message: receivedMessage.message,
                 timestamp: receivedMessage.timestamp,
@@ -146,6 +140,7 @@ async function openConversation(conversationID, otherUser) {
             } else if (receivedMessage.blocked !== receivedMessage.user) { // If the blocked user is the other user
                 const blockUserButton = document.getElementById(receivedMessage.blocked).querySelector('.block-button')
                 blockUserButton.style.color = 'green';
+                blockUserButton.setAttribute('aria-label', 'Unblock user'); // Change the tooltip
                 blockUserButton.style.display = 'block';
             }
         } else if (receivedMessage.type === 'user_unblocked') {
@@ -155,47 +150,51 @@ async function openConversation(conversationID, otherUser) {
                 enableChat(receivedMessage.blocked);
             }
         } else if (receivedMessage.type === 'game_invite') {
-            if (DEBUG) {console.log('Game invite received from:', receivedMessage.user);}
-            // Get the gameID and the id of the user who sent the invite
-            const gameID = receivedMessage.gameID;
-            const otherUser = receivedMessage.user;
-            // Create the accept and decline buttons and add them to the chat
-            const acceptButton = document.createElement('button');
-            acceptButton.className = 'btn btn-success accept-button';
-            acceptButton.textContent = 'Accept';
-            acceptButton.addEventListener('click', () => {
-                // Send a message to the other user to accept the game
-                if (chatWS && chatWS.readyState === WebSocket.OPEN) {
-                    // Send the message to accept the game
-                    const messageData = {
-                        type: 'acceptGameInvite',
-                        gameID: gameID,
-                        timestamp: new Date().toISOString()
-                    };
-                    chatWS.send(JSON.stringify(messageData));
-                }
-                // Accept the game invite
-                play(gameID);
+            if (receivedMessage.sender.nickname === receivedMessage.user) {
+                if (DEBUG) {console.log('Game invite sent to:', receivedMessage.receiver);}
+                const messageData = {
+                    type: 'game_invite',
+                    sender: receivedMessage.sender,
+                    message: "Game invite sent to " + receivedMessage.receiver,
+                    timestamp: receivedMessage.timestamp,
+                    user: receivedMessage.user
+                };
+                displayMessage(messageData);
+            } else {
+                if (DEBUG) {console.log('Game invite received from:', receivedMessage.sender.nickname);}
+                const messageData = {
+                    type: 'game_invite',
+                    sender: receivedMessage.sender,
+                    message: receivedMessage.sender.nickname + " has invited you to play a game.",
+                    timestamp: receivedMessage.timestamp,
+                    user: receivedMessage.user
+                };
+                displayMessage(messageData);
+            }
+        } else if (receivedMessage.type === 'accept_game_invite') {
+            if (DEBUG) {console.log('Game invite accepted by:', receivedMessage.sender.nickname);}
+            // Display a message to say that the game invite has been accepted
+            const chatBody = document.querySelector('.chat-body');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'd-flex justify-content-end mb-4 mr-2';
+            const messageContent = document.createElement('p');
+            messageContent.className = 'chat-msg position-relative accept-msg';
+            messageContent.innerHTML = `
+                Game invite accepted.
+                <button class="btn btn-success join-button mt-2">Join the game</button>
+                <span class="msg-time position-absolute end-0">${new Date(receivedMessage.timestamp).toLocaleTimeString()}</span>
+            `;
+            // Create a button to join the game
+            const joinButton = messageContent.querySelector('.join-button');
+            joinButton.addEventListener('click', () => {
+                if (DEBUG) {console.log('Join game');}
+                // Join the game
+                // play(receivedMessage.gameID);
             });
-
-            const declineButton = document.createElement('button');
-            declineButton.className = 'btn btn-danger decline-button';
-            declineButton.textContent = 'Decline';
-            declineButton.addEventListener('click', () => {
-                // Decline the game invite
-                // Send a message to the other user to decline the game
-                if (chatWS && chatWS.readyState === WebSocket.OPEN) {
-                    // Send the message to decline the game
-                    const messageData = {
-                        type: 'declineGameInvite',
-                        gameID: gameID,
-                        timestamp: new Date().toISOString()
-                    };
-                    chatWS.send(JSON.stringify(messageData));
-                }
-            });
+            messageDiv.appendChild(messageContent);
+            chatBody.appendChild(messageDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
         }
-
     }
 
     chatWS.onclose = function() {
@@ -234,12 +233,45 @@ function displayMessage(messageData) {
         imgAvatar.alt = 'Other user avatar';
         messageDiv.className = 'd-flex justify-content-start mb-4 ml-2';
         messageContent.className = 'chat-msg position-relative received-msg';
-        messageContent.innerHTML = `
-            ${messageData.message}
-            <span class="msg-time position-absolute start-0">${new Date(messageData.timestamp).toLocaleTimeString()}</span>
-        `;
+        if (messageData.type === 'game_invite') {
+            messageContent.innerHTML = `
+                ${messageData.message}
+                <button class="btn btn-success accept-button mt-2">Accept</button>
+                <span class="msg-time position-absolute start-0">${new Date(messageData.timestamp).toLocaleTimeString()}</span>
+            `;
+            const acceptButton = messageContent.querySelector('.accept-button');
+            acceptButton.addEventListener('click', () => {
+                // Action à effectuer lorsque le bouton est cliqué
+                console.log("Le bouton 'Accepter' a été cliqué");
+                acceptGameInvite(messageData.sender.nickname);
+                // Cacher le bouton accepter
+                acceptButton.style.display = 'none';
+                // TODO: Call API to accept the game invite 
+            });
+        } else if (messageData.message == 'Game invite send to ' + messageData.user) {
+            messageContent.innerHTML = `
+                ${messageData.sender.nickname} has invited you to play a game.
+                <button class="btn btn-success accept-button mt-2">Accept</button>
+                <span class="msg-time position-absolute start-0">${new Date(messageData.timestamp).toLocaleTimeString()}</span>
+            `;
+            const acceptButton = messageContent.querySelector('.accept-button');
+            acceptButton.addEventListener('click', () => {
+                // Action à effectuer lorsque le bouton est cliqué
+                console.log("Le bouton 'Accepter' a été cliqué");
+                acceptGameInvite(messageData.sender.nickname);
+                // Cacher le bouton accepter
+                acceptButton.style.display = 'none';
+                // TODO: Call API to accept the game invite 
+            });
+        } else {
+            messageContent.innerHTML = `
+                ${messageData.message}
+                <span class="msg-time position-absolute start-0">${new Date(messageData.timestamp).toLocaleTimeString()}</span>
+            `;
+        }
         messageDiv.appendChild(imgAvatar);
         messageDiv.appendChild(messageContent);
+
     }
     chatBody.appendChild(messageDiv);
     chatBody.scrollTop = chatBody.scrollHeight;
@@ -256,6 +288,34 @@ export function handleMessage(message) {
         chatWS.send(JSON.stringify(messageData));
     } else {
         if (DEBUG) {console.error('Chat WebSocket is not open.');}
+    }
+}
+
+// Function to invite a user to play
+export function inviteUserToPlay() {
+    // Recupérer le nom de l'utilisateur à inviter via le titre du chat
+    const chatTitle = document.querySelector('.chat-title');
+    const otherUser = chatTitle.textContent.split(' ')[2];
+    console.log('Invite', otherUser, 'to play a game.');
+    if (chatWS && chatWS.readyState === WebSocket.OPEN) {
+        const messageData = {
+            type: 'game_invite',
+            invited: otherUser,
+            timestamp: new Date().toISOString()
+        };
+        chatWS.send(JSON.stringify(messageData));
+    }
+}
+
+// Function to accept a game invite
+export function acceptGameInvite(fromUser) {
+    if (chatWS && chatWS.readyState === WebSocket.OPEN) {
+        const messageData = {
+            type: 'accept_game_invite',
+            invitation_from: fromUser,
+            timestamp: new Date().toISOString()
+        };
+        chatWS.send(JSON.stringify(messageData));
     }
 }
 
@@ -294,6 +354,7 @@ function enableChat(otherUser) {
         chatSendButton.disabled = false;
         inviteGameButton.disabled = false;
         blockUserButton.style.color = 'red';
+        blockUserButton.setAttribute('aria-label', `Block ${otherUser}`); // Change the tooltip
         blockUserButton.style.display = 'block';
     }
 }

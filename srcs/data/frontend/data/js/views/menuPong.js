@@ -168,22 +168,28 @@ export async function menuPongView(container) {
 
 
     function openModal() {
-        if (modalGameSettings.style.display === 'block') {
-            modalGameSettings.removeAttribute('aria-hidden'); // Supprimer aria-hidden quand la modale est visible
-            modalGameSettings.focus(); // Donner le focus à la modale pour une meilleure accessibilité
-        }
+        modalGameSettings.style.display = 'block';
+        modalGameSettings.removeAttribute('aria-hidden');
+        modalGameSettings.focus();
 
-            // Ouvre la modal
-            modalGameSettings.style.display = 'block';
-            setTimeout(() => {
-                modalGameSettings.classList.add('modalGameSettingsBase-show');
-                modalGameSettings.setAttribute('tabindex', '-1'); // Make the modal focusable
-                modalGameSettings.focus();
-                mainDivMenu.style.backdropFilter = 'blur(10px)';
-                mainDivMenu.style.transition = 'backdrop-filter 0.3s ease';
-            }, 10);
-        }
+        setTimeout(() => {
+            modalGameSettings.classList.add('modalGameSettingsBase-show');
+            modalGameSettings.setAttribute('tabindex', '-1'); // Rendre la modal focusable
+            mainDivMenu.style.backdropFilter = 'blur(10px)';
+            mainDivMenu.style.transition = 'backdrop-filter 0.3s ease';
+        }, 10);
 
+        // Empêcher le focus de sortir de la modal
+        document.addEventListener('focusin', trapFocus);
+    }
+
+    // Fonction de gestion du focus pour rester dans la modal
+    function trapFocus(event) {
+        if (!modalGameSettings.contains(event.target)) {
+            event.stopPropagation();
+            modalGameSettings.focus();
+        }
+    }
         // Bouton Solo
         const soloButton = createAnimatedButton(
             'soloButton',               // Classe du bouton
@@ -237,6 +243,7 @@ export async function menuPongView(container) {
         modalGameSettings.setAttribute('aria-labelledby', 'modalGameSettingsLabel');
         modalGameSettings.setAttribute('aria-hidden', 'true');
         modalGameSettings.style.display = 'none'; // Initialement caché
+
         mainDivMenu.appendChild(modalGameSettings);
 
         const modalGameSettingsDialog = document.createElement('div');
@@ -251,7 +258,7 @@ export async function menuPongView(container) {
         modalGameSettingsHeader.className = 'modal-header pb-2 border-bottom modalLoginHeader';
         modalGameSettingsContent.appendChild(modalGameSettingsHeader);
 
-        const modalGameSettingsTitle = document.createElement('h2');
+        const modalGameSettingsTitle = document.createElement('h1');
         modalGameSettingsTitle.textContent = 'Game Settings';
         modalGameSettingsTitle.className = 'modal-title modalLoginTitle';
         modalGameSettingsHeader.appendChild(modalGameSettingsTitle);
@@ -275,25 +282,32 @@ export async function menuPongView(container) {
 
         // Add event listener for mouse accessibility
         closeButton.addEventListener('click', () => {
-            modalGameSettings.classList.remove('modalGameSettingsBase-show');
-            setTimeout(() => {
-                modalGameSettings.style.display = 'none';
-                mainDivMenu.style.backdropFilter = 'none'; // Retire le flou via JS
-                // form.reset();
-            }, 100);
+            closeModalActions();
         });
 
         document.addEventListener('click', (event) => {
-            // Si le clic est en dehors du contenu de la modal
-            if (!modalGameSettingsContent.contains(event.target) && !soloButton.contains(event.target) && !duoButton.contains(event.target) && !tournamentButton.contains(event.target) && modalGameSettings.style.display === 'block') {
-                modalGameSettings.classList.remove('modalGameSettingsBase-show');
-                document.body.classList.remove('blur-background'); // Enlève l'effet de flou
-                setTimeout(() => {
-                    modalGameSettings.style.display = 'none';
-                }, 100);
-                //form.reset();
+            if (!modalGameSettingsContent.contains(event.target) &&
+                !soloButton.contains(event.target) &&
+                !duoButton.contains(event.target) &&
+                !tournamentButton.contains(event.target) &&
+                modalGameSettings.style.display === 'block') {
+
+                closeModalActions();
             }
         });
+
+        function closeModalActions() {
+            modalGameSettings.classList.remove('modalGameSettingsBase-show');
+
+            setTimeout(() => {
+                modalGameSettings.style.display = 'none';
+                modalGameSettings.setAttribute('aria-hidden', 'true');
+                mainDivMenu.style.backdropFilter = 'none';
+            }, 100);
+
+            // Retirer le piège de focus
+            document.removeEventListener('focusin', trapFocus);
+        }
 
         let tempBackgroundColor = GameSettings.background_game;
         let tempPadsColor = GameSettings.pads_color;
@@ -336,6 +350,7 @@ export async function menuPongView(container) {
             const textElement = document.createElement('p');
             textElement.className = 'w-100 d-flex justify-content-center align-items-center';
             textElement.textContent = textContent;
+            textElement.style.color = '#000';
             //ADD textElement.style.color = couleur que tu veux
             blockTheme.appendChild(textElement);
 
@@ -449,9 +464,10 @@ export async function menuPongView(container) {
         const autumnBlock = createImageBlock('/js/img/leaf.png', '90px', 'Autumn');
         ContenerThemes.appendChild(autumnBlock);
 
-        const TitleBackgroundColor = document.createElement('h5');
-        TitleBackgroundColor.className = 'TitleBackgroundColor mb-4';
+        const TitleBackgroundColor = document.createElement('p');
+        TitleBackgroundColor.className = 'TitleBackgroundColor mb-4 fs-5';
         TitleBackgroundColor.textContent = 'Game color';
+        TitleBackgroundColor.style.color = '#000';
         form.appendChild(TitleBackgroundColor);
 
         // Div contenant les options de couleur
@@ -463,68 +479,80 @@ export async function menuPongView(container) {
         // Fonction pour creer le visuel des couleurs
         const addColorOptions = (container, colorType) => {
             Object.entries(colorMapping).forEach(([colorName, colorValue]) => {
-                const colorDiv = document.createElement('div');
-                colorDiv.className = 'color-option';
-                colorDiv.style.backgroundColor = colorValue;
-                colorDiv.style.width = '40px';
-                colorDiv.style.height = '40px';
-                colorDiv.style.borderRadius = '50%';
-                colorDiv.style.margin = '0 5px';
-                colorDiv.style.cursor = 'pointer';
-                colorDiv.style.border = '2px solid transparent'; // Bordure initialement transparente
-                colorDiv.setAttribute('tabindex', '0');
-                colorDiv.setAttribute('aria-label', `Select ${colorName} color`);
+                // Créer un bouton pour chaque option de couleur
+                const colorButton = document.createElement('button');
+                colorButton.className = 'color-option';
+                colorButton.style.backgroundColor = colorValue;
+                colorButton.style.width = '40px';
+                colorButton.style.height = '40px';
+                colorButton.style.borderRadius = '50%';
+                colorButton.style.margin = '0 5px';
+                colorButton.style.cursor = 'pointer';
+                colorButton.style.border = '2px solid transparent'; // Bordure initialement transparente
+                colorButton.setAttribute('aria-label', `Select ${colorName} color for ${colorType}`); // Aria label pour l'accessibilité
+                colorButton.type = 'button'; // Empêche le comportement de soumission
 
-                if (selectTheme == false) {
-                    if (colorType === 'background' && GameSettings.background_game == colorName) {
-                        colorDiv.style.border = '4px solid #F4ED37';
+                // Logique de sélection visuelle
+                if (selectTheme === false) {
+                    if (colorType === 'background' && GameSettings.background_game === colorName) {
+                        colorButton.style.border = '4px solid #F4ED37';
+                    } else if (colorType === 'pads' && GameSettings.pads_color === colorName) {
+                        colorButton.style.border = '4px solid #F4ED37';
+                    } else if (colorType === 'ball' && GameSettings.ball_color === colorName) {
+                        colorButton.style.border = '4px solid #F4ED37';
                     }
-                    else if (colorType === 'pads' && GameSettings.pads_color == colorName) {
-                        colorDiv.style.border = '4px solid #F4ED37';
-                    }
-                    else if (colorType === 'ball' && GameSettings.ball_color == colorName) {
-                        colorDiv.style.border = '4px solid #F4ED37';
-                    }
-                }
-                if (selectTheme == true) {
+                } else if (selectTheme === true) {
                     if ((colorType === 'background' && colorName === tempBackgroundColor) ||
-                    (colorType === 'pads' && colorName === tempPadsColor) ||
-                    (colorType === 'ball' && colorName === tempBallColor)) {
-                        colorDiv.style.border = '4px solid #F4ED37';
+                        (colorType === 'pads' && colorName === tempPadsColor) ||
+                        (colorType === 'ball' && colorName === tempBallColor)) {
+                        colorButton.style.border = '4px solid #F4ED37';
                     }
                 }
 
-                colorDiv.addEventListener('keydown', (event) => {
+                // Écouteur d'événements pour le clavier
+                colorButton.addEventListener('keydown', (event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault(); // Disable the default action
-                        colorDiv.click(); // Simulate a click on the button
+                        event.preventDefault(); // Empêcher l'action par défaut
+                        colorButton.click(); // Simule un clic sur le bouton
                     }
                 });
-                colorDiv.addEventListener('click', () => {
-                    const isSelected = colorDiv.style.border === '4px solid #F4ED37';
+
+                // Écouteur d'événements pour le clic
+                colorButton.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Empêche la propagation vers le formulaire
+                    const isSelected = colorButton.style.border === '4px solid #F4ED37';
                     container.querySelectorAll('.color-option').forEach(option => {
-                        option.style.border = '2px solid transparent';
+                        option.style.border = '2px solid transparent'; // Réinitialise la bordure des autres options
                     });
-                    if (!isSelected)
-                        colorDiv.style.border = '4px solid #F4ED37';
-                    if (colorType === 'background')
+                    if (!isSelected) {
+                        colorButton.style.border = '4px solid #F4ED37'; // Sélectionne la nouvelle couleur
+                    }
+                    // Met à jour la couleur temporaire en fonction du type
+                    if (colorType === 'background') {
                         tempBackgroundColor = colorName;
-                    else if (colorType === 'pads')
+                    } else if (colorType === 'pads') {
                         tempPadsColor = colorName;
-                    else if (colorType === 'ball')
+                    } else if (colorType === 'ball') {
                         tempBallColor = colorName;
+                    }
                     const colorsMatch = verifySelectedThemeColors();
-                    if (!colorsMatch)
+                    if (!colorsMatch) {
                         removeThemeBorder();
+                    }
                 });
-                container.appendChild(colorDiv);
+
+                // Ajoute le bouton au conteneur
+                container.appendChild(colorButton);
             });
         };
 
+
+
         addColorOptions(colorOptionsContainer, 'background');// Pour le fond du jeu
 
-        const TitlePadsColor = document.createElement('h5');
-        TitlePadsColor.className = 'TitlePadsColor mb-4';
+        const TitlePadsColor = document.createElement('p');
+        TitlePadsColor.className = 'TitlePadsColor mb-4 fs-5';
+        TitlePadsColor.style.color = '#000';
         TitlePadsColor.textContent = 'Pads Color';
         form.appendChild(TitlePadsColor);
 
@@ -534,16 +562,17 @@ export async function menuPongView(container) {
 
         addColorOptions(colorOptionsContainerPad, 'pads');    // COLOR Pour les pads
 
-        const TitleBallColor = document.createElement('h5');
-        TitleBallColor.className = 'TitleBallColor mb-4';
+        const TitleBallColor = document.createElement('p');
+        TitleBallColor.className = 'TitleBallColor mb-4 fs-5';
         TitleBallColor.textContent = 'Ball Color';
+        TitleBallColor.style.color = '#000';
         form.appendChild(TitleBallColor);
 
         const colorOptionsContainerBall = document.createElement('div');
         colorOptionsContainerBall.className = 'd-flex justify-content-center mb-3 colorOptionsContainer';
         form.appendChild(colorOptionsContainerBall);
 
-        addColorOptions(colorOptionsContainerBall, 'ball');  //COLOR Pour la balle
+       addColorOptions(colorOptionsContainerBall, 'ball');  //COLOR Pour la balle
 
 
         function refreshColorOptions() {
@@ -569,10 +598,7 @@ export async function menuPongView(container) {
         {
             if (tempBackgroundColor == tempPadsColor || tempBackgroundColor == tempBallColor)
                 return false;
-            if (tempBackgroundColor == 'white' && (tempPadsColor === 'pink' || tempBallColor === 'pink') ||
-                tempBackgroundColor == 'white' && (tempPadsColor === 'gray' || tempBallColor === 'gray') ||
-                tempBackgroundColor == 'white' && (tempPadsColor === 'lila' || tempBallColor === 'lila') ||
-                tempBackgroundColor == 'white' && (tempPadsColor === 'blue_light' || tempBallColor === 'blue_light'))
+            if (tempBackgroundColor == 'white')
                 return false;
             if (tempBackgroundColor == 'purple' && (tempPadsColor === 'blue' || tempBallColor === 'blue') ||
                 tempBackgroundColor == 'purple' && (tempPadsColor === 'pink' || tempBallColor === 'pink') ||

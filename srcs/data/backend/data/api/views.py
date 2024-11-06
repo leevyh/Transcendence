@@ -384,7 +384,6 @@ def get_settings(request):
                     'email': user.email,
                     'language': settings.language,
                     'font_size': settings.font_size,
-                    'dark_mode': settings.dark_mode,
                     'avatar': avatar}
             return JsonResponse(data, status=200)
         except Accessibility.DoesNotExist:

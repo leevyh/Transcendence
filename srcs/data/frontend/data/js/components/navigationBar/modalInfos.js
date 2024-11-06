@@ -133,10 +133,5 @@ export async function createModalInfo(userData) {
     ModalPoliceElem.textContent = `Font size : ${userData.font_size}`;
     modalInfoColumnInfos.appendChild(ModalPoliceElem);
 
-    const ModalModeElem = document.createElement('div');
-    ModalModeElem.className = 'ModalModeElem';
-    ModalModeElem.textContent = `Dark Mode : ${userData.theme}`;
-    modalInfoColumnInfos.appendChild(ModalModeElem);
-
     return modalInfo;
 }
