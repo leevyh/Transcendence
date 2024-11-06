@@ -31,6 +31,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     # cree une partie si le joueur est le premier a se connecter ou rejoint une partie si un autre joueur est deja connecte. return cette partie
     async def findMatch(self, player):
+        print("consumer invitational games : ", invitational_games)
         for game in invitational_games:
             if game.player_1 == player:
                 print("consumer create invitation game with user : ", player)
@@ -53,7 +54,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                 game.status = "ready"
                 invitational_games.remove(game)
                 self.task = asyncio.create_task(self.game.game_loop())
-                return game
+            return game
 
         if (len(list_of_games) == 0) :
             print("consumer create game with user : ", player)

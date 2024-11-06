@@ -2,6 +2,8 @@ import { DEBUG, navigateTo } from '../../app.js';
 import { play } from '../../views/pong_game.js';
 import { getCookie } from '../../views/utils.js';
 import { createChatWindow } from './visual.js';
+// import { openModal } from '../views/menuPong.js';
+// import { redirectTo } from '../views/menuPong.js';
 
 export let chatWS = null;
 
