@@ -213,10 +213,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         sender = await database_sync_to_async(User.objects.get)(nickname=user.nickname)
         members = await database_sync_to_async(list)(conversation.members.all())
 
+        # Get the invited user based on the id from the event
+        invited = await database_sync_to_async(User.objects.get)(id=event['invited'])
+
         message = await database_sync_to_async(Message.objects.create)(
             conversation=conversation,
             sender=sender,
-            content="Game invite send to " + event['invited'],
+            content="Game invite send to " + invited.nickname,
             timestamp=event['timestamp']
         )
 
@@ -228,7 +231,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'id': sender.id,
                 'avatar': encode_avatar(sender),
             },
-            'receiver': event['invited'],
+            'receiver': invited.nickname,
             'timestamp': str(message.timestamp)
         }
 
