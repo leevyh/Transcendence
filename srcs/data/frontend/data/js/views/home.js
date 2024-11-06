@@ -207,6 +207,7 @@ export function homeView(container) {
                 if (data.url) {
                     window.location.href = data.url;
                 }
+                navigateTo('/profile');
             })
             .catch(error => {
                 const errorMessage = document.createElement('p');

@@ -597,6 +597,7 @@ export async function menuPongView(container) {
         function checkColorMatching(tempBackgroundColor, tempPadsColor, tempBallColor)
         {
             if (tempBackgroundColor == tempPadsColor || tempBackgroundColor == tempBallColor)
+
                 return false;
             if (tempBackgroundColor == 'white')
                 return false;
@@ -670,7 +671,14 @@ export async function menuPongView(container) {
                     },
                     body: JSON.stringify(GameSettings),
                 });
-                if (response.ok && checkColorMatching(tempBackgroundColor, tempPadsColor, tempBallColor)) {
+                if (!response.ok) {
+                    const errorMessage = document.createElement('p');
+                    errorMessage.className = 'text-danger';
+                    errorMessage.textContent = 'Invalid coulour choices';
+                    form.insertBefore(errorMessage, playButton);
+                    form.reset();
+                }
+                else if (response.ok && checkColorMatching(tempBackgroundColor, tempPadsColor, tempBallColor)) {
 
                     const successMessage = document.createElement('p');
                     successMessage.className = 'text-success';
@@ -679,9 +687,7 @@ export async function menuPongView(container) {
                     navigateTo(redirectTo);
                     form.reset();
 
-                }
-                if (!checkColorMatching(tempBackgroundColor, tempPadsColor, tempBallColor))
-                {
+                } else {
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'text-danger';
                     errorMessage.textContent = 'Low visibility, try again.';
@@ -689,13 +695,7 @@ export async function menuPongView(container) {
                     setTimeout(() => errorMessage.remove(), 3000);
                     form.reset();
                 }
-                else {
-                    const errorMessage = document.createElement('p');
-                    errorMessage.className = 'text-danger';
-                    errorMessage.textContent = 'Invalid coulour choices';
-                    form.insertBefore(errorMessage, playButton);
-                    form.reset();
-                }
+                // if (!checkColorMatching(tempBackgroundColor, tempPadsColor, tempBallColor))
             } catch (error) {
                 const errorMessage = document.createElement('p');
                 errorMessage.className = 'text-danger';
