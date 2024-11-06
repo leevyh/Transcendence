@@ -24,9 +24,7 @@ export async function chatView(container) {
      if (statusChatSocket === null) {
         statusChatSocket = new WebSocket(`wss://${window.location.host}/ws/status/`);
         statusChatSocket.onopen = function (event) {
-            if (DEBUG) {
-                console.log('Status WebSocket opened (in Chat)');
-            }
+            if (DEBUG) {console.log('Status WebSocket opened (in Chat)');}
         }
     }
     else if (statusChatSocket.readyState === WebSocket.CLOSED) {
