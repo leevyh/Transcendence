@@ -56,8 +56,8 @@ class CLIPongConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_2)
             game.status = "ready"
             await asyncio.gather(
-                self.periodic_state_update()
-                self.game.game_loop(),
+                self.periodic_state_update(),
+                self.game.game_loop()
             )
 
         return game
@@ -146,17 +146,41 @@ class CLIPongConsumer(AsyncWebsocketConsumer):
         await self.close()
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
+        print("Received text_data:", text_data)
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError as e:
+            print(f"JSONDecodeError: {e}")
+            return
+   
+        # if text_data is not None:
+        #     data = json.loads(text_data)
+        # else:
+        #     data = None
+        from api.models import User_site
+        player = User_site
+        player.nickname = 'anonymous'
+        # print("data : ", data)
         # Update player positions or handle key events
-        if data['type'] == 'update_player_position':
-            if hasattr(self, 'game') and self.game is not None and self.game.is_active:
-                self.game.move_player(data['player'], data['move'])
+        if data['type'] == 'up':
+            print("up 1")
+            print("game : ", self.game)
+            print("game is active : ", self.game.is_active)
+            if hasattr(self, 'game') and self.game is not None and self.game.is_active :
+                print("up 2")
+                if self.game.player_1 == player:
+                    self.game.move_player('player_1', 'up')
+                else:
+                    self.game.move_player('player_2', 'up')
+        if data['type'] == 'down':
+            if hasattr(self, 'game') and self.game is not None and self.game.is_active and text_data:
+                if self.game.player_1 == player:
+                    self.game.move_player('player_1', 'down')
+                else:
+                    self.game.move_player('player_2', 'down')
         if data['type'] == 'state_of_the_game':
             await self.state_of_the_game()
         if data['type'] == 'stop_game' :
-            from api.models import User_site
-            player = User_site
-            player.nickname = 'anonymous'
             if self.game.player_1 == player:
                 self.game.winner = self.game.player_2
                 self.game.loser = self.game.player_1

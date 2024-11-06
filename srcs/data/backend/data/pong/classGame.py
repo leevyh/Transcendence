@@ -180,6 +180,7 @@ class PongGame:
     
     #move the player
     def move_player(self, player, move):
+        print("move player : ", player, " ", move)
         if player == 'player_1':
             if move == "up":
                 self.move_player_1_up = True
