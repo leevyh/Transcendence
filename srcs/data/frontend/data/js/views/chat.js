@@ -4,6 +4,8 @@ import { navigationBar } from './navigation.js';
 import { createGlobalContainer, createUserCard } from '../components/chat/visual.js';
 import { notifications } from "./notifications.js";
 
+export let statusChatSocket = null;
+
 export async function chatView(container) {
     container.innerHTML = '';
 
@@ -18,14 +20,29 @@ export async function chatView(container) {
     div.appendChild(viewContainer);
 
     // Create the WebSocket for user status
-    const statusSocket = new WebSocket(`wss://${window.location.host}/ws/status/`);
+
+     if (statusChatSocket === null) {
+        statusChatSocket = new WebSocket(`wss://${window.location.host}/ws/status/`);
+        statusChatSocket.onopen = function (event) {
+            if (DEBUG) {
+                console.log('Status WebSocket opened (in Chat)');
+            }
+        }
+    }
+    else if (statusChatSocket.readyState === WebSocket.CLOSED) {
+        statusChatSocket = new WebSocket(`wss://${window.location.host}/ws/status/`);
+        statusChatSocket.onopen = function (event) {
+            if (DEBUG) {console.log('Status WebSocket opened (in Chat)');}
+        }
+    }
+
     // Onopen event
-    statusSocket.onopen = function(event) {
+    statusChatSocket.onopen = function(event) {
         if (DEBUG) {console.log('Status WebSocket opened (in Chat)');}
     };
 
     // On message received from the server (status of a user)
-    statusSocket.onmessage = function(event) {
+    statusChatSocket.onmessage = function(event) {
         const data = JSON.parse(event.data);
         // Update the user list with the new status
         const userList = document.getElementById('user-list');
@@ -36,7 +53,7 @@ export async function chatView(container) {
     };
 
     // Onclose event
-    statusSocket.onclose = function(event) {
+    statusChatSocket.onclose = function(event) {
         if (DEBUG) {console.error('Status WebSocket closed (in Chat)', event);}
     };
 

@@ -1,7 +1,10 @@
 import { DEBUG, navigateTo } from '../app.js';
 import { getCookie } from './utils.js';
 import { createNavigationBar } from '../components/navigationBar/visual.js';
-import {displayFriends, updateFriendStatus, addNewFriend} from '../components/navigationBar/friends.js';
+import { displayFriends, updateFriendStatus, addNewFriend } from '../components/navigationBar/friends.js';
+
+
+export let friends_websocket = null;
 
 export async function navigationBar(container) {
     const div = document.createElement('div');
@@ -31,14 +34,31 @@ export async function navigationBar(container) {
                     avatar: data.avatar,
                 };
 
-                const friends_websocket = new WebSocket(`wss://${window.location.host}/ws/friends/`);
-                friends_websocket.onopen = () => {
-                    if (DEBUG) console.log('Friends WebSocket connection established');
-                    friends_websocket.send(JSON.stringify({type: 'get_friends'}));
+                console.log("friends_websocket", friends_websocket);
+                if (friends_websocket === null) {
+                    friends_websocket = new WebSocket(`wss://${window.location.host}/ws/friends/`);
+                    friends_websocket.onopen = function (event) {
+                        if (DEBUG) {console.log('Status WebSocket opened (in Navigation)');}
+                        friends_websocket.send(JSON.stringify({type: 'get_friends'}));
+
+                    }
                 }
+                else if (friends_websocket.readyState === WebSocket.CLOSED) {
+                    friends_websocket = new WebSocket(`wss://${window.location.host}/ws/friends/`);
+                    friends_websocket.onopen = function (event) {
+                        if (DEBUG) {console.log('Status WebSocket opened (in Navigation)');}
+                        friends_websocket.send(JSON.stringify({type: 'get_friends'}));
+                    }
+                }
+                else  if (friends_websocket.readyState === WebSocket.OPEN) {
+                        friends_websocket.send(JSON.stringify({type: 'get_friends'}));
+                }
+
 
                 friends_websocket.onmessage = event => {
                     const message = JSON.parse(event.data);
+                    console.log('Friends:', message);
+
                     if (message.type === 'get_friends') {
                         displayFriends(message.friends);
                     } else if (message.type === 'friends_status_update') {
