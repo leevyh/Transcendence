@@ -54,7 +54,6 @@ class PongGame:
         while self.is_active:
             await self.move_ball()
             await self.move_player_loop()
-            await self.broadcastState()
             await asyncio.sleep(0.01)
 
     #start the game
@@ -181,6 +180,7 @@ class PongGame:
     
     #move the player
     def move_player(self, player, move):
+        print("move player : ", player, " ", move)
         if player == 'player_1':
             if move == "up":
                 self.move_player_1_up = True
@@ -227,7 +227,8 @@ class PongGame:
             self.loser = self.player_1 if self.player_1_score < self.player_2_score else self.player_2
         self.channel_winner = self.channel_player_1 if self.winner == self.player_1 else self.channel_player_2
         self.channel_loser = self.channel_player_1 if self.loser == self.player_1 else self.channel_player_2
-        await self.save_game()
+        if self.player_1.nickname != 'anonymous_player' and self.player_2.nickname != 'anonymous_player':
+            await self.save_game()
         print("winner : ", self.winner.nickname)
         print("loser : ", self.loser.nickname)
         await self.channel_layer.group_send(
