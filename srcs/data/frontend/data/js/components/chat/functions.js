@@ -119,6 +119,7 @@ async function openConversation(conversationID, otherUser) {
                     blockUserButton.style.display = 'none';
                 } else if (conversation.other.blocked === true) { // If the other user is blocked
                     blockUserButton.style.color = 'green';
+                    blockUserButton.setAttribute('aria-label', `Unblock ${conversation.other.nickname}`); // Change the tooltip
                     blockUserButton.style.display = 'block';
                 }
             }
@@ -139,6 +140,7 @@ async function openConversation(conversationID, otherUser) {
             } else if (receivedMessage.blocked !== receivedMessage.user) { // If the blocked user is the other user
                 const blockUserButton = document.getElementById(receivedMessage.blocked).querySelector('.block-button')
                 blockUserButton.style.color = 'green';
+                blockUserButton.setAttribute('aria-label', 'Unblock user'); // Change the tooltip
                 blockUserButton.style.display = 'block';
             }
         } else if (receivedMessage.type === 'user_unblocked') {
@@ -352,6 +354,7 @@ function enableChat(otherUser) {
         chatSendButton.disabled = false;
         inviteGameButton.disabled = false;
         blockUserButton.style.color = 'red';
+        blockUserButton.setAttribute('aria-label', `Block ${otherUser}`); // Change the tooltip
         blockUserButton.style.display = 'block';
     }
 }

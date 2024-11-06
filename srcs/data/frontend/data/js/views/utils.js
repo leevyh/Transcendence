@@ -264,7 +264,6 @@ export async function getAccessibility() {
                 const userData = {
                     language: data.language,
                     font_size: data.font_size,
-                    theme: data.dark_mode,
                 };
                 return userData;
             } else if (response.status === 307) {
@@ -298,7 +297,6 @@ export function applyAccessibilitySettings(userSettings) {
     if (!userSettings) {
         document.documentElement.setAttribute('lang', 'fr');
         bodyElement.style.fontSize = '16px';
-        document.body.classList.remove('dark-mode');
         return;
     }
     if (DEBUG) {console.log('User settings:', userSettings);}
@@ -321,12 +319,5 @@ export function applyAccessibilitySettings(userSettings) {
     // TODO: Apply the language
     if (userSettings.language) {
         document.documentElement.setAttribute('lang', userSettings.language);
-    }
-
-    // TODO: Apply the dark/light theme
-    if (userSettings.theme) {
-        document.body.classList.add('dark-mode');
-    } else {
-        document.body.classList.remove('dark-mode');
     }
 }

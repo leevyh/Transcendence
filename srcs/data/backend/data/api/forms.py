@@ -21,8 +21,7 @@ class AccessibilityUpdateForm(forms.ModelForm):
     class Meta:
         model = Accessibility
         fields = ['language',
-                  'font_size',
-                  'dark_mode']
+                  'font_size']
 
 class SettingsForm(forms.ModelForm):
     class Meta:

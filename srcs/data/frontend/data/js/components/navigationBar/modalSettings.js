@@ -57,7 +57,7 @@ export async function createModalSettings(userData) {
     });
 
     const modalSettingsBody = document.createElement('div');
-    modalSettingsBody.className = 'modal-body modalSettingsBody';
+    modalSettingsBody.className = 'modal-body modalSettingsBody text-body';
     modalSettingsContent.appendChild(modalSettingsBody);
 
     // Creation of the settings form
@@ -114,11 +114,6 @@ async function createSettingsForm() {
         const nickname = data.get('newNicknameModify');
         const email = data.get('newEmailModify');
 
-        // TODO: ATTENTION, si le nickname est vide et qu'on veut changer que l'email, le nickname sera vide
-        // et donc le serveur renverra une erreur car le nickname est obligatoire
-        // Il faudrait donc vérifier si le nickname est vide et si c'est le cas, le remplacer par l'ancien nickname
-        // et ne pas envoyer le nickname au serveur si il est vide
-
         // Check the size of the nickname (between 3 and 10 characters)
         if (nickname && nickname.length < 3 || nickname.length > 10) {
             const errorMessage = document.createElement('p');
@@ -160,10 +155,6 @@ async function createSettingsForm() {
                     settingsForm.insertBefore(errorMessage, settingsSubmitButton);
                     settingsForm.reset();
                 });
-                // errorMessage.textContent = 'Error while modifying parameters';
-                // settingsForm.insertBefore(errorMessage, settingsSubmitButton);
-
-                // Reset the form after success
             }
         } catch (error) {
             if (DEBUG) {console.error(error);}
@@ -181,7 +172,7 @@ async function createSettingsForm() {
 }
 
 async function createAccessibilityForm(userData) {
-    // Creation of the form to modify accessibility settings {font_size, language, dark_mode} = accessibilityForm
+    // Creation of the form to modify accessibility settings {font_size, language} = accessibilityForm
     const accessibilityForm = document.createElement('form');
     accessibilityForm.className = 'w-100 mt-4 accessibilityForm';
 
@@ -217,20 +208,6 @@ async function createAccessibilityForm(userData) {
     optionEs.textContent = 'Espanol';
     language.appendChild(optionEs);
 
-    // Creation of the dark mode field
-    const labelDarkMode = document.createElement('label');
-    labelDarkMode.className = 'form-label';
-    labelDarkMode.textContent = 'Dark mode';
-    accessibilityForm.appendChild(labelDarkMode);
-
-    const darkMode = document.createElement('input');
-    darkMode.type = 'checkbox';
-    darkMode.id = 'dark-mode';
-    darkMode.name = 'dark-mode';
-    darkMode.className = 'form-check-input mb-4 ms-4';
-    darkMode.value = userData.theme;
-    accessibilityForm.appendChild(darkMode);
-
     // Submit button
     const accessSubmitButton = document.createElement('button');
     accessSubmitButton.type = 'submit';
@@ -252,7 +229,6 @@ async function createAccessibilityForm(userData) {
         const data = new FormData(accessibilityForm);
         const font_size = data.get('font-size');
         const language = data.get('language');
-        const dark_mode = data.get('dark-mode');
 
         try {
             // Send the data to the server
@@ -263,7 +239,7 @@ async function createAccessibilityForm(userData) {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
-                body: JSON.stringify({ font_size, language, dark_mode })
+                body: JSON.stringify({ font_size, language })
             });
 
             if (response.ok) {
