@@ -1,4 +1,4 @@
-export const DEBUG = true;
+export const DEBUG = false;
 
 import { chatWS } from './components/chat/functions.js';
 import { getCookie, getAccessibility, applyAccessibilitySettings, isAuthenticated } from './views/utils.js';
