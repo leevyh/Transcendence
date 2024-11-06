@@ -22,8 +22,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.conversation_group_name, self.channel_name)
         await self.accept()
 
-        # Add inactive_connections -> Means the user is active in the chat
-        active_connections[user.id] = self.channel_name
+        # Initialize new list of active_connections for the conversation
+        if self.conversation_id not in active_connections:
+            active_connections[self.conversation_id] = []
+
+        # Add new connection to the list of active_connections
+        active_connections[self.conversation_id].append(user.id)
+        # print(f"User {user.nickname} connected to conversation {self.conversation_id}.") # DEBUG
 
         # Check and remode any existing notifications for this conversation
         await self.remove_notifications(user, self.conversation_id)
@@ -36,10 +41,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Leave conversation group
         user = self.scope['user']
         await self.channel_layer.group_discard(self.conversation_group_name, self.channel_name)
+        self.conversation_id = self.scope['url_route']['kwargs']['conversationID']
 
-        # Remove from active_connections -> Means the user is not active in the chat
-        if user.id in active_connections:
-            del active_connections[user.id]
+        # Remove from active_connections
+        if self.conversation_id in active_connections:
+            active_connections[self.conversation_id].remove(user.id)
+            if not active_connections[self.conversation_id]:  # If no more active connections, remove the conversation from the list
+                del active_connections[self.conversation_id]
+        # print(f"User {user.nickname} disconnected from conversation {self.conversation_id}.") # DEBUG
+
 
     async def receive(self, text_data):
         # Receive message from WebSocket
@@ -127,7 +137,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'timestamp': str(message['timestamp'])
                 } for message in messages
             ],
-            # TODO: Ajouter les game invites ?
         }))
 
 
@@ -213,10 +222,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         sender = await database_sync_to_async(User.objects.get)(nickname=user.nickname)
         members = await database_sync_to_async(list)(conversation.members.all())
 
+        # Get the invited user based on the id from the event
+        invited = await database_sync_to_async(User.objects.get)(id=event['invited'])
+
         message = await database_sync_to_async(Message.objects.create)(
             conversation=conversation,
             sender=sender,
-            content="Game invite send to " + event['invited'],
+            content="Game invite send to " + invited.nickname,
             timestamp=event['timestamp']
         )
 
@@ -228,7 +240,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'id': sender.id,
                 'avatar': encode_avatar(sender),
             },
-            'receiver': event['invited'],
+            'receiver': invited.nickname,
             'timestamp': str(message.timestamp)
         }
 
@@ -336,7 +348,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         for member in members:
             if member.id != sender.id:  # Exclude the sender
                 # Check if the user is active in the chat, if not -> send a notification
-                if not await self.is_user_in_group(member.id):
+                if not await self.is_user_in_group(self.conversation_id, member.id):
                     #Save the notification in database
                     await database_sync_to_async(Notification.objects.create)(
                         user=member,
@@ -436,8 +448,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
 # CHECKS
     # Check if the user is active in the chat
-    async def is_user_in_group(self, user_id):
-        return user_id in active_connections
+    async def is_user_in_group(self, conversation_id, user_id):
+        if conversation_id in active_connections:
+            return user_id in active_connections[conversation_id]
+        return False
 
 
 # UTILS
