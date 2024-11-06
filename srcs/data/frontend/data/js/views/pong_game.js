@@ -1,3 +1,5 @@
+import { DEBUG } from "../app.js";
+
 export { canvas } from './pong.js'; // space game
 import { inTournament } from './pong.js';
 // export var game; // statut game
@@ -122,14 +124,14 @@ export function play() {
 
 export function stop() {
 
-    console.log("stop game");
+    if (DEBUG) {console.log("stop game");}
     PongWebSocketManager.sendStopGame(game.game_name);
     cancelAnimationFrame(anim);
     GameOn = false;
 }
 
 export function endOfGame(winner) {
-    console.log("end of game");
+    if (DEBUG) {console.log("end of game");}
     cancelAnimationFrame(anim);
     GameOn = false;
 }
@@ -150,14 +152,14 @@ export function handleKeyDown(event, currentPlayer, player_name, game_name) {
     // {
     //     spaceDown = true;
     //     stop();
-    //     console.log("ESPACE key down gamone = ", GameOn);
+    //     if (DEBUG) {console.log("ESPACE key down gamone = ", GameOn);}
     //     stopButton.disabled = true;
     // }
     // if (event.key === "Escape")
     // {
     //     escapeDown = true;
     //     stop();
-    //     console.log("ECHAP key down gamone = ", GameOn);
+    //     if (DEBUG) {console.log("ECHAP key down gamone = ", GameOn);}
     //     stopButton.disabled = true;
     // }
     // if (event.key === ' ' && !GameOn) {

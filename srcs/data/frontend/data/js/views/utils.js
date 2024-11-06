@@ -255,7 +255,7 @@ export async function isAuthenticated() {
 // Récupérer les paramètres d'accessibilité de l'utilisateur
 export async function getAccessibility() {
     if (await isAuthenticated() === true) {
-        console.log('User is authenticated');
+        if (DEBUG) {console.log('User is authenticated');}
         try {
             const response = await fetch('/api/settings/', {
                 method: 'GET',

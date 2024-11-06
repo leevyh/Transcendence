@@ -307,7 +307,7 @@ export function handleMessage(message) {
 
 // Function to invite a user to play
 export function inviteUserToPlay(user) {
-    if (DEBUG) console.log('Invite', user.nickname, 'to play a game.');
+    if (DEBUG) {console.log('Invite', user.nickname, 'to play a game.');}
     if (chatWS && chatWS.readyState === WebSocket.OPEN) {
         const messageData = {
             type: 'game_invite',

@@ -2,6 +2,7 @@ import { navigationBar } from './navigation.js';
 import { notifications } from './notifications.js';
 import { getCookie } from './utils.js';
 import { get_leaderboard } from "./leaderboard.js";
+import { DEBUG } from "../app.js";
 
 
 async function fetchUserStats(userID) {
@@ -267,7 +268,7 @@ export async function profileView(container, userID) {
 
         const winRate = stats.win_rate; // Récupère le taux de victoire en pourcentage (ex: 75 pour 75%)
         const totalGames = stats.nb_games;
-        console.log("totalGames", totalGames);
+        if (DEBUG) {console.log("totalGames", totalGames);}
 
         function createWinRateChart(winRate, totalGames) {
 
@@ -297,7 +298,7 @@ export async function profileView(container, userID) {
 
             // Fonction pour dessiner le cercle blanc de fond
             function drawFilledWhiteCircle(canvasId) {
-                console.log("round blanc");
+                if (DEBUG) {console.log("round blanc");}
                 const canvas = document.getElementById(canvasId);
                 const content = canvas.getContext('2d');
 
@@ -343,9 +344,9 @@ export async function profileView(container, userID) {
                 content.fill();
             }
 
-            console.log("in function totalGames", totalGames);
+            if (DEBUG) {console.log("in function totalGames", totalGames);}
             if (totalGames === 0) {
-                console.log("Aucun match joué", totalGames);
+                if (DEBUG) {console.log("Aucun match joué", totalGames);}
                 drawFilledWhiteCircle('myCanvas');
             } else {
                 drawWinRateChart('myCanvas', winRate);
@@ -503,7 +504,7 @@ export async function profileView(container, userID) {
         });
         // get the data
         const data = await response.json();
-        console.log(data);
+        if (DEBUG) {console.log(data);}
 
         // add the data to the view
         data.forEach((game) => {
@@ -514,6 +515,6 @@ export async function profileView(container, userID) {
         div.appendChild(notifications_div);
 
     } catch (error) {
-        console.log(error);
+        if (DEBUG) {console.log(error);}
     }
 }

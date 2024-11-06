@@ -32,7 +32,7 @@ function createUserRow(user_list_row, data) {
     let user_card_element = document.getElementById(user_card_id);
 
     if (!user_card_element) {
-        console.log('data', data);
+        if (DEBUG) {console.log('data', data);}
         const user_col = document.createElement('div');
         user_col.className = 'col-xl-4 col-md-6';
         user_list_row.appendChild(user_col);
@@ -123,7 +123,7 @@ export async function friendsView(container) {
     const me = await getCurrentUser(); // Current user
 
     const token = localStorage.getItem('token');
-    console.log(token);
+    if (DEBUG) {console.log(token);}
 
     // const url = window.location.href.split('/').pop();
 
@@ -131,7 +131,7 @@ export async function friendsView(container) {
         statusSocket = new WebSocket(`wss://${window.location.host}/ws/status/`);
         statusSocket.onopen = function (event) {
             if (DEBUG) {
-                console.log('Status WebSocket opened (in Users)');
+                if (DEBUG) {console.log('Status WebSocket opened (in Users)');}
             }
         }
     }

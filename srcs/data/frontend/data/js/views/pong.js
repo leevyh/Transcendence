@@ -1,5 +1,5 @@
 import { navigationBar } from './navigation.js';
-import { navigateTo } from '../app.js';
+import { DEBUG, navigateTo } from '../app.js';
 import { PongWebSocketManager } from './wsPongManager.js';
 import { notifications } from './notifications.js';
 import { currentPlayer, endOfTournamentView } from './tournament.js';
@@ -93,7 +93,7 @@ export async function pongView(container, tournamentSocket) {
     }
     else {
         PongWebSocketManager.socket = tournamentSocket;
-        console.log("PongWebSocketManager.socket");
+        if (DEBUG) {console.log("PongWebSocketManager.socket");}
         inTournament = true;
     }
 
@@ -105,7 +105,7 @@ export async function pongView(container, tournamentSocket) {
             var currentPlayer = data.current_player;
             var player_name = data.name_player;
             var game_name = data.game;
-            console.log("data = ", data);
+            if (DEBUG) {console.log("data = ", data);}
             if (keydownListener) {
                 document.removeEventListener('keydown', keydownListener);
             }
@@ -122,14 +122,14 @@ export async function pongView(container, tournamentSocket) {
             startGame(container, data.game.game_name);
         }
         if (data.action_type === 'waiting_for_player') {
-            console.log("waiting for player");
+            if (DEBUG) {console.log("waiting for player");}
             updatePlayerPositions(data.game.player_1_position, data.game.player_2_position);
             updateBallPosition(data.game.ball_position);
             // displayWaiting(container);
             draw();
         }
         // if(data.action_type === 'show_game') {
-        //     console.log("show game");
+        //     if (DEBUG) {console.log("show game");}
         //     pongView(container, PongWebSocketManager.socket);
         // }
         if (GameOn) {
@@ -159,7 +159,7 @@ export async function pongView(container, tournamentSocket) {
 
     PongWebSocketManager.socket.onclose = (event) => {
         setInGame(false);
-        console.log("Pong WebSocket disconnected", event);
+        if (DEBUG) {console.log("Pong WebSocket disconnected", event);}
     };
     const notifications_div = await notifications();
     div.appendChild(notifications_div);
@@ -223,7 +223,7 @@ function startCountdown(container, game_name) {
         countdownElement.innerText = countdownValue;
         let countdownInterval = setInterval(() => {
             if (getInGame() === false) {
-                console.log("countdown 1 inGame = ", inGame);
+                if (DEBUG) {console.log("countdown 1 inGame = ", inGame);}
                 clearInterval(countdownInterval); 
                 countdownElement.remove();
                 gameNameElement.remove();
@@ -240,7 +240,7 @@ function startCountdown(container, game_name) {
                     countdownElement.remove();
                     gameNameElement.remove();
                     if (getInGame() === true) {
-                        console.log("countdown 2 inGame = ", inGame);
+                        if (DEBUG) {console.log("countdown 2 inGame = ", inGame);}
                         play();
                         PongWebSocketManager.sendGameStarted();
                     }
@@ -249,7 +249,7 @@ function startCountdown(container, game_name) {
         }, 1000);
         const checkInGame = setInterval(() => {
             if (getInGame() === false) {
-                console.log("countdown 3 inGame = ", inGame);
+                if (DEBUG) {console.log("countdown 3 inGame = ", inGame);}
                 clearInterval(countdownInterval);
                 clearInterval(checkInGame);
                 countdownElement.remove();
@@ -285,7 +285,7 @@ function updateState(data) {
 }
 
 async function update_Stats(data) {
-    console.log("data = ", data);
+    if (DEBUG) {console.log("data = ", data);}
     // data = {action_type: 'end_of_game', winner: 'rouge', result: 'win', nb_point_taken: 2, nb_point_given: 1}
     const response = await fetch('/api/updateStats/', {
         method: 'POST',
@@ -355,7 +355,7 @@ function displayeWinner(winner) {
 
     const checkInGame = setInterval(() => {
         if (getInGame() === false) {
-            console.log("displayWinner: inGame = ", inGame);
+            if (DEBUG) {console.log("displayWinner: inGame = ", inGame);}
             clearInterval(checkInGame);
             winnerElement.style.opacity = '0';
             setTimeout(() => {
@@ -397,7 +397,7 @@ function displayWaiting(container) {
 
     const checkInGame = setInterval(() => {
         if (getInGame() === false) {
-            console.log("displayWaiting: inGame = ", inGame);
+            if (DEBUG) {console.log("displayWaiting: inGame = ", inGame);}
             clearInterval(checkInGame);
             waitingElement.remove();
         }

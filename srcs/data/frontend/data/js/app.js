@@ -74,7 +74,7 @@ async function router() {
 
     if (chatWS) {chatWS.close();}
     if (inGame) {
-        console.log('Disconnecting player in app');
+        if (DEBUG) {console.log('Disconnecting player in app');}
         disconnectPlayer();
     }
 

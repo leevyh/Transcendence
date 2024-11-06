@@ -34,7 +34,7 @@ export async function navigationBar(container) {
                     avatar: data.avatar,
                 };
 
-                console.log("friends_websocket", friends_websocket);
+                if (DEBUG) {console.log("friends_websocket", friends_websocket);}
                 if (friends_websocket === null) {
                     friends_websocket = new WebSocket(`wss://${window.location.host}/ws/friends/`);
                     friends_websocket.onopen = function (event) {
@@ -57,7 +57,7 @@ export async function navigationBar(container) {
 
                 friends_websocket.onmessage = event => {
                     const message = JSON.parse(event.data);
-                    console.log('Friends:', message);
+                    if (DEBUG) {console.log('Friends:', message);}
 
                     if (message.type === 'get_friends') {
                         displayFriends(message.friends);

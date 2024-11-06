@@ -1,5 +1,6 @@
 import { navigationBar } from './navigation.js';
 import { notifications } from './notifications.js';
+import { DEBUG } from "../app.js";
 
 export function get_leaderboard() {
     return fetch('/api/leaderboard', {
@@ -219,7 +220,7 @@ export async function leaderboardView(container) {
     mainDiv.appendChild(ContenerListLead);
 
     if (leaderboard.length < 3) {
-        console.log('leaderboard.length', leaderboard.length);
+        if (DEBUG) {console.log('leaderboard.length', leaderboard.length);}
         //Display a message : Not enough users to display the leaderboard in center of the div leaderboard
         const NotEnoughUsers = document.createElement('div');
         NotEnoughUsers.className = 'NotEnoughUsers d-flex justify-content-center align-items-center w-100 h-100';
