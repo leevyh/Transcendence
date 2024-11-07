@@ -1,5 +1,6 @@
 import { navigationBar } from './navigation.js';
 import { pongView, inGame, setInGame } from './pong.js';
+import { DEBUG } from "../app.js";
 
 export let currentPlayer = null;
 
@@ -26,12 +27,12 @@ export function tournamentView(container) {
         document.body.appendChild(tournamentContainer);
     }
 
-    loadPongCSS();  // CSS
+    // loadPongCSS();  // CSS
 
     // Appliquer des styles pour centrer le conteneur
     tournamentContainer.style.display = 'flex';
     tournamentContainer.style.flexDirection = 'column';
-    tournamentContainer.style.alignItems = 'center';
+    // tournamentContainer.style.alignItems = 'center';
     tournamentContainer.style.justifyContent = 'center';
     tournamentContainer.style.height = '100vh'; // S'assurer que le conteneur prend toute la hauteur de l'écran
 
@@ -60,17 +61,17 @@ export function tournamentView(container) {
     }
 
     tournamentContainer.appendChild(playerList);
-    
+
     // Connexion WebSocket
     const tournamentSocket = new WebSocket(`wss://${window.location.host}/ws/tournament/`);
 
     tournamentSocket.onopen = function(event) {
-        console.log('Connected to the tournament WebSocket');
+        if (DEBUG) {console.log('Connected to the tournament WebSocket');}
     };
     setInGame(true);
     tournamentSocket.onmessage = function(event) {
         const data = JSON.parse(event.data);
-        console.log("Received message from tournament WebSocket:", data);
+        if (DEBUG) {console.log("Received message from tournament WebSocket:", data);}
 
         if(data.action_type === 'update_player_list') {
             currentPlayer = data.current_player;
@@ -87,7 +88,7 @@ export function tournamentView(container) {
     // Gérer la fermeture de la connexion WebSocket
     tournamentSocket.onclose = function(event) {
         setInGame(false);
-        console.log('Tournament WebSocket closed.');
+        if (DEBUG) {console.log('Tournament WebSocket closed.');}
     };
 
     // Gérer les erreurs de la WebSocket
@@ -98,7 +99,7 @@ export function tournamentView(container) {
     // Fonction pour mettre à jour la liste des joueurs
     function updatePlayerList(data) {
         const players = data.players; // Accéder à la liste des joueurs dans l'objet data
-        console.log("players = ", players);
+        if (DEBUG) {console.log("players = ", players);}
         for (let i = 0; i < 4; i++) {
             const playerSlot = document.getElementById(`player-${i + 1}`);
             if (playerSlot) {
@@ -110,8 +111,8 @@ export function tournamentView(container) {
 
     // Fonction pour démarrer le tournoi qui affiche "Tournament started!" en rouge après le nom des joueurs
     function startTournament() {
-        console.log("Tournament started!");
-        
+        if (DEBUG) {console.log("Tournament started!");}
+
         // Sélectionner tous les slots de joueurs
         const playerSlots = document.querySelectorAll('#player-list li');
 
@@ -133,7 +134,7 @@ export function tournamentView(container) {
 
     // Fonction pour démarrer la vue Pong
     function startPongView() {
-        console.log("Starting Pong view");
+        if (DEBUG) {console.log("Starting Pong view");}
         pongView(tournamentContainer, tournamentSocket);
     }
 }
@@ -150,7 +151,7 @@ export function endOfTournamentView(container, ranking) {
     }
     tournamentContainer.innerHTML = '';
 
-    loadPongCSS();
+    // loadPongCSS();
 
     const title = document.createElement('h2');
     title.textContent = "Final Ranking";
@@ -194,21 +195,21 @@ function loadPongCSS() {
         margin: 0;
         color: white;
     }
-    
+
     h2, ul, li {
         color: white;
     }
-    
+
     ul {
         margin: 0;
         padding: 0;
         list-style-type: none;
     }
-    
+
     li {
         padding: 5px;
     }
-    
+
     /* Styles spécifiques pour le canvas */
     .canvas {
         max-width: 100%;
@@ -216,7 +217,7 @@ function loadPongCSS() {
         border-style: groove;
         border-color: black;
     }
-    
+
     /* Styles spécifiques pour la vue de fin de tournoi */
     .ranking-list {
         font-size: 1.2em;
@@ -224,11 +225,11 @@ function loadPongCSS() {
         padding: 0;
         text-align: center;
     }
-    
+
     .ranking-list li {
         margin: 10px 0;
     }
-    
+
     /* Style spécial pour le premier joueur */
     .first-place {
         font-size: 2em;

@@ -9,5 +9,6 @@ websocket_urlpatterns = [
     re_path(r'ws/friends/$', consumers.FriendShipConsumer.as_asgi()),
     re_path(r'ws/chat/(?P<conversationID>\w+)/$', chat_consumers.ChatConsumer.as_asgi()),
     re_path(r'ws/pong/$', pong_consumers.PongConsumer.as_asgi()),
+    re_path(r'ws/cli_pong/$', pong_consumers.CLIPongConsumer.as_asgi()),
     re_path(r'ws/tournament/$', pong_consumers.TournamentConsumer.as_asgi()),
 ]

@@ -16,6 +16,190 @@ def create_game(player_1, player_2):
     from pong.models import Game
     return Game.objects.create(player_1=player_1, player_2=player_2, is_active=True)
 
+
+class CLIPongConsumer(AsyncWebsocketConsumer):
+    
+    async def connect(self):
+        # Accept the WebSocket connection
+        await self.accept()
+        from api.models import User_site
+        player = User_site
+        player.nickname = 'anonymous_player'
+        #envoyer juste un signal 'connected' pour dire que le joueur est connecte
+        await self.send(text_data=json.dumps({
+            'connected': 'connected'}))
+        await self.findMatch(player)
+
+    # cree une partie si le joueur est le premier a se connecter ou rejoint une partie si un autre joueur est deja connecte. return cette partie
+    async def findMatch(self, player):
+        if (len(list_of_games) == 0) :
+            await self.send(text_data=json.dumps({
+                'game created': 'game first player'}))
+            game = PongGame(player)
+            list_of_games.append(game)
+            game.status = "waiting"
+            game.player_1 = player
+            game.nbPlayers += 1
+            game.channel_player_1 = self.channel_name
+            self.game = game
+            self.periodic_state_update_task = asyncio.create_task(self.periodic_state_update())
+        else :
+            game = list_of_games.pop(0)
+            game.player_2 = player
+            game.nbPlayers += 1   
+            game.channel_player_2 = self.channel_name
+            self.game = game
+            self.periodic_state_update_task = asyncio.create_task(self.periodic_state_update())
+
+        if(game.nbPlayers == 2) :
+            await self.send(text_data=json.dumps({
+                'game created' :  self.game.player_1.nickname + ' and ' + self.game.player_2.nickname}))
+            await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_1)
+            await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_2)
+            game.status = "ready"
+            self.task = asyncio.create_task(self.game.game_loop())
+
+        return game
+
+    async def periodic_state_update(self):
+        while self.game.winner is None:
+            await asyncio.sleep(3)
+            if hasattr(self, 'game') and self.game is not None:
+                if self.game.is_active:
+                    await self.state_of_the_game()
+       
+    async def game_state(self, event):
+        pass
+
+    async def state_of_the_game(self):
+        await self.send(text_data=json.dumps({
+            'action_type': 'state_of_the_game',
+            'game': {
+                'ball_position': {
+                    'x': self.game.ball_position_x,
+                    'y': self.game.ball_position_y
+                },
+                'players': {
+                    'player_1': {
+                        'name': self.game.player_1.nickname,
+                        'position': self.game.player_1_position,
+                        'score': self.game.player_1_score
+                    },
+                    'player_2': {
+                        'name': self.game.player_2.nickname,
+                        'position': self.game.player_2_position,
+                        'score': self.game.player_2_score
+                    }
+                }
+            }
+        }))
+
+    async def define_player(self, event):
+        pass
+
+    async def start_game(self, event):
+        pass
+    
+    async def disconnect(self, code):
+        # Retirer le joueur de la file d'attente s'il quitte la connexion
+        from api.models import User_site
+        player = User_site
+        player.nickname = 'anonymous_player'
+        if player in waiting_players:
+            waiting_players.remove(player)
+        
+        if hasattr(self, 'game') and self.game is not None:
+            if self.game.status == "ready":
+                if self.game.winner is None:
+                    if self.game.player_1 == player:
+                        self.game.winner = self.game.player_2
+                        self.game.loser = self.game.player_1
+                    else:
+                        self.game.winner = self.game.player_1
+                        self.game.loser = self.game.player_2
+                    await self.channel_layer.group_discard(f"game_{self.game.id}", self.channel_name)
+                    self.game.reset_ball()
+                    await self.game.broadcastState()
+                    await self.game.stop_game()
+            await self.channel_layer.group_discard(f"game_{self.game.id}", self.channel_name)
+            
+            if self.game in list_of_games :
+                list_of_games.remove(self.game)
+            self.game = None
+            
+        await self.close()
+
+    async def receive(self, text_data):
+        print("Received text_data:", text_data)
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError as e:
+            print(f"JSONDecodeError: {e}")
+            return
+   
+        from api.models import User_site
+        player = User_site
+        player.nickname = 'anonymous_player'
+        if data['type'] == 'up':
+            if hasattr(self, 'game') and self.game is not None and self.game.is_active :
+                if self.game.player_1 == player:
+                    self.game.move_player('player_1', 'up')
+                else:
+                    self.game.move_player('player_2', 'up')
+        if data['type'] == 'down':
+            if hasattr(self, 'game') and self.game is not None and self.game.is_active :
+                if self.game.player_1 == player:
+                    self.game.move_player('player_1', 'down')
+                else:
+                    self.game.move_player('player_2', 'down')
+        if data['type'] == 'stop up':
+            if hasattr(self, 'game') and self.game is not None and self.game.is_active :
+                if self.game.player_1 == player:
+                    self.game.move_player('player_1', 'stop up')
+                else:
+                    self.game.move_player('player_2', 'stop up')
+        if data['type'] == 'stop down':
+            if hasattr(self, 'game') and self.game is not None and self.game.is_active :
+                if self.game.player_1 == player:
+                    self.game.move_player('player_1', 'stop down')
+                else:
+                    self.game.move_player('player_2', 'stop down')
+        if data['type'] == 'state_of_the_game':
+            await self.state_of_the_game()
+        if data['type'] == 'stop_game' :
+            if hasattr(self, 'game') and self.game is not None and self.game.is_active :
+                if self.game.player_1 == player:
+                    self.game.winner = self.game.player_2
+                    self.game.loser = self.game.player_1
+                else:
+                    self.game.winner = self.game.player_1
+                    self.game.loser = self.game.player_2
+                await self.game.broadcastState()
+                await self.game.stop_game()
+        if data['type'] == 'disconnect_player' :
+            await self.disconnect(1000)
+
+    async def end_of_game(self, event):
+        pass
+        # if event['winner'] == 'anonymous_player':
+        #     result = 'win'
+        #     nb_point_taken = event['score_winner']
+        #     nb_point_given = event['score_loser']
+        # else :
+        #     result = 'lose'
+        #     nb_point_taken = event['score_loser']
+        #     nb_point_given = event['score_winner']
+        # if self.channel_name is not None:
+        #     await self.send(text_data=json.dumps({
+        #         'action_type': 'end_of_game',
+        #         'winner': event['winner'],
+        #         'result': result,
+        #         'nb_point_taken' : nb_point_taken,
+        #         'nb_point_given' : nb_point_given
+        #     }))
+        # self.game = None
+
+
 class PongConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
@@ -31,16 +215,16 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     # cree une partie si le joueur est le premier a se connecter ou rejoint une partie si un autre joueur est deja connecte. return cette partie
     async def findMatch(self, player):
-        print("consumer invitational games : ", invitational_games)
+        # print("consumer invitational games : ", invitational_games)
         for game in invitational_games:
             if game.player_1 == player:
-                print("consumer create invitation game with user : ", player)
+                # print("consumer create invitation game with user : ", player)
                 game.channel_player_1 = self.channel_name
                 self.game = game
                 self.game.nbPlayers += 1
                 self.game.status = "waiting"
             if game.player_2 == player:
-                print("consumer join invitation game with user : ", player)
+                # print("consumer join invitation game with user : ", player)
                 game.channel_player_2 = self.channel_name
                 self.game = game
                 self.game.nbPlayers += 1
@@ -57,7 +241,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             return game
 
         if (len(list_of_games) == 0) :
-            print("consumer create game with user : ", player)
+            # print("consumer create game with user : ", player)
             game = PongGame(player)
             list_of_games.append(game)
             game.status = "waiting"
@@ -65,12 +249,12 @@ class PongConsumer(AsyncWebsocketConsumer):
             game.nbPlayers += 1
             game.channel_player_1 = self.channel_name
             self.game = game
-            await self.send_waiting()
+            # await self.send_waiting()
         else :
             for game in list_of_games:
                 if game.player_1 == player or game.player_2 == player:
                     return
-            print("consumer join game with user : ", player)
+            # print("consumer join game with user : ", player)
             game = list_of_games.pop(0)
             game.player_2 = player
             game.nbPlayers += 1   
@@ -78,10 +262,11 @@ class PongConsumer(AsyncWebsocketConsumer):
             self.game = game
 
         if(game.nbPlayers == 2) :
-            print("consumer game with 2 players")
-            game_database = await create_game(game.player_1, game.player_2)
-            game.id = game_database.id
-            game_database.is_active = True
+            # print("consumer game with 2 players")
+            if game.player_1.nickname != 'anonymous_player' and game.player_2.nickname != 'anonymous_player':
+                game_database = await create_game(game.player_1, game.player_2)
+                game.id = game_database.id
+                game_database.is_active = True
             await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_1)
             await self.channel_layer.group_add(f"game_{game.id}", game.channel_player_2)
             game.status = "ready"
@@ -89,7 +274,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         return game
 
     async def send_waiting(self):
-        print("consumer send waiting for player")
+        # print("consumer send waiting for player")
         if self.channel_name is not None:
             await self.send(text_data=json.dumps({
                 'action_type': 'waiting_for_player',
@@ -122,7 +307,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     #fonction pour envoyer start_game aux front par les deux joueurs, met la game en active, passe le statut en PLAYING
     async def start_game(self, event):
-        print("consumer start game user : ", self.scope['user'])
+        # print("consumer start game user : ", self.scope['user'])
         if self.channel_name is not None:
             await self.send(text_data=json.dumps({
                 'action_type': 'start_game',
@@ -131,7 +316,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, code):
         # Retirer le joueur de la file d'attente s'il quitte la connexion
-        print("consumer disconnect user : ", self.scope['user'])
+        # print("consumer disconnect user : ", self.scope['user'])
         player = self.scope['user']
         if player in waiting_players:
             waiting_players.remove(player)
@@ -187,7 +372,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             await self.game.broadcastState()
             await self.game.stop_game()
         if data['type'] == 'disconnect_player' :
-            print("disconnect player in consumer pong : ", self.scope['user'])
+            # print("disconnect player in consumer pong : ", self.scope['user'])
             await self.disconnect(1000)
 
     async def end_of_game(self, event):
@@ -241,7 +426,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.tournament = list_of_tournaments[0]
             for player_in_tournament in list_of_tournaments[0].player:
                 if player_in_tournament == player:
-                        print("consumer player already in THIS tournament")
+                        # print("consumer player already in THIS tournament")
                         return
             for i in range(4):
                 if self.tournament.player[i] is None:
@@ -253,8 +438,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     self.current_player = 'player_' + str(i+1)
                     await self.update_player_list(self.tournament)
                     break
-        else :
-            print("consumer error no tournament available")
+        # else :
+            # print("consumer error no tournament available")
         if(self.tournament.nbPlayers == 4) :
             list_of_tournaments.pop(0)
             # print("tournament with 4 players")
@@ -270,12 +455,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         return self.tournament
 
     async def disconnect(self, code):
-        print("consumer tournament disconnect user : ", self.scope['user'])
+        # print("consumer tournament disconnect user : ", self.scope['user'])
         player = self.scope['user']
         if hasattr(self, 'tournament') and self.tournament is not None:
             if player in self.tournament.player:
-                print("consumer tournament disconnect player in tournament")
-                print("consumer tournament status : ", self.tournament.status)
+                # print("consumer tournament disconnect player in tournament")
+                # print("consumer tournament status : ", self.tournament.status)
                 if hasattr(self, 'tournament_id'):
                     await self.channel_layer.group_discard(f"tournament_{self.tournament_id}", self.channel_name)
                 if self.tournament.status == "waiting":
@@ -297,7 +482,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                             game = self.tournament.final
                         elif player == self.tournament.small_final.player_1 or player == self.tournament.small_final.player_2:
                             game = self.tournament.small_final
-                    print("consumer disconnect game : ", game)
+                    # print("consumer disconnect game : ", game)
                     if game.winner is None:
                         if game.player_1 == player:
                             game.winner = game.player_2
@@ -334,7 +519,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     })
                 })
         if event.nbPlayers == 0:
-            print("No player left in the tournament")
+            # print("No player left in the tournament")
             return
 
     async def start_tournament(self, event):
@@ -344,14 +529,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             }))
 
     async def show_game(self, event):
-        print("consumer tournament show game user : ", self.scope['user'])
+        # print("consumer tournament show game user : ", self.scope['user'])
         if self.channel_name is not None:
             await self.send(text_data=json.dumps({
                 'action_type': 'show_game',
             }))
 
     async def start_game(self, event):
-        print("consumer tournament start game user : ", self.scope['user'])
+        # print("consumer tournament start game user : ", self.scope['user'])
         if self.channel_name is not None:
             await self.send(text_data=json.dumps({
                 'action_type': 'start_game',
@@ -381,7 +566,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if data['type'] == 'stop_game' :
             await self.tournament.stop_game(data['game'])
         if data['type'] == 'disconnect_player' :
-            print("disconnect player in consumer tournament : ", self.scope['user'])
+            # print("disconnect player in consumer tournament : ", self.scope['user'])
             await self.disconnect(1000)
 
     async def end_of_game(self, event):

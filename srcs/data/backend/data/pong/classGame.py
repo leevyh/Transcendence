@@ -43,7 +43,7 @@ class PongGame:
 
     #loop for the game
     async def game_loop(self):
-        print("game loop")
+        # print("game loop")
         if (self.is_active == False):
             if(self.status == "ready"):
                 await self.broadcastState()
@@ -54,19 +54,18 @@ class PongGame:
         while self.is_active:
             await self.move_ball()
             await self.move_player_loop()
-            await self.broadcastState()
             await asyncio.sleep(0.01)
 
     #start the game
     async def start_game(self):
-        print("start game")
+        # print("start game")
         self.is_active = True
         await self.send_define_player('player_1', 'player_2')
         self.reset_ball()
-        print("game name : ", self.name)
+        # print("game name : ", self.name)
         self.channel_layer = get_channel_layer()
-        print("channel player 1 : ", self.channel_player_1, "username : ", self.player_1.nickname)
-        print("channel player 2 : ", self.channel_player_2, "username : ", self.player_2.nickname)
+        # print("channel player 1 : ", self.channel_player_1, "username : ", self.player_1.nickname)
+        # print("channel player 2 : ", self.channel_player_2, "username : ", self.player_2.nickname)
         await self.channel_layer.group_send(
             f"game_{self.id}",
             {
@@ -109,7 +108,7 @@ class PongGame:
         )
 
     async def send_define_player(self, current_player_1, current_player_2):
-        print("send define player")
+        # print("send define player")
         self.channel_layer = get_channel_layer()
         await self.channel_layer.send(
             self.channel_player_1,
@@ -132,7 +131,7 @@ class PongGame:
 
     #reset the ball position
     def reset_ball(self):
-        print("reset ball")
+        # print("reset ball")
         self.ball_position_x = iv.GAME_WIDTH // 2
         self.ball_position_y = iv.GAME_HEIGHT // 2
         self.player_1_position = iv.GAME_HEIGHT // 2
@@ -177,10 +176,12 @@ class PongGame:
         impact = self.ball_position_y - paddle_position - iv.PADDLE_HEIGHT / 2
         ratio = 35 / (iv.PADDLE_HEIGHT / 2)
         self.ball_speed_y = round(impact * ratio / 10)
-        self.ball_speed_x *= 1.2
-    
+        if self.ball_speed_x < iv.BALL_SPEED_MAX and self.ball_speed_x > -iv.BALL_SPEED_MAX:
+            self.ball_speed_x *= 1.2
+
     #move the player
     def move_player(self, player, move):
+        print("move player : ", player, " ", move)
         if player == 'player_1':
             if move == "up":
                 self.move_player_1_up = True
@@ -218,7 +219,7 @@ class PongGame:
 
     #stop the game
     async def stop_game(self):
-        print("stop game : ", self.name)
+        # print("stop game : ", self.name)
         self.is_active = False
         self.status = "finished"
         if self.winner is None :
@@ -227,9 +228,11 @@ class PongGame:
             self.loser = self.player_1 if self.player_1_score < self.player_2_score else self.player_2
         self.channel_winner = self.channel_player_1 if self.winner == self.player_1 else self.channel_player_2
         self.channel_loser = self.channel_player_1 if self.loser == self.player_1 else self.channel_player_2
-        await self.save_game()
-        print("winner : ", self.winner.nickname)
-        print("loser : ", self.loser.nickname)
+        if self.player_1.nickname != 'anonymous_player' and self.player_2.nickname != 'anonymous_player':
+            await self.save_game()
+        # print("winner : ", self.winner.nickname)
+        # print("loser : ", self.loser.nickname)
+
         await self.channel_layer.group_send(
             f"game_{self.id}",
             {
@@ -242,7 +245,7 @@ class PongGame:
 
     #save the game in the database
     async def save_game(self):
-        print("save game")
+        # print("save game")
         from pong.models import Game
         game_database = await sync_to_async(Game.objects.get, thread_sensitive=True)(id=self.id)
         game_database.player_1_score = self.player_1_score

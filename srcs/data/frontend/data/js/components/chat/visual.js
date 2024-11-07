@@ -77,13 +77,13 @@ async function createUsersContainer() {
 
 // Function to create a user card
 export function createUserCard(user, userList) {
-    let userCard = document.getElementById(user.user_id);
     if (DEBUG) {console.log('User:', user);}
-
+    let chat_card_id = `chat_card_${user.user_id}`;
+    let userCard = document.getElementById(chat_card_id);
     if (!userCard) {
         userCard = document.createElement('div');
-        userCard.className = 'd-flex align-items-center bd-highlight justify-content-between w-100';
-        userCard.id = user.user_id; // ID = nickname
+        userCard.className = 'd-flex align-items-center bd-highlight justify-content-between w-100 chat_card';
+        userCard.id = chat_card_id; // ID = nickname
         userList.appendChild(userCard);
 
         const avatarDiv = document.createElement('div');
@@ -104,8 +104,8 @@ export function createUserCard(user, userList) {
         userInfo.className = 'mt-auto mb-auto user-info';
         userInfo.innerHTML = `<span>${user.nickname}</span>`;
         userInfo.setAttribute('aria-label', `Chat with ${user.nickname}`);
-        userInfo.setAttribute('role', 'button'); // Make it focusable for accessibility
-        userInfo.setAttribute('tabindex', '0'); // Make it focusable for accessibility
+        userInfo.setAttribute('role', 'button');
+        userInfo.setAttribute('tabindex', '0');
         userCard.appendChild(userInfo);
 
         // Make it clickable with the keyboard
@@ -123,46 +123,11 @@ export function createUserCard(user, userList) {
         userInfo.addEventListener('click', () => {
             // If chatWindow is already open for the user, do nothing
             const chatWindow = document.getElementById(`chat_user_${user.user_id}`);
-            // Si la fenêtre de chat est active, on ne fait rien
             if (chatWindow && chatWindow.classList.contains('active')) {
                 return;
             }
-
-            // const chatTitle = document.querySelector('.chat-title');
-            // if (chatTitle.textContent === `Chat with ${user.nickname}`) {
-            //     return;
-            // } else {
-            //     // Hide the block button for the previous user
-            //     const users = userList.children;
-            //     for (let i = 0; i < users.length; i++) {
-            //         const user = users[i].id;
-            //         const userCard = document.getElementById(user);
-            //         if (userCard.classList.contains('invisible')) {
-            //             continue;
-            //         }
-            //         if (userCard.textContent !== user.nickname) {
-            //             const blockButton = userCard.querySelector('.block-button');
-            //             blockButton.style.display = 'none';
-            //         }
-            //     }
-
-            //     const chatBody = document.querySelector('.chat-body');
-            //     chatBody.innerHTML = '';
-            //     chatTitle.textContent = `Chat Window`;
-                openChatWithUser(user);
-            // }
+            openChatWithUser(user);
         });
-
-        const blockButton = document.createElement('button');
-        blockButton.className = "bi bi-slash-circle border-0 block-button";
-        blockButton.style.color = 'red';
-        blockButton.setAttribute('aria-label', `Block/Unblock ${user.nickname}`);
-        blockButton.style.display = 'none'; // Hide the button when the chat is not open
-        blockButton.setAttribute('aria-label', `Block/Unblock ${user.nickname}`);
-        blockButton.addEventListener('click', () => {
-            blockUnblockUser(user.nickname);
-        });
-        userCard.appendChild(blockButton);
     }
 
     // Update the user avatar if the user changed it
@@ -187,6 +152,14 @@ export function createUserCard(user, userList) {
         userInfo.children[0].textContent = user.nickname;
     }
 
+    // Change chatTitle if the user changes his nickname
+    const chatWindow = document.getElementById(`chat_user_${user.user_id}`);
+    if (chatWindow && chatWindow.classList.contains('active')) {
+        if (chatWindow.querySelector('.chat-title').textContent !== `Chat with ${user.nickname}`) {
+            chatWindow.querySelector('.chat-title').textContent = `Chat with ${user.nickname}`;
+        }
+    }
+
     // Update the user status
     const userStatus = userCard.querySelector('.user-status');
     userStatus.textContent = user.status;
@@ -194,8 +167,7 @@ export function createUserCard(user, userList) {
     // Sort the users list
     const users = userList.children;
     for (let i = 0; i < users.length; i++) {
-        const user = users[i].id;
-        const userCard = document.getElementById(user);
+        const userCard = users[i];
         if (userCard.classList.contains('invisible')) {
             continue;
         }
@@ -282,6 +254,17 @@ function createChatContainerHeader(user) {
     div2.appendChild(inviteGameButton);
     inviteGameButton.addEventListener('click', () => {
         inviteUserToPlay(user);
+    });
+
+    const blockButton = document.createElement('button');
+    blockButton.id = 'block-button';
+    blockButton.className = "btn btn-outline-danger bi-slash-circle block-button";
+    blockButton.style.color = 'red';
+    blockButton.setAttribute('aria-label', `Block/Unblock ${user.nickname}`);
+    div2.appendChild(blockButton);
+    blockButton.addEventListener('click', () => {
+        if (DEBUG) {console.log('Block/Unblock button clicked');}
+        blockUnblockUser(user.nickname);
     });
 
     return chatHeader;

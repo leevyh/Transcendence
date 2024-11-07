@@ -1,5 +1,5 @@
 import { navigationBar } from './navigation.js';
-import { navigateTo } from '../app.js';
+import { DEBUG, navigateTo } from '../app.js';
 import { PongWebSocketManager } from './wsPongManager.js';
 import { notifications } from './notifications.js';
 import { currentPlayer, endOfTournamentView } from './tournament.js';
@@ -38,7 +38,7 @@ export async function pongView(container, tournamentSocket) {
     const navBarContainer = await navigationBar(container);
     div.appendChild(navBarContainer);
 
-	loadPongCSS();  // CSS
+	// loadPongCSS();  // CSS
 
     // HTML
     const viewContainer = document.createElement('div');
@@ -58,9 +58,9 @@ export async function pongView(container, tournamentSocket) {
     scoreP.className = 'd-flex justify-content-center';
 
     scoreP.innerHTML = `
-    <span style="font-size: 24px; font-weight: bold; margin-right: 40px;" id="player1-name"></span> 
-    <span style="font-size: 24px; margin-right: 60px;" id="player1-score">0</span> - 
-    <span style="font-size: 24px; margin-left: 60px;" id="player2-score">0</span> 
+    <span style="font-size: 24px; font-weight: bold; margin-right: 40px;" id="player1-name"></span>
+    <span style="font-size: 24px; margin-right: 60px;" id="player1-score">0</span> -
+    <span style="font-size: 24px; margin-left: 60px;" id="player2-score">0</span>
     <span style="font-size: 24px; font-weight: bold; margin-left: 40px;" id="player2-name"></span>
 `;
 
@@ -93,19 +93,20 @@ export async function pongView(container, tournamentSocket) {
     }
     else {
         PongWebSocketManager.socket = tournamentSocket;
-        console.log("PongWebSocketManager.socket");
+        if (DEBUG) {console.log("PongWebSocketManager.socket");}
         inTournament = true;
     }
 
     setInGame(true);
 
     PongWebSocketManager.socket.onmessage = (event) => {
+        // console.log("start websock redir");
         const data = JSON.parse(event.data);
         if (data.action_type === 'define_player') {
             var currentPlayer = data.current_player;
             var player_name = data.name_player;
             var game_name = data.game;
-            console.log("data = ", data);
+            if (DEBUG) {console.log("data = ", data);}
             if (keydownListener) {
                 document.removeEventListener('keydown', keydownListener);
             }
@@ -122,21 +123,24 @@ export async function pongView(container, tournamentSocket) {
             startGame(container, data.game.game_name);
         }
         if (data.action_type === 'waiting_for_player') {
-            console.log("waiting for player");
+            if (DEBUG) {console.log("waiting for player");}
             updatePlayerPositions(data.game.player_1_position, data.game.player_2_position);
             updateBallPosition(data.game.ball_position);
             // displayWaiting(container);
             draw();
         }
         // if(data.action_type === 'show_game') {
-        //     console.log("show game");
+        //     if (DEBUG) {console.log("show game");}
         //     pongView(container, PongWebSocketManager.socket);
         // }
         if (GameOn) {
             if (data.action_type === 'game_state')
                 updateState(data);
         }
+        // console.log("=>gameon", GameOn);
+        // console.log("before end_of_game", data.action_type);
         if (data.action_type === 'end_of_game') {
+            // console.log("inside end partie",  data.action_type)
             endOfGame(data);
             displayeWinner(data.winner);
             update_Stats(data);
@@ -148,18 +152,21 @@ export async function pongView(container, tournamentSocket) {
                 }, 3000);
             }
         }
+        // console.log ("=> coucou ", data.action_type);
         if (data.action_type === 'final_results') {
             endOfGame(data);
             endOfTournamentView(container, data.ranking);
         }
+        // console.log ("=> endtournament ", data.action_type);
         if (data.action_type === 'end_of_tournament') {
+            inTournament = false;
             navigateTo('/menuPong');
         }
     };
 
     PongWebSocketManager.socket.onclose = (event) => {
         setInGame(false);
-        console.log("Pong WebSocket disconnected", event);
+        if (DEBUG) {console.log("Pong WebSocket disconnected", event);}
     };
     const notifications_div = await notifications();
     div.appendChild(notifications_div);
@@ -167,10 +174,10 @@ export async function pongView(container, tournamentSocket) {
 
 // Fonction pour démarrer le décompte
 function startCountdown(container, game_name) {
-    
+
     // clearInterval(checkInGame);
     // waitingElement.remove();
-    
+
     let countdownValue = 3;
 
     const gameContainer = container.querySelector('.PongDiv');
@@ -218,12 +225,12 @@ function startCountdown(container, game_name) {
         }
     }
     typeGameName();
-        
+
     function startCountdownTimer() {
         countdownElement.innerText = countdownValue;
         let countdownInterval = setInterval(() => {
             if (getInGame() === false) {
-                console.log("countdown 1 inGame = ", inGame);
+                if (DEBUG) {console.log("countdown 1 inGame = ", inGame);}
                 clearInterval(countdownInterval); 
                 countdownElement.remove();
                 gameNameElement.remove();
@@ -240,7 +247,7 @@ function startCountdown(container, game_name) {
                     countdownElement.remove();
                     gameNameElement.remove();
                     if (getInGame() === true) {
-                        console.log("countdown 2 inGame = ", inGame);
+                        if (DEBUG) {console.log("countdown 2 inGame = ", inGame);}
                         play();
                         PongWebSocketManager.sendGameStarted();
                     }
@@ -249,7 +256,7 @@ function startCountdown(container, game_name) {
         }, 1000);
         const checkInGame = setInterval(() => {
             if (getInGame() === false) {
-                console.log("countdown 3 inGame = ", inGame);
+                if (DEBUG) {console.log("countdown 3 inGame = ", inGame);}
                 clearInterval(countdownInterval);
                 clearInterval(checkInGame);
                 countdownElement.remove();
@@ -285,7 +292,7 @@ function updateState(data) {
 }
 
 async function update_Stats(data) {
-    console.log("data = ", data);
+    if (DEBUG) {console.log("data = ", data);}
     // data = {action_type: 'end_of_game', winner: 'rouge', result: 'win', nb_point_taken: 2, nb_point_given: 1}
     const response = await fetch('/api/updateStats/', {
         method: 'POST',
@@ -328,7 +335,7 @@ function displayeWinner(winner) {
     const winnerElement = document.createElement('div');
     winnerElement.id = 'winner-display';
 
-    loadPongCSS();
+    // loadPongCSS();
 
     winnerElement.style.position = 'absolute';
     winnerElement.style.top = `${canvas.offsetTop + canvas.height / 2}px`;
@@ -348,14 +355,14 @@ function displayeWinner(winner) {
 
     setTimeout(() => {
         winnerElement.style.opacity = '1';
-    }, 10); 
+    }, 10);
 
     const displayDuration = 3000;
     const disappearDelay = 1000;
 
     const checkInGame = setInterval(() => {
         if (getInGame() === false) {
-            console.log("displayWinner: inGame = ", inGame);
+            if (DEBUG) {console.log("displayWinner: inGame = ", inGame);}
             clearInterval(checkInGame);
             winnerElement.style.opacity = '0';
             setTimeout(() => {
@@ -380,7 +387,7 @@ function displayWaiting(container) {
     const waitingElement = document.createElement('div');
     waitingElement.id = 'waiting-display';
 
-    loadPongCSS();
+    // loadPongCSS();
 
     waitingElement.style.position = 'absolute';
     waitingElement.style.top = `${canvas.offsetTop + canvas.height / 2}px`;
@@ -397,7 +404,7 @@ function displayWaiting(container) {
 
     const checkInGame = setInterval(() => {
         if (getInGame() === false) {
-            console.log("displayWaiting: inGame = ", inGame);
+            if (DEBUG) {console.log("displayWaiting: inGame = ", inGame);}
             clearInterval(checkInGame);
             waitingElement.remove();
         }

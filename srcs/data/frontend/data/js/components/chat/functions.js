@@ -20,14 +20,13 @@ export function openChatWithUser(user) {
         close_chatWindows(chatWindow);
     } else {
         if (DEBUG) {console.log('Chat window does not exist');}
-
         chatWindow = createChatWindow(user);
         chatWindow.classList.add('active');
         document.getElementById('chat-container').appendChild(chatWindow);
         close_chatWindows(chatWindow);
     }
 
-    checkConversationID(user.nickname).then(conversationID => {
+    checkConversationID(user).then(conversationID => {
         getNotificationId(user.nickname);
         openConversation(conversationID, user);
     });
@@ -35,7 +34,7 @@ export function openChatWithUser(user) {
     // Function to check if a conversation ID exists for the users, if not create one
     async function checkConversationID(user) {
         let response = null;
-        await fetch(`/api_chat/conversationID/${user}/`, {
+        await fetch(`/api_chat/conversationID/${user.user_id}/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -176,6 +175,17 @@ function displayMessage(messageData, otherUser) {
                 // Hide the accept button
                 acceptButton.style.display = 'none';
             });
+        } else if (messageData.message == 'Game invite accepted') {
+            messageContent.innerHTML = `
+                Game invite accepted.
+                <button class="btn btn-success join-button mt-2">Join the game</button>
+                <span class="msg-time position-absolute start-0">${new Date(messageData.timestamp).toLocaleTimeString()}</span>
+            `;
+            const joinButton = messageContent.querySelector('.join-button');
+            joinButton.addEventListener('click', () => {
+                if (DEBUG) {console.log('Join game');}
+                navigateTo('/pong');
+            });
         } else {
             messageContent.innerHTML = `
                 ${messageData.message}
@@ -207,13 +217,16 @@ function handleWSMessage(receivedMessage, user) {
         } else {
             disableChat(conversation.other.id);
             disableChat(conversation.me.id);
-            const blockUserButton = document.getElementById(conversation.other.id).querySelector('.block-button')
+            const chatWindow_id = `chat_user_${conversation.other.id}`;
+            const blockUserButton = document.getElementById(chatWindow_id).querySelector('.block-button')
             if (conversation.me.blocked === true) { // If the current user is blocked
-                blockUserButton.style.display = 'none';
+                if (blockUserButton) {
+                    blockUserButton.disabled = true;
+                }
             } else if (conversation.other.blocked === true) { // If the other user is blocked
-                blockUserButton.style.color = 'green';
-                blockUserButton.setAttribute('aria-label', `Unblock ${conversation.other.nickname}`); // Change the tooltip
-                blockUserButton.style.display = 'block';
+                if (blockUserButton) {
+                    blockUserButton.style.color = 'green';
+                }
             }
         }
     } else if (receivedMessage.type === 'chat_message') {
@@ -226,22 +239,26 @@ function handleWSMessage(receivedMessage, user) {
         };
         displayMessage(messageData, user);
     } else if (receivedMessage.type === 'user_blocked') {
-        disableChat(receivedMessage.blocked);
-        disableChat(receivedMessage.blocker);
-        if (receivedMessage.blocked === receivedMessage.user) { // If the blocked user is the current user
-            const blockUserButton = document.getElementById(receivedMessage.blocker).querySelector('.block-button')
-            blockUserButton.style.display = 'none';
-        } else if (receivedMessage.blocked !== receivedMessage.user) { // If the blocked user is the other user
-            const blockUserButton = document.getElementById(receivedMessage.blocked).querySelector('.block-button')
-            blockUserButton.style.color = 'green';
-            blockUserButton.setAttribute('aria-label', 'Unblock user'); // Change the tooltip
-            blockUserButton.style.display = 'block';
+        if (receivedMessage.blocked.nickname === receivedMessage.user) { // If the blocked user is the current user
+            disableChat(receivedMessage.blocker);
+            const chatWindow_id = `chat_user_${receivedMessage.blocker}`;
+            const blockUserButton = document.getElementById(chatWindow_id).querySelector('.block-button')
+            if (blockUserButton) {
+                blockUserButton.disabled = true;
+            }
+        } else if (receivedMessage.blocked.nickame !== receivedMessage.user) { // If the blocked user is the other user
+            disableChat(receivedMessage.blocked.id);
+            const chatWindow_id = `chat_user_${receivedMessage.blocked.id}`;
+            const blockUserButton = document.getElementById(chatWindow_id).querySelector('.block-button')
+            if (blockUserButton) {
+                blockUserButton.style.color = 'green';
+            }
         }
     } else if (receivedMessage.type === 'user_unblocked') {
-        if (receivedMessage.blocked === receivedMessage.user) {
+        if (receivedMessage.blocked.nickname === receivedMessage.user) { // If the unblocked user is the current user
             enableChat(receivedMessage.blocker);
-        } else if (receivedMessage.blocked !== receivedMessage.user) {
-            enableChat(receivedMessage.blocked);
+        } else if (receivedMessage.blocked.nickname !== receivedMessage.user) { // If the unblocked user is the other user
+            enableChat(receivedMessage.blocked.id);
         }
     } else if (receivedMessage.type === 'game_invite') {
         if (receivedMessage.sender.nickname === receivedMessage.user) {
@@ -307,7 +324,7 @@ export function handleMessage(message) {
 
 // Function to invite a user to play
 export function inviteUserToPlay(user) {
-    if (DEBUG) console.log('Invite', user.nickname, 'to play a game.');
+    if (DEBUG) {console.log('Invite', user.nickname, 'to play a game.');}
     if (chatWS && chatWS.readyState === WebSocket.OPEN) {
         const messageData = {
             type: 'game_invite',
@@ -342,10 +359,10 @@ export function blockUnblockUser(user) {
 }
 
 function disableChat(user_id) {
+    if (DEBUG) {console.log('Chat disabled for user_id:', user_id);}
     const chatWindow_id = `chat_user_${user_id}`;
     // If the chatWindow exists, disable the chat
     if (document.getElementById(chatWindow_id)) {
-        if (DEBUG) {console.log('Chat disabled for user_id:', user_id);}
         const chatInput = document.getElementById(chatWindow_id).querySelector('.chat-input');
         const chatSendButton = document.getElementById(chatWindow_id).querySelector('.chat-send-button');
         const inviteGameButton = document.getElementById(chatWindow_id).querySelector('.invite-game-button');
@@ -359,6 +376,7 @@ function disableChat(user_id) {
 }
 
 function enableChat(user_id) {
+    if (DEBUG) {console.log('Chat enabled for user_id:', user_id);}
     const chatWindow_id = `chat_user_${user_id}`;
     // If the chatWindow exists, enable the chat
     if (document.getElementById(chatWindow_id)) {
@@ -366,19 +384,15 @@ function enableChat(user_id) {
         const chatInput = document.getElementById(chatWindow_id).querySelector('.chat-input');
         const chatSendButton = document.getElementById(chatWindow_id).querySelector('.chat-send-button');
         const inviteGameButton = document.getElementById(chatWindow_id).querySelector('.invite-game-button');
+        const blockUserButton = document.getElementById(chatWindow_id).querySelector('.block-button')
         
-        if (chatInput && chatSendButton) {
+        // if (chatInput && chatSendButton && inviteGameButton && blockUserButton) {
             chatInput.disabled = false;
             chatSendButton.disabled = false;
             inviteGameButton.disabled = false;
-        }
-    }
-    // Change the block button color and tooltip
-    const blockUserButton = document.getElementById(user_id).querySelector('.block-button')
-    if (blockUserButton) {
-        blockUserButton.style.color = 'red';
-        blockUserButton.setAttribute('aria-label', `Block ${user_id}`); // Change the tooltip
-        blockUserButton.style.display = 'block';
+            blockUserButton.style.color = 'red';
+            blockUserButton.disabled = false;
+        // }
     }
 }
 

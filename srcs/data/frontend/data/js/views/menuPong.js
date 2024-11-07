@@ -1,4 +1,4 @@
-import { navigateTo } from '../app.js';
+import { DEBUG, navigateTo } from '../app.js';
 import { navigationBar } from './navigation.js';
 import { notifications } from './notifications.js';
 import { getCookie } from './utils.js';
@@ -733,6 +733,6 @@ export async function menuPongView(container) {
         const notifications_div = await notifications();
         div.appendChild(notifications_div);
     } catch {
-        console.log("Menupong pas charger");
+        if (DEBUG) {console.log("Menupong pas charger");}
     }
 }
