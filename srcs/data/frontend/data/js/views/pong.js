@@ -159,7 +159,6 @@ export async function pongView(container, tournamentSocket) {
         }
         // console.log ("=> endtournament ", data.action_type);
         if (data.action_type === 'end_of_tournament') {
-            // console.log("inside end tournament");
             inTournament = false;
             navigateTo('/menuPong');
         }
