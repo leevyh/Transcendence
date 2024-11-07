@@ -112,8 +112,7 @@ export function tournamentView(container) {
     // Fonction pour démarrer le tournoi qui affiche "Tournament started!" en rouge après le nom des joueurs
     function startTournament() {
         if (DEBUG) {console.log("Tournament started!");}
-        console.log("Tournament started!");
-      
+
         // Sélectionner tous les slots de joueurs
         const playerSlots = document.querySelectorAll('#player-list li');
 
