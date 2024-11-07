@@ -502,18 +502,32 @@ export async function profileView(container, userID) {
                 'X-CSRFToken': getCookie('csrftoken'),
             },
         });
-        // get the data
-        const data = await response.json();
-        if (DEBUG) {console.log(data);}
+      
+        if (response.status === 200) {
+            // get the data
+            const data = await response.json();
+            // add the data to the view
+            data.forEach((game) => {
+                historical.appendChild(createGameHistory(`${game.player_avatar}`, `${game.player}`, `${game.player_score}`, `${game.opponent_avatar}`, `${game.opponent}`, `${game.opponent_score}`, game.tournament));
+            }); //TODO CHANGE THE 0 TO 1 WHEN TOURNAMENT IS IMPLEMENTED
 
-        // add the data to the view
-        data.forEach((game) => {
-            historical.appendChild(createGameHistory(`${game.player_avatar}`, `${game.player}`, `${game.player_score}`, `${game.opponent_avatar}`, `${game.opponent}`, `${game.opponent_score}`, game.tournament));
-        }); //TODO CHANGE THE 0 TO 1 WHEN TOURNAMENT IS IMPLEMENTED
-
-        const notifications_div = await notifications();
-        div.appendChild(notifications_div);
-
+            const notifications_div = await notifications();
+            div.appendChild(notifications_div);
+        } else if (response.status === 307) {
+            localStorage.removeItem('token');
+            await fetch('/api/logout/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            });
+            navigateTo('/');
+            return null;
+        } else {
+            console.error('Error:', response);
+            return null;
+        }
     } catch (error) {
         if (DEBUG) {console.log(error);}
     }

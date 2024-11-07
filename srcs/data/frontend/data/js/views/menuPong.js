@@ -25,7 +25,18 @@ export async function fetchUserGameSettings() {
             };
             return GameSettings;
         }
-    }  else {
+    } else if (response.status === 307) {
+            localStorage.removeItem('token');
+            await fetch('/api/logout/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            });
+            navigateTo('/');
+            return null;
+    } else {
         console.error('Error:', response);
         return null;
     }
@@ -671,6 +682,18 @@ export async function menuPongView(container) {
                     },
                     body: JSON.stringify(GameSettings),
                 });
+                if (response.status === 307) {
+                    localStorage.removeItem('token');
+                    await fetch('/api/logout/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken'),
+                        },
+                    });
+                    navigateTo('/');
+                    return;
+                }
                 if (!response.ok) {
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'text-danger';

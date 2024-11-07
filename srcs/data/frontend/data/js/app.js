@@ -112,7 +112,7 @@ async function router() {
 
         history.pushState(null, null, `/profile/${currentUser.id}`);
         profileView(appDiv, currentUser.id);
-    } else if (match) { // TODO: Need to fix the path in every link that leads to a profile
+    } else if (match) {
         // Load a specific user's profile
         const userId = match[1]; // Extract the user ID from the URL
         document.title = `${pageTitle} | User ${userId}'s Profile`;
