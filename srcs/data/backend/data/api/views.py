@@ -38,6 +38,18 @@ def register(request):
             form = UserRegistrationForm(data)
             if form.is_valid():
                 user = form.save(commit=False)
+                #Regex for password : /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,12}$/
+
+                if len(form.cleaned_data['password']) < 8:
+                    return JsonResponse({'error': 'Password must be at least 8 characters long'}, status=400)
+                if len(form.cleaned_data['password']) > 12:
+                    return JsonResponse({'error': 'Password must be at most 12 characters long'}, status=400)
+                if not any(char.isupper() for char in form.cleaned_data['password']):
+                    return JsonResponse({'error': 'Password must contain at least one uppercase letter'}, status=400)
+                if not any(char.islower() for char in form.cleaned_data['password']):
+                    return JsonResponse({'error': 'Password must contain at least one lowercase letter'}, status=400)
+                if not any(char.isdigit() for char in form.cleaned_data['password']):
+                    return JsonResponse({'error': 'Password must contain at least one digit'}, status=400)
                 user.set_password(form.cleaned_data['password'])
                 user.username = form.cleaned_data.get('username', None)
                 user.save()
