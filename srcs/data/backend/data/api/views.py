@@ -68,7 +68,7 @@ def loginView(request):
                 user.status = User_site.Status.ONLINE
                 login(request, user)
                 user.save()
-                encoded_jwt = jwt.encode({'username': user.username, 'exp': time.time() + 3600}, 'secret', algorithm='HS256')
+                encoded_jwt = jwt.encode({'username': user.username, 'exp': time.time() + 10800}, 'secret', algorithm='HS256')
                 return JsonResponse({'message': 'User logged in successfully', 'token': encoded_jwt}, status=200)
             else:
                 return JsonResponse({'error': 'Invalid credentials'}, status=401)
