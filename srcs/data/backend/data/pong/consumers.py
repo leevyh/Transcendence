@@ -62,11 +62,12 @@ class CLIPongConsumer(AsyncWebsocketConsumer):
         return game
 
     async def periodic_state_update(self):
-        while self.game.winner is None:
-            await asyncio.sleep(3)
-            if hasattr(self, 'game') and self.game is not None:
-                if self.game.is_active:
-                    await self.state_of_the_game()
+        if hasattr(self, 'game') and self.game is not None:
+            while self.game.winner is None:
+                await asyncio.sleep(3)
+                if hasattr(self, 'game') and self.game is not None:
+                    if self.game.is_active:
+                        await self.state_of_the_game()
        
     async def game_state(self, event):
         pass
