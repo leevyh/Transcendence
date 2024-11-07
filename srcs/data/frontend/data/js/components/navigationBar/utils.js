@@ -60,7 +60,10 @@ export function openModal(modalToOpen) {
 }
 
 export function closeModal(modalToClose) {
-    if (modalToClose) console.log('modalToClose');
+    if (modalToClose)
+    {
+        if (DEBUG) {console.log('modalToClose');}
+    }
     setTimeout(() => {
         // Use the Bootstrap API to hide the modal
         const modalInstance = bootstrap.Modal.getInstance(modalToClose);

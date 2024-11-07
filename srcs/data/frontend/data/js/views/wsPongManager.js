@@ -1,3 +1,4 @@
+import { DEBUG } from "../app.js";
 
 export const PongWebSocketManager = {
     socket: null,
@@ -7,7 +8,7 @@ export const PongWebSocketManager = {
         this.socket = new WebSocket(url);
 
         this.socket.onopen = () => {
-            console.log('Pong WebSocket connection established');
+            if (DEBUG) {console.log('Pong WebSocket connection established');}
         };
     },
 
@@ -45,7 +46,7 @@ export const PongWebSocketManager = {
     },
 
     sendDisconnect() {
-        console.log('disconnecting');
+        if (DEBUG) {console.log('disconnecting');}
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
             const data = {
                 type: 'disconnect_player',

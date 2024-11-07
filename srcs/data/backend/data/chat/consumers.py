@@ -57,8 +57,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Receive message from WebSocket
         data = json.loads(text_data)
         message_type = data.get('type')
-        # print('message_type: ', message_type) # DEBUG
-
+        # print(data)
+        # print('message_type: ', message_type)
         if message_type == 'block_user':
             blocked = data.get('blocked')
             await self.handle_block_user(blocked)

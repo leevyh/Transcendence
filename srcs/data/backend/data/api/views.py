@@ -92,7 +92,7 @@ def who_am_i(request):
             user = User_site.objects.get(username=username)
             data = {'nickname': user.nickname,
                     'id': user.id}
-            print("user:", data)         # DEBUG
+            # print("user:", data)         # DEBUG
             return JsonResponse(data, status=200)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
@@ -468,7 +468,7 @@ def getLeaderboard(request):
                             'nb_losses': user.stats_user.nb_losses,
                             'avatar': avatar})
 
-                print (f"data nickname and rank: {data[i-1]['nickname']} and {data[i-1]['rank']}")         # DEBUG
+                # print (f"data nickname and rank: {data[i-1]['nickname']} and {data[i-1]['rank']}")         # DEBUG
 
             return JsonResponse(data, status=200, safe=False)
         except User_site.DoesNotExist:
@@ -672,7 +672,7 @@ def update_Stats(request): #TODO without form and with json.loads. Need to chang
             stats_id = Stats_user.objects.get(user=user_id)
             nb_wins = stats_id.nb_wins
             nb_losses = stats_id.nb_losses
-            print(f"data: {data}")         # DEBUG
+            # print(f"data: {data}")         # DEBUG
             if data['result'] == 'win':
                 nb_wins += 1
             else:
@@ -792,7 +792,7 @@ def create_user42(response, code):
 @csrf_exempt #TODO: CHECK IF THIS IS THE RIGHT DECORATOR
 def token_42(request):
     if request.method == 'POST':
-        print('request:', request.body)         # DEBUG
+        # print('request:', request.body)         # DEBUG
         client_id = os.getenv('CLIENT_ID')
         client_secret = os.getenv('CLIENT_SECRET')
         redirect_uri = os.getenv('REDIRECT_URI')
