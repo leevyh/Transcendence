@@ -34,7 +34,6 @@ def register(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            # language = data.pop('language', None)
             form = UserRegistrationForm(data)
             if form.is_valid():
                 user = form.save(commit=False)
@@ -54,9 +53,6 @@ def register(request):
                 user.username = form.cleaned_data.get('username', None)
                 user.save()
                 settings = Accessibility(user=user)
-                # settings.language = language
-                # if settings.language is None:
-                #     settings.language = 'fr'
                 settings.save()
                 stats = Stats_user(user=user)
                 stats.save()
@@ -395,7 +391,6 @@ def get_settings(request):
             data = {'username': user.username,
                     'nickname': user.nickname,
                     'email': user.email,
-                    'language': settings.language,
                     'font_size': settings.font_size,
                     'avatar': avatar}
             return JsonResponse(data, status=200)

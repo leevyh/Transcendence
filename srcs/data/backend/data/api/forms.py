@@ -20,8 +20,7 @@ class UserRegistrationForm(forms.ModelForm):
 class AccessibilityUpdateForm(forms.ModelForm):
     class Meta:
         model = Accessibility
-        fields = ['language',
-                  'font_size']
+        fields = ['font_size']
 
 class SettingsForm(forms.ModelForm):
     class Meta:
