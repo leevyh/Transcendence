@@ -433,13 +433,15 @@ export function homeView(container) {
             return;
         }
         // If the password does not match the regex
-        // else if (!passwordRegex.test(password)) {
-        //     const errorMessage = document.createElement('p');
-        //     errorMessage.className = 'text-danger';
-        //     errorMessage.textContent = 'The password must contain between 8 and 12 characters, at least one uppercase letter, one lowercase letter and one digit';
-        //     formRegister.insertBefore(errorMessage, submitRegisterButton);
-        //     return;
-        // }
+        else if (!passwordRegex.test(password)) {
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'text-danger';
+            errorMessage.textContent = 'Password must be 8-12 characters, \
+            an uppercase letter, and a digit';
+            formRegister.insertBefore(errorMessage, submitRegisterButton);
+            setTimeout(() => errorMessage.remove(), 3000);
+            return;
+        }
 
 
         // Send the data to the server
