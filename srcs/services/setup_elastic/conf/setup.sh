@@ -74,8 +74,12 @@ if [ ! -f config/certs/certs.zip ] && [ ! -f config/certs/ca.zip ]; then
     sleep 1;
   done;
 
-  echo "Enrolling postgresql indexes in the ILM policy"
-  until curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/postgresql*/_settings -d "{\"index\":{\"lifecycle\":{\"name\":\"default-policy\"}}}" | grep -q "^{\"acknowledged\":true}"; do
+  echo "Enrolling nginx indexes in the ILM policy"
+  until curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/.ds-logs-nginx*/_settings -d "{\"index\":{\"lifecycle\":{\"name\":\"default-policy\"}}}" | grep -q "^{\"acknowledged\":true}"; do
+    sleep 1;
+  done;
+
+  until curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/.ds-metrics-nginx*/_settings -d "{\"index\":{\"lifecycle\":{\"name\":\"default-policy\"}}}" | grep -q "^{\"acknowledged\":true}"; do
     sleep 1;
   done;
 
@@ -84,12 +88,8 @@ if [ ! -f config/certs/certs.zip ] && [ ! -f config/certs/ca.zip ]; then
     sleep 1;
   done;
 
-  echo "Enrolling nginx indexes in the ILM policy"
-  until curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/.ds-logs-nginx*/_settings -d "{\"index\":{\"lifecycle\":{\"name\":\"default-policy\"}}}" | grep -q "^{\"acknowledged\":true}"; do
-    sleep 1;
-  done;
-
-  until curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/.ds-metrics-nginx*/_settings -d "{\"index\":{\"lifecycle\":{\"name\":\"default-policy\"}}}" | grep -q "^{\"acknowledged\":true}"; do
+  echo "Enrolling postgresql indexes in the ILM policy"
+  until curl -s -X PUT --cacert config/certs/ca/ca.crt -u "elastic:$ELASTIC_PASSWORD" -H "Content-Type: application/json" https://backend-elastic:9200/postgresql*/_settings -d "{\"index\":{\"lifecycle\":{\"name\":\"default-policy\"}}}" | grep -q "^{\"acknowledged\":true}"; do
     sleep 1;
   done;
 

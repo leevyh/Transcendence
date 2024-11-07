@@ -1,5 +1,7 @@
 - pipeline.id: pipeline-django-1
   path.config: "/usr/share/logstash/pipeline/django"
+  pipeline.workers: 2
 
 - pipeline.id: pipeline-postgresql-1
   path.config: "/usr/share/logstash/pipeline/postgresql"
+  pipeline.workers: 2
