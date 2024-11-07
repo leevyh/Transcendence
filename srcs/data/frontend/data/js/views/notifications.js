@@ -218,7 +218,7 @@ function displayNotifications(notification, offcanvas_body) {
     if (!notificationsArray.find(notif => notif.id === notification.id)) {
         notificationsArray.push(notification);
     }
-    console.log(notificationsArray);
+    if (DEBUG) {console.log(notificationsArray);}
 
     // Sort notification by order
     notificationsArray.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -242,7 +242,7 @@ export function removeNotification(notificationId) {
     //remove notification from the notificationsArray
     notificationsArray.pop();
 
-    console.log(notificationsArray);
+    if (DEBUG) {console.log(notificationsArray);}
     const notification = document.getElementById(`notification_${notificationId}`);
     if (notification !== null) {
 
