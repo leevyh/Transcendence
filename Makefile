@@ -13,7 +13,6 @@
 NAME	= ft_transcendence
 
 COMPOSE	= ./docker-compose.yml
-COMPOSL	= ./docker-compose-lite.yml
 
 DATA	= ./srcs/data
 ENVV	= ./env
@@ -25,24 +24,11 @@ DCPF	= ./srcs/setup/dir_cleanup_force.sh
 ECHK	= ./srcs/setup/env_check.sh
 
 all:
-	@echo "Make sure that any services or volumes created by master version are removed before running lite mode"
-	@echo "Also, you need all environment files and directories required by the master version"
-	@echo "Beware you may experience longer docker build and services starting time!"
-	@echo -n "Continue? [y/N] " && read ans && [ $${ans:-N} = y ]
-	@${ECHK} ${ENVV}
-	@${DSTP} ${DATA}
-	@docker compose -f ${COMPOSL} up -d --build
-
-down:
-	@docker compose -f ${COMPOSL} down  --rmi all
-	@echo "Note that containers are being removed with down --rmi all to ensure non-conflicting services"
-
-a-full:
 	@${ECHK} ${ENVV}
 	@${DSTP} ${DATA}
 	@docker compose -f ${COMPOSE} up -d --build
 
-d-full:
+down:
 	@docker compose -f ${COMPOSE} down
 
 clean:
@@ -59,8 +45,6 @@ prune:
 	@docker system prune -af
 
 re: down all
-
-r-full: d-full a-full
 
 .PHONY: all down clean force logs status prune re
 .SILENT: all down clean force logs status prune re
