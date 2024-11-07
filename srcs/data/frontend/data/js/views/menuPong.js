@@ -37,7 +37,7 @@ export async function fetchUserGameSettings() {
             navigateTo('/');
             return null;
     } else {
-        console.error('Error:', response);
+        if (DEBUG) {console.error('Error:', response);}
         return null;
     }
 }

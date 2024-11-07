@@ -182,7 +182,7 @@ function startCountdown(container, game_name) {
 
     const gameContainer = container.querySelector('.PongDiv');
     if (!gameContainer) {
-        console.error("Conteneur de jeu introuvable");
+        if (DEBUG) {console.error("Conteneur de jeu introuvable");}
         return;
     }
 

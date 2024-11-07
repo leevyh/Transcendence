@@ -148,6 +148,10 @@ export function collide(player) {
     if (game.ball.y < player.y || game.ball.y > player.y + PLAYER_HEIGHT) {
         reset();
 
+       if (!document.getElementById('#computer-score') || !document.getElementById('#player-score')) {
+           return;
+       }
+
         // Update score
         if (player == game.player) {
             game.computer.score++;
@@ -226,8 +230,10 @@ export function stop() {
     game.computer.score = 0;
     game.player.score = 0;
 
-    document.querySelector('#computer-score').textContent = game.computer.score;
-    document.querySelector('#player-score').textContent = game.player.score;
+    if (document.getElementById('#computer-score') && document.getElementById('#player-score')) {
+        document.querySelector('#computer-score').textContent = game.computer.score;
+        document.querySelector('#player-score').textContent = game.player.score;
+    }
 
     draw();
     GameOn = false;

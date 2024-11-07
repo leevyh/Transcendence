@@ -93,7 +93,7 @@ export function tournamentView(container) {
 
     // Gérer les erreurs de la WebSocket
     tournamentSocket.onerror = function(error) {
-        console.error('WebSocket error:', error);
+        if (DEBUG) {console.error('WebSocket error:', error);}
     };
 
     // Fonction pour mettre à jour la liste des joueurs

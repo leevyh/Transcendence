@@ -20,19 +20,19 @@ class WebSocketManager {
         if (this.token) {
             //Check token validity with backend
             const status_token = await isAuthenticated();
-            if (DEBUG) {console.log('Token status:', status_token);}
+            // if (DEBUG) {console.log('Token status:', status_token);}
             if (!status_token) {
-                if (DEBUG) {console.error('Invalid token');}
+                // if (DEBUG) {console.error('Invalid token');}
                 return;
             }
             try {
                 this.socket = new WebSocket(this.url);
             } catch (error) {
-                if (DEBUG) {console.error('WSManager WebSocket connection error:', error);}
+                // if (DEBUG) {console.error('WSManager WebSocket connection error:', error);}
                 return;
             }
             this.socket.onopen = () => {
-                if (DEBUG) {console.log('WSManager WebSocket connection established');}
+                // if (DEBUG) {console.log('WSManager WebSocket connection established');}
                 this.isConnected = true;
             };
 
@@ -42,25 +42,22 @@ class WebSocketManager {
             };
 
             this.socket.onclose = () => {
-                if (DEBUG) {console.log('WSManager WebSocket connection closed');}
+                // if (DEBUG) {console.log('WSManager WebSocket connection closed');}
                 this.isConnected = false;
                 setTimeout(() => this.connect(), 1000);
             };
             this.socket.onerror = error => {
-                if (DEBUG) {console.error('WSManager WebSocket error:', error);}
+                // if (DEBUG) {console.error('WSManager WebSocket error:', error);}
             };
         } else {
-            console.error('No token found');
             // if (DEBUG) {console.error('No token found');}
         }
     }
 
     send(data){
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-            if (DEBUG) {console.log("Sending data: ", data);}
+            // if (DEBUG) {console.log("Sending data: ", data);}
             this.socket.send(JSON.stringify(data));
-        } else {
-            if (DEBUG) {console.error('WSManager WebSocket is not connected');}
         }
     }
 

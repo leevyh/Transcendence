@@ -184,7 +184,7 @@ export async function readNotification(notification_id) {
     });
 
     if (!response.ok) {
-        console.error("Error while reading notification");
+        if (DEBUG) {console.error("Error while reading notification");}
     }
 }
 
@@ -199,7 +199,7 @@ async function readAllNotifications() {
     });
 
     if (!response.ok) {
-        console.error("Error while reading all notifications");
+        if (DEBUG) {console.error("Error while reading all notifications");}
     }
     else
     {
@@ -253,7 +253,7 @@ export function removeNotification(notificationId) {
         })
         .catch( (error) => {
             displayToast('Error while deleting notification', 'bg-danger');
-            console.error(error);
+            if (DEBUG) {console.error(error);}
         });
     }
 
@@ -271,7 +271,7 @@ async function deleteNotification(notificationId) {
         }
     });
     if (!response.ok) {
-        console.error("Error while deleting notification");
+        if (DEBUG) {console.error("Error while deleting notification");}
     }
 
 }

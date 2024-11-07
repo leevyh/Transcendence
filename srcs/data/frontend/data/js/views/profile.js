@@ -30,7 +30,7 @@ async function fetchUserStats(userID) {
         navigateTo('/');
         return null;
     } else {
-        console.error('Error:', response);
+        if (DEBUG) {console.error('Error:', response);}
         return null;
     }
 }
@@ -525,7 +525,7 @@ export async function profileView(container, userID) {
             navigateTo('/');
             return null;
         } else {
-            console.error('Error:', response);
+            if (DEBUG) {console.error('Error:', response);}
             return null;
         }
     } catch (error) {

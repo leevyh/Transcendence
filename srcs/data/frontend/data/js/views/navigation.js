@@ -81,7 +81,7 @@ export async function navigationBar(container) {
                 div.appendChild(nav);
 
             } else {
-                console.error('No data received');
+                if (DEBUG) {console.error('No data received');}
             }
         } else if (response.status === 307) {
             localStorage.removeItem('token');
@@ -94,10 +94,10 @@ export async function navigationBar(container) {
             });
             navigateTo('/');
         } else {
-            console.error('Error:', response.statusText);
+            if (DEBUG) {console.error('Error:', response.statusText);}
         }
     } catch (error) {
-        console.error('An error occurred:', error);
+        if (DEBUG) {console.error('An error occurred:', error);}
     }
 
     return div;
