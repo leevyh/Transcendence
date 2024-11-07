@@ -226,7 +226,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = await database_sync_to_async(Message.objects.create)(
             conversation=conversation,
             sender=sender,
-            content="Game invite send to " + invited.nickname,
+            content="Game invite sent to " + invited.nickname,
             timestamp=event['timestamp']
         )
 
@@ -238,7 +238,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'id': sender.id,
                 'avatar': encode_avatar(sender),
             },
-            'receiver': invited.nickname,
+            'receiver': {
+                'nickname' : invited.nickname,
+                'id': invited.id,
+            },          
             'timestamp': str(message.timestamp)
         }
 
@@ -265,11 +268,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'type': 'game_invite',
             'message': "User " + message_data['sender']['nickname'] + " invited you to play a game",
-            'sender': {
-                'nickname': message_data['sender']['nickname'],
-                'id': message_data['sender']['id'],
-                'avatar': message_data['sender']['avatar'],
-            },
+            'sender': message_data['sender'],
             'receiver': message_data['receiver'],
             'user': user.nickname, # Who am I
             'timestamp': message_data['timestamp']
@@ -286,6 +285,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         conversation = await database_sync_to_async(Conversation.objects.get)(id=self.conversation_id)
         sender = await database_sync_to_async(User.objects.get)(nickname=user.nickname)
         members = await database_sync_to_async(list)(conversation.members.all())
+
+        # Get the one who invited
+        invitation_from = await database_sync_to_async(User.objects.get)(nickname=event['invitation_from'])
 
         game = PongGame(sender)
         game.player_1 = await database_sync_to_async(User.objects.get)(nickname=event['invitation_from'])
@@ -308,7 +310,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'id': sender.id,
                 'avatar': encode_avatar(sender),
             },
-            'receiver': event['invitation_from'],
+            'receiver': {
+                'nickname': invitation_from.nickname,
+                'id': invitation_from.id,
+            },
             'timestamp': str(message.timestamp)
         }
 
