@@ -604,7 +604,8 @@ def deleteAvatar(request):
             user.avatar = 'media/default.jpg'
             user.save()
             #delete the file in the media directory
-            os.remove(f'media/{username}.jpg')
+            if (os.path.exists(f'media/{username}.jpg')):
+                os.remove(f'media/{username}.jpg')
             return JsonResponse({'message': 'Avatar deleted successfully'}, status=200)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
