@@ -79,6 +79,10 @@ export async function initialize_color() {
 
 
 export async function draw() {
+    if (!document.getElementById('canvas')) {
+        return;
+    }
+
     var context = canvas.getContext('2d');
 
 	const background_color  = colorMapping[background_color_key] || "#000";
@@ -116,6 +120,10 @@ export function changeDirection(playerPosition) {
 }
 
 export function movePlayerWithKeyboard() {
+    if (!document.getElementById('canvas')) {
+        return;
+    }
+
     if (playerMovingUp) {
         game.player.y -= PLAYER_SPEED;
     }
@@ -161,6 +169,10 @@ export function collide(player) {
 }
 
 export function ballMove() {
+    if (!document.getElementById('canvas')) {
+        return;
+    }
+
     // Rebounds on top and bottom
     if (game.ball.y > canvas.height || game.ball.y < 0) {
         game.ball.speed.y *= -1;
@@ -188,6 +200,10 @@ export async function play() {
 }
 
 export function reset() {
+    if (!document.getElementById('canvas')) {
+        return;
+    }
+
     // Set ball and players to the center
     game.ball.x = canvas.width / 2;
     game.ball.y = canvas.height / 2;
