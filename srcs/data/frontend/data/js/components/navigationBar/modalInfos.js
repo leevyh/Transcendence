@@ -123,11 +123,6 @@ export async function createModalInfo(userData) {
     ModalMDPElem.textContent = `Password : *******`;
     modalInfoColumnInfos.appendChild(ModalMDPElem);
 
-    const ModalLanguageElem = document.createElement('div');
-    ModalLanguageElem.className = 'ModalLanguageElem';
-    ModalLanguageElem.textContent = `Language : ${userData.language}`;
-    modalInfoColumnInfos.appendChild(ModalLanguageElem);
-
     const ModalPoliceElem = document.createElement('div');
     ModalPoliceElem.className = 'ModalPoliceElem';
     ModalPoliceElem.textContent = `Font size : ${userData.font_size}`;

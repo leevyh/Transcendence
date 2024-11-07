@@ -34,17 +34,25 @@ def register(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            # language = data.pop('language', None)
             form = UserRegistrationForm(data)
             if form.is_valid():
                 user = form.save(commit=False)
+                #Regex for password : /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,12}$/
+
+                if len(form.cleaned_data['password']) < 8:
+                    return JsonResponse({'error': 'Password must be at least 8 characters long'}, status=400)
+                if len(form.cleaned_data['password']) > 12:
+                    return JsonResponse({'error': 'Password must be at most 12 characters long'}, status=400)
+                if not any(char.isupper() for char in form.cleaned_data['password']):
+                    return JsonResponse({'error': 'Password must contain at least one uppercase letter'}, status=400)
+                if not any(char.islower() for char in form.cleaned_data['password']):
+                    return JsonResponse({'error': 'Password must contain at least one lowercase letter'}, status=400)
+                if not any(char.isdigit() for char in form.cleaned_data['password']):
+                    return JsonResponse({'error': 'Password must contain at least one digit'}, status=400)
                 user.set_password(form.cleaned_data['password'])
                 user.username = form.cleaned_data.get('username', None)
                 user.save()
                 settings = Accessibility(user=user)
-                # settings.language = language
-                # if settings.language is None:
-                #     settings.language = 'fr'
                 settings.save()
                 stats = Stats_user(user=user)
                 stats.save()
@@ -383,7 +391,6 @@ def get_settings(request):
             data = {'username': user.username,
                     'nickname': user.nickname,
                     'email': user.email,
-                    'language': settings.language,
                     'font_size': settings.font_size,
                     'avatar': avatar}
             return JsonResponse(data, status=200)
@@ -597,7 +604,8 @@ def deleteAvatar(request):
             user.avatar = 'media/default.jpg'
             user.save()
             #delete the file in the media directory
-            os.remove(f'media/{username}.jpg')
+            if (os.path.exists(f'media/{username}.jpg')):
+                os.remove(f'media/{username}.jpg')
             return JsonResponse({'message': 'Avatar deleted successfully'}, status=200)
         except User_site.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)

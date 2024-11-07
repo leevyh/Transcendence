@@ -57,12 +57,7 @@ class User_site(AbstractUser):
 
 
 class Accessibility(models.Model):
-    class Language(models.TextChoices):
-        FRENCH = "fr"
-        ENGLISH = "en"
-        SPANISH = "sp"
     user = models.OneToOneField(User_site, on_delete=models.CASCADE, primary_key=True)
-    language = models.CharField(max_length=255, default=Language.ENGLISH, choices=Language.choices)
     font_size = models.IntegerField(default=2, choices=[(1, 'Small'), (2, 'Medium'), (3, 'Large')])
 
 

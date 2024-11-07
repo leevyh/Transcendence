@@ -134,7 +134,6 @@ async function createSettingsForm() {
                 },
                 body: JSON.stringify({ nickname, email })
             });
-
             if (response.ok) {
                 const successMessage = document.createElement('p');
                 successMessage.className = 'text-success';
@@ -172,43 +171,13 @@ async function createSettingsForm() {
 }
 
 async function createAccessibilityForm(userData) {
-    // Creation of the form to modify accessibility settings {font_size, language} = accessibilityForm
+    // Creation of the form to modify accessibility settings {font_size} = accessibilityForm
     const accessibilityForm = document.createElement('form');
     accessibilityForm.className = 'w-100 mt-4 accessibilityForm';
 
     // Creation of the font size field
     const divFontSize = await createFontSizeDiv(userData);
     accessibilityForm.appendChild(divFontSize);
-
-    // Creation of the language field
-    const labelLanguage = document.createElement('label');
-    labelLanguage.className = 'form-label';
-    labelLanguage.textContent = 'Language';
-    labelLanguage.style.color = '#000';
-    labelLanguage.setAttribute('for', 'language'); // Associe le label avec le select
-    accessibilityForm.appendChild(labelLanguage);
-
-    const language = document.createElement('select');
-    language.name = 'language';
-    language.id = 'language';
-    language.className = 'form-select mb-4';
-    language.value = userData.language;
-    accessibilityForm.appendChild(language);
-
-    const optionEn = document.createElement('option');
-    optionEn.value = 'en';
-    optionEn.textContent = 'English';
-    language.appendChild(optionEn);
-
-    const optionFr = document.createElement('option');
-    optionFr.value = 'fr';
-    optionFr.textContent = 'Francais';
-    language.appendChild(optionFr);
-
-    const optionEs = document.createElement('option');
-    optionEs.value = 'es';
-    optionEs.textContent = 'Espanol';
-    language.appendChild(optionEs);
 
     // Submit button
     const accessSubmitButton = document.createElement('button');
@@ -230,7 +199,6 @@ async function createAccessibilityForm(userData) {
         // Get the form data
         const data = new FormData(accessibilityForm);
         const font_size = data.get('font-size');
-        const language = data.get('language');
 
         try {
             // Send the data to the server
@@ -241,9 +209,8 @@ async function createAccessibilityForm(userData) {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken'),
                 },
-                body: JSON.stringify({ font_size, language })
+                body: JSON.stringify({ font_size })
             });
-
             if (response.ok) {
                 const successMessage = document.createElement('p');
                 successMessage.className = 'text-success';
