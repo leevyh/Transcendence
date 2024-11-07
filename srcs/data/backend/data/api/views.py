@@ -497,6 +497,8 @@ def updateSettings(request):
             #update user settings. If data[nickname] is not empty, update the nickname else let the nickname as it is
             if data['nickname']:
                 user.nickname = data['nickname']
+                if User_site.objects.filter(nickname=data['nickname']).exclude(username=username).exists():
+                    return JsonResponse({'error': 'Nickname already used'}, status=409)
             if data['email']:
                 if user.user_school:
                     return JsonResponse({'error': 'Cannot change email'}, status=403)
