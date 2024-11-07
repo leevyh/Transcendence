@@ -433,7 +433,7 @@ export function homeView(container) {
             return;
         }
         // If the password does not match the regex
-        else if (!passwordRegex.test(password)) {
+        else if (!passwordRegex.test(passwordRe)) {
             const errorMessage = document.createElement('p');
             errorMessage.className = 'text-danger';
             errorMessage.textContent = 'Password must be 8-12 characters, \
