@@ -475,6 +475,7 @@ export function homeView(container) {
                 modalRegister.classList.remove('ModalLoginBase-show');
                 setTimeout(() => {
                     modalRegister.style.display = 'none';
+                    modalRegister.setAttribute('aria-hidden', 'true'); // Masquer aux technologies d'assistance
                 }, 500);
                 modalRegister.classList.add('ModalLoginBase-show');
                 setTimeout(() => {
