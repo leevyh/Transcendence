@@ -471,22 +471,20 @@ export function homeView(container) {
             }
             else {
                 formRegister.reset();
-                // If the registration is successful, close the modal and open the login modal
-                modalRegister.classList.remove('ModalLoginBase-show');
+                modalRegister.classList.remove('modalRegisterBase-show');
+                modalRegister.setAttribute('aria-hidden', 'true'); // Masquer aux technologies d'assistance
                 setTimeout(() => {
                     modalRegister.style.display = 'none';
-                    modalRegister.setAttribute('aria-hidden', 'true'); // Masquer aux technologies d'assistance
                 }, 500);
-                modalRegister.classList.add('ModalLoginBase-show');
-                setTimeout(() => {
-                    modalRegister.style.display = 'flex';
-                }, 10);
 
                 // Display the login modal
+                modalLogin.style.display = 'block'; // Display the modal
+                modalLogin.setAttribute('aria-hidden', 'false'); // Rendre visible pour les technologies d'assistance
                 setTimeout(() => {
                     modalLogin.classList.add('ModalLoginBase-show');
-                    modalLogin.style.display = 'flex';
-                }, 500);
+                    modalLogin.setAttribute('tabindex', '-1'); // Make the modal focusable
+                    modalLogin.focus();
+                }, 10); // Slight delay for the animation effect
             }
         })
         .catch(error => {
