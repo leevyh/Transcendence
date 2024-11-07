@@ -163,7 +163,7 @@ function displayMessage(messageData, otherUser) {
                 // Hide the accept button
                 acceptButton.style.display = 'none';
             });
-        } else if (messageData.message == 'Game invite send to ' + messageData.user) {
+        } else if (messageData.message == 'Game invite sent to ' + messageData.user) {
             messageContent.innerHTML = `
                 ${messageData.sender.nickname} has invited you to play a game.
                 <button class="btn btn-success accept-button mt-2">Accept</button>
@@ -262,11 +262,11 @@ function handleWSMessage(receivedMessage, user) {
         }
     } else if (receivedMessage.type === 'game_invite') {
         if (receivedMessage.sender.nickname === receivedMessage.user) {
-            if (DEBUG) {console.log('Game invite sent to:', receivedMessage.receiver);}
+            if (DEBUG) {console.log('Game invite sent to:', receivedMessage.receiver.nickname);}
             const messageData = {
                 type: 'game_invite',
                 sender: receivedMessage.sender,
-                message: "Game invite sent to " + receivedMessage.receiver,
+                message: "Game invite sent to " + receivedMessage.receiver.nickname,
                 timestamp: receivedMessage.timestamp,
                 user: receivedMessage.user
             };
@@ -284,10 +284,6 @@ function handleWSMessage(receivedMessage, user) {
         }
     } else if (receivedMessage.type === 'accept_game_invite') {
         if (DEBUG) {console.log('Game invite accepted by:', receivedMessage.sender.nickname);}
-        // Display a message to say that the game invite has been accepted
-        const chatBody = document.querySelector('.chat-body');
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'd-flex justify-content-end mb-4 mr-2';
         const messageContent = document.createElement('p');
         messageContent.className = 'chat-msg position-relative accept-msg';
         messageContent.innerHTML = `
@@ -295,15 +291,26 @@ function handleWSMessage(receivedMessage, user) {
             <button class="btn btn-success join-button mt-2">Join the game</button>
             <span class="msg-time position-absolute end-0">${new Date(receivedMessage.timestamp).toLocaleTimeString()}</span>
         `;
-        // Create a button to join the game
+        if (receivedMessage.sender.nickname == receivedMessage.user) {
+            const chatBody = document.getElementById(`chat_user_${receivedMessage.receiver.id}`).querySelector('.chat-body');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'd-flex justify-content-end mb-4 mr-2';
+            messageDiv.appendChild(messageContent);
+            chatBody.appendChild(messageDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        } else {
+            const chatBody = document.getElementById(`chat_user_${receivedMessage.sender.id}`).querySelector('.chat-body');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'd-flex justify-content-end mb-4 mr-2';
+            messageDiv.appendChild(messageContent);
+            chatBody.appendChild(messageDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
         const joinButton = messageContent.querySelector('.join-button');
         joinButton.addEventListener('click', () => {
             if (DEBUG) {console.log('Join game');}
                 navigateTo('/pong');
         });
-        messageDiv.appendChild(messageContent);
-        chatBody.appendChild(messageDiv);
-        chatBody.scrollTop = chatBody.scrollHeight;
     }
 }
 
@@ -359,10 +366,10 @@ export function blockUnblockUser(user) {
 }
 
 function disableChat(user_id) {
-    if (DEBUG) {console.log('Chat disabled for user_id:', user_id);}
     const chatWindow_id = `chat_user_${user_id}`;
     // If the chatWindow exists, disable the chat
     if (document.getElementById(chatWindow_id)) {
+        if (DEBUG) {console.log('Chat disabled for user_id:', user_id);}
         const chatInput = document.getElementById(chatWindow_id).querySelector('.chat-input');
         const chatSendButton = document.getElementById(chatWindow_id).querySelector('.chat-send-button');
         const inviteGameButton = document.getElementById(chatWindow_id).querySelector('.invite-game-button');
@@ -376,7 +383,6 @@ function disableChat(user_id) {
 }
 
 function enableChat(user_id) {
-    if (DEBUG) {console.log('Chat enabled for user_id:', user_id);}
     const chatWindow_id = `chat_user_${user_id}`;
     // If the chatWindow exists, enable the chat
     if (document.getElementById(chatWindow_id)) {
