@@ -14,6 +14,7 @@ import {
 
 import { GameOn } from './pongSolo_game.js';
 export let canvas = 'null'
+export let inGameSolo = false;
 
 
 export async function pongSoloView(container) {
@@ -111,6 +112,10 @@ export async function pongSoloView(container) {
     stopGameButton.disabled = true; // Le bouton Stop est désactivé au début
     const notifications_div = await notifications();
     div.appendChild(notifications_div);
+}
+
+export function setIngameSolo(value) {
+    inGameSolo = value;
 }
 
 

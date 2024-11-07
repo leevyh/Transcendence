@@ -1,6 +1,8 @@
 export { canvas } from './pong.js'; // space game
 import {fetchUserGameSettings} from './menuPong.js';
 import { getCookie } from './utils.js';
+import { inGameSolo } from './pongSolo.js';
+import { setIngameSolo } from './pongSolo.js';
 
 
 // export var game; // statut game
@@ -21,7 +23,6 @@ const colorMapping = {
 	'green_light': '#58d68d',
 	'blue_light': '#85c1e9'
 };
-
 
 var game = {
 	player: {
@@ -76,7 +77,6 @@ export async function initialize_color() {
     await get_gameSettings_drawing();
 
 }
-
 
 export async function draw() {
     if (!document.getElementById('canvas')) {
@@ -191,6 +191,7 @@ export function ballMove() {
 export async function play() {
 
     if (GameOn == false)
+        setIngameSolo(true);
         GameOn = true;
     draw();
     movePlayerWithKeyboard();
@@ -216,7 +217,8 @@ export function reset() {
 }
 
 export function stop() {
-
+    setIngameSolo(false);
+    console.log('stop');
     cancelAnimationFrame(anim);
     reset();
 
@@ -238,31 +240,31 @@ export function handleKeyDown(event, startButton, stopButton) {
 		playerMovingUp = true;
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
 		playerMovingDown = true;
-    if (event.key === ' ' && GameOn == false) {
-        play();
-        spaceDown = true;
-        startButton.disabled = true;
-        stopButton.disabled = false;
-        GameOn = true;
-    }
-    else if (event.key === ' ' && GameOn == true )
-    {
-        spaceDown = true;
-        stop();
-        startButton.disabled = false;
-        stopButton.disabled = true;
-    }
-    if (event.key === "Escape")
-    {
-        escapeDown = true;
-        stop();
-        startButton.disabled = false;
-        stopButton.disabled = true;
-    }
-    if (event.key === ' ' && !GameOn) {
-        play();
-        GameOn = true;
-    }
+    // if (event.key === ' ' && GameOn == false) {
+    //     play();
+    //     spaceDown = true;
+    //     startButton.disabled = true;
+    //     stopButton.disabled = false;
+    //     GameOn = true;
+    // }
+    // else if (event.key === ' ' && GameOn == true )
+    // {
+    //     spaceDown = true;
+    //     stop();
+    //     startButton.disabled = false;
+    //     stopButton.disabled = true;
+    // }
+    // if (event.key === "Escape")
+    // {
+    //     escapeDown = true;
+    //     stop();
+    //     startButton.disabled = false;
+    //     stopButton.disabled = true;
+    // }
+    // if (event.key === ' ' && !GameOn) {
+    //     play();
+    //     GameOn = true;
+    // }
 }
 
 // Key Up
@@ -272,8 +274,8 @@ export function handleKeyUp(event) {
 		playerMovingUp = false;
 	if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S')
 		playerMovingDown = false;
-    if (event.key === "Escape")
-        escapeDown = false;
-    if (event.key === ' ')
-        spaceDown = false;
+    // if (event.key === "Escape")
+    //     escapeDown = false;
+    // if (event.key === ' ')
+    //     spaceDown = false;
 }

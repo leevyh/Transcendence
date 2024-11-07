@@ -10,7 +10,8 @@ import { homeView } from './views/home.js';
 import { notFoundView } from './views/404.js';
 import { friendsView } from './views/users.js';
 import { inGame, pongView, disconnectPlayer } from './views/pong.js';
-import { pongSoloView } from './views/pongSolo.js';
+import { pongSoloView, inGameSolo } from './views/pongSolo.js';
+import { stop } from './views/pongSolo_game.js';
 import { tournamentView } from './views/tournament.js';
 import { profileView } from './views/profile.js';
 import { callback42 } from './views/callback42.js';
@@ -76,6 +77,9 @@ async function router() {
     if (inGame) {
         if (DEBUG) {console.log('Disconnecting player in app');}
         disconnectPlayer();
+    }
+    if (inGameSolo){
+        stop();
     }
 
     // If the user is not authenticated and tries to access a private route, redirect to the home page
