@@ -28,11 +28,11 @@ SECRET_KEY = 'django-insecure-a4=7pox#i*0jn++(jt$dj+wrjp6+xucis%dy&pukjdj7qxan+4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['backend-django', 'localhost', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = ['backend-django', 'localhost', '0.0.0.0', '127.0.0.1', '10.32.7.12']
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8888', 'https://localhost:8888']
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8888', 'https://localhost:8888', 'https://10.32.7.12']
 
-CORS_ALLOWED_ORIGINS = ['http://localhost:8888', 'https://localhost:8888']
+CORS_ALLOWED_ORIGINS = ['http://localhost:8888', 'https://localhost:8888', 'https://10.32.7.12']
 
 AUTH_USER_MODEL = 'api.User_site'
 
