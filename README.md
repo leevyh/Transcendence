@@ -48,9 +48,9 @@ $ https://localhost:8888
 
 ## Description
 
-Ft_transcendence is a SPA website, where you can play the good and old pong game with a complete matchmaking, chat, friends and personalization system.
-It comes with a complete Elastic stack and Prometheus stack.
-Have a fun !
+Conception and development of a Single Page Application (SPA) website allowing users to play a tournament of the famous Pong game in real time, with user management, real-time chat and accessibility for visually impaired users. 
+<br>Technologies used: HTML, CSS, JavaScript, Bootstrap, Python, Django, Django Channels, PostgreSQL, Websockets, Docker and more !
+<br>It comes with a complete Elastic stack and Prometheus stack made by @ArthurCrespy
 
 ---
 <p align="center">
