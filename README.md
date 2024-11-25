@@ -1,5 +1,5 @@
 <h1 align="center">
-  ft_transcendence
+  ft_Transcendence
 </h1>
 
 <h3 align="center">Surprise</h3>
