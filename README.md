@@ -61,3 +61,5 @@ Conception and development of a Single Page Application (SPA) website allowing u
     <a href="https://github.com/Lazanett"> <img alt="Made by Lazanett" src="https://img.shields.io/badge/made%20by-Lazanett-blue"></a>
     <a href="https://42.fr"><img alt="42 Website" src="https://img.shields.io/badge/website-42.fr-blue"></a>
 </p>
+
+<img alt="Transcendence Preview" src="assets/Transcendence1 (1).gif"> </img>
